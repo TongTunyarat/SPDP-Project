@@ -33,7 +33,7 @@ public class ProjectController {
 
     @GetMapping("/")
     public String index() {
-        return "ProposalEva";  // ชื่อของไฟล์ HTML (ไม่ต้องใส่นามสกุล .html)
+        return "Login";  // ชื่อของไฟล์ HTML (ไม่ต้องใส่นามสกุล .html)
     }
 
     @GetMapping("/proposal-evaluation")
@@ -42,6 +42,10 @@ public class ProjectController {
         model.addAttribute("projects", projects);
         return "ProposalEva";  // Name of your Thymeleaf template
     }
+
+    @GetMapping("/periodSettings")
+    public String getPeriodSettings() { return "ScorePeriodSettings"; }
+
 
 //    @GetMapping("/projects")
 //    public List<Project> getAllProject() {
