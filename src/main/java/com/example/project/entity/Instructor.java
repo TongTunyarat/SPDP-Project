@@ -3,9 +3,11 @@ package com.example.project.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.List;
 
+@Data
 @Entity
 @Table(name = "instructor")
 public class Instructor {
@@ -27,17 +29,6 @@ public class Instructor {
     @JoinColumn(name = "user_username")
     @JsonManagedReference
     private Account account;
-
-//    @Column(name = "user_username")
-//    private String user_username;
-    @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL)
-    @JsonBackReference
-    private List<ProjectInstructorRole> projectInstructorRoles;
-
-
-    public Instructor() {
-
-    }
 
     public String getProfessorId() {
         return professorId;
@@ -77,14 +68,5 @@ public class Instructor {
 
     public void setAccount(Account account) {
         this.account = account;
-    }
-
-
-    public List<ProjectInstructorRole> getProjectInstructorRoles() {
-        return projectInstructorRoles;
-    }
-
-    public void setProjectInstructorRoles(List<ProjectInstructorRole> projectInstructorRoles) {
-        this.projectInstructorRoles = projectInstructorRoles;
     }
 }

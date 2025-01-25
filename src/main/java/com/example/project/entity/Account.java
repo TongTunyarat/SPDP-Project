@@ -1,20 +1,10 @@
 package com.example.project.entity;
 
-// <<<<<<< Nref
 import com.fasterxml.jackson.annotation.JsonBackReference;
-// =======
-// >>>>>>> Tong
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.Getter;
-import lombok.Setter;
 
-// <<<<<<< Nref
-import java.util.List;
-
-// =======
-// >>>>>>> Tong
-@Getter
+@Data
 @Entity
 @Table(name = "Account")
 public class Account {
@@ -26,32 +16,19 @@ public class Account {
     @Column(name = "user_password")
     private String password;
 
-// <<<<<<< Nref
-//     // https://www.baeldung.com/jpa-one-to-one
-//     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
-//     @JsonBackReference
-//     private Instructor instructors;
+    // https://www.baeldung.com/jpa-one-to-one
+    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private Instructor instructors;
 
-//     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
-//     @JsonBackReference
-//     private List<ProposalEvaluation> proposalEvaluations;
+    @OneToOne(mappedBy = "adminsAccount", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private Admin admins;
 
-//     @OneToMany(mappedBy = "accountEdit", cascade = CascadeType.ALL)
-//     @JsonBackReference
-//     private  List<ProposalEvaluation> proposalEvaluationsEdit;
+    public String getUsername() {
+        return username;
+    }
 
-//     public Account() {
-
-//     }
-
-
-// =======
-// >>>>>>> Tong
-//     public String getUsername() {
-//         return username;
-//     }
-
-// <<<<<<< Nref
     public void setUsername(String username) {
         this.username = username;
     }
@@ -72,26 +49,12 @@ public class Account {
         this.instructors = instructors;
     }
 
-    public List<ProposalEvaluation> getProposalEvaluations() {
-        return proposalEvaluations;
+    public Admin getAdmins() {
+        return admins;
     }
 
-    public void setProposalEvaluations(List<ProposalEvaluation> proposalEvaluations) {
-        this.proposalEvaluations = proposalEvaluations;
-    }
-
-    public List<ProposalEvaluation> getProposalEvaluationsEdit() {
-        return proposalEvaluationsEdit;
-    }
-
-    public void setProposalEvaluationsEdit(List<ProposalEvaluation> proposalEvaluationsEdit) {
-        this.proposalEvaluationsEdit = proposalEvaluationsEdit;
+    public void setAdmins(Admin admins) {
+        this.admins = admins;
     }
 }
-// =======
-//     public String getPassword() {
-//         return password;
-//     }
-// }
 
-// >>>>>>> Tong
