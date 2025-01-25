@@ -31,10 +31,16 @@ public class ProjectController {
         return projectService.getAllProjects();
     }
 
+// <<<<<<< Nai
+    @GetMapping("/")
+    public String index() {
+        return "Login";  // ชื่อของไฟล์ HTML (ไม่ต้องใส่นามสกุล .html)
+// =======
     @GetMapping("/admins/all")
     public List<Admin> getAllAdmins() {
         System.out.println(adminRepository.findAll());
         return adminRepository.findAll();
+// >>>>>>> Tong
     }
 
 //    @GetMapping("/")
@@ -53,6 +59,10 @@ public class ProjectController {
 //    public List<Project> getAllAdmins() {
 //        return projectService.getAllProjects();
 //    }
+
+    @GetMapping("/periodSettings")
+    public String getPeriodSettings() { return "ScorePeriodSettings"; }
+
 
 //    @GetMapping("/projects")
 //    public List<Project> getAllProject() {
