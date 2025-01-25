@@ -33,6 +33,11 @@ public class ProjectInstructorRole {
     @JsonManagedReference
     private Instructor instructor;
 
+    // map to defense eva
+    @OneToMany(mappedBy = "defenseInstructorId", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<DefenseEvaluation> defenseEvaluations;
+
 //    @OneToMany(mappedBy = "projectInstructorRole", cascade = CascadeType.ALL)
 //    @JsonBackReference
 //    private List<ProposalEvaluation> proposalEvaluations;
@@ -76,5 +81,13 @@ public class ProjectInstructorRole {
 
     public void setInstructor(Instructor instructor) {
         this.instructor = instructor;
+    }
+
+    public List<DefenseEvaluation> getDefenseEvaluations() {
+        return defenseEvaluations;
+    }
+
+    public void setDefenseEvaluations(List<DefenseEvaluation> defenseEvaluations) {
+        this.defenseEvaluations = defenseEvaluations;
     }
 }
