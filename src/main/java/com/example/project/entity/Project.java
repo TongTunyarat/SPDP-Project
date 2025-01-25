@@ -11,7 +11,10 @@ import lombok.Data;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+// <<<<<<< Nref
 import java.util.List;
+// =======
+// >>>>>>> Tong
 
 @Data
 @Entity
@@ -44,11 +47,15 @@ public class Project {
     private LocalDateTime editedOn;
 
     @ManyToOne
+// <<<<<<< Nref
     @JsonBackReference
+=======
+// >>>>>>> Tong
     @JoinColumn(name = "recorded_by", referencedColumnName = "user_username")
     private Account recordedBy;
 
     @ManyToOne
+// <<<<<<< Nref
     @JsonBackReference
     @JoinColumn(name = "edited_by", referencedColumnName = "user_username")
     private Account editedBy;
@@ -73,82 +80,116 @@ public class Project {
 
     }
 
+// =======
+    @JoinColumn(name = "edited_by", referencedColumnName = "user_username")
+    private Account editedBy;
+
+//     Getters สำหรับทุกฟิลด์
+// >>>>>>> Tong
     public String getProjectId() {
         return projectId;
     }
 
+// <<<<<<< Nref
     public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
 
+// =======
+// >>>>>>> Tong
     public String getProgram() {
         return program;
     }
 
+// <<<<<<< Nref
     public void setProgram(String program) {
         this.program = program;
     }
 
+// =======
+// >>>>>>> Tong
     public String getSemester() {
         return semester;
     }
 
+// <<<<<<< Nref
     public void setSemester(String semester) {
         this.semester = semester;
     }
 
+// =======
+// >>>>>>> Tong
     public String getProjectTitle() {
         return projectTitle;
     }
 
+// <<<<<<< Nref
     public void setProjectTitle(String projectTitle) {
         this.projectTitle = projectTitle;
     }
 
+// =======
+// >>>>>>> Tong
     public String getProjectCategory() {
         return projectCategory;
     }
 
+// <<<<<<< Nref
     public void setProjectCategory(String projectCategory) {
         this.projectCategory = projectCategory;
     }
 
+// =======
+// >>>>>>> Tong
     public String getProjectDescription() {
         return projectDescription;
     }
 
+// <<<<<<< Nref
     public void setProjectDescription(String projectDescription) {
         this.projectDescription = projectDescription;
     }
 
+// =======
+// >>>>>>> Tong
     public LocalDateTime getRecordedOn() {
         return recordedOn;
     }
 
+// <<<<<<< Nref
     public void setRecordedOn(LocalDateTime recordedOn) {
         this.recordedOn = recordedOn;
     }
 
+// =======
+// >>>>>>> Tong
     public LocalDateTime getEditedOn() {
         return editedOn;
     }
 
+// <<<<<<< Nref
     public void setEditedOn(LocalDateTime editedOn) {
         this.editedOn = editedOn;
     }
 
+// =======
+// >>>>>>> Tong
     public Account getRecordedBy() {
         return recordedBy;
     }
 
+// <<<<<<< Nref
     public void setRecordedBy(Account recordedBy) {
         this.recordedBy = recordedBy;
     }
 
+// =======
+// >>>>>>> Tong
     public Account getEditedBy() {
         return editedBy;
     }
 
+// <<<<<<< Nref
     public void setEditedBy(Account editedBy) {
         this.editedBy = editedBy;
     }
@@ -202,3 +243,8 @@ public class Project {
 //                '}';
 //    }
 }
+// =======
+// }
+
+
+// >>>>>>> Tong
