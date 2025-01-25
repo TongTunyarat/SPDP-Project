@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+
+</head>
+
+<body>
+<div class="container">
+    <div class="image-section"></div>
+    <div class="form-section">
+        <div class="form-container">
+            <h2>Sign in</h2>
+            <p>with your Mahidol University Accounts</p>
+            <form th:action="@{/login}" method="post">
+                <div class="input-group">
+                    <span class="icon"><i class="fas fa-envelope"></i></span>
+                    <input type="text" name="username" placeholder="Username" required>
+                </div>
+                <div class="input-group">
+                    <span class="icon"><i class="fas fa-lock"></i></span>
+                    <input type="password" name="password" placeholder="Password" id="password" required>
+                </div>
+                <a th:if="${error}" th:text="${error}" style="color: red;" ></a>
+
+                <!--                <a href="#">Forgot Password?</a>-->
+
+                <button type="submit" class="btn">Login</button>
+
+            </form>
+        </div>
+    </div>
+</div>
+</body>
+
+</html>
