@@ -49,10 +49,10 @@ public class DefenseEvaluation {
     private Project projectId;
 
     // instructor_id
-//    @ManyToOne
-//    @JoinColumn(name = "instructor_id")
-//    @JsonManagedReference
-//    private InstructorRole instructorId;
+    @ManyToOne
+    @JoinColumn(name = "instructor_id")
+    @JsonManagedReference
+    private ProjectInstructorRole defenseInstructorId;
 
 //
 //    @ManyToOne
@@ -114,5 +114,21 @@ public class DefenseEvaluation {
 
     public void setDefenseEvalScore(List<DefenseEvalScore> defenseEvalScore) {
         this.defenseEvalScore = defenseEvalScore;
+    }
+
+    public Project getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Project projectId) {
+        this.projectId = projectId;
+    }
+
+    public ProjectInstructorRole getDefenseInstructorId() {
+        return defenseInstructorId;
+    }
+
+    public void setDefenseInstructorId(ProjectInstructorRole defenseInstructorId) {
+        this.defenseInstructorId = defenseInstructorId;
     }
 }
