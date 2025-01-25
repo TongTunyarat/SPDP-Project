@@ -14,12 +14,21 @@ public class ProjectService {
     @Autowired
     private ProjectRepository projectRepository;
 
+// <<<<<<< Nref
+// //    public List<String> getAllProjectNames() {
+// //        List<Project> projects = projectRepository.findAll();
+// //        return projects.stream()
+// //                .map(Project::getProjectTitle)
+// //                .collect(Collectors.toList());
+// //    }
+// =======
     public List<String> getAllProjectNames() {
         List<Project> projects = projectRepository.findAll();
         return projects.stream()
                 .map(Project::getProjectTitle)
                 .collect(Collectors.toList());
     }
+// >>>>>>> Tong
 
     public List<Project> getAllProjects() {
         return projectRepository.findAll();
