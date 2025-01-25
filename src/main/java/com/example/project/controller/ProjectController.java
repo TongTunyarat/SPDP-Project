@@ -1,6 +1,8 @@
 package com.example.project.controller;
 
+import com.example.project.entity.Admin;
 import com.example.project.entity.Project;
+import com.example.project.repository.AdminRepository;
 import com.example.project.repository.ProjectRepository;
 import com.example.project.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 //@RestController
-@Controller
+@RestController
 public class ProjectController {
 
     @Autowired
@@ -21,27 +23,42 @@ public class ProjectController {
     @Autowired
     private ProjectRepository projectRepository;
 
-    @GetMapping("/projects")
-    public List<String> getAllProjectNames() {
-        return projectService.getAllProjectNames();
-    }
+    @Autowired
+    private AdminRepository adminRepository;
 
     @GetMapping("/projects/all")
     public List<Project> getAllProjects() {
         return projectService.getAllProjects();
     }
 
+// <<<<<<< Nai
     @GetMapping("/")
     public String index() {
         return "Login";  // ชื่อของไฟล์ HTML (ไม่ต้องใส่นามสกุล .html)
+// =======
+    @GetMapping("/admins/all")
+    public List<Admin> getAllAdmins() {
+        System.out.println(adminRepository.findAll());
+        return adminRepository.findAll();
+// >>>>>>> Tong
     }
 
-    @GetMapping("/proposal-evaluation")
-    public String getProposalEvaluation(Model model) {
-        List<Project> projects = projectRepository.findAll();  // Assuming you're using a repository for data access
-        model.addAttribute("projects", projects);
-        return "ProposalEva";  // Name of your Thymeleaf template
-    }
+//    @GetMapping("/")
+//    public String index() {
+//        return "ProposalEva";
+//    }
+//
+//    @GetMapping("/proposal-evaluation")
+//    public String getProposalEvaluation(Model model) {
+//        List<Project> projects = projectRepository.findAll();
+//        model.addAttribute("projects", projects);
+//        return "ProposalEva";
+//    }
+
+//    @GetMapping("/admin/all")
+//    public List<Project> getAllAdmins() {
+//        return projectService.getAllProjects();
+//    }
 
     @GetMapping("/periodSettings")
     public String getPeriodSettings() { return "ScorePeriodSettings"; }
@@ -62,7 +79,5 @@ public class ProjectController {
 //        System.out.println(projectService.getAllProjects());
 //        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(projectService.getAllProjects());
 //    }
-
-
 
 }

@@ -91,23 +91,6 @@ public class Project {
         return editedBy;
     }
 
-
-
-    // Optionally, override the toString method for better debugging
-//    @Override
-//    public String toString() {
-//        return "Project{" +
-//                "projectId='" + projectId + '\'' +
-//                ", program='" + program + '\'' +
-//                ", semester='" + semester + '\'' +
-//                ", projectTitle='" + projectTitle + '\'' +
-//                ", projectCategory='" + projectCategory + '\'' +
-//                ", projectDescription='" + projectDescription + '\'' +
-//                ", recordedOn=" + recordedOn +
-//                ", editedOn=" + editedOn +
-//                ", recordedBy=" + (recordedBy != null ? recordedBy.getUsername() : "N/A") +
-//                ", editedBy=" + (editedBy != null ? editedBy.getUsername() : "N/A") +
-//                '}';
-//    }
 }
+
 
