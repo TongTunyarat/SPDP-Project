@@ -78,4 +78,5 @@ public class Admin {
     public void setAdminsAccount(Account adminsAccount) {
         this.adminsAccount = adminsAccount;
     }
+
 }

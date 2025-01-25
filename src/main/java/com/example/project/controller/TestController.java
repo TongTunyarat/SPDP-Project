@@ -1,11 +1,7 @@
 package com.example.project.controller;
 
-import com.example.project.entity.Account;
-import com.example.project.entity.Admin;
-import com.example.project.entity.Instructor;
-import com.example.project.repository.AccountRepository;
-import com.example.project.repository.AdminRepository;
-import com.example.project.repository.InstructorRepository;
+import com.example.project.entity.*;
+import com.example.project.repository.*;
 import com.example.project.service.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,9 +24,33 @@ public class TestController {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private CriteriaRepository criteriaRepository;
+
+    @Autowired
+    private DefenseEvalScoreRepository defenseEvalScoreRepository;
+
+    @Autowired
+    private DefenseEvaluationRepository defenseEvaluationRepository;
+
+    @Autowired
+    private GradingDefenseEvaluationRepository gradingDefenseEvaluationRepository;
+
+    @Autowired
+    private ScoringPeriodsRepository scoringPeriodsRepository;
+
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
+    private ProjectInstructorRoleRepository projectInstructorRoleRepository;
+
+
+
+
     @GetMapping("/")
     public String index() {
-        return "Login";  // ชื่อของไฟล์ HTML (ไม่ต้องใส่นามสกุล .html)
+        return "Login";
     }
 
     @GetMapping("/admins/all")
@@ -48,7 +68,27 @@ public class TestController {
         return accountRepository.findAll();
     }
 
-    @GetMapping("/periodSettings")
-    public String getPeriodSettings() { return "ScorePeriodSettings"; }
+    @GetMapping("/criterias/all")
+    public List<Criteria> getAllCriterias() { return criteriaRepository.findAll(); }
+
+    @GetMapping("/defenseEvaScore/all")
+    public List<DefenseEvalScore> getAllDefenseScore() { return defenseEvalScoreRepository.findAll(); }
+
+    @GetMapping("/defenseEva/all")
+    public List<DefenseEvaluation> getAllDefenseEva() { return defenseEvaluationRepository.findAll(); }
+
+    @GetMapping("/defenseGrade/all")
+    public List<GradingDefenseEvaluation> getAllDefenseGrade() { return gradingDefenseEvaluationRepository.findAll(); }
+
+    @GetMapping("/period/all")
+    public List<ScoringPeriods> getAllScorePeriod() { return scoringPeriodsRepository.findAll(); }
+
+    @GetMapping("/project/all")
+    public List<Project> getAllProjects() {
+        return projectRepository.findAll();
+    }
+
+    @GetMapping("/instructorRole/all")
+    public List<ProjectInstructorRole> getAllProjectInstructorRole() { return projectInstructorRoleRepository.findAll(); }
 
 }

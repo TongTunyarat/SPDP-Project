@@ -25,6 +25,7 @@ public class Instructor {
     @Column(name = "email")
     private String email;
 
+    // user_username
     @OneToOne
     @JoinColumn(name = "user_username")
     @JsonManagedReference
