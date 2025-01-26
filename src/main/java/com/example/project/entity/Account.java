@@ -58,7 +58,16 @@ public class Account {
     @JsonBackReference
     private List<ProposalSchedule> proposaleditedBy;
 
-    
+    // map to PosterEvaluation ('recorded_by')
+    @OneToMany(mappedBy = "recordedByPoster", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<PosterEvaluation> posterEvaluations;
+
+    // map to PosterEvaluation ('edited_by')
+    @OneToMany(mappedBy = "editedByPoster", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<PosterEvaluation> posterEvaluationsEdit;
+
     public String getUsername() {
         return username;
     }
@@ -91,20 +100,6 @@ public class Account {
         this.admins = admins;
     }
 
-    public List<DefenseEvaluation> getDefenseRecordedBy() {
-        return defenseRecordedBy;
-    }
-
-    public void setDefenseRecordedBy(List<DefenseEvaluation> defenseRecordedBy) { this.defenseRecordedBy = defenseRecordedBy; }
-
-    public List<DefenseEvaluation> getDefenseEditedBy() {
-        return defenseEditedBy;
-    }
-
-    public void setDefenseEditedBy(List<DefenseEvaluation> defenseEditedBy) {
-        this.defenseEditedBy = defenseEditedBy;
-    }
-
     public List<Project> getRecordProjects() {
         return recordProjects;
     }
@@ -117,11 +112,33 @@ public class Account {
         return editProject;
     }
 
-    public void setEditProject(List<Project> editProject) { this.editProject = editProject; }
+    public void setEditProject(List<Project> editProject) {
+        this.editProject = editProject;
+    }
 
-    public List<ScoringPeriods> getScoringPeriods() { return scoringPeriods; }
+    public List<DefenseEvaluation> getDefenseRecordedBy() {
+        return defenseRecordedBy;
+    }
 
-    public void setScoringPeriods(List<ScoringPeriods> scoringPeriods) { this.scoringPeriods = scoringPeriods; }
+    public void setDefenseRecordedBy(List<DefenseEvaluation> defenseRecordedBy) {
+        this.defenseRecordedBy = defenseRecordedBy;
+    }
+
+    public List<DefenseEvaluation> getDefenseEditedBy() {
+        return defenseEditedBy;
+    }
+
+    public void setDefenseEditedBy(List<DefenseEvaluation> defenseEditedBy) {
+        this.defenseEditedBy = defenseEditedBy;
+    }
+
+    public List<ScoringPeriods> getScoringPeriods() {
+        return scoringPeriods;
+    }
+
+    public void setScoringPeriods(List<ScoringPeriods> scoringPeriods) {
+        this.scoringPeriods = scoringPeriods;
+    }
 
     public List<ProposalSchedule> getProposaleditedBy() {
         return proposaleditedBy;
@@ -129,6 +146,22 @@ public class Account {
 
     public void setProposaleditedBy(List<ProposalSchedule> proposaleditedBy) {
         this.proposaleditedBy = proposaleditedBy;
+    }
+
+    public List<PosterEvaluation> getPosterEvaluations() {
+        return posterEvaluations;
+    }
+
+    public void setPosterEvaluations(List<PosterEvaluation> posterEvaluations) {
+        this.posterEvaluations = posterEvaluations;
+    }
+
+    public List<PosterEvaluation> getPosterEvaluationsEdit() {
+        return posterEvaluationsEdit;
+    }
+
+    public void setPosterEvaluationsEdit(List<PosterEvaluation> posterEvaluationsEdit) {
+        this.posterEvaluationsEdit = posterEvaluationsEdit;
     }
 }
 

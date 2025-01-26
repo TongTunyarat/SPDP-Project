@@ -66,13 +66,10 @@ public class Project {
     @JsonBackReference
     private List<ProjectInstructorRole> projectInstructorRoles;
 
-    // TODO: ทำเพิ่ม
-    // map for proposal evaluation
     // map for poster evaluation
-    // map for proposal grading
-    // มี map ของตารางอื่นอีกด้วยต้องเช็คเพิ่ม
-
-
+    @OneToMany(mappedBy = "projectIdPoster", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<PosterEvaluation> posterEvaluations;
 
 //    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
 //    @JsonBackReference
@@ -185,6 +182,22 @@ public class Project {
 
     public void setGradingDefenseEvaluations(List<GradingDefenseEvaluation> gradingDefenseEvaluations) {
         this.gradingDefenseEvaluations = gradingDefenseEvaluations;
+    }
+
+    public List<ProjectInstructorRole> getProjectInstructorRoles() {
+        return projectInstructorRoles;
+    }
+
+    public void setProjectInstructorRoles(List<ProjectInstructorRole> projectInstructorRoles) {
+        this.projectInstructorRoles = projectInstructorRoles;
+    }
+
+    public List<PosterEvaluation> getPosterEvaluations() {
+        return posterEvaluations;
+    }
+
+    public void setPosterEvaluations(List<PosterEvaluation> posterEvaluations) {
+        this.posterEvaluations = posterEvaluations;
     }
 }
 
