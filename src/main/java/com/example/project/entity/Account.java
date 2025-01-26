@@ -119,4 +119,3 @@ public class Account {
 
     public void setScoringPeriods(List<ScoringPeriods> scoringPeriods) { this.scoringPeriods = scoringPeriods; }
 }
-

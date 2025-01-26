@@ -11,6 +11,11 @@
 
   <!-- Library -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <!-- Calendar -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
 </head>
 <body>
 <div class="container">
@@ -73,95 +78,238 @@
     </div>
 
     <div class="body-section">
+      <!-- Proposal Evaluation -->
       <div class="date-container">
-        <p> Proposal Evaluation (40%) </p>
-
-        <label for="start-date">Start Date:</label>
+        <p>Proposal Evaluation (40%)</p>
+        <label for="proposal-eval-start-date">Start Date:</label>
         <div class="input-group">
-          <input type="text" id="start-date" placeholder="Select Start Date">
-          <i class="fas fa-calendar-alt calendar-icon"></i>
+          <input type="text" id="proposal-eval-start-date" placeholder="Select Start Date">
+          <i class="fas fa-calendar-alt calendar-icon" data-target="proposal-eval-start-date"></i>
         </div>
         <br>
-        <label for="end-date"> End Date: </label>
+        <label for="proposal-eval-end-date">End Date:</label>
         <div class="input-group">
-          <input type="text" id="end-date" placeholder="Select End Date">
-          <i class="fas fa-calendar-alt calendar-icon"></i>
+          <input type="text" id="proposal-eval-end-date" placeholder="Select End Date">
+          <i class="fas fa-calendar-alt calendar-icon" data-target="proposal-eval-end-date"></i>
+        </div>
+        <div class="btn-container">
+          <button id="btn-save-proposal-eval" class="save-btn">Save</button>
         </div>
       </div>
 
+      <!-- Proposal Grade -->
       <div class="date-container">
-        <p> Proposal Grade (40%) </p>
-
-        <label for="start-date">Start Date:</label>
+        <p>Proposal Grade (60%)</p>
+        <label for="proposal-grade-start-date">Start Date:</label>
         <div class="input-group">
-          <input type="text" id="start-date" placeholder="Select Start Date">
-          <i class="fas fa-calendar-alt calendar-icon"></i>
+          <input type="text" id="proposal-grade-start-date" placeholder="Select Start Date">
+          <i class="fas fa-calendar-alt calendar-icon" data-target="proposal-grade-start-date"></i>
         </div>
         <br>
-        <label for="end-date"> End Date: </label>
+        <label for="proposal-grade-end-date">End Date:</label>
         <div class="input-group">
-          <input type="text" id="end-date" placeholder="Select End Date">
-          <i class="fas fa-calendar-alt calendar-icon"></i>
+          <input type="text" id="proposal-grade-end-date" placeholder="Select End Date">
+          <i class="fas fa-calendar-alt calendar-icon" data-target="proposal-grade-end-date"></i>
+        </div>
+        <div class="btn-container">
+          <button id="btn-save-proposal-grade" class="save-btn">Save</button>
         </div>
       </div>
 
+      <!-- Poster Evaluation -->
       <div class="date-container">
-        <p> Poster Evaluation (40%) </p>
-
-        <label for="start-date">Start Date:</label>
+        <p>Poster Evaluation</p>
+        <label for="poster-eval-start-date">Start Date:</label>
         <div class="input-group">
-          <input type="text" id="start-date" placeholder="Select Start Date">
-          <i class="fas fa-calendar-alt calendar-icon"></i>
+          <input type="text" id="poster-eval-start-date" placeholder="Select Start Date">
+          <i class="fas fa-calendar-alt calendar-icon" data-target="poster-eval-start-date"></i>
         </div>
         <br>
-        <label for="end-date"> End Date: </label>
+        <label for="poster-eval-end-date">End Date:</label>
         <div class="input-group">
-          <input type="text" id="end-date" placeholder="Select End Date">
-          <i class="fas fa-calendar-alt calendar-icon"></i>
+          <input type="text" id="poster-eval-end-date" placeholder="Select End Date">
+          <i class="fas fa-calendar-alt calendar-icon" data-target="poster-eval-end-date"></i>
+        </div>
+        <div class="btn-container">
+          <button id="btn-save-poster-eval" class="save-btn">Save</button>
         </div>
       </div>
 
+      <!-- Defense Evaluation -->
       <div class="date-container">
-        <p> Defense Evaluation (60%) </p>
-
-        <label for="start-date">Start Date:</label>
+        <p>Defense Evaluation (40%)</p>
+        <label for="defense-eval-start-date">Start Date:</label>
         <div class="input-group">
-          <input type="text" id="start-date" placeholder="Select Start Date">
-          <i class="fas fa-calendar-alt calendar-icon"></i>
+          <input type="text" id="defense-eval-start-date" placeholder="Select Start Date">
+          <i class="fas fa-calendar-alt calendar-icon" data-target="defense-eval-start-date"></i>
         </div>
         <br>
-        <label for="end-date"> End Date: </label>
+        <label for="defense-eval-end-date">End Date:</label>
         <div class="input-group">
-          <input type="text" id="end-date" placeholder="Select End Date">
-          <i class="fas fa-calendar-alt calendar-icon"></i>
+          <input type="text" id="defense-eval-end-date" placeholder="Select End Date">
+          <i class="fas fa-calendar-alt calendar-icon" data-target="defense-eval-end-date"></i>
+        </div>
+        <div class="btn-container">
+          <button id="btn-save-defense-eval" class="save-btn">Save</button>
         </div>
       </div>
 
+      <!-- Defense Grade -->
       <div class="date-container">
-        <p> Defense Grade (60%) </p>
-
-        <label for="start-date">Start Date:</label>
+        <p>Defense Grade (60%)</p>
+        <label for="defense-grade-start-date">Start Date:</label>
         <div class="input-group">
-          <input type="text" id="start-date" placeholder="Select Start Date">
-          <i class="fas fa-calendar-alt calendar-icon"></i>
+          <input type="text" id="defense-grade-start-date" placeholder="Select Start Date">
+          <i class="fas fa-calendar-alt calendar-icon" data-target="defense-grade-start-date"></i>
         </div>
         <br>
-        <label for="end-date"> End Date: </label>
+        <label for="defense-grade-end-date">End Date:</label>
         <div class="input-group">
-          <input type="text" id="end-date" placeholder="Select End Date">
-          <i class="fas fa-calendar-alt calendar-icon"></i>
+          <input type="text" id="defense-grade-end-date" placeholder="Select End Date">
+          <i class="fas fa-calendar-alt calendar-icon" data-target="defense-grade-end-date"></i>
+        </div>
+        <div class="btn-container">
+          <button id="btn-save-defense-grade" class="save-btn">Save</button>
         </div>
       </div>
 
-      <div class="btn-container">
-        <div class="btn-cancel"> Cancel </div>
-        <div class="btn-save"> Save </div>
-      </div>
-
+      <!-- Buttons -->
+<!--      <div class="btn-container">-->
+<!--        <div class="btn-cancel">Cancel</div>-->
+<!--        <div class="btn-save" id="btn-save">Save</div>-->
+<!--      </div>-->
     </div>
 
 
   </div>
+
+
 </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    // เปิดใช้งาน Flatpickr
+    flatpickr("input[type='text']", { dateFormat: "Y-m-d" });
+
+    // คลิกที่ไอคอนปฏิทินเพื่อเปิด Flatpickr สำหรับการเลือกวันที่
+    document.querySelectorAll(".calendar-icon").forEach((icon) => {
+      icon.addEventListener("click", (event) => {
+        const targetId = event.target.getAttribute("data-target");
+        if (targetId) {
+          document.getElementById(targetId).flatpickr().open();
+        }
+      });
+    });
+
+    // บันทึกข้อมูล
+    const handleSave = async (type, startDateId, endDateId) => {
+      const startDate = document.getElementById(startDateId).value;
+      const endDate = document.getElementById(endDateId).value;
+
+      if (!startDate || !endDate) {
+        alert("กรุณากรอกวันที่ให้ครบก่อนบันทึก!");
+        return;
+      }
+
+      const requestData = {
+        evaluationType: type,
+        startDate: startDate,
+        endDate: endDate,
+        recordedBy: "P.Ittipol", // TODO: ต้องดึงจาก user ที่ login
+      };
+
+      try {
+        console.log("Request Data:", requestData); // Debugging
+        const response = await fetch("/scoring-periods", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(requestData),
+        });
+
+        if (response.ok) {
+          alert(`บันทึกข้อมูลสำเร็จสำหรับ ${type}`);
+          const data = await response.json();
+          console.log("Response Data:", data);
+        } else {
+          throw new Error("เกิดข้อผิดพลาดในการบันทึก");
+        }
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    // ดึงข้อมูลมาจาก database
+    const fetchDates = async (evaluationType) => {
+      try {
+        const response = await fetch(`/scoring-periods/get-dates?evaluationType=${evaluationType}`);
+        if (response.ok) {
+          const data = await response.json();
+          return data;
+        } else {
+          throw new Error("ไม่สามารถดึงข้อมูลวันที่ได้");
+        }
+      } catch (error) {
+        console.error(error);
+        return null;
+      }
+    };
+
+    // แสดงวันที่ใน input box
+    const setDatesInInput = async (evaluationType, startDateId, endDateId) => {
+      const dates = await fetchDates(evaluationType);
+
+      if (dates && dates.startDate && dates.endDate) {
+        document.getElementById(startDateId).value = dates.startDate;
+        document.getElementById(endDateId).value = dates.endDate;
+      }
+    };
+
+    // กำหนดประเภทของการประเมิน
+    const evaluations = [
+      {
+        type: "Proposal Evaluation",
+        startDateId: "proposal-eval-start-date",
+        endDateId: "proposal-eval-end-date",
+        buttonId: "btn-save-proposal-eval",
+      },
+      {
+        type: "Proposal Grade",
+        startDateId: "proposal-grade-start-date",
+        endDateId: "proposal-grade-end-date",
+        buttonId: "btn-save-proposal-grade",
+      },
+      {
+        type: "Poster Evaluation",
+        startDateId: "poster-eval-start-date",
+        endDateId: "poster-eval-end-date",
+        buttonId: "btn-save-poster-eval",
+      },
+      {
+        type: "Defense Evaluation",
+        startDateId: "defense-eval-start-date",
+        endDateId: "defense-eval-end-date",
+        buttonId: "btn-save-defense-eval",
+      },
+      {
+        type: "Defense Grade",
+        startDateId: "defense-grade-start-date",
+        endDateId: "defense-grade-end-date",
+        buttonId: "btn-save-defense-grade",
+      },
+    ];
+
+    // เพิ่ม Event Listener สำหรับปุ่ม
+    evaluations.forEach(({ type, startDateId, endDateId, buttonId }) => {
+      const button = document.getElementById(buttonId);
+      if (button) {
+        button.addEventListener("click", () =>
+                handleSave(type, startDateId, endDateId)
+        );
+      }
+      setDatesInInput(type, startDateId, endDateId);
+    });
+  });
+</script>
 </body>
 </html>
