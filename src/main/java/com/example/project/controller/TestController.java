@@ -45,6 +45,15 @@ public class TestController {
     @Autowired
     private ProjectInstructorRoleRepository projectInstructorRoleRepository;
 
+    @Autowired
+    private ProposalSchedRepository proposalSchedRepository;
+
+    @Autowired
+    private DefenseSchedRepository defenseSchedRepository;
+
+    @Autowired
+    private RoomRepository roomRepository;
+
 
 
 
@@ -91,4 +100,12 @@ public class TestController {
     @GetMapping("/instructorRole/all")
     public List<ProjectInstructorRole> getAllProjectInstructorRole() { return projectInstructorRoleRepository.findAll(); }
 
+    @GetMapping("/proposalSchedule")
+    public List<ProposalSchedule> getAllProposalSchedule() {return proposalSchedRepository.findAll();}
+
+    @GetMapping("/defenseSchedule")
+    public List<DefenseSchedule> getAllDefenseSchedule() {return defenseSchedRepository.findAll();}
+
+    @GetMapping("/room")
+    public List<Room> getAllRooms() {return roomRepository.findAll();}
 }

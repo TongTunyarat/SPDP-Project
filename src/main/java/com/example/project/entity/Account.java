@@ -53,8 +53,12 @@ public class Account {
     @JsonBackReference
     private List<ScoringPeriods> scoringPeriods;
 
+    // map to ProposalSchedule ('edited_by')
+    @OneToMany(mappedBy = "editedBy", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<ProposalSchedule> proposaleditedBy;
 
-
+    
     public String getUsername() {
         return username;
     }
@@ -118,5 +122,13 @@ public class Account {
     public List<ScoringPeriods> getScoringPeriods() { return scoringPeriods; }
 
     public void setScoringPeriods(List<ScoringPeriods> scoringPeriods) { this.scoringPeriods = scoringPeriods; }
+
+    public List<ProposalSchedule> getProposaleditedBy() {
+        return proposaleditedBy;
+    }
+
+    public void setProposaleditedBy(List<ProposalSchedule> proposaleditedBy) {
+        this.proposaleditedBy = proposaleditedBy;
+    }
 }
 
