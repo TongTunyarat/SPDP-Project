@@ -25,10 +25,15 @@ public class Instructor {
     @Column(name = "email")
     private String email;
 
+    // user_username
     @OneToOne
     @JoinColumn(name = "user_username")
     @JsonManagedReference
     private Account account;
+
+    @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<ProjectInstructorRole> projectInstructorRoles;
 
     public String getProfessorId() {
         return professorId;
@@ -68,5 +73,13 @@ public class Instructor {
 
     public void setAccount(Account account) {
         this.account = account;
+    }
+
+    public List<ProjectInstructorRole> getProjectInstructorRoles() {
+        return projectInstructorRoles;
+    }
+
+    public void setProjectInstructorRoles(List<ProjectInstructorRole> projectInstructorRoles) {
+        this.projectInstructorRoles = projectInstructorRoles;
     }
 }
