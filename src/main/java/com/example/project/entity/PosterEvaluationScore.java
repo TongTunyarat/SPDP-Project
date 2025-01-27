@@ -29,6 +29,8 @@ public class PosterEvaluationScore {
     @JsonBackReference
     private PosterEvaluation posterEvaluation;
 
+
+
     public String getPosterEvaId() {
         return posterEvaId;
     }

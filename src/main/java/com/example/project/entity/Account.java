@@ -68,6 +68,16 @@ public class Account {
     @JsonBackReference
     private List<PosterEvaluation> posterEvaluationsEdit;
 
+    // map to ProposalEvaluation ('edited_by')
+    @OneToMany(mappedBy = "accountEdit", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<ProposalEvaluation> proposalEvaluationsEdit;
+
+    // map to ProposalEvaluation ('recorded_by')
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<ProposalEvaluation> proposalEvaluationsRecord;
+
     public String getUsername() {
         return username;
     }
@@ -162,6 +172,22 @@ public class Account {
 
     public void setPosterEvaluationsEdit(List<PosterEvaluation> posterEvaluationsEdit) {
         this.posterEvaluationsEdit = posterEvaluationsEdit;
+    }
+
+    public List<ProposalEvaluation> getProposalEvaluationsEdit() {
+        return proposalEvaluationsEdit;
+    }
+
+    public void setProposalEvaluationsEdit(List<ProposalEvaluation> proposalEvaluationsEdit) {
+        this.proposalEvaluationsEdit = proposalEvaluationsEdit;
+    }
+
+    public List<ProposalEvaluation> getProposalEvaluationsRecord() {
+        return proposalEvaluationsRecord;
+    }
+
+    public void setProposalEvaluationsRecord(List<ProposalEvaluation> proposalEvaluationsRecord) {
+        this.proposalEvaluationsRecord = proposalEvaluationsRecord;
     }
 }
 

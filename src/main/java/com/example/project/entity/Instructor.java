@@ -31,6 +31,10 @@ public class Instructor {
     @JsonManagedReference
     private Account account;
 
+    @OneToMany(mappedBy = "instructor", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<ProjectInstructorRole> projectInstructorRoles;
+
     public String getProfessorId() {
         return professorId;
     }
@@ -69,5 +73,13 @@ public class Instructor {
 
     public void setAccount(Account account) {
         this.account = account;
+    }
+
+    public List<ProjectInstructorRole> getProjectInstructorRoles() {
+        return projectInstructorRoles;
+    }
+
+    public void setProjectInstructorRoles(List<ProjectInstructorRole> projectInstructorRoles) {
+        this.projectInstructorRoles = projectInstructorRoles;
     }
 }

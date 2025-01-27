@@ -44,9 +44,9 @@ public class ProjectInstructorRole {
     private List<PosterEvaluation> posterEvaluations;
 
 
-//    @OneToMany(mappedBy = "projectInstructorRole", cascade = CascadeType.ALL)
-//    @JsonBackReference
-//    private List<ProposalEvaluation> proposalEvaluations;
+    @OneToMany(mappedBy = "projectInstructorRole", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<ProposalEvaluation> proposalEvaluations;
 
 
     public String getInstructorId() {
@@ -103,5 +103,13 @@ public class ProjectInstructorRole {
 
     public void setPosterEvaluations(List<PosterEvaluation> posterEvaluations) {
         this.posterEvaluations = posterEvaluations;
+    }
+
+    public List<ProposalEvaluation> getProposalEvaluations() {
+        return proposalEvaluations;
+    }
+
+    public void setProposalEvaluations(List<ProposalEvaluation> proposalEvaluations) {
+        this.proposalEvaluations = proposalEvaluations;
     }
 }

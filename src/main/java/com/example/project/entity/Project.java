@@ -75,17 +75,20 @@ public class Project {
 //    @JsonBackReference
 //    private List<ProjectInstructorRole> projectInstructorRoles;
 
-//    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-//    @JsonBackReference
-//    private List<StudentProject> studentProjects;
+    // map for studentProjects
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<StudentProject> studentProjects;
 
-//    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-//    @JsonBackReference
-//    private List<GradingProposalEvaluation> gradingProposalEvaluations;
+    // map for gradingProposalEvaluations
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<GradingProposalEvaluation> gradingProposalEvaluations;
 
-//    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-//    @JsonBackReference
-//    private List<ProposalEvaluation> proposalEvaluations;
+    // map for proposalEvaluations
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<ProposalEvaluation> proposalEvaluations;
 
 
     public String getProjectId() {
@@ -198,6 +201,30 @@ public class Project {
 
     public void setPosterEvaluations(List<PosterEvaluation> posterEvaluations) {
         this.posterEvaluations = posterEvaluations;
+    }
+
+    public List<StudentProject> getStudentProjects() {
+        return studentProjects;
+    }
+
+    public void setStudentProjects(List<StudentProject> studentProjects) {
+        this.studentProjects = studentProjects;
+    }
+
+    public List<ProposalEvaluation> getProposalEvaluations() {
+        return proposalEvaluations;
+    }
+
+    public void setProposalEvaluations(List<ProposalEvaluation> proposalEvaluations) {
+        this.proposalEvaluations = proposalEvaluations;
+    }
+
+    public List<GradingProposalEvaluation> getGradingProposalEvaluations() {
+        return gradingProposalEvaluations;
+    }
+
+    public void setGradingProposalEvaluations(List<GradingProposalEvaluation> gradingProposalEvaluations) {
+        this.gradingProposalEvaluations = gradingProposalEvaluations;
     }
 }
 
