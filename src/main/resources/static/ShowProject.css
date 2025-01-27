@@ -1,0 +1,148 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+body {
+    font-family: Inter;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+.content {
+    flex: 1;
+    margin-left: 280px;
+}
+
+.header-section {
+    background-color: #00796b;
+    color: white;
+    padding: 20px;
+    text-align: left;
+    font-size: 24px;
+    font-weight: bold;
+    height: 100px;
+}
+
+.table-container {
+    max-width: 1500px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: -60px;
+    margin-left: 32px;
+}
+
+h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.filter-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.filter-controls label {
+    font-size: 14px;
+    font-weight: bold;
+    margin-right: 4px;
+}
+
+.filter-controls select, .filter-controls input {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.filter-controls select {
+    margin-right: 48px;
+}
+
+.filter-controls input {
+    margin-left: auto;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+thead th {
+    background-color: #f4f4f4;
+    padding: 12px;
+    text-align: left;
+    border-bottom: 2px solid #ddd;
+}
+
+tbody td {
+    padding: 12px;
+    border-bottom: 1px solid #ddd;
+}
+
+.tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    color: white;
+}
+
+.tag.ict {
+    background-color: #77B1B1;
+}
+
+.tag.dst {
+    background-color: #f5d76e;
+}
+
+.role {
+    font-size: 14px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 4px;
+}
+
+.role.advisor {
+    background-color: #ff6f6f;
+    color: white;
+}
+
+.role.committee {
+    background-color: #6fa8ff;
+    color: white;
+}
+
+.evaluation {
+    font-size: 18px;
+}
+
+.evaluation.completed {
+    color: green;
+}
+
+.evaluation.pending {
+    color: gray;
+}
+
+.actions  {
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+
+td:nth-child(2) {
+    max-width: 200px;
+    word-wrap: break-word; /* ป้องกันการล้นของข้อความ */
+    white-space: normal; /* อนุญาตให้แบ่งบรรทัดได้ */
+}
+
+td:nth-child(4) ul, td:nth-child(5) ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+
+

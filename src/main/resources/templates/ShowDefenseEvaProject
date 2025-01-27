@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Defense Evaluation Project</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="sidebar-instructor.css">
+    <link rel="stylesheet" href="showproject.css">
+    <!-- Library -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+<div class="container">
+    <div class="sidebar">
+        <h2>ICT MAHIDOL</h2>
+        <ul>
+            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                     style="fill:#FFFFFF;">
+                <path
+                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+                </path>
+            </svg> Homepage </h4>
+            <li><a href="#">Dashboard</a></li>
+        </ul>
+
+        <ul>
+            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                <g fill="#ffffff" fill-rule="nonzero">
+                    <g transform="scale(5.33333,5.33333)">
+                        <path
+                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                        </path>
+                    </g>
+                </g>
+            </svg> Evaluation (40%) </h4>
+            <li><a href="/ShowProposalEvaProject.html">Proposal Evaluation</a></li>
+            <li><a href="/showPosterEvaProject.html">Poster Evaluation</a></li>
+            <li><a href="/showDefenseEvaProject.html">Defense Evaluation</a></li>
+        </ul>
+
+        <ul>
+            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                <g fill="#ffffff" fill-rule="nonzero">
+                    <g transform="scale(5.33333,5.33333)">
+                        <path
+                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                        </path>
+                    </g>
+                </g>
+            </svg> Grades (60%) </h4>
+            <li><a href="#">Proposal Grade</a></li>
+            <li><a href="#">Defense Grade</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+
+        <div class="header-section">
+            Defense Evaluation (40%)
+        </div>
+
+        <div class="table-container">
+            <h1>Projects</h1>
+            <div class="filter-controls">
+                <label id="program-select"><strong>Program:</strong></label>
+                <select name="program">
+                    <option value="all" selected>ALL</option>
+                    <option value="ict">ICT</option>
+                    <option value="dst">DST</option>
+                </select>
+                <label id="role-select"><strong>Role:</strong></label>
+                <select name="role">
+                    <option value="all" selected>ALL</option>
+                    <option value="advisor">Advisor</option>
+                    <option value="committee">Committee</option>
+                </select>
+                <input type="text" placeholder="Search">
+            </div>
+            <table>
+                <thead>
+                <tr>
+                    <th>Project ID</th>
+                    <th>Project Name</th>
+                    <th>Role</th>
+                    <th>Student ID</th>
+                    <th>Student Names</th>
+                    <th>Evaluation</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td><span class="tag ict">ICT</span> SP2024-01</td>
+                    <td>SPDP: Senior Project Management Digital Platform</td>
+                    <td><span class="role advisor">Advisor</span></td>
+                    <td>
+                        <ul>
+                            <li>6487002</li>
+                            <li>6487023</li>
+                            <li>6487069</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>Tunyarat Nithirunpattana</li>
+                            <li>Chanyanuch Nuangjumnong</li>
+                            <li>Neadnapa Tawontaweekul</li>
+                        </ul>
+                    </td>
+                    <td class="evaluation completed"><span class="material-icons">done</span> </td>
+                    <td class="actions"><span class="material-icons">edit</span></td>
+                </tr>
+                <tr>
+                    <td><span class="tag dst">DST</span> SP2024-01</td>
+                    <td>SPDP: Senior Project Management Digital Platform </td>
+                    <td><span class="role advisor">Advisor</span></td>
+                    <td>
+                        <ul>
+                            <li>6487002</li>
+                            <li>6487023</li>
+                            <li>6487069</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>Tunyarat Nithirunpattana</li>
+                            <li>Chanyanuch Nuangjumnong</li>
+                            <li>Neadnapa Tawontaweekul</li>
+                        </ul>
+                    </td>
+                    <td class="evaluation pending"><span class="material-icons">sync</span> </td>
+                    <td class="actions"><span class="material-icons">edit</span></td>
+                </tr>
+                <tr>
+                    <td><span class="tag dst">DST</span> SP2024-01</td>
+                    <td>SPDP: Senior Project Management Digital Platform</td>
+                    <td><span class="role committee">Committee</span></td>
+                    <td>
+                        <ul>
+                            <li>6487002</li>
+                            <li>6487023</li>
+                            <li>6487069</li>
+                        </ul>
+                    </td>
+                    <td>
+                        <ul>
+                            <li>Tunyarat Nithirunpattana</li>
+                            <li>Chanyanuch Nuangjumnong</li>
+                            <li>Neadnapa Tawontaweekul</li>
+                        </ul>
+                    </td>
+                    <td class="evaluation completed"><span class="material-icons">done</span> </td>
+                    <td class="actions"><span class="material-icons" onclick="editAction()">edit</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+</body>
+
+<script>
+    function editAction() {
+        alert("ไอคอนถูกคลิกแล้ว!");
+    }
+</script>
+
+</html>
