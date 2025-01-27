@@ -190,4 +190,3 @@ public class Account {
         this.proposalEvaluationsRecord = proposalEvaluationsRecord;
     }
 }
-
