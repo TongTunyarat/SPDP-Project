@@ -2,7 +2,6 @@ package com.example.project.controller;
 
 import com.example.project.entity.*;
 import com.example.project.repository.*;
-import com.example.project.service.TestService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,9 +13,6 @@ public class TestController {
 
     @Autowired
     private AdminRepository adminRepository;
-
-    @Autowired
-    private TestService testService;
 
     @Autowired
     private InstructorRepository instructorRepository;
@@ -45,7 +41,18 @@ public class TestController {
     @Autowired
     private ProjectInstructorRoleRepository projectInstructorRoleRepository;
 
+    @Autowired
+    private ProposalSchedRepository proposalSchedRepository;
 
+    @Autowired
+    private DefenseSchedRepository defenseSchedRepository;
+
+    @Autowired
+    private RoomRepository roomRepository;
+    @Autowired
+    private PosterEvaRepository posterEvaRepository;
+    @Autowired
+    private PosterEvaScoreRepository posterEvaScoreRepository;
 
 
     @GetMapping("/")
@@ -91,4 +98,18 @@ public class TestController {
     @GetMapping("/instructorRole/all")
     public List<ProjectInstructorRole> getAllProjectInstructorRole() { return projectInstructorRoleRepository.findAll(); }
 
+    @GetMapping("/proposalSchedule")
+    public List<ProposalSchedule> getAllProposalSchedule() {return proposalSchedRepository.findAll();}
+
+    @GetMapping("/defenseSchedule")
+    public List<DefenseSchedule> getAllDefenseSchedule() {return defenseSchedRepository.findAll();}
+
+    @GetMapping("/room")
+    public List<Room> getAllRooms() {return roomRepository.findAll();}
+
+    @GetMapping("/posterEva")
+    public List<PosterEvaluation> getAllPosterEva() {return posterEvaRepository.findAll();}
+
+    @GetMapping("/posterEva/score")
+    public List<PosterEvaluationScore> getAllPosterEvaScore() {return posterEvaScoreRepository.findAll();}
 }

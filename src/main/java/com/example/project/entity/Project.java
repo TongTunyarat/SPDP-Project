@@ -66,29 +66,29 @@ public class Project {
     @JsonBackReference
     private List<ProjectInstructorRole> projectInstructorRoles;
 
-    // TODO: ทำเพิ่ม
-    // map for proposal evaluation
     // map for poster evaluation
-    // map for proposal grading
-    // มี map ของตารางอื่นอีกด้วยต้องเช็คเพิ่ม
-
-
+    @OneToMany(mappedBy = "projectIdPoster", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<PosterEvaluation> posterEvaluations;
 
 //    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
 //    @JsonBackReference
 //    private List<ProjectInstructorRole> projectInstructorRoles;
 
-//    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-//    @JsonBackReference
-//    private List<StudentProject> studentProjects;
+    // map for studentProjects
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<StudentProject> studentProjects;
 
-//    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-//    @JsonBackReference
-//    private List<GradingProposalEvaluation> gradingProposalEvaluations;
+    // map for gradingProposalEvaluations
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<GradingProposalEvaluation> gradingProposalEvaluations;
 
-//    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
-//    @JsonBackReference
-//    private List<ProposalEvaluation> proposalEvaluations;
+    // map for proposalEvaluations
+    @OneToMany(mappedBy = "project", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<ProposalEvaluation> proposalEvaluations;
 
 
     public String getProjectId() {
@@ -185,6 +185,46 @@ public class Project {
 
     public void setGradingDefenseEvaluations(List<GradingDefenseEvaluation> gradingDefenseEvaluations) {
         this.gradingDefenseEvaluations = gradingDefenseEvaluations;
+    }
+
+    public List<ProjectInstructorRole> getProjectInstructorRoles() {
+        return projectInstructorRoles;
+    }
+
+    public void setProjectInstructorRoles(List<ProjectInstructorRole> projectInstructorRoles) {
+        this.projectInstructorRoles = projectInstructorRoles;
+    }
+
+    public List<PosterEvaluation> getPosterEvaluations() {
+        return posterEvaluations;
+    }
+
+    public void setPosterEvaluations(List<PosterEvaluation> posterEvaluations) {
+        this.posterEvaluations = posterEvaluations;
+    }
+
+    public List<StudentProject> getStudentProjects() {
+        return studentProjects;
+    }
+
+    public void setStudentProjects(List<StudentProject> studentProjects) {
+        this.studentProjects = studentProjects;
+    }
+
+    public List<ProposalEvaluation> getProposalEvaluations() {
+        return proposalEvaluations;
+    }
+
+    public void setProposalEvaluations(List<ProposalEvaluation> proposalEvaluations) {
+        this.proposalEvaluations = proposalEvaluations;
+    }
+
+    public List<GradingProposalEvaluation> getGradingProposalEvaluations() {
+        return gradingProposalEvaluations;
+    }
+
+    public void setGradingProposalEvaluations(List<GradingProposalEvaluation> gradingProposalEvaluations) {
+        this.gradingProposalEvaluations = gradingProposalEvaluations;
     }
 }
 

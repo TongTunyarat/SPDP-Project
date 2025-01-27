@@ -1,86 +1,133 @@
-//package com.example.project.entity;
-//
-//import jakarta.persistence.*;
-//import lombok.Getter;
-//
-//import java.time.LocalDateTime;
-//
-//@Getter
-//@Entity
-//@Table(name = "DefenseSchedule")
-//public class DefenseSchedule {
-//
-//    @Id
-//    @Column(name = "defense_schedule_id")
-//    private String defenseScheduleId;
-//
-//    @Column(name = "start_time")
-//    private LocalDateTime startTime;
-//
-//    @Column(name = "end_time")
-//    private LocalDateTime endTime;
-//
-//    @Column(name = "date")
-//    private String date;
-//
-//    @Column(name = "status")
-//    private String status;
-//
-//    @Column(name = "remark")
-//    private String remark;
-//
-//    @Column(name = "edited_on")
-//    private LocalDateTime editedOn;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "edited_by", referencedColumnName = "user_username")
-//    private Account editedBy;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "project_id", referencedColumnName = "project_id")
-//    private Project projectId;
-//
-//    @ManyToOne
-//    @JoinColumn(name = "room_number", referencedColumnName = "room_number")
-//    private Room roomNumber;
-//
-//    public String getDefenseScheduleId() {
-//        return defenseScheduleId;
-//    }
-//
-//    public LocalDateTime getStartTime() {
-//        return startTime;
-//    }
-//
-//    public LocalDateTime getEndTime() {
-//        return endTime;
-//    }
-//
-//    public String getDate() {
-//        return date;
-//    }
-//
-//    public String getStatus() {
-//        return status;
-//    }
-//
-//    public String getRemark() {
-//        return remark;
-//    }
-//
-//    public LocalDateTime getEditedOn() {
-//        return editedOn;
-//    }
-//
-//    public Account getEditedBy() {
-//        return editedBy;
-//    }
-//
-//    public Project getProjectId() {
-//        return projectId;
-//    }
-//
-//    public Room getRoomNumber() {
-//        return roomNumber;
-//    }
-//}
+package com.example.project.entity;
+
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
+import lombok.Getter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Entity
+@Table(name = "defenseschedule")
+public class DefenseSchedule {
+
+    @Id
+    @Column(name = "defense_schedule_id")
+    private String defenseScheduleId;
+
+    @Column(name = "start_time")
+    private LocalDateTime startTime;
+
+    @Column(name = "end_time")
+    private LocalDateTime endTime;
+
+    @Column(name = "date")
+    private String date;
+
+    @Column(name = "status")
+    private String status;
+
+    @Column(name = "remark")
+    private String remark;
+
+    @Column(name = "edited_on")
+    private LocalDateTime editedOn;
+
+    // edited_by
+    @ManyToOne
+    @JoinColumn(name = "edited_by")
+    @JsonManagedReference
+    private Account editedBy;
+
+    // project_id
+    @ManyToOne
+    @JoinColumn(name = "project_id")
+    @JsonManagedReference
+    private Project projectId;
+
+    // room_number
+    @ManyToOne
+    @JoinColumn(name = "room_number")
+    @JsonManagedReference
+    private Room roomNumber;
+
+    public String getDefenseScheduleId() {
+        return defenseScheduleId;
+    }
+
+    public void setDefenseScheduleId(String defenseScheduleId) {
+        this.defenseScheduleId = defenseScheduleId;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getRemark() {
+        return remark;
+    }
+
+    public void setRemark(String remark) {
+        this.remark = remark;
+    }
+
+    public LocalDateTime getEditedOn() {
+        return editedOn;
+    }
+
+    public void setEditedOn(LocalDateTime editedOn) {
+        this.editedOn = editedOn;
+    }
+
+    public Account getEditedBy() {
+        return editedBy;
+    }
+
+    public void setEditedBy(Account editedBy) {
+        this.editedBy = editedBy;
+    }
+
+    public Project getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Project projectId) {
+        this.projectId = projectId;
+    }
+
+    public Room getRoomNumber() {
+        return roomNumber;
+    }
+
+    public void setRoomNumber(Room roomNumber) {
+        this.roomNumber = roomNumber;
+    }
+}

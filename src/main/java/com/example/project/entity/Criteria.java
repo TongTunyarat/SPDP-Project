@@ -31,9 +31,14 @@ public class Criteria {
     @JsonBackReference
     private List<DefenseEvalScore> defenseEvalScore;
 
+
     // TODO: ทำเพิ่ม
     // map to poster eva score
+
     // map to proposal eva score
+    @OneToMany(mappedBy = "criteria", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<ProposalEvalScore> proposalEvalScores;
 
     public String getCriteriaId() {
         return criteriaId;
@@ -81,5 +86,13 @@ public class Criteria {
 
     public void setDefenseEvalScore(List<DefenseEvalScore> defenseEvalScore) {
         this.defenseEvalScore = defenseEvalScore;
+    }
+
+    public List<ProposalEvalScore> getProposalEvalScores() {
+        return proposalEvalScores;
+    }
+
+    public void setProposalEvalScores(List<ProposalEvalScore> proposalEvalScores) {
+        this.proposalEvalScores = proposalEvalScores;
     }
 }

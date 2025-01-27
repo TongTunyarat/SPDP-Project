@@ -53,7 +53,30 @@ public class Account {
     @JsonBackReference
     private List<ScoringPeriods> scoringPeriods;
 
+    // map to ProposalSchedule ('edited_by')
+    @OneToMany(mappedBy = "editedBy", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<ProposalSchedule> proposaleditedBy;
 
+    // map to PosterEvaluation ('recorded_by')
+    @OneToMany(mappedBy = "recordedByPoster", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<PosterEvaluation> posterEvaluations;
+
+    // map to PosterEvaluation ('edited_by')
+    @OneToMany(mappedBy = "editedByPoster", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<PosterEvaluation> posterEvaluationsEdit;
+
+    // map to ProposalEvaluation ('edited_by')
+    @OneToMany(mappedBy = "accountEdit", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<ProposalEvaluation> proposalEvaluationsEdit;
+
+    // map to ProposalEvaluation ('recorded_by')
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<ProposalEvaluation> proposalEvaluationsRecord;
 
     public String getUsername() {
         return username;
@@ -87,20 +110,6 @@ public class Account {
         this.admins = admins;
     }
 
-    public List<DefenseEvaluation> getDefenseRecordedBy() {
-        return defenseRecordedBy;
-    }
-
-    public void setDefenseRecordedBy(List<DefenseEvaluation> defenseRecordedBy) { this.defenseRecordedBy = defenseRecordedBy; }
-
-    public List<DefenseEvaluation> getDefenseEditedBy() {
-        return defenseEditedBy;
-    }
-
-    public void setDefenseEditedBy(List<DefenseEvaluation> defenseEditedBy) {
-        this.defenseEditedBy = defenseEditedBy;
-    }
-
     public List<Project> getRecordProjects() {
         return recordProjects;
     }
@@ -113,9 +122,71 @@ public class Account {
         return editProject;
     }
 
-    public void setEditProject(List<Project> editProject) { this.editProject = editProject; }
+    public void setEditProject(List<Project> editProject) {
+        this.editProject = editProject;
+    }
 
-    public List<ScoringPeriods> getScoringPeriods() { return scoringPeriods; }
+    public List<DefenseEvaluation> getDefenseRecordedBy() {
+        return defenseRecordedBy;
+    }
 
-    public void setScoringPeriods(List<ScoringPeriods> scoringPeriods) { this.scoringPeriods = scoringPeriods; }
+    public void setDefenseRecordedBy(List<DefenseEvaluation> defenseRecordedBy) {
+        this.defenseRecordedBy = defenseRecordedBy;
+    }
+
+    public List<DefenseEvaluation> getDefenseEditedBy() {
+        return defenseEditedBy;
+    }
+
+    public void setDefenseEditedBy(List<DefenseEvaluation> defenseEditedBy) {
+        this.defenseEditedBy = defenseEditedBy;
+    }
+
+    public List<ScoringPeriods> getScoringPeriods() {
+        return scoringPeriods;
+    }
+
+    public void setScoringPeriods(List<ScoringPeriods> scoringPeriods) {
+        this.scoringPeriods = scoringPeriods;
+    }
+
+    public List<ProposalSchedule> getProposaleditedBy() {
+        return proposaleditedBy;
+    }
+
+    public void setProposaleditedBy(List<ProposalSchedule> proposaleditedBy) {
+        this.proposaleditedBy = proposaleditedBy;
+    }
+
+    public List<PosterEvaluation> getPosterEvaluations() {
+        return posterEvaluations;
+    }
+
+    public void setPosterEvaluations(List<PosterEvaluation> posterEvaluations) {
+        this.posterEvaluations = posterEvaluations;
+    }
+
+    public List<PosterEvaluation> getPosterEvaluationsEdit() {
+        return posterEvaluationsEdit;
+    }
+
+    public void setPosterEvaluationsEdit(List<PosterEvaluation> posterEvaluationsEdit) {
+        this.posterEvaluationsEdit = posterEvaluationsEdit;
+    }
+
+    public List<ProposalEvaluation> getProposalEvaluationsEdit() {
+        return proposalEvaluationsEdit;
+    }
+
+    public void setProposalEvaluationsEdit(List<ProposalEvaluation> proposalEvaluationsEdit) {
+        this.proposalEvaluationsEdit = proposalEvaluationsEdit;
+    }
+
+    public List<ProposalEvaluation> getProposalEvaluationsRecord() {
+        return proposalEvaluationsRecord;
+    }
+
+    public void setProposalEvaluationsRecord(List<ProposalEvaluation> proposalEvaluationsRecord) {
+        this.proposalEvaluationsRecord = proposalEvaluationsRecord;
+    }
 }
