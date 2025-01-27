@@ -55,10 +55,10 @@ public class TestController {
     private PosterEvaScoreRepository posterEvaScoreRepository;
 
 
-    @GetMapping("/")
-    public String index() {
-        return "Login";
-    }
+//    @GetMapping("/")
+//    public String index() {
+//        return "Login";
+//    }
 
     @GetMapping("/admins/all")
     public List<Admin> getAllAdmins() {

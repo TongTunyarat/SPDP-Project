@@ -59,31 +59,31 @@ public class LoginController {
     }
 
 
-    // account
-    @GetMapping("/account/all")
-    public List<Account> getAllAccount(){
-        return loginService.getAllAccount();
-    }
-
-    @GetMapping("/account/admin")
-    public List<Account> getAdminAccount() {
-        return loginService.getAdminAccount();
-    }
-
-    @GetMapping("/account/instructor")
-    public List<Account> getInstructorAccount() {
-        return loginService.getInstructorAccount();
-    }
-
-    // admin
-    @GetMapping("/admin")
-    public List<Admin> getAdmin() {
-        return loginService.getAdmin();
-    }
-
-    // instructor
-    @GetMapping("/instructor")
-    public List<Instructor> getInstructor() {
-        return loginService.getInstructor();
-    }
+//    // account
+//    @GetMapping("/account/all")
+//    public List<Account> getAllAccount(){
+//        return loginService.getAllAccount();
+//    }
+//
+//    @GetMapping("/account/admin")
+//    public List<Account> getAdminAccount() {
+//        return loginService.getAdminAccount();
+//    }
+//
+//    @GetMapping("/account/instructor")
+//    public List<Account> getInstructorAccount() {
+//        return loginService.getInstructorAccount();
+//    }
+//
+//    // admin
+//    @GetMapping("/admin")
+//    public List<Admin> getAdmin() {
+//        return loginService.getAdmin();
+//    }
+//
+//    // instructor
+//    @GetMapping("/instructor")
+//    public List<Instructor> getInstructor() {
+//        return loginService.getInstructor();
+//    }
 }
