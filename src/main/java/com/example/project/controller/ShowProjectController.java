@@ -17,8 +17,6 @@ public class ShowProjectController {
     @Autowired
     private ShowProjectService showProjectService;
 
-//    @Autowired
-//    private ShowProjectService filterService;
 
     // รับข้อมูลจากผู้ใช้และทำการกรองข้อมูล
     @GetMapping("/filter")
