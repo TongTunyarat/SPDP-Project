@@ -134,7 +134,13 @@ tbody td {
 
 
 td:nth-child(2) {
-    max-width: 200px;
+    max-width: 150px;
+    word-wrap: break-word; /* ป้องกันการล้นของข้อความ */
+    white-space: normal; /* อนุญาตให้แบ่งบรรทัดได้ */
+}
+
+td:nth-child(4) , td:nth-child(5)  {
+    max-width: 150px;
     word-wrap: break-word; /* ป้องกันการล้นของข้อความ */
     white-space: normal; /* อนุญาตให้แบ่งบรรทัดได้ */
 }
@@ -144,5 +150,8 @@ td:nth-child(4) ul, td:nth-child(5) ul {
     padding: 0;
 }
 
-
+.student-id, .student-name {
+    display: inline-block; /* ทำให้ข้อความแสดงเป็นแนวนอน */
+    margin-right: 10px;     /* เพิ่มช่องว่างระหว่างข้อมูล */
+}
 

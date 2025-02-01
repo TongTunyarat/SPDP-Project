@@ -16,11 +16,11 @@ import java.util.List;
 //@RestController
 public class LoginController {
 
-    @GetMapping("/")
-    @ResponseBody
-    public String defaultPage() {
-        return ("Hello World");
-    }
+//    @GetMapping("/")
+//    @ResponseBody
+//    public String defaultPage() {
+//        return ("Hello World");
+//    }
 
     // login page (USE)
     @GetMapping("/login")

@@ -69,20 +69,27 @@
             <h1>Projects</h1>
             <div class="filter-controls">
                 <label id="program-select"><strong>Program:</strong></label>
-                <select name="program">
+                <select id="program-select-box" name="program">
                     <option value="all" selected>ALL</option>
                     <option value="ict">ICT</option>
                     <option value="dst">DST</option>
                 </select>
+
                 <label id="role-select"><strong>Role:</strong></label>
-                <select name="role">
+                <select id="role-select-box" name="role">
                     <option value="all" selected>ALL</option>
                     <option value="advisor">Advisor</option>
                     <option value="committee">Committee</option>
                 </select>
-                <input type="text" placeholder="Search">
+
+                <input id="search-keyword" type="text" placeholder="Search" />
+
+<!--                <button id="filter-btn" onclick="applyFilters()">Apply Filter</button>-->
             </div>
-            <table>
+
+<!--            <div id="filter-results"></div>-->
+
+            <table id="result-table">
                 <thead>
                 <tr>
                     <th>Project ID</th>
@@ -94,72 +101,89 @@
                     <th>Actions</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr>
-                    <td><span class="tag ict">ICT</span> SP2024-01</td>
-                    <td>SPDP: Senior Project Management Digital Platform</td>
-                    <td><span class="role advisor">Advisor</span></td>
-                    <td>
-                        <ul>
-                            <li>6487002</li>
-                            <li>6487023</li>
-                            <li>6487069</li>
-                        </ul>
-                    </td>
-                    <td>
-                        <ul>
-                            <li>Tunyarat Nithirunpattana</li>
-                            <li>Chanyanuch Nuangjumnong</li>
-                            <li>Neadnapa Tawontaweekul</li>
-                        </ul>
-                    </td>
-                    <td class="evaluation completed"><span class="material-icons">done</span> </td>
-                    <td class="actions"><span class="material-icons">edit</span></td>
-                </tr>
-                <tr>
-                    <td><span class="tag dst">DST</span> SP2024-01</td>
-                    <td>SPDP: Senior Project Management Digital Platform </td>
-                    <td><span class="role advisor">Advisor</span></td>
-                    <td>
-                        <ul>
-                            <li>6487002</li>
-                            <li>6487023</li>
-                            <li>6487069</li>
-                        </ul>
-                    </td>
-                    <td>
-                        <ul>
-                            <li>Tunyarat Nithirunpattana</li>
-                            <li>Chanyanuch Nuangjumnong</li>
-                            <li>Neadnapa Tawontaweekul</li>
-                        </ul>
-                    </td>
-                    <td class="evaluation pending"><span class="material-icons">sync</span> </td>
-                    <td class="actions"><span class="material-icons">edit</span></td>
-                </tr>
-                <tr>
-                    <td><span class="tag dst">DST</span> SP2024-01</td>
-                    <td>SPDP: Senior Project Management Digital Platform</td>
-                    <td><span class="role committee">Committee</span></td>
-                    <td>
-                        <ul>
-                            <li>6487002</li>
-                            <li>6487023</li>
-                            <li>6487069</li>
-                        </ul>
-                    </td>
-                    <td>
-                        <ul>
-                            <li>Tunyarat Nithirunpattana</li>
-                            <li>Chanyanuch Nuangjumnong</li>
-                            <li>Neadnapa Tawontaweekul</li>
-                        </ul>
-                    </td>
-                    <td class="evaluation completed"><span class="material-icons">done</span> </td>
-                    <td class="actions"><span class="material-icons" onclick="editAction()">edit</span></td>
-                </tr>
+                <tbody id="filter-results">
+                <!-- ผลลัพธ์จะถูกเติมที่นี่ -->
                 </tbody>
             </table>
+
+<!--            <table id="filter-results">-->
+<!--                <thead>-->
+<!--                <tr>-->
+<!--                    <th>Project ID</th>-->
+<!--                    <th>Project Name</th>-->
+<!--                    <th>Role</th>-->
+<!--                    <th>Student ID</th>-->
+<!--                    <th>Student Names</th>-->
+<!--                    <th>Evaluation</th>-->
+<!--                    <th>Actions</th>-->
+<!--                </tr>-->
+<!--                </thead>-->
+<!--                <tbody>-->
+<!--                <tr>-->
+<!--                    <td><span class="tag ict">ICT</span> SP2024-01</td>-->
+<!--                    <td>SPDP: Senior Project Management Digital Platform</td>-->
+<!--                    <td><span class="role advisor">Advisor</span></td>-->
+<!--                    <td>-->
+<!--                        <ul>-->
+<!--                            <li>6487002</li>-->
+<!--                            <li>6487023</li>-->
+<!--                            <li>6487069</li>-->
+<!--                        </ul>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                        <ul>-->
+<!--                            <li>Tunyarat Nithirunpattana</li>-->
+<!--                            <li>Chanyanuch Nuangjumnong</li>-->
+<!--                            <li>Neadnapa Tawontaweekul</li>-->
+<!--                        </ul>-->
+<!--                    </td>-->
+<!--                    <td class="evaluation completed"><span class="material-icons">done</span> </td>-->
+<!--                    <td class="actions"><span class="material-icons">edit</span></td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td><span class="tag dst">DST</span> SP2024-01</td>-->
+<!--                    <td>SPDP: Senior Project Management Digital Platform </td>-->
+<!--                    <td><span class="role advisor">Advisor</span></td>-->
+<!--                    <td>-->
+<!--                        <ul>-->
+<!--                            <li>6487002</li>-->
+<!--                            <li>6487023</li>-->
+<!--                            <li>6487069</li>-->
+<!--                        </ul>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                        <ul>-->
+<!--                            <li>Tunyarat Nithirunpattana</li>-->
+<!--                            <li>Chanyanuch Nuangjumnong</li>-->
+<!--                            <li>Neadnapa Tawontaweekul</li>-->
+<!--                        </ul>-->
+<!--                    </td>-->
+<!--                    <td class="evaluation pending"><span class="material-icons">sync</span> </td>-->
+<!--                    <td class="actions"><span class="material-icons">edit</span></td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td><span class="tag dst">DST</span> SP2024-01</td>-->
+<!--                    <td>SPDP: Senior Project Management Digital Platform</td>-->
+<!--                    <td><span class="role committee">Committee</span></td>-->
+<!--                    <td>-->
+<!--                        <ul>-->
+<!--                            <li>6487002</li>-->
+<!--                            <li>6487023</li>-->
+<!--                            <li>6487069</li>-->
+<!--                        </ul>-->
+<!--                    </td>-->
+<!--                    <td>-->
+<!--                        <ul>-->
+<!--                            <li>Tunyarat Nithirunpattana</li>-->
+<!--                            <li>Chanyanuch Nuangjumnong</li>-->
+<!--                            <li>Neadnapa Tawontaweekul</li>-->
+<!--                        </ul>-->
+<!--                    </td>-->
+<!--                    <td class="evaluation completed"><span class="material-icons">done</span> </td>-->
+<!--                    <td class="actions"><span class="material-icons" onclick="editAction()">edit</span></td>-->
+<!--                </tr>-->
+<!--                </tbody>-->
+<!--            </table>-->
         </div>
 
     </div>
@@ -167,10 +191,167 @@
 </div>
 </body>
 
+</html>
+
 <script>
+
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchData();
+        // ตั้งค่า event listeners สำหรับแต่ละฟิลด์ฟิลเตอร์ เพื่อดูการเปลี่ยนแปลง
+        document.getElementById('program-select-box').addEventListener('change', debounce(applyFilters, 100));
+        document.getElementById('role-select-box').addEventListener('change', debounce(applyFilters, 100));
+        document.getElementById('search-keyword').addEventListener('input', debounce(applyFilters, 100));
+    });
+
+    function debounce(func, delay) {
+        let timeout;
+        return function (...args) {
+            // เคลียร์ timeout ที่มีอยู่เดิมก่อน เพื่อหน่วงเวลาการเรียกฟังก์ชัน
+            clearTimeout(timeout);
+
+            // ตั้ง timeout ใหม่เพื่อเรียกฟังก์ชันหลังจากดีเลย์ที่กำหนด
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    function fetchData() {
+        // ตัวอย่าง URL ที่จะดึงข้อมูล
+        let url = 'http://localhost:8080/api/filter';  // เปลี่ยน URL ตามที่ใช้
+
+        // ทำการส่งคำขอไปยัง API หรือ Backend
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // แสดงผลข้อมูลที่ได้รับ
+                displayResults(data);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                document.getElementById('filter-results').innerHTML = "ไม่พบข้อมูล";
+            });
+    }
+
+    // ฟังก์ชันสำหรับดึงข้อมูลที่กรองตามการกรอกค่าของผู้ใช้
+    function applyFilters() {
+
+        // ดึงค่าจากฟิลด์ฟิลเตอร์
+        const program = document.getElementById('program-select-box').value;
+        const role = document.getElementById('role-select-box').value;
+        const searchKeyword = document.getElementById('search-keyword').value;
+
+        // สร้าง URL สำหรับส่งข้อมูลไปยัง API ที่ใช้กรองข้อมูล
+        let url = `http://localhost:8080/api/filter?program=${program}&role=${role}`;
+
+        // เพิ่มคำค้นหาถ้ามีการกรอก
+        if (searchKeyword) {
+            url += `&searchKeyword=${searchKeyword}`;
+        }
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log(data);
+
+                // เช็คว่า data เป็น Array หรือไม่
+                if (Array.isArray(data)) {
+                    displayResults(data); // หากเป็น Array ให้แสดงผล
+                } else if (data && data.studentName) {
+                    // หากเป็น Object เดียว ให้แปลงเป็น Array ก่อนแล้วแสดงผล
+                    displayResults([data]);
+                } else {
+                    // ถ้า data ไม่ใช่ Array หรือ Object ที่ต้องการ
+                    console.error("Expected an array or object, but received:", data);
+                    document.getElementById('filter-results').innerHTML = "No data found.";
+                }
+            })
+            .catch(error => {
+                console.error("Error fetching data:", error);
+                document.getElementById('filter-results').innerHTML = "An error occurred while fetching data.";
+            });
+    }
+
+
+    function displayResults(data) {
+        let tableBody = document.querySelector("tbody");
+        tableBody.innerHTML = "";  // เคลียร์ข้อมูลเก่า
+
+        if (Array.isArray(data)) {
+            // สร้าง object สำหรับเก็บข้อมูลที่มี projectId เดียวกัน
+            let groupedData = {};
+
+            data.forEach(item => {
+                // ตรวจสอบว่ามีข้อมูลใน groupedData สำหรับ projectId นี้อยู่แล้วหรือไม่
+                if (!groupedData[item.projectId]) {
+                    // ถ้ายังไม่มีข้อมูลของ projectId นี้ใน groupedData ให้สร้างใหม่
+                    groupedData[item.projectId] = {
+                        program: item.program,
+                        projectId: item.projectId,
+                        projectTitle: item.projectTitle,
+                        role: item.role,
+                        studentIds: [],
+                        studentNames: []
+                    };
+                }
+
+                // ตรวจสอบว่า studentId หรือ studentName นี้มีอยู่ในกลุ่มแล้วหรือไม่
+                if (!groupedData[item.projectId].studentIds.includes(item.studentId)) {
+                    // ถ้าไม่มี studentId นี้ในกลุ่ม ให้เพิ่มลงไป
+                    groupedData[item.projectId].studentIds.push(item.studentId);
+                }
+                if (!groupedData[item.projectId].studentNames.includes(item.studentName)) {
+                    // ถ้าไม่มี studentName นี้ในกลุ่ม ให้เพิ่มลงไป
+                    groupedData[item.projectId].studentNames.push(item.studentName);
+                }
+            });
+
+            // แสดงผลข้อมูลที่จัดกลุ่มแล้ว
+            for (let projectId in groupedData) {
+                let item = groupedData[projectId];
+                let row = document.createElement("tr");
+
+                // ตรวจสอบว่า studentIds และ studentNames เป็นอาร์เรย์หรือไม่ ก่อนใช้งาน .map()
+                const studentIdsList = Array.isArray(item.studentIds) ? item.studentIds : [item.studentIds];
+                const studentNamesList = Array.isArray(item.studentNames) ? item.studentNames : [item.studentNames];
+
+                // สร้างข้อมูลแต่ละเซลล์ในแถว
+                row.innerHTML = `
+                <td><span class="tag ${item.program.toLowerCase()}">${item.program}</span> ${item.projectId}</td>
+                <td>${item.projectTitle}</td>
+                <td><span class="role ${item.role.toLowerCase()}">${item.role}</span></td>
+                <td>
+                    <ul>
+                        ${studentIdsList.map(id => `<li>${id}</li>`).join('')}
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        ${studentNamesList.map(name => `<li>${name}</li>`).join('')}
+                    </ul>
+                </td>
+                <td class="evaluation completed"><span class="material-icons">done</span></td>
+                <td class="actions"><span class="material-icons" @onClick="editAction">edit</span></td>
+            `;
+
+                tableBody.appendChild(row);  // เพิ่มแถวในตาราง
+            }
+        } else {
+            console.error("Data is not an array:", data);
+            document.getElementById('filter-results').innerHTML = "No valid data to display.";
+        }
+    }
+
+    // Function to handle edit action (stub)
     function editAction() {
-        alert("ไอคอนถูกคลิกแล้ว!");
+        alert('Edit action triggered');
     }
 </script>
-
-</html>
