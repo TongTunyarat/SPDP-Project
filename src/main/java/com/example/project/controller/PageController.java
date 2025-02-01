@@ -5,12 +5,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
-@RequestMapping("/scoring-periods")
+//@RequestMapping("/scoring-periods")
 public class PageController {
 
-    @GetMapping
+    @GetMapping("/scoring-periods")
     public String index() {
         return "ScorePeriodSettings";
+    }
+
+    @GetMapping("/eva")
+    public String eva() {
+        return "ProposalEva";
     }
 }
 
