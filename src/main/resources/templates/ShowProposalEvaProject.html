@@ -81,13 +81,8 @@
                     <option value="advisor">Advisor</option>
                     <option value="committee">Committee</option>
                 </select>
-
                 <input id="search-keyword" type="text" placeholder="Search" />
-
-<!--                <button id="filter-btn" onclick="applyFilters()">Apply Filter</button>-->
             </div>
-
-<!--            <div id="filter-results"></div>-->
 
             <table id="result-table">
                 <thead>
@@ -105,85 +100,6 @@
                 <!-- ผลลัพธ์จะถูกเติมที่นี่ -->
                 </tbody>
             </table>
-
-<!--            <table id="filter-results">-->
-<!--                <thead>-->
-<!--                <tr>-->
-<!--                    <th>Project ID</th>-->
-<!--                    <th>Project Name</th>-->
-<!--                    <th>Role</th>-->
-<!--                    <th>Student ID</th>-->
-<!--                    <th>Student Names</th>-->
-<!--                    <th>Evaluation</th>-->
-<!--                    <th>Actions</th>-->
-<!--                </tr>-->
-<!--                </thead>-->
-<!--                <tbody>-->
-<!--                <tr>-->
-<!--                    <td><span class="tag ict">ICT</span> SP2024-01</td>-->
-<!--                    <td>SPDP: Senior Project Management Digital Platform</td>-->
-<!--                    <td><span class="role advisor">Advisor</span></td>-->
-<!--                    <td>-->
-<!--                        <ul>-->
-<!--                            <li>6487002</li>-->
-<!--                            <li>6487023</li>-->
-<!--                            <li>6487069</li>-->
-<!--                        </ul>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <ul>-->
-<!--                            <li>Tunyarat Nithirunpattana</li>-->
-<!--                            <li>Chanyanuch Nuangjumnong</li>-->
-<!--                            <li>Neadnapa Tawontaweekul</li>-->
-<!--                        </ul>-->
-<!--                    </td>-->
-<!--                    <td class="evaluation completed"><span class="material-icons">done</span> </td>-->
-<!--                    <td class="actions"><span class="material-icons">edit</span></td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td><span class="tag dst">DST</span> SP2024-01</td>-->
-<!--                    <td>SPDP: Senior Project Management Digital Platform </td>-->
-<!--                    <td><span class="role advisor">Advisor</span></td>-->
-<!--                    <td>-->
-<!--                        <ul>-->
-<!--                            <li>6487002</li>-->
-<!--                            <li>6487023</li>-->
-<!--                            <li>6487069</li>-->
-<!--                        </ul>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <ul>-->
-<!--                            <li>Tunyarat Nithirunpattana</li>-->
-<!--                            <li>Chanyanuch Nuangjumnong</li>-->
-<!--                            <li>Neadnapa Tawontaweekul</li>-->
-<!--                        </ul>-->
-<!--                    </td>-->
-<!--                    <td class="evaluation pending"><span class="material-icons">sync</span> </td>-->
-<!--                    <td class="actions"><span class="material-icons">edit</span></td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td><span class="tag dst">DST</span> SP2024-01</td>-->
-<!--                    <td>SPDP: Senior Project Management Digital Platform</td>-->
-<!--                    <td><span class="role committee">Committee</span></td>-->
-<!--                    <td>-->
-<!--                        <ul>-->
-<!--                            <li>6487002</li>-->
-<!--                            <li>6487023</li>-->
-<!--                            <li>6487069</li>-->
-<!--                        </ul>-->
-<!--                    </td>-->
-<!--                    <td>-->
-<!--                        <ul>-->
-<!--                            <li>Tunyarat Nithirunpattana</li>-->
-<!--                            <li>Chanyanuch Nuangjumnong</li>-->
-<!--                            <li>Neadnapa Tawontaweekul</li>-->
-<!--                        </ul>-->
-<!--                    </td>-->
-<!--                    <td class="evaluation completed"><span class="material-icons">done</span> </td>-->
-<!--                    <td class="actions"><span class="material-icons" onclick="editAction()">edit</span></td>-->
-<!--                </tr>-->
-<!--                </tbody>-->
-<!--            </table>-->
         </div>
 
     </div>
@@ -200,7 +116,7 @@
         // ตั้งค่า event listeners สำหรับแต่ละฟิลด์ฟิลเตอร์ เพื่อดูการเปลี่ยนแปลง
         document.getElementById('program-select-box').addEventListener('change', debounce(applyFilters, 100));
         document.getElementById('role-select-box').addEventListener('change', debounce(applyFilters, 100));
-        document.getElementById('search-keyword').addEventListener('input', debounce(applyFilters, 100));
+        // document.getElementById('search-keyword').addEventListener('input', debounce(applyFilters, 100));
     });
 
     function debounce(func, delay) {
@@ -215,8 +131,7 @@
     }
 
     function fetchData() {
-        // ตัวอย่าง URL ที่จะดึงข้อมูล
-        let url = 'http://localhost:8080/api/filter';  // เปลี่ยน URL ตามที่ใช้
+        let url = 'http://localhost:8080/api/filter';
 
         // ทำการส่งคำขอไปยัง API หรือ Backend
         fetch(url)
@@ -236,21 +151,15 @@
             });
     }
 
-    // ฟังก์ชันสำหรับดึงข้อมูลที่กรองตามการกรอกค่าของผู้ใช้
+    // ------ Script for filter function ------- //
     function applyFilters() {
 
         // ดึงค่าจากฟิลด์ฟิลเตอร์
         const program = document.getElementById('program-select-box').value;
         const role = document.getElementById('role-select-box').value;
-        const searchKeyword = document.getElementById('search-keyword').value;
 
         // สร้าง URL สำหรับส่งข้อมูลไปยัง API ที่ใช้กรองข้อมูล
         let url = `http://localhost:8080/api/filter?program=${program}&role=${role}`;
-
-        // เพิ่มคำค้นหาถ้ามีการกรอก
-        if (searchKeyword) {
-            url += `&searchKeyword=${searchKeyword}`;
-        }
 
         fetch(url)
             .then(response => {
@@ -280,6 +189,33 @@
             });
     }
 
+    // ------ Script for search function ------- //
+    document.getElementById('search-keyword').addEventListener('input', function () {
+        const searchTerm = this.value.toLowerCase();
+
+        // ดึงทุกแถวในตารางมา
+        const rows = document.querySelectorAll("#filter-results tr");
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+
+            // ตัวแปรที่ใช้ check ว่า row นี้มีข้อมูลที่ตรงกับคำค้นหามั้ย
+            let rowMatches = false;
+
+            // วนลูปผ่านทุกคอลัมน์ในแถว
+            cells.forEach(cell => {
+                if (cell.textContent.toLowerCase().includes(searchTerm)) {
+                    rowMatches = true;
+                }
+            });
+
+            // ถ้าแถวนี้มีข้อมูลที่ตรงกับคำค้นหาก็จะแสดงแถวนั้น
+            if (rowMatches) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
 
     function displayResults(data) {
         let tableBody = document.querySelector("tbody");
@@ -350,8 +286,4 @@
         }
     }
 
-    // Function to handle edit action (stub)
-    function editAction() {
-        alert('Edit action triggered');
-    }
 </script>
