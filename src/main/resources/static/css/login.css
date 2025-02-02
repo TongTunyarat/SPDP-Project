@@ -25,7 +25,7 @@ body {
 .image-section {
     flex: 0.5;
     background-size: cover;
-    background: url('ictFront.png') no-repeat center center/cover;
+    background: url('css/ictFront.png') no-repeat center center/cover;
     background-repeat: no-repeat;
     width: auto;
 }

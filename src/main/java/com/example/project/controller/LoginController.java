@@ -16,11 +16,11 @@ import java.util.List;
 //@RestController
 public class LoginController {
 
-    @GetMapping("/")
-    @ResponseBody
-    public String defaultPage() {
-        return ("Hello World");
-    }
+//    @GetMapping("/")
+//    @ResponseBody
+//    public String defaultPage() {
+//        return ("Hello World");
+//    }
 
     // login page (USE)
     @GetMapping("/login")
@@ -47,7 +47,7 @@ public class LoginController {
             if (role.equals("Admin")) {
                 return "AdminHome";
             } else if (role.equals("Instructor")) {
-                return "InstructorHome";
+                return "ShowProposalEvaProject";
             } else {
                 redirectAttributes.addFlashAttribute("error", "Invalid user role");
                 return "redirect:/login";
@@ -59,31 +59,31 @@ public class LoginController {
     }
 
 
-//    // account
-//    @GetMapping("/account/all")
-//    public List<Account> getAllAccount(){
-//        return loginService.getAllAccount();
-//    }
-//
-//    @GetMapping("/account/admin")
-//    public List<Account> getAdminAccount() {
-//        return loginService.getAdminAccount();
-//    }
-//
-//    @GetMapping("/account/instructor")
-//    public List<Account> getInstructorAccount() {
-//        return loginService.getInstructorAccount();
-//    }
-//
-//    // admin
-//    @GetMapping("/admin")
-//    public List<Admin> getAdmin() {
-//        return loginService.getAdmin();
-//    }
-//
-//    // instructor
-//    @GetMapping("/instructor")
-//    public List<Instructor> getInstructor() {
-//        return loginService.getInstructor();
-//    }
+    // account
+    @GetMapping("/account/all")
+    public List<Account> getAllAccount(){
+        return loginService.getAllAccount();
+    }
+
+    @GetMapping("/account/admin")
+    public List<Account> getAdminAccount() {
+        return loginService.getAdminAccount();
+    }
+
+    @GetMapping("/account/instructor")
+    public List<Account> getInstructorAccount() {
+        return loginService.getInstructorAccount();
+    }
+
+    // admin
+    @GetMapping("/admin")
+    public List<Admin> getAdmin() {
+        return loginService.getAdmin();
+    }
+
+    // instructor
+    @GetMapping("/instructor")
+    public List<Instructor> getInstructor() {
+        return loginService.getInstructor();
+    }
 }
