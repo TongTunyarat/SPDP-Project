@@ -31,7 +31,7 @@ public class SecurityConfig {
 //                        .ignoringRequestMatchers("/user/details")
 //                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/css/**", "/js/**").permitAll()
+                        .requestMatchers("/login", "/css/**", "/js/**", "/publicProjectDetail").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/instructor/**").hasRole("INSTRUCTOR")
                         .anyRequest().authenticated()
@@ -50,7 +50,7 @@ public class SecurityConfig {
                             if(roles.contains("ROLE_ADMIN")){
                                 response.sendRedirect("/admin/home");
                             } else if (roles.contains("ROLE_INSTRUCTOR")) {
-                                response.sendRedirect("/instructor/home");
+                                response.sendRedirect("/instructor/view");
                             }
                         })
                         .failureHandler((request, response, authentication) -> {

@@ -62,7 +62,7 @@ public class TestController {
 //        return "Login";
 //    }
 
-    @GetMapping("/adminsall")
+    @GetMapping("/admins/all")
     public List<Admin> getAllAdmins() {
         return adminRepository.findAll();
     }

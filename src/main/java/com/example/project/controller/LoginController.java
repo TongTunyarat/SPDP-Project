@@ -4,6 +4,7 @@ import com.example.project.DTO.InstructorProjectDTO;
 import com.example.project.DTO.StudentProjectDTO;
 import com.example.project.entity.ProjectInstructorRole;
 import com.example.project.service.ProjectService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -36,46 +37,52 @@ public class LoginController {
         return "login";
     }
 
+    @Autowired
     private final ProjectService projectService;
 
     public LoginController(ProjectService projectService) {
         this.projectService = projectService;
     }
 
-    // all project instructor
-    @GetMapping("/instructor/home")
-    public String defautlInstructor(Model model) {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Account username: " + authentication.getName());
-        System.out.println("Session ID: " + RequestContextHolder.currentRequestAttributes().getSessionId());
 
-        List<ProjectInstructorRole> projectInstructorRoles = projectService.getInstructorProject();
+        @GetMapping("/instructor/view")
+        public String viewInstructorProjectPage() {
+            return "ShowProposalEvaProject";
+        }
 
-        List<InstructorProjectDTO> instructorProjectDTOS = projectInstructorRoles.stream()
-                .map(i -> {
-                    // getStudentProjects -> studentProjects (Project Entity) => (StudentProjects Entity)
-                    List<StudentProjectDTO> studentProjectDTOS = i.getProjectIdRole().getStudentProjects().stream()
-                            .map(studentProject -> new StudentProjectDTO(
-                                    // getStudent() -> (StudentProjects Entity)
-                                    studentProject.getStudent().getStudentId(),
-                                    studentProject.getStudent().getStudentName()))
-                            .toList();
+        @GetMapping("/instructor/projectList")
+        @ResponseBody
+        public List<InstructorProjectDTO> getInstructorData() {
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            System.out.println("Account username: " + authentication.getName());
+            System.out.println("Session ID: " + RequestContextHolder.currentRequestAttributes().getSessionId());
 
-                    return new InstructorProjectDTO(
-                            // i -> projectInstructorRoles
-                            // i.getProjectIdRole() -> Project (ProjectInstructorRole Entity)
-                            // getProjectId() -> Id (Project Entity)
-                            i.getProjectIdRole().getProgram(),
-                            i.getProjectIdRole().getProjectId(),
-                            i.getProjectIdRole().getProjectTitle(),
-                            i.getRole(),
-                            studentProjectDTOS
-                    );
-                }).collect(Collectors.toList());
+            List<ProjectInstructorRole> projectInstructorRoles = projectService.getInstructorProject();
 
-        model.addAttribute("projects", instructorProjectDTOS);
-        return "ShowProposalEvaProject";
-    }
+            // return JSON
+            return projectInstructorRoles.stream()
+                    .map(i -> {
+                        // getStudentProjects -> studentProjects (Project Entity) => (StudentProjects Entity)
+                        List<StudentProjectDTO> studentProjectDTOS = i.getProjectIdRole().getStudentProjects().stream()
+                                .map(studentProject -> new StudentProjectDTO(
+                                        // getStudent() -> ใน (StudentProjects Entity)
+                                        studentProject.getStudent().getStudentId(),
+                                        studentProject.getStudent().getStudentName()))
+                                .toList();
+
+                        return new InstructorProjectDTO(
+                                // i -> projectInstructorRoles
+                                // i.getProjectIdRole() -> Project (ProjectInstructorRole Entity)
+                                // getProjectId() -> Id (Project Entity)
+                                i.getProjectIdRole().getProgram(),
+                                i.getProjectIdRole().getProjectId(),
+                                i.getProjectIdRole().getProjectTitle(),
+                                i.getRole(),
+                                studentProjectDTOS
+                        );
+                    }).collect(Collectors.toList());
+        }
+
 
 
     //https://medium.com/@CodeWithTech/understanding-securitycontext-and-securitycontextholder-in-spring-security-e8ec9c030819

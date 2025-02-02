@@ -100,32 +100,7 @@
                 </thead>
                 <tbody id="filter-results">
                 <!-- Record Result -->
-                <tr th:each="project : ${projects}">
-                    <td><span class="tag" th:text="${project.projectProgram.toLowerCase()}"></span><span th:text="${project.projectId}"></span></td>
-                    <td th:text="${project.projectTitle}"></td>
-                    <td><span class="role" th:text="${project.role.toLowerCase()}"></span></td>
-                    <div th:each="student : ${project.students}">
-                    <td>
-                        <ul>
-                            <li>
-                                <span th:text="${student.studentId}"></span>
-                            </li>
-                        </ul>
-                    </td>
-                    <td>
-                        <ul>
-                            <li>
-                                <span th:text="${student.studentName}"></span>
-                            </li>
-                        </ul>
-                    </td>
-                    </div>
-                    <td>
-                        <form th:action="@{/instructor/editEvaluation}" method="get">
-                            <input type="hidden" name="projectId" th:value="${project.projectId}">
-                            <button type="submit"><i style="font-size:24px" class="fa">&#xf044;</i></button>
-                        </form></td>
-                </tr>
+
                 </tbody>
             </table>
         </div>
@@ -140,7 +115,7 @@
 <script>
 
     document.addEventListener('DOMContentLoaded', function () {
-        // fetchData();
+        fetchData();
         // ตั้งค่า event listeners สำหรับแต่ละฟิลด์ฟิลเตอร์ เพื่อดูการเปลี่ยนแปลง
         document.getElementById('program-select-box').addEventListener('change', debounce(applyFilters, 100));
         document.getElementById('role-select-box').addEventListener('change', debounce(applyFilters, 100));
@@ -158,10 +133,42 @@
         };
     }
 
-    // function fetchData() {
-    //     let url = 'http://localhost:8080/api/filter';
+    function fetchData() {
+        let url = 'http://localhost:8080/instructor/projectList';
+
+        // ทำการส่งคำขอไปยัง API หรือ Backend
+        fetch(url)
+            .then(response => {
+                // console.log(response.json());
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Data: " + data);
+                // แสดงผลข้อมูลที่ได้รับ
+                displayResults(data);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                document.getElementById('filter-results').innerHTML = "ไม่พบข้อมูล";
+            });
+    }
+
+
+
+    // ------ Script for filter function ------- //
+    // function applyFilters() {
     //
-    //     // ทำการส่งคำขอไปยัง API หรือ Backend
+    //     // ดึงค่าจากฟิลด์ฟิลเตอร์
+    //     const program = document.getElementById('program-select-box').value;
+    //     const role = document.getElementById('role-select-box').value;
+    //
+    //     // สร้าง URL สำหรับส่งข้อมูลไปยัง API ที่ใช้กรองข้อมูล
+    //     let url = `http://localhost:8080/instructor/projectList?projectProgram=${program}&role=${role}`;
+    //         // http://localhost:8080/api/filter?program=${program}&role=${role}
+    //
     //     fetch(url)
     //         .then(response => {
     //             if (!response.ok) {
@@ -170,52 +177,25 @@
     //             return response.json();
     //         })
     //         .then(data => {
-    //             // แสดงผลข้อมูลที่ได้รับ
-    //             displayResults(data);
+    //             console.log(data);
+    //
+    //             // เช็คว่า data เป็น Array หรือไม่
+    //             if (Array.isArray(data)) {
+    //                 displayResults(data); // หากเป็น Array ให้แสดงผล
+    //             } else if (data && data.studentName) {
+    //                 // หากเป็น Object เดียว ให้แปลงเป็น Array ก่อนแล้วแสดงผล
+    //                 displayResults([data]);
+    //             } else {
+    //                 // ถ้า data ไม่ใช่ Array หรือ Object ที่ต้องการ
+    //                 console.error("Expected an array or object, but received:", data);
+    //                 document.getElementById('filter-results').innerHTML = "No data found.";
+    //             }
     //         })
     //         .catch(error => {
-    //             console.error('Error fetching data:', error);
-    //             document.getElementById('filter-results').innerHTML = "ไม่พบข้อมูล";
+    //             console.error("Error fetching data:", error);
+    //             document.getElementById('filter-results').innerHTML = "An error occurred while fetching data.";
     //         });
     // }
-
-    // ------ Script for filter function ------- //
-    function applyFilters() {
-
-        // ดึงค่าจากฟิลด์ฟิลเตอร์
-        const program = document.getElementById('program-select-box').value;
-        const role = document.getElementById('role-select-box').value;
-
-        // สร้าง URL สำหรับส่งข้อมูลไปยัง API ที่ใช้กรองข้อมูล
-        let url = `http://localhost:8080/api/filter?program=${program}&role=${role}`;
-
-        fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log(data);
-
-                // เช็คว่า data เป็น Array หรือไม่
-                if (Array.isArray(data)) {
-                    displayResults(data); // หากเป็น Array ให้แสดงผล
-                } else if (data && data.studentName) {
-                    // หากเป็น Object เดียว ให้แปลงเป็น Array ก่อนแล้วแสดงผล
-                    displayResults([data]);
-                } else {
-                    // ถ้า data ไม่ใช่ Array หรือ Object ที่ต้องการ
-                    console.error("Expected an array or object, but received:", data);
-                    document.getElementById('filter-results').innerHTML = "No data found.";
-                }
-            })
-            .catch(error => {
-                console.error("Error fetching data:", error);
-                document.getElementById('filter-results').innerHTML = "An error occurred while fetching data.";
-            });
-    }
 
     // ------ Script for search function ------- //
     document.getElementById('search-keyword').addEventListener('input', function () {
@@ -249,95 +229,101 @@
         let tableBody = document.querySelector("tbody");
         tableBody.innerHTML = "";  // เคลียร์ข้อมูลเก่า
 
-        if (Array.isArray(data)) {
-            // สร้าง object สำหรับเก็บข้อมูลที่มี projectId เดียวกัน
-            let groupedData = {};
-            data.forEach(item => {
-                // ตรวจสอบว่ามีข้อมูลใน groupedData สำหรับ projectId นี้อยู่แล้วหรือไม่
-                if (!groupedData[item.projectId]) {
-                    // ถ้ายังไม่มีข้อมูลของ projectId นี้ใน groupedData ให้สร้างใหม่
-                    groupedData[item.projectId] = {
-                        program: item.program,
-                        projectId: item.projectId,
-                        projectTitle: item.projectTitle,
-                        role: item.role,
-                        studentIds: [],
-                        studentNames: []
-                    };
-                }
+        // if (Array.isArray(data)) {
+        //     // สร้าง object สำหรับเก็บข้อมูลที่มี projectId เดียวกัน
+        //     let groupedData = {};
+        //     data.forEach(item => {
+        //         // ตรวจสอบว่ามีข้อมูลใน groupedData สำหรับ projectId นี้อยู่แล้วหรือไม่
+        //         console.log(item);
+        //         if (!groupedData[item.projectId]) {
+        //             // ถ้ายังไม่มีข้อมูลของ projectId นี้ใน groupedData ให้สร้างใหม่
+        //             groupedData[item.projectId] = {
+        //                 program: item.projectProgram,
+        //                 projectId: item.projectId,
+        //                 projectTitle: item.projectTitle,
+        //                 role: item.role,
+        //                 studentIds: [],
+        //                 studentNames: []
+        //             };
+        //         }
+        //
+        //         // ตรวจสอบว่า studentId หรือ studentName นี้มีอยู่ในกลุ่มแล้วหรือไม่
+        //         if (!groupedData[item.projectId].studentIds.includes(item.studentId)) {
+        //             // ถ้าไม่มี studentId นี้ในกลุ่ม ให้เพิ่มลงไป
+        //             groupedData[item.projectId].studentIds.push(item.studentId);
+        //         }
+        //         if (!groupedData[item.projectId].studentNames.includes(item.studentName)) {
+        //             // ถ้าไม่มี studentName นี้ในกลุ่ม ให้เพิ่มลงไป
+        //             groupedData[item.projectId].studentNames.push(item.studentName);
+        //         }
+        //     });
+        //
+        //     // แสดงผลข้อมูลที่จัดกลุ่มแล้ว
+        //     for (let projectId in groupedData) {
+        //         let item = groupedData[projectId];
+        //         let row = document.createElement("tr");
+        //
+        //         // ตรวจสอบว่า studentIds และ studentNames เป็นอาร์เรย์หรือไม่ ก่อนใช้งาน .map()
+        //         const studentIdsList = Array.isArray(item.studentIds) ? item.studentIds : [item.studentIds];
+        //         const studentNamesList = Array.isArray(item.studentNames) ? item.studentNames : [item.studentNames];
+        //
+        //     //     // สร้างข้อมูลแต่ละเซลล์ในแถว
+        //         row.innerHTML = `
+        //         <td><span class="tag ${item.program.toLowerCase()}">${item.program}</span> ${item.projectId}</td>
+        //         <td>${item.projectTitle}</td>
+        //         <td><span class="role ${item.role.toLowerCase()}">${item.role}</span></td>
+        //         <td>
+        //             <ul>
+        //                 ${studentIdsList.map(id => `<li>${id}</li>`).join('')}
+        //             </ul>
+        //         </td>
+        //         <td>
+        //             <ul>
+        //                 ${studentNamesList.map(name => `<li>${name}</li>`).join('')}
+        //             </ul>
+        //         </td>
+        //         <td class="evaluation completed"><span class="material-icons">done</span></td>
+        //         <td class="actions"><span class="material-icons" @onClick="editAction">edit</span></td>
+        //     `;
+        //
+        //         tableBody.appendChild(row);  // เพิ่มแถวในตาราง
+        //     }
+        // } else {
+        //     console.error("Data is not an array:", data);
+        //     document.getElementById('filter-results').innerHTML = "No valid data to display.";
+        // }
 
-                // ตรวจสอบว่า studentId หรือ studentName นี้มีอยู่ในกลุ่มแล้วหรือไม่
-                if (!groupedData[item.projectId].studentIds.includes(item.studentId)) {
-                    // ถ้าไม่มี studentId นี้ในกลุ่ม ให้เพิ่มลงไป
-                    groupedData[item.projectId].studentIds.push(item.studentId);
-                }
-                if (!groupedData[item.projectId].studentNames.includes(item.studentName)) {
-                    // ถ้าไม่มี studentName นี้ในกลุ่ม ให้เพิ่มลงไป
-                    groupedData[item.projectId].studentNames.push(item.studentName);
-                }
-            });
+        try {
+            data.forEach(project => {
+                console.log("Process project: "+ project);
 
-            // แสดงผลข้อมูลที่จัดกลุ่มแล้ว
-            for (let projectId in groupedData) {
-                let item = groupedData[projectId];
-                let row = document.createElement("tr");
+                const row = document.createElement('tr');
 
-                // ตรวจสอบว่า studentIds และ studentNames เป็นอาร์เรย์หรือไม่ ก่อนใช้งาน .map()
-                const studentIdsList = Array.isArray(item.studentIds) ? item.studentIds : [item.studentIds];
-                const studentNamesList = Array.isArray(item.studentNames) ? item.studentNames : [item.studentNames];
-
-            //     // สร้างข้อมูลแต่ละเซลล์ในแถว
-            //     row.innerHTML = `
-            //     <td><span class="tag ${item.program.toLowerCase()}">${item.program}</span> ${item.projectId}</td>
-            //     <td>${item.projectTitle}</td>
-            //     <td><span class="role ${item.role.toLowerCase()}">${item.role}</span></td>
-            //     <td>
-            //         <ul>
-            //             ${studentIdsList.map(id => `<li>${id}</li>`).join('')}
-            //         </ul>
-            //     </td>
-            //     <td>
-            //         <ul>
-            //             ${studentNamesList.map(name => `<li>${name}</li>`).join('')}
-            //         </ul>
-            //     </td>
-            //     <td class="evaluation completed"><span class="material-icons">done</span></td>
-            //     <td class="actions"><span class="material-icons" @onClick="editAction">edit</span></td>
-            // `;
-
-                // row.innerHTML = `
-                //                 <tr th:each="project : ${projects}">
-                //     <td><span class="tag" th:text="${project.projectProgram.toLowerCase()}"></span><span th:text="${project.projectId}"></span></td>
-                //     <td th:text="${project.projectTitle}"></td>
-                //     <td><span class="role" th:text="${project.role.toLowerCase()}"></span></td>
-                //     <td  th:each="student : ${project.students}">
-                //         <ul>
-                //             <li>
-                //                 <span th:text="${student.studentId}"></span>
-                //             </li>
-                //         </ul>
-                //     </td>
-                //     <td  th:each="student : ${project.students}">
-                //         <ul>
-                //             <li>
-                //                 <span th:text="${student.studentName}"></span>
-                //             </li>
-                //         </ul>
-                //     </td>
-                //     <td>
-                //     <form th:action="@{/instructor/editEvaluation}" method="get">
-                //         <input type="hidden" name="projectId" th:value="${project.projectId}">
-                //         <button type="submit"><i style="font-size:24px" class="fa">&#xf044;</i></button>
-                //     </form></td>
-                // </tr>
-            `;
-
-                tableBody.appendChild(row);  // เพิ่มแถวในตาราง
-            }
-        } else {
-            console.error("Data is not an array:", data);
+                row.innerHTML = `
+                 <td><span class="tag ${project.projectProgram.toLowerCase()}">${project.projectProgram}</span> ${project.projectId}</td>
+                <td>${project.projectTitle}</td>
+                <td><span class="role ${project.role.toLowerCase()}">${project.role}</span></td>
+                <td>
+                    <ul>
+                        ${project.students.map(id => `<li>${id.studentId}</li>`).join('')}
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        ${project.students.map(name => `<li>${name.studentName}</li>`).join('')}
+                    </ul>
+                </td>
+                <td class="evaluation completed"><span class="material-icons">done</span></td>
+                <td class="actions"><span class="material-icons" @onClick="editAction">edit</span></td>
+                `;
+                tableBody.appendChild(row);
+            })
+        } catch (error) {
+            console.error("Error display data in html: "+ error);
             document.getElementById('filter-results').innerHTML = "No valid data to display.";
         }
     }
 
 </script>
+
+
