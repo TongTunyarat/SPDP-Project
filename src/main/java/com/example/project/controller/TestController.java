@@ -49,18 +49,20 @@ public class TestController {
 
     @Autowired
     private RoomRepository roomRepository;
+
     @Autowired
     private PosterEvaRepository posterEvaRepository;
+
     @Autowired
     private PosterEvaScoreRepository posterEvaScoreRepository;
 
 
-    @GetMapping("/")
-    public String index() {
-        return "Login";
-    }
+//    @GetMapping("/")
+//    public String index() {
+//        return "Login";
+//    }
 
-    @GetMapping("/admins/all")
+    @GetMapping("/adminsall")
     public List<Admin> getAllAdmins() {
         return adminRepository.findAll();
     }

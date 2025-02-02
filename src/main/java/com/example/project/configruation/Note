@@ -1,0 +1,10 @@
+
+# ดึง user ที่ login
+Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+String username = authentication.getName();
+
+# ดึง role
+Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+for (GrantedAuthority authority : authorities) {
+    System.out.println("User Role: " + authority.getAuthority());
+}
