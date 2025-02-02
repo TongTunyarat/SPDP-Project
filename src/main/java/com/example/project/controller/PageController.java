@@ -18,4 +18,14 @@ public class PageController {
     public String showProject() {
         return "ShowProposalEvaProject";
     }
+
+    @GetMapping("/give-eva-score")
+    public String giveEvaScore() {
+        return "GivePropEvaScore";
+    }
+
+    @GetMapping("/give-grade-score")
+    public String giveGradeScore() {
+        return "GivePropGradeScore";
+    }
 }

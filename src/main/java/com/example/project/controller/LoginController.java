@@ -86,4 +86,5 @@ public class LoginController {
     public List<Instructor> getInstructor() {
         return loginService.getInstructor();
     }
+
 }
