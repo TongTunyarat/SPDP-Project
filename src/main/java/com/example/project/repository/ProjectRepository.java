@@ -1,6 +1,7 @@
 package com.example.project.repository;
 
 
+import com.example.project.DTO.FilterResponseDTO;
 import com.example.project.entity.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,11 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "LOWER(p.projectTitle) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(p.projectDescription) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Project> searchProjects(@Param("keyword") String keyword);
+
+//    List<FilterResponseDTO> filteredProjects(
+//            @Param("program") String program,
+//            @Param("role") String role
+//    );
 
     Project findByProjectId(String projectId);
 }

@@ -18,16 +18,9 @@ public class ShowProjectService {
     @Autowired
     private ProjectRepository projectRepository;
 
-    public List<FilterResponseDTO> getFilteredData(String program, String role ) {
-        // ตรวจสอบค่า program, role  ที่ได้รับจากผู้ใช้
-        return filterRepository.findFilteredData(
-
-                // ถ้า program ไม่ใช่ "all", กรองตาม program, ถ้าเป็น "all" ส่งค่า null
-                program != null && !program.equalsIgnoreCase("all") ? program : null,
-
-                // ถ้า role ไม่ใช่ "all", กรองตาม role, ถ้าเป็น "all" ส่งค่า null
-                role != null && !role.equalsIgnoreCase("all") ? role : null
-        );
+    public List<FilterResponseDTO> filterData(String role, String program) {
+        System.out.println("Filter Word Role: " + role + "\nProgram: " + program);
+        return filterRepository.findFilteredData(role, program);
     }
 
     public List<Project> processWord(String word) {

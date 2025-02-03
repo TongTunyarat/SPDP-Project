@@ -71,19 +71,20 @@
         <div class="table-container">
             <h1>Projects</h1>
             <div class="filter-controls">
-                <label id="program-select"><strong>Program:</strong></label>
+                <label id="program-select"><strong>Program:</strong>
                 <select id="program-select-box" name="program">
                     <option value="all" selected>ALL</option>
                     <option value="ict">ICT</option>
                     <option value="dst">DST</option>
                 </select>
-
-                <label id="role-select"><strong>Role:</strong></label>
+                </label>
+                <label id="role-select"><strong>Role:</strong>
                 <select id="role-select-box" name="role">
                     <option value="all" selected>ALL</option>
                     <option value="advisor">Advisor</option>
                     <option value="committee">Committee</option>
                 </select>
+                </label>
                 <input id="search-keyword" type="text" placeholder="Search" />
             </div>
 
@@ -115,25 +116,6 @@
 
 <script>
 
-    document.addEventListener('DOMContentLoaded', function () {
-        fetchData();
-        // ตั้งค่า event listeners สำหรับแต่ละฟิลด์ฟิลเตอร์ เพื่อดูการเปลี่ยนแปลง
-        document.getElementById('program-select-box').addEventListener('change', debounce(applyFilters, 100));
-        document.getElementById('role-select-box').addEventListener('change', debounce(applyFilters, 100));
-        // document.getElementById('search-keyword').addEventListener('input', debounce(applyFilters, 100));
-    });
-
-    function debounce(func, delay) {
-        let timeout;
-        return function (...args) {
-            // เคลียร์ timeout ที่มีอยู่เดิมก่อน เพื่อหน่วงเวลาการเรียกฟังก์ชัน
-            clearTimeout(timeout);
-
-            // ตั้ง timeout ใหม่เพื่อเรียกฟังก์ชันหลังจากดีเลย์ที่กำหนด
-            timeout = setTimeout(() => func.apply(this, args), delay);
-        };
-    }
-
     function fetchData() {
         // JSON information fetch project list
         let url = 'http://localhost:8080/instructor/projectList';
@@ -158,9 +140,58 @@
             });
     }
 
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchData();
+        // ตั้งค่า event listeners สำหรับแต่ละฟิลด์ฟิลเตอร์ เพื่อดูการเปลี่ยนแปลง
+        document.getElementById('program-select-box').addEventListener('change', debounce(applyFilters, 100));
+        document.getElementById('role-select-box').addEventListener('change', debounce(applyFilters, 100));
+        // document.getElementById('search-keyword').addEventListener('input', debounce(applyFilters, 100));
+    });
 
+    function debounce(func, delay) {
+        let timeout;
+        return function (...args) {
+            // เคลียร์ timeout ที่มีอยู่เดิมก่อน เพื่อหน่วงเวลาการเรียกฟังก์ชัน
+            clearTimeout(timeout);
+
+            // ตั้ง timeout ใหม่เพื่อเรียกฟังก์ชันหลังจากดีเลย์ที่กำหนด
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
 
     // ------ Script for filter function ------- //
+    function applyFilters() {
+        const programFilter = document.getElementById('program-select-box')?.value;
+        const roleFilter = document.getElementById('role-select-box')?.value;
+
+        const rows = document.querySelectorAll("#filter-results tr");
+        console.log(programFilter)
+        console.log(roleFilter)
+
+        rows.forEach(row => {
+            const programCell = row.querySelector('.tag');
+            const roleCell = row.querySelector('.role');
+
+            let matches = true;
+
+            // กรอง Program: ถ้าเลือก "All" จะไม่กรอง
+            if (matches && programFilter !== 'all' && programCell) {
+                matches = programCell.classList.contains(programFilter);
+                console.log("Filtered Program : " + programFilter)
+            }
+
+            // กรอง Role: ถ้าเลือก "All" จะไม่กรอง
+            if (matches && roleFilter !== 'all' && roleCell) {
+                matches = roleCell.classList.contains(roleFilter);
+                console.log("Filtered Role : " + roleFilter)
+            }
+
+            // แสดงหรือซ่อนแถว
+            row.style.display = matches ? '' : 'none';
+        });
+    }
+
+    // // ------ Script for filter function ------- //
     // function applyFilters() {
     //
     //     // ดึงค่าจากฟิลด์ฟิลเตอร์
@@ -168,8 +199,9 @@
     //     const role = document.getElementById('role-select-box').value;
     //
     //     // สร้าง URL สำหรับส่งข้อมูลไปยัง API ที่ใช้กรองข้อมูล
-    //     let url = `http://localhost:8080/instructor/projectList?projectProgram=${program}&role=${role}`;
+    //     let url = `http://localhost:8080/api/filter?program=${program}&role=${role}`;
     //         // http://localhost:8080/api/filter?program=${program}&role=${role}
+    //     // http://localhost:8080/instructor/projectList?projectProgram=${program}&role=${role}
     //
     //     fetch(url)
     //         .then(response => {

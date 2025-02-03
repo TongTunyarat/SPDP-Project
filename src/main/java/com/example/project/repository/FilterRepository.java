@@ -21,6 +21,7 @@ public interface FilterRepository extends JpaRepository<Project, Long> {
             "JOIN ProjectInstructorRole pir ON pir.projectIdRole.projectId = p.projectId " +
             "WHERE (:program IS NULL OR p.program = :program) " +
             "AND (:role IS NULL OR pir.role = :role) ")
+
     List<FilterResponseDTO> findFilteredData(
             @Param("program") String program,
             @Param("role") String role

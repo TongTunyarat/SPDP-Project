@@ -26,7 +26,7 @@ public class ShowProjectController {
     ) {
         try {
             // เรียกใช้ Service เพื่อดึงข้อมูลที่กรองแล้ว
-            List<FilterResponseDTO> response = showProjectService.getFilteredData(program, role);
+            List<FilterResponseDTO> response = showProjectService.filterData(program, role);
 
             // ส่งข้อมูลที่ได้จาก Service กลับไปยัง Frontend
             return ResponseEntity.ok(response);
