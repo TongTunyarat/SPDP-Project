@@ -17,6 +17,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -75,6 +76,21 @@ public class ProjectController {
                             studentProjectDTOS
                     );
                 }).collect(Collectors.toList());
+    }
+
+    @GetMapping("/instructor/getProjectDetails")
+    @ResponseBody
+    public Project getProjectDetails(@RequestParam String projectId) {
+        // เรียกใช้ service เพื่อดึงข้อมูลจากฐานข้อมูล
+        Project project = projectService.getProjectDetails(projectId);
+
+        if (project == null) {
+            // ถ้าไม่พบโปรเจกต์
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found");
+        }
+
+        // ส่งข้อมูลกลับเป็น JSON
+        return project;
     }
 
 

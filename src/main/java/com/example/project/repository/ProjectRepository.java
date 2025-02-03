@@ -21,10 +21,6 @@ public interface ProjectRepository extends JpaRepository<Project, Long> {
             "LOWER(p.projectDescription) LIKE LOWER(CONCAT('%', :keyword, '%'))")
     List<Project> searchProjects(@Param("keyword") String keyword);
 
-//    List<FilterResponseDTO> filteredProjects(
-//            @Param("program") String program,
-//            @Param("role") String role
-//    );
-
     Project findByProjectId(String projectId);
+
 }
