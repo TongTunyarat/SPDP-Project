@@ -1,5 +1,7 @@
 package com.example.project.controller;
 
+import com.example.project.DTO.InstructorProjectDTO;
+import com.example.project.DTO.StudentProjectDTO;
 import com.example.project.entity.Admin;
 import com.example.project.entity.Instructor;
 import com.example.project.entity.Project;
@@ -11,36 +13,130 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
-@RestController
+@Controller
 public class ProjectController {
 
+    @Autowired
     private final ProjectService projectService;
 
-    @Autowired
+
     public ProjectController(ProjectService projectService) {
         this.projectService = projectService;
     }
 
+    //=========================================== USE ===================================================
 
-    @GetMapping("/instructor/editEvaluation")
+    // show project list page
+    @GetMapping("/instructor/view")
+    public String viewInstructorProjectPage() {
+        System.out.println("Show project proposal page");
+        return "ShowProposalEvaProject"; // html
+    }
+
+    // project list by user
+    @GetMapping("/instructor/projectList")
     @ResponseBody
-    public ResponseEntity<?> getProjectDetails(@RequestParam String projectId, Model model){
+    public List<InstructorProjectDTO> getInstructorData() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println("Account username: " + authentication.getName());
         System.out.println("Session ID: " + RequestContextHolder.currentRequestAttributes().getSessionId());
 
-        Project projectDetails = projectService.getProjectDetails(projectId);
-        if (projectDetails == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Project Details");
-        }
-        return ResponseEntity.ok(projectDetails);
+        List<ProjectInstructorRole> projectInstructorRoles = projectService.getInstructorProject();
+
+        System.out.println("Find project list");
+
+        // return JSON
+        return projectInstructorRoles.stream()
+                .map(i -> {
+                    // getStudentProjects -> studentProjects (Project Entity) => (StudentProjects Entity)
+                    List<StudentProjectDTO> studentProjectDTOS = i.getProjectIdRole().getStudentProjects().stream()
+                            .map(studentProject -> new StudentProjectDTO(
+                                    // getStudent() -> ใน (StudentProjects Entity)
+                                    studentProject.getStudent().getStudentId(),
+                                    studentProject.getStudent().getStudentName()))
+                            .toList();
+
+                    return new InstructorProjectDTO(
+                            // i -> projectInstructorRoles
+                            // i.getProjectIdRole() -> Project (ProjectInstructorRole Entity)
+                            // getProjectId() -> Id (Project Entity)
+                            i.getProjectIdRole().getProgram(),
+                            i.getProjectIdRole().getProjectId(),
+                            i.getProjectIdRole().getProjectTitle(),
+                            i.getRole(),
+                            studentProjectDTOS
+                    );
+                }).collect(Collectors.toList());
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    //=========================================== NOT USE ===================================================
+
+
+//    // send project when click edit
+//    @GetMapping("/instructor/editProposalEvaluation")
+//    @ResponseBody
+//    public ResponseEntity<?> getProjectDetails(@RequestParam String projectId){
+//
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        System.out.println("Account username: " + authentication.getName());
+//        System.out.println("Session ID: " + RequestContextHolder.currentRequestAttributes().getSessionId());
+//
+//        Project projectDetails = projectService.getProjectDetails(projectId);
+//        if (projectDetails == null) {
+//            System.out.println("Umm");
+//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("No Project Details");
+//        }
+//        System.out.println("Project ID: " + projectId);
+//        System.out.println("Project Detail: " + projectDetails);
+//        return ResponseEntity.ok(projectDetails);
+//    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

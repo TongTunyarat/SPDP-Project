@@ -22,7 +22,10 @@ public class LoginService implements UserDetailsService {
         this.accountRepository = accountRepository;
     }
 
-    // authentication
+    //=========================================== USE ===================================================
+
+
+    // authentication wit spring security
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Account account = accountRepository.findAccountByUsername(username)

@@ -22,7 +22,9 @@ public class ProjectService {
         this.projectRepository = projectRepository;
     }
 
-    // instructor project
+    //=========================================== USE ===================================================
+
+    // find project by instructor user
     public List<ProjectInstructorRole> getInstructorProject() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -46,6 +48,36 @@ public class ProjectService {
     public Project getProjectDetails(String projectId) {
         return projectRepository.findByProjectId(projectId);
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //=========================================== See Result (Not Use) ===================================================
 

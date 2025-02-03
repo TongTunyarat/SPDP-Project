@@ -1,18 +1,13 @@
 package com.example.project.controller;
 
-import com.example.project.DTO.InstructorProjectDTO;
-import com.example.project.DTO.StudentProjectDTO;
-import com.example.project.entity.ProjectInstructorRole;
-import com.example.project.service.ProjectService;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 import org.springframework.web.context.request.RequestContextHolder;
-import java.util.List;
-import java.util.stream.Collectors;
+
 
 @Controller
 //@RestController
@@ -24,7 +19,10 @@ public class LoginController {
         return ("Hello World");
     }
 
-    // login page (USE)
+
+    //=========================================== USE ===================================================
+
+    // login page throw any error
     @GetMapping("/login")
     // param จาก config
     public String loginPage(@RequestParam(required = false) String error, @RequestParam(required = false) String logout, Model model) {
@@ -37,54 +35,9 @@ public class LoginController {
         return "login";
     }
 
-    @Autowired
-    private final ProjectService projectService;
-
-    public LoginController(ProjectService projectService) {
-        this.projectService = projectService;
-    }
 
 
-        @GetMapping("/instructor/view")
-        public String viewInstructorProjectPage() {
-            return "ShowProposalEvaProject";
-        }
-
-        @GetMapping("/instructor/projectList")
-        @ResponseBody
-        public List<InstructorProjectDTO> getInstructorData() {
-            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-            System.out.println("Account username: " + authentication.getName());
-            System.out.println("Session ID: " + RequestContextHolder.currentRequestAttributes().getSessionId());
-
-            List<ProjectInstructorRole> projectInstructorRoles = projectService.getInstructorProject();
-
-            // return JSON
-            return projectInstructorRoles.stream()
-                    .map(i -> {
-                        // getStudentProjects -> studentProjects (Project Entity) => (StudentProjects Entity)
-                        List<StudentProjectDTO> studentProjectDTOS = i.getProjectIdRole().getStudentProjects().stream()
-                                .map(studentProject -> new StudentProjectDTO(
-                                        // getStudent() -> ใน (StudentProjects Entity)
-                                        studentProject.getStudent().getStudentId(),
-                                        studentProject.getStudent().getStudentName()))
-                                .toList();
-
-                        return new InstructorProjectDTO(
-                                // i -> projectInstructorRoles
-                                // i.getProjectIdRole() -> Project (ProjectInstructorRole Entity)
-                                // getProjectId() -> Id (Project Entity)
-                                i.getProjectIdRole().getProgram(),
-                                i.getProjectIdRole().getProjectId(),
-                                i.getProjectIdRole().getProjectTitle(),
-                                i.getRole(),
-                                studentProjectDTOS
-                        );
-                    }).collect(Collectors.toList());
-        }
-
-
-
+    // Prepare Admin login
     //https://medium.com/@CodeWithTech/understanding-securitycontext-and-securitycontextholder-in-spring-security-e8ec9c030819
     //https://stackoverflow.com/questions/3542026/retrieving-session-id-with-spring-security
     @GetMapping("/admin/home")
@@ -95,6 +48,14 @@ public class LoginController {
 
         return "AdminHome";
     }
+
+
+
+
+
+
+
+
 
 
     //=========================================== See Result (Not Use) ===================================================
@@ -112,7 +73,6 @@ public class LoginController {
     }
 
 }
-
 
 
 
