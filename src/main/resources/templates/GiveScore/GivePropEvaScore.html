@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Give Score Proposal Evaluation</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/sidebar-instructor.css">
+    <link rel="stylesheet" href="/css/GivePropEvaScore.css">
+
+    <!-- Library -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<div class="container">
+    <div class="sidebar">
+        <h2>ICT MAHIDOL</h2>
+        <ul>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                     style="fill:#FFFFFF;">
+                    <path
+                            d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+                    </path>
+                </svg>
+                Homepage
+            </h4>
+            <li><a href="#">Dashboard</a></li>
+        </ul>
+
+        <ul>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
+                    </g>
+                </svg>
+                Evaluation (40%)
+            </h4>
+            <li><a href="/ShowProposalEvaProject">Proposal Evaluation</a></li>
+            <li><a href="/showPosterEvaProject">Poster Evaluation</a></li>
+            <li><a href="/showDefenseEvaProject">Defense Evaluation</a></li>
+        </ul>
+
+        <ul>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
+                    </g>
+                </svg>
+                Grades (60%)
+            </h4>
+            <li><a href="#">Proposal Grade</a></li>
+            <li><a href="#">Defense Grade</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+
+        <div class="header-section">
+            <a href="/ShowProposalEvaProject" class="gray-link">Proposal Evaluation (40%)</a> > SP2024-01
+        </div>
+
+        <div class="body-section">
+
+            <div class="project-details">
+
+                <h1>Project Details</h1>
+
+                <!--                <div id="details">-->
+
+                <!--                </div>-->
+                <!--                <div class="details">-->
+                <!--                    <div><strong> Project ID: </strong>-->
+                <!--                        <span> </span>-->
+                <!--                    </div>-->
+                <!--                    <div><strong> Project Name: </strong>-->
+                <!--                        <span></span>-->
+                <!--                    </div>-->
+                <!--                    <div><strong> Project Advisor: </strong>-->
+                <!--                        <span></span>-->
+                <!--                    </div>-->
+                <!--                    <div><strong> Project Title: </strong>-->
+                <!--                        <span></span>-->
+                <!--                    </div>-->
+                <!--                    <div><strong> Date: </strong>-->
+                <!--                        <span></span>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+
+                <div class="details">
+                    <div><strong>Project ID:</strong> <span id="project-id"></span></div>
+                    <div><strong>Project Title:</strong> <span id="project-title"></span></div>
+                    <div><strong>Project Advisor:</strong> <span id="project-advisor"></span></div>
+                    <div><strong>Project Description:</strong> <span id="project-description"></span></div>
+                    <div><strong>Date:</strong> <span id="project-date"></span></div>
+                </div>
+
+            </div>
+
+            <div class="table-container">
+                <h1>Student Score</h1>
+                <table>
+
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Quality of Work</th>
+                        <th>Level of Progress</th>
+                        <th>Presentation Language</th>
+                        <th>Question & Answer</th>
+                        <th>Result</th>
+                    </tr>
+                    </thead>
+
+                    <tbody id="student-score">
+                    <!-- Record Result -->
+
+                    </tbody>
+                    <!--                    <tbody>-->
+                    <!--                    <tr>-->
+                    <!--                        <td style="text-align: left;"> Tunyarat Nithirunpattana</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>40</td>-->
+                    <!--                    </tr>-->
+                    <!--                    <tr>-->
+                    <!--                        <td style="text-align: left;"> Chanyanuch Nuangjumnong</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>40</td>-->
+                    <!--                    </tr>-->
+                    <!--                    <tr>-->
+                    <!--                        <td style="text-align: left;"> Neadnapa Tawontaweekul</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>40</td>-->
+                    <!--                    </tr>-->
+                    <!--                    </tbody>-->
+                </table>
+            </div>
+
+            <!-- Presentation -->
+            <div class="table-container">
+                <h1>Proposal Presentation (20%)</h1>
+                <label class="checkbox-group">
+                    <input type="checkbox"/>
+                    Enter the same scores for all students
+                    <div class="subtitle">
+                        ต้องการกรอกคะแนนเหมือนกันทั้งหมดหรือไม่
+                    </div>
+                </label>
+
+                <table class="evaluation-table">
+                    <thead>
+                    <tr id="student-name-header">
+
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <strong>Quality of work</strong>
+                            <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>
+                            </div>
+                        </td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Level of Progress</strong>
+                            <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>
+                            </div>
+                        </td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Presentation Language</strong>
+                            <div class="subtitle">ภาษาในการนำเสนอ <span class="max-score">Max Score
+                                            10</span></div>
+                        </td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Question & Answer</strong>
+                            <div class="subtitle">การตอบคำถาม <span class="max-score">Max Score 10</span>
+                            </div>
+                        </td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Document -->
+            <div class="table-container">
+                <h1> Document (20%)</h1>
+                <label class="checkbox-group">
+                    <input type="checkbox"/>
+                    Enter the same scores for all students
+                    <div class="subtitle">
+                        ต้องการกรอกคะแนนเหมือนกันทั้งหมดหรือไม่
+                    </div>
+                </label>
+
+                <table class="evaluation-table">
+                    <thead>
+                    <tr id="student-name-header-2">
+<!--                    <tr>-->
+<!--                        <th></th>-->
+<!--                        <th>6487002 Tunyarat</th>-->
+<!--                        <th>6487023 Chanyanuch</th>-->
+<!--                        <th>6487069 Neadnapa</th>-->
+<!--                    </tr>-->
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td>
+                            <strong>Quality of work</strong>
+                            <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>
+                            </div>
+                        </td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <strong>Timeline</strong>
+                            <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>
+                            </div>
+                        </td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                        <td><input type="number" min="0" max="10" value="0"/></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Score Result -->
+            <div class="table-container">
+                <h1> Score Result </h1>
+                <label class="score-subtitle">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    Unable to calculate the grade because not all committee members have submitted their scores.
+                </label>
+
+                <div id="card-container">
+
+                </div>
+
+                <!--                <div class="card-container">-->
+                <!--                    <div class="card-score-result">-->
+                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
+                <!--                        <span class="score">100 / 100</span>-->
+                <!--                    </div>-->
+
+                <!--                    <div class="card-score-result">-->
+                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
+                <!--                        <span class="score">100 / 100</span>-->
+                <!--                    </div>-->
+
+                <!--                    <div class="card-score-result">-->
+                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
+                <!--                        <span class="score">100 / 100</span>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+
+                <button class="save-button"> Save</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+
+    window.onload = fetchData;
+
+    function getProjectIdFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get("projectId"); // ดึงค่าจาก ?projectId=xxxx
+    }
+
+    function fetchData() {
+        // รับค่า projectId จาก URL
+        const projectId = getProjectIdFromURL();
+
+        if (!projectId) {
+            document.getElementById('student-score').innerHTML = "ไม่พบข้อมูล projectId";
+            return;
+        }
+
+        const url = `http://localhost:8080/instructor/giveScoreProposalEvaluation?projectId=${encodeURIComponent(projectId)}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Data received from API:", data);
+                displayStudentScore(data);
+                displayResultsCards(data);
+                displayStudentHeader(data);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                document.getElementById('student-score').innerHTML = "ไม่พบข้อมูล";
+            });
+    }
+
+
+    // Show Project Details //
+    document.addEventListener('DOMContentLoaded', function () {
+        // ดึงค่า projectId จาก URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('projectId');
+
+        if (projectId) {
+            // ถ้ามี projectId ใน URL
+            fetch(`http://localhost:8080/instructor/getProjectDetails?projectId=${projectId}`)
+                .then(response => response.json())
+                .then(project => {
+                    // แสดงข้อมูลที่ได้จาก API ใน HTML
+                    document.getElementById('project-id').textContent = project.projectId;
+                    document.getElementById('project-title').textContent = project.projectTitle;
+                    document.getElementById('project-advisor').textContent = project.projectTitle;
+                    document.getElementById('project-description').textContent = project.projectDescription;
+                    document.getElementById('project-date').textContent = project.recordedOn;
+                })
+                .catch(error => {
+                    console.error('Error fetching project details:', error);
+                    alert('ไม่พบข้อมูลโปรเจกต์');
+                });
+        } else {
+            alert('ไม่พบ projectId ใน URL');
+        }
+    });
+
+    // Show Student Score
+    function displayStudentScore(data) {
+        let tableBody = document.querySelector("tbody");
+        tableBody.innerHTML = "";
+
+        if (!Array.isArray(data)) {
+            data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
+        }
+
+        try {
+            data.forEach(project => {
+                project.students.forEach(student => {
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                <td style="text-align: left;">${student.studentName}</td>
+                <td>${project.score}</td>
+                <td>${project.score}</td>
+                <td>${project.score}</td>
+                <td>${project.score}</td>
+                <td>${project.score * 4}</td>
+            `;
+                    tableBody.appendChild(row);
+                });
+            });
+        } catch (error) {
+            console.error("Error displaying data in HTML:", error);
+            document.getElementById('student-score').innerHTML = "No valid data to display.";
+        }
+    }
+
+    function displayResultsCards(data) {
+        const cardContainer = document.querySelector('#card-container');
+        cardContainer.innerHTML = "";
+
+        if (!Array.isArray(data)) {
+            data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
+        }
+
+        try {
+            data.forEach(project => {
+                project.students.forEach(student => {
+                    const card = document.createElement('div');
+                    card.className = 'card-score-result';
+                    card.innerHTML = `
+                        <span class="icon"><i class="fa fa-user"></i> ${student.studentId} ${student.studentName}</span>
+                        <span class="score"> / 100</span>
+                    `;
+                    cardContainer.appendChild(card);
+                });
+            });
+        } catch (error) {
+            console.error("Error displaying data in HTML:", error);
+            document.getElementById('student-score').innerHTML = "No valid data to display.";
+        }
+    }
+
+    function displayStudentHeader(data) {
+        if (!Array.isArray(data)) {
+            data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
+        }
+
+        try {
+            data.forEach(project => {
+                const studentNameHeader = document.getElementById('student-name-header');
+
+                studentNameHeader.innerHTML = '';
+
+                // เพิ่ม <th> ช่องว่างแรก
+                const emptyTh = document.createElement('th');
+                emptyTh.innerHTML = '';  // ช่องว่าง
+                studentNameHeader.appendChild(emptyTh);
+
+                // เพิ่ม <th> สำหรับนักศึกษาทุกคน
+                project.students.forEach(student => {
+                    const studentTh = document.createElement('th');
+                    studentTh.innerHTML = `${student.studentId} ${student.studentName}`;
+                    studentNameHeader.appendChild(studentTh);
+                });
+
+                // ใช้ฟังก์ชันเดียวกัน สำหรับอีก Header นึง
+                const studentNameHeader2 = document.getElementById('student-name-header-2');
+                if (studentNameHeader2) {
+                    studentNameHeader2.innerHTML = '';
+                    studentNameHeader2.appendChild(emptyTh.cloneNode(true)); // เพิ่มช่องว่าง
+
+                    project.students.forEach(student => {
+                        const studentTh2 = document.createElement('th');
+                        studentTh2.innerHTML = `${student.studentId} ${student.studentName}`;
+                        studentNameHeader2.appendChild(studentTh2);  // เพิ่มข้อมูลที่เหมือนกัน
+                    });
+                }
+            });
+        } catch (error) {
+            console.error("Error displaying data: ", error);
+        }
+    }
+
+
+
+</script>
+
+</html>
