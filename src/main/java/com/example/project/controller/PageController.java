@@ -39,6 +39,16 @@ public class PageController {
         return "GiveScore/GiveDefEvaScore";
     }
 
+    @GetMapping("/give-prop-grade-projects")
+    public String giveProposalGradeScore() {
+        return "GiveScore/GivePropGradeScore";
+    }
+
+    @GetMapping("/give-def-grade-projects")
+    public String giveDefenseGradeScore() {
+        return "GiveScore/GiveDefGradeScore";
+    }
+
 
 }
 

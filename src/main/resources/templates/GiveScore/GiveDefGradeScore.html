@@ -1,20 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Give Score Proposal Evaluation</title>
+    <title>Give Proposal Grade Evaluation</title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="/css/sidebar-instructor.css">
-    <link rel="stylesheet" href="/css/GivePropEvaScore.css">
+    <link rel="stylesheet" href="/css/GiveGradeScore.css">
 
     <!-- Library -->
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-
+<body>
 <div class="container">
     <div class="sidebar">
         <h2>ICT MAHIDOL</h2>
@@ -44,9 +43,9 @@
                 </svg>
                 Evaluation (40%)
             </h4>
-            <li><a href="/ShowProposalEvaProject">Proposal Evaluation</a></li>
-            <li><a href="/showPosterEvaProject">Poster Evaluation</a></li>
-            <li><a href="/showDefenseEvaProject">Defense Evaluation</a></li>
+            <li><a href="/ShowProposalEvaProject.html">Proposal Evaluation</a></li>
+            <li><a href="/showPosterEvaProject.html">Poster Evaluation</a></li>
+            <li><a href="/showDefenseEvaProject.html">Defense Evaluation</a></li>
         </ul>
 
         <ul>
@@ -70,37 +69,14 @@
     <div class="content">
 
         <div class="header-section">
-            <a href="/ShowProposalEvaProject" class="gray-link">Proposal Evaluation (40%)</a> > SP2024-01
+            <a href="/instructor/projectList" class="gray-link">Proposal Grade (60%)</a> > SP2024-01
         </div>
 
         <div class="body-section">
 
             <!-- Project Details-->
             <div class="project-details">
-
                 <h1>Project Details</h1>
-
-                <!--                <div id="details">-->
-
-                <!--                </div>-->
-                <!--                <div class="details">-->
-                <!--                    <div><strong> Project ID: </strong>-->
-                <!--                        <span> </span>-->
-                <!--                    </div>-->
-                <!--                    <div><strong> Project Name: </strong>-->
-                <!--                        <span></span>-->
-                <!--                    </div>-->
-                <!--                    <div><strong> Project Advisor: </strong>-->
-                <!--                        <span></span>-->
-                <!--                    </div>-->
-                <!--                    <div><strong> Project Title: </strong>-->
-                <!--                        <span></span>-->
-                <!--                    </div>-->
-                <!--                    <div><strong> Date: </strong>-->
-                <!--                        <span></span>-->
-                <!--                    </div>-->
-                <!--                </div>-->
-
                 <div class="details">
                     <div><strong>Project ID:</strong> <span id="project-id"></span></div>
                     <div><strong>Project Title:</strong> <span id="project-title"></span></div>
@@ -108,68 +84,36 @@
                     <div><strong>Project Description:</strong> <span id="project-description"></span></div>
                     <div><strong>Date:</strong> <span id="project-date"></span></div>
                 </div>
-
             </div>
 
-            <!-- Student Score -->
+            <!-- Score Prop -->
             <div class="table-container">
-                <h1>Student Score</h1>
-                <table>
+                <div class="header-container">
+                    <h1>Defense Evaluation (40%) </h1>
+                    <button id="preview-button"
+                            style="margin-left: auto; display: block; float: right; margin-top: 10px;">Preview
+                    </button>
+                </div>
 
+                <table class="evaluation-table">
                     <thead>
                     <tr>
                         <th>Name</th>
-                        <th>Quality of Work</th>
-                        <th>Level of Progress</th>
-                        <th>Presentation Language</th>
-                        <th>Question & Answer</th>
-                        <th>Result</th>
+                        <th>Presentation (20%)</th>
+                        <th>Document (10%)</th>
+                        <th>Poster (10%)</th>
+                        <th>Result (40%)</th>
                     </tr>
                     </thead>
-
                     <tbody id="student-score">
                     <!-- Record Result -->
-
                     </tbody>
-                    <!--                    <tbody>-->
-                    <!--                    <tr>-->
-                    <!--                        <td style="text-align: left;"> Tunyarat Nithirunpattana</td>-->
-                    <!--                        <td>10</td>-->
-                    <!--                        <td>10</td>-->
-                    <!--                        <td>10</td>-->
-                    <!--                        <td>10</td>-->
-                    <!--                        <td>40</td>-->
-                    <!--                    </tr>-->
-                    <!--                    <tr>-->
-                    <!--                        <td style="text-align: left;"> Chanyanuch Nuangjumnong</td>-->
-                    <!--                        <td>10</td>-->
-                    <!--                        <td>10</td>-->
-                    <!--                        <td>10</td>-->
-                    <!--                        <td>10</td>-->
-                    <!--                        <td>40</td>-->
-                    <!--                    </tr>-->
-                    <!--                    <tr>-->
-                    <!--                        <td style="text-align: left;"> Neadnapa Tawontaweekul</td>-->
-                    <!--                        <td>10</td>-->
-                    <!--                        <td>10</td>-->
-                    <!--                        <td>10</td>-->
-                    <!--                        <td>10</td>-->
-                    <!--                        <td>40</td>-->
-                    <!--                    </tr>-->
-                    <!--                    </tbody>-->
                 </table>
             </div>
 
-            <!-- Presentation -->
+            <!-- Grading -->
             <div class="table-container">
-                <h1>Proposal Presentation (20%)</h1>
-                <label class="checkbox-group">
-                    <input type="checkbox"/>
-                    Enter the same scores for all students
-                    <div class="subtitle">
-                        ต้องการกรอกคะแนนเหมือนกันทั้งหมดหรือไม่
-                    </div>
-                </label>
+                <h1> Grading (60%)</h1>
 
                 <table class="evaluation-table">
                     <thead>
@@ -177,39 +121,10 @@
                     </thead>
                     <tbody>
                     <tr>
-                        <td>
-                            <strong>Quality of work</strong>
-                            <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>
-                            </div>
-                        </td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Level of Progress</strong>
-                            <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>
-                            </div>
-                        </td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Presentation Language</strong>
-                            <div class="subtitle">ภาษาในการนำเสนอ <span class="max-score">Max Score
-                                            10</span></div>
-                        </td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Question & Answer</strong>
-                            <div class="subtitle">การตอบคำถาม <span class="max-score">Max Score 10</span>
+                        <td style="text-align: left;">
+                            <strong>Evaluate Score</strong>
+                            <div class="subtitle">Advisor Please evaluate <span class="max-score">Max Score
+                                            10</span>
                             </div>
                         </td>
                         <td><input type="number" min="0" max="10" value="0"/></td>
@@ -220,42 +135,20 @@
                 </table>
             </div>
 
-            <!-- Document -->
+            <!-- Extra Score -->
             <div class="table-container">
-                <h1> Document (20%)</h1>
-                <label class="checkbox-group">
-                    <input type="checkbox"/>
-                    Enter the same scores for all students
-                    <div class="subtitle">
-                        ต้องการกรอกคะแนนเหมือนกันทั้งหมดหรือไม่
-                    </div>
-                </label>
+                <h1> Extra Score (10%)</h1>
 
                 <table class="evaluation-table">
                     <thead>
-                    <tr id="student-name-header-2">
-<!--                    <tr>-->
-<!--                        <th></th>-->
-<!--                        <th>6487002 Tunyarat</th>-->
-<!--                        <th>6487023 Chanyanuch</th>-->
-<!--                        <th>6487069 Neadnapa</th>-->
-<!--                    </tr>-->
+                    <tr id="student-name-header-2"> <!-- Student Name Header --> </tr>
                     </thead>
                     <tbody>
                     <tr>
-                        <td>
-                            <strong>Quality of work</strong>
-                            <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>
-                            </div>
-                        </td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Timeline</strong>
-                            <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>
+                        <td style="text-align: left;">
+                            <strong> Technical Report / Conference </strong>
+                            <div class="subtitle"> From Proposal Exam <span class="max-score">Max Score
+                                            10</span>
                             </div>
                         </td>
                         <td><input type="number" min="0" max="10" value="0"/></td>
@@ -274,34 +167,17 @@
                     Unable to calculate the grade because not all committee members have submitted their scores.
                 </label>
 
-                <div id="card-container"> </div>
-
-                <!--                <div class="card-container">-->
-                <!--                    <div class="card-score-result">-->
-                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
-                <!--                        <span class="score">100 / 100</span>-->
-                <!--                    </div>-->
-
-                <!--                    <div class="card-score-result">-->
-                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
-                <!--                        <span class="score">100 / 100</span>-->
-                <!--                    </div>-->
-
-                <!--                    <div class="card-score-result">-->
-                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
-                <!--                        <span class="score">100 / 100</span>-->
-                <!--                    </div>-->
-                <!--                </div>-->
+                <div id="card-container"></div>
 
                 <button class="save-button"> Save</button>
             </div>
-
         </div>
     </div>
 </div>
+</body>
+
 
 <script>
-
     window.onload = fetchData;
 
     function getProjectIdFromURL() {
@@ -311,7 +187,8 @@
 
     function fetchData() {
         // รับค่า projectId จาก URL
-        const projectId = getProjectIdFromURL();
+        // const projectId = getProjectIdFromURL();
+        const projectId = "DST SP2024-01"
 
         if (!projectId) {
             document.getElementById('student-score').innerHTML = "ไม่พบข้อมูล projectId";
@@ -386,7 +263,6 @@
                 <td>${project.score}</td>
                 <td>${project.score}</td>
                 <td>${project.score}</td>
-                <td>${project.score}</td>
                 <td>${project.score * 4}</td>
             `;
                     tableBody.appendChild(row);
@@ -413,6 +289,7 @@
                     card.className = 'card-score-result';
                     card.innerHTML = `
                         <span class="icon"><i class="fa fa-user"></i> ${student.studentId} ${student.studentName}</span>
+                        <span class="grade">A</span>
                         <span class="score"> / 100</span>
                     `;
                     cardContainer.appendChild(card);
@@ -465,8 +342,127 @@
         }
     }
 
+    // Modal popup logic
+    const modalTemplate = `
+    <div id="popup-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6);">
+        <div style="background: white; width: 80%; margin: 5% auto; padding: 20px; position: relative;">
+                    <button id="close-modal" style="position: absolute; top: 10px; right: 10px;">Close</button>
+                    <div class="table-container">
+                        <h1> Score Evaluation </h1>
+                        <hr>
+                        <div class="user-section">
+                            <span class="icon">
+                                <i class="fa fa-user" style="font-size: 32px; color: #000;"></i>
+                                <div class="text-container">
+                                    <div class="name">Aj.Siripen Pongpaichet</div>
+                                    <div class="subtitle">Advisor</div>
+                                </div>
+                            </span>
+                        </div>
 
+                        <h1>Proposal Presentation (20%)</h1>
+                        <table class="evaluation-table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>6487002 Tunyarat</th>
+                                    <th>6487023 Chanyanuch</th>
+                                    <th>6487069 Neadnapa</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="text-align: left;"> <strong>Quality of work</strong>
+                                        <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>
+                                        </div>
+                                    </td>
+                                    <td><input type="text"/></td>
+                                    <td><input type="text"/></td>
+                                    <td><input type="text"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left;"> <strong>Level of Progress</strong>
+                                        <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>
+                                        </div>
+                                    </td>
+                                    <td><input type="text"/></td>
+                                    <td><input type="text"/></td>
+                                    <td><input type="text"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left;"> <strong>Presentation Language</strong>
+                                        <div class="subtitle">ภาษาในการนำเสนอ <span class="max-score">Max Score
+                                                10</span></div>
+                                    </td>
+                                    <td><input type="text"/></td>
+                                    <td><input type="text"/></td>
+                                    <td><input type="text"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left;"> <strong>Question & Answer</strong>
+                                        <div class="subtitle">การตอบคำถาม <span class="max-score">Max Score 10</span>
+                                        </div>
+                                    </td>
+                                    <td><input type="text"/></td>
+                                    <td><input type="text"/></td>
+                                    <td><input type="text"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-container">
+                        <h1>Document (20%)</h1>
+                        <table class="evaluation-table">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>6487002 Tunyarat</th>
+                                    <th>6487023 Chanyanuch</th>
+                                    <th>6487069 Neadnapa</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td style="text-align: left;"> <strong>Quality of work</strong>
+                                        <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>
+                                        </div>
+                                    </td>
+                                    <td><input type="text"/></td>
+                                    <td><input type="text"/></td>
+                                    <td><input type="text"/></td>
+                                </tr>
+                                <tr>
+                                    <td style="text-align: left;"> <strong>Timeline</strong>
+                                        <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>
+                                        </div>
+                                    </td>
+                                    <td><input type="text"/></td>
+                                    <td><input type="text"/></td>
+                                    <td><input type="text"/></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+    </div>`;
 
+    document.body.insertAdjacentHTML('beforeend', modalTemplate);
+
+    document.getElementById("preview-button").addEventListener("click", function () {
+        document.getElementById("popup-modal").style.display = "block";
+    });
+
+    document.getElementById("close-modal").addEventListener("click", function () {
+        document.getElementById("popup-modal").style.display = "none";
+    });
+
+    // ปิด modal เมื่อคลิกนอก modal
+    document.getElementById("popup-modal").addEventListener("click", function (event) {
+        if (event.target === document.getElementById("popup-modal")) {
+            document.getElementById("popup-modal").style.display = "none";
+        }
+    });
 </script>
+
 
 </html>
