@@ -151,8 +151,9 @@ input[type="number"] {
     color: #DA1E28;
 }
 
-.card-container {
+#card-container {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
     gap: 32px;
     padding: 24px;
@@ -166,7 +167,7 @@ input[type="number"] {
     border: 1px solid #ccc;
     border-radius: 8px;
     background-color: #fff;
-    width: 180px;
+    width: 200px;
     text-align: center;
     gap: 32px;
 }
@@ -197,4 +198,20 @@ input[type="number"] {
 
 .save-button:hover {
     background-color: #575757;
+}
+
+.comment-poster input {
+    width: 85%;
+    padding: 10px 15px;
+    margin: 10px 0;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    background-color: #ffffff;
+    transition: all 0.3s ease;
+}
+
+.comment-poster input:hover {
+    border-color: #777;
+    background-color: #f2f2f2;
 }

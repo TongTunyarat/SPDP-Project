@@ -44,10 +44,25 @@ public class ProjectService {
         throw new UsernameNotFoundException("User is not authenticated");
     }
 
-    // get project details
+//     get project details
     public Project getProjectDetails(String projectId) {
         return projectRepository.findByProjectId(projectId);
     }
+
+
+//
+//    public Project getProjectDetails(String projectId) {
+//        Object[] result = projectRepository.findProfessorNameByProjectId(projectId);
+//        Project project = (Project) result[0];
+//        String professorName = (String) result[1];
+//        project.setProfessorName(professorName);  // ตั้งค่า professorName ให้กับ Project
+//        return project;
+//    }
+
+
+
+
+
 
 
 

@@ -15,19 +15,19 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Controller
-public class ProposalEvaluationController {
+public class DefenseEvaluationController {
 
     @Autowired
     private ProjectService projectService;
 
     // send project when click edit
-    @GetMapping("/instructor/editProposalEvaluation")
+    @GetMapping("/instructor/editDefenseEvaluation")
     public String getProjectDetails(@RequestParam String projectId){
-        return "GiveScore/GivePropEvaScore";
+        return "GiveScore/GiveDefEvaScore";
     }
 
     // project list by user with specific projectId
-    @GetMapping("/instructor/giveScoreProposalEvaluation")
+    @GetMapping("/instructor/giveScoreDefenseEvaluation")
     @ResponseBody
     public InstructorProjectDTO getProjectById(@RequestParam String projectId) {
         // ดึงข้อมูลโครงการด้วย service ที่มีอยู่
@@ -53,7 +53,4 @@ public class ProposalEvaluationController {
                 studentProjectDTOS
         );
     }
-
-
-
 }

@@ -79,26 +79,26 @@
 
                 <h1>Project Details</h1>
 
-<!--                <div id="details">-->
+                <!--                <div id="details">-->
 
-<!--                </div>-->
-<!--                <div class="details">-->
-<!--                    <div><strong> Project ID: </strong>-->
-<!--                        <span> </span>-->
-<!--                    </div>-->
-<!--                    <div><strong> Project Name: </strong>-->
-<!--                        <span></span>-->
-<!--                    </div>-->
-<!--                    <div><strong> Project Advisor: </strong>-->
-<!--                        <span></span>-->
-<!--                    </div>-->
-<!--                    <div><strong> Project Title: </strong>-->
-<!--                        <span></span>-->
-<!--                    </div>-->
-<!--                    <div><strong> Date: </strong>-->
-<!--                        <span></span>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <!--                </div>-->
+                <!--                <div class="details">-->
+                <!--                    <div><strong> Project ID: </strong>-->
+                <!--                        <span> </span>-->
+                <!--                    </div>-->
+                <!--                    <div><strong> Project Name: </strong>-->
+                <!--                        <span></span>-->
+                <!--                    </div>-->
+                <!--                    <div><strong> Project Advisor: </strong>-->
+                <!--                        <span></span>-->
+                <!--                    </div>-->
+                <!--                    <div><strong> Project Title: </strong>-->
+                <!--                        <span></span>-->
+                <!--                    </div>-->
+                <!--                    <div><strong> Date: </strong>-->
+                <!--                        <span></span>-->
+                <!--                    </div>-->
+                <!--                </div>-->
 
                 <div class="details">
                     <div><strong>Project ID:</strong> <span id="project-id"></span></div>
@@ -113,6 +113,7 @@
             <div class="table-container">
                 <h1>Student Score</h1>
                 <table>
+
                     <thead>
                     <tr>
                         <th>Name</th>
@@ -123,38 +124,17 @@
                         <th>Result</th>
                     </tr>
                     </thead>
-                    <tbody>
-                    <tr>
-                        <td style="text-align: left;"> Tunyarat Nithirunpattana</td>
-                        <td>10</td>
-                        <td>10</td>
-                        <td>10</td>
-                        <td>10</td>
-                        <td>40</td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: left;"> Chanyanuch Nuangjumnong</td>
-                        <td>10</td>
-                        <td>10</td>
-                        <td>10</td>
-                        <td>10</td>
-                        <td>40</td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: left;"> Neadnapa Tawontaweekul</td>
-                        <td>10</td>
-                        <td>10</td>
-                        <td>10</td>
-                        <td>10</td>
-                        <td>40</td>
-                    </tr>
+
+                    <tbody id="student-score">
+                    <!-- Record Result -->
+
                     </tbody>
                 </table>
             </div>
 
             <!-- Presentation -->
             <div class="table-container">
-                <h1>Proposal Presentation (20%)</h1>
+                <h1>Defense Presentation (20%)</h1>
                 <label class="checkbox-group">
                     <input type="checkbox"/>
                     Enter the same scores for all students
@@ -165,11 +145,8 @@
 
                 <table class="evaluation-table">
                     <thead>
-                    <tr>
-                        <th></th>
-                        <th>6487002 Tunyarat</th>
-                        <th>6487023 Chanyanuch</th>
-                        <th>6487069 Neadnapa</th>
+                    <tr id="student-name-header">
+
                     </tr>
                     </thead>
                     <tbody>
@@ -230,18 +207,15 @@
 
                 <table class="evaluation-table">
                     <thead>
-                    <tr>
-                        <th></th>
-                        <th>6487002 Tunyarat</th>
-                        <th>6487023 Chanyanuch</th>
-                        <th>6487069 Neadnapa</th>
-                    </tr>
+
+                    <tr id="student-name-header-2"></tr>
+
                     </thead>
                     <tbody>
                     <tr>
                         <td>
-                            <strong>Quality of work</strong>
-                            <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>
+                            <strong>Completeness</strong>
+                            <div class="subtitle"> คุณภาพของงาน <span class="max-score">Max Score 10</span>
                             </div>
                         </td>
                         <td><input type="number" min="0" max="10" value="0"/></td>
@@ -270,22 +244,26 @@
                     Unable to calculate the grade because not all committee members have submitted their scores.
                 </label>
 
-                <div class="card-container">
-                    <div class="card-score-result">
-                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>
-                        <span class="score">100 / 100</span>
-                    </div>
+                <div id="card-container">
 
-                    <div class="card-score-result">
-                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>
-                        <span class="score">100 / 100</span>
-                    </div>
-
-                    <div class="card-score-result">
-                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>
-                        <span class="score">100 / 100</span>
-                    </div>
                 </div>
+
+                <!--                <div class="card-container">-->
+                <!--                    <div class="card-score-result">-->
+                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
+                <!--                        <span class="score">100 / 100</span>-->
+                <!--                    </div>-->
+
+                <!--                    <div class="card-score-result">-->
+                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
+                <!--                        <span class="score">100 / 100</span>-->
+                <!--                    </div>-->
+
+                <!--                    <div class="card-score-result">-->
+                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
+                <!--                        <span class="score">100 / 100</span>-->
+                <!--                    </div>-->
+                <!--                </div>-->
 
                 <button class="save-button"> Save</button>
             </div>
@@ -296,13 +274,55 @@
 
 <script>
 
+    window.onload = fetchData;
+
+    function getProjectIdFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get("projectId"); // ดึงค่าจาก ?projectId=xxxx
+    }
+
+    function fetchData() {
+        // รับค่า projectId จาก URL
+        // const projectId = getProjectIdFromURL();
+        const projectId = "DST SP2024-01";
+
+        if (!projectId) {
+            document.getElementById('student-score').innerHTML = "ไม่พบข้อมูล projectId";
+            return;
+        }
+
+        const url = `http://localhost:8080/instructor/giveScoreProposalEvaluation?projectId=${encodeURIComponent(projectId)}`;
+
+        fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Data received from API:", data);
+                displayStudentScore(data);
+                displayResultsCards(data);
+                displayStudentHeader(data);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                document.getElementById('student-score').innerHTML = "ไม่พบข้อมูล";
+            });
+    }
+
+
+    // Show Project Details //
     document.addEventListener('DOMContentLoaded', function () {
         // ดึงค่า projectId จาก URL
         const urlParams = new URLSearchParams(window.location.search);
-        const projectId = urlParams.get('projectId');
+        // const projectId = urlParams.get('projectId');
+        const projectId = "DST SP2024-01";
 
         if (projectId) {
             // ถ้ามี projectId ใน URL
+
             fetch(`http://localhost:8080/instructor/getProjectDetails?projectId=${projectId}`)
                 .then(response => response.json())
                 .then(project => {
@@ -318,9 +338,108 @@
                     alert('ไม่พบข้อมูลโปรเจกต์');
                 });
         } else {
-            alert('ไม่พบ projectId ใน URL');
+            // alert('ไม่พบ projectId ใน URL');
         }
     });
+
+    // Show Student Score
+    function displayStudentScore(data) {
+        let tableBody = document.querySelector("tbody");
+        tableBody.innerHTML = "";
+
+        if (!Array.isArray(data)) {
+            data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
+        }
+
+        try {
+            data.forEach(project => {
+                project.students.forEach(student => {
+                    const row = document.createElement('tr');
+
+                    row.innerHTML = `
+                <td style="text-align: left;">${student.studentName}</td>
+                <td>${project.score}</td>
+                <td>${project.score}</td>
+                <td>${project.score}</td>
+                <td>${project.score}</td>
+                <td>${project.score * 4}</td>
+            `;
+                    tableBody.appendChild(row);
+                });
+            });
+        } catch (error) {
+            console.error("Error displaying data in HTML:", error);
+            document.getElementById('student-score').innerHTML = "No valid data to display.";
+        }
+    }
+
+    function displayResultsCards(data) {
+        const cardContainer = document.querySelector('#card-container');
+        cardContainer.innerHTML = "";
+
+        if (!Array.isArray(data)) {
+            data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
+        }
+
+        try {
+            data.forEach(project => {
+                project.students.forEach(student => {
+                    const card = document.createElement('div');
+                    card.className = 'card-score-result';
+                    card.innerHTML = `
+                        <span class="icon"><i class="fa fa-user"></i> ${student.studentId} ${student.studentName}</span>
+                        <span class="score"> / 100</span>
+                    `;
+                    cardContainer.appendChild(card);
+                });
+            });
+        } catch (error) {
+            console.error("Error displaying data in HTML:", error);
+            document.getElementById('student-score').innerHTML = "No valid data to display.";
+        }
+    }
+
+    function displayStudentHeader(data) {
+        if (!Array.isArray(data)) {
+            data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
+        }
+
+        try {
+            data.forEach(project => {
+                const studentNameHeader = document.getElementById('student-name-header');
+
+                studentNameHeader.innerHTML = '';
+
+                // เพิ่ม <th> ช่องว่างแรก
+                const emptyTh = document.createElement('th');
+                emptyTh.innerHTML = '';  // ช่องว่าง
+                studentNameHeader.appendChild(emptyTh);
+
+                // เพิ่ม <th> สำหรับนักศึกษาทุกคน
+                project.students.forEach(student => {
+                    const studentTh = document.createElement('th');
+                    studentTh.innerHTML = `${student.studentId} ${student.studentName}`;
+                    studentNameHeader.appendChild(studentTh);
+                });
+
+                // ใช้ฟังก์ชันเดียวกัน สำหรับอีก Header นึง
+                const studentNameHeader2 = document.getElementById('student-name-header-2');
+                if (studentNameHeader2) {
+                    studentNameHeader2.innerHTML = '';
+                    studentNameHeader2.appendChild(emptyTh.cloneNode(true)); // เพิ่มช่องว่าง
+
+                    project.students.forEach(student => {
+                        const studentTh2 = document.createElement('th');
+                        studentTh2.innerHTML = `${student.studentId} ${student.studentName}`;
+                        studentNameHeader2.appendChild(studentTh2);  // เพิ่มข้อมูลที่เหมือนกัน
+                    });
+                }
+            });
+        } catch (error) {
+            console.error("Error displaying data: ", error);
+        }
+    }
+
 
 
 </script>

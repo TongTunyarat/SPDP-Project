@@ -14,9 +14,31 @@ public class PageController {
         return "ScorePeriodSettings";
     }
 
-    @GetMapping("/show-projects")
-    public String showProject() {
+    @GetMapping("/show-proposal-eva-projects")
+    public String showProposalEvaProject() {
         return "ShowProposalEvaProject";
     }
+
+    @GetMapping("/show-poster-projects")
+    public String showPosterEvaProject() {
+        return "ShowPosterEvaProject";
+    }
+
+    @GetMapping("/give-poster-eva-projects")
+    public String givePosterEvaScore() {
+        return "GiveScore/GivePosterScore";
+    }
+
+    @GetMapping("/show-defense-eva-projects")
+    public String showDefenseEvaProject() {
+        return "ShowDefenseEvaProject";
+    }
+
+    @GetMapping("/give-defense-eva-projects")
+    public String giveDefenseEvaScore() {
+        return "GiveScore/GiveDefEvaScore";
+    }
+
+
 }
 
