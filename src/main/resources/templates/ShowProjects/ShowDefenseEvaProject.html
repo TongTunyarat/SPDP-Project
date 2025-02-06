@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proposal Evaluation Project</title>
+    <title>Defense Evaluation Project</title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="/css/sidebar-instructor.css">
@@ -57,15 +57,15 @@
                     </g>
                 </g>
             </svg> Grades (60%) </h4>
-            <li><a href="#">Proposal Grade</a></li>
-            <li><a href="#">Defense Grade</a></li>
+            <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>
+            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>
         </ul>
     </div>
 
     <div class="content">
 
         <div class="header-section">
-            Proposal Evaluation (40%)
+            Defense Evaluation (40%)
         </div>
 
         <div class="table-container">
@@ -118,7 +118,7 @@
 
     function fetchData() {
         // JSON information fetch project list
-        let url = 'http://localhost:8080/instructor/projectList';
+        let url = 'http://localhost:8080/advisor/projectList';
 
         // ทำการส่งคำขอไปยัง API หรือ Backend
         fetch(url)
@@ -349,7 +349,7 @@
                 </td>
                 <td class="evaluation completed"><span class="material-icons">done</span></td>
                 <td>
-                    <form action="/instructor/editProposalEvaluation" method="get">
+                    <form action="/instructor/editDefenseEvaluation" method="get">
                         <input type="hidden" name="projectId" value="${project.projectId}">
                         <button type="submit"><span class="material-icons">edit</span></button>
                     </form>

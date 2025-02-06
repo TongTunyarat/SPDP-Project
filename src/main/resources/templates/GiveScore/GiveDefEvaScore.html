@@ -70,7 +70,7 @@
     <div class="content">
 
         <div class="header-section">
-            <a href="/ShowProposalEvaProject" class="gray-link">Proposal Evaluation (40%)</a> > SP2024-01
+            <a href="/ShowProposalEvaProject" class="gray-link">Defense Evaluation (40%)</a> > <span id="project-id-title"></span>
         </div>
 
         <div class="body-section">
@@ -283,8 +283,8 @@
 
     function fetchData() {
         // รับค่า projectId จาก URL
-        // const projectId = getProjectIdFromURL();
-        const projectId = "DST SP2024-01";
+        const projectId = getProjectIdFromURL();
+        // const projectId = "DST SP2024-01";
 
         if (!projectId) {
             document.getElementById('student-score').innerHTML = "ไม่พบข้อมูล projectId";
@@ -317,8 +317,8 @@
     document.addEventListener('DOMContentLoaded', function () {
         // ดึงค่า projectId จาก URL
         const urlParams = new URLSearchParams(window.location.search);
-        // const projectId = urlParams.get('projectId');
-        const projectId = "DST SP2024-01";
+        const projectId = urlParams.get('projectId');
+        // const projectId = "DST SP2024-01";
 
         if (projectId) {
             // ถ้ามี projectId ใน URL
@@ -328,6 +328,7 @@
                 .then(project => {
                     // แสดงข้อมูลที่ได้จาก API ใน HTML
                     document.getElementById('project-id').textContent = project.projectId;
+                    document.getElementById('project-id-title').textContent = project.projectId;
                     document.getElementById('project-title').textContent = project.projectTitle;
                     document.getElementById('project-advisor').textContent = project.projectTitle;
                     document.getElementById('project-description').textContent = project.projectDescription;
@@ -338,7 +339,7 @@
                     alert('ไม่พบข้อมูลโปรเจกต์');
                 });
         } else {
-            // alert('ไม่พบ projectId ใน URL');
+            alert('ไม่พบ projectId ใน URL');
         }
     });
 

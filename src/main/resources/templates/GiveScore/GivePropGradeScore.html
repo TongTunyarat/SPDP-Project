@@ -43,9 +43,9 @@
                 </svg>
                 Evaluation (40%)
             </h4>
-            <li><a href="/ShowProposalEvaProject.html">Proposal Evaluation</a></li>
-            <li><a href="/showPosterEvaProject.html">Poster Evaluation</a></li>
-            <li><a href="/showDefenseEvaProject.html">Defense Evaluation</a></li>
+            <li><a href="/show-proposal-eva-projects">Proposal Evaluation</a></li>
+            <li><a href="/show-poster-projects">Poster Evaluation</a></li>
+            <li><a href="/show-defense-eva-projects">Defense Evaluation</a></li>
         </ul>
 
         <ul>
@@ -61,15 +61,16 @@
                 </svg>
                 Grades (60%)
             </h4>
-            <li><a href="#">Proposal Grade</a></li>
-            <li><a href="#">Defense Grade</a></li>
+            <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>
+            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>
         </ul>
     </div>
 
     <div class="content">
 
         <div class="header-section">
-            <a href="proposal-evaluation.html" class="gray-link">Proposal Grade (60%)</a> > SP2024-01
+            <a href="/show-proposal-grade-projects" class="gray-link">Proposal Grade (60%)</a> > <span
+                id="project-id-title"></span>
         </div>
 
         <div class="body-section">
@@ -185,8 +186,7 @@
 
     function fetchData() {
         // รับค่า projectId จาก URL
-        // const projectId = getProjectIdFromURL();
-        const projectId = "DST SP2024-01"
+        const projectId = getProjectIdFromURL();
 
         if (!projectId) {
             document.getElementById('student-score').innerHTML = "ไม่พบข้อมูล projectId";
@@ -228,6 +228,7 @@
                 .then(project => {
                     // แสดงข้อมูลที่ได้จาก API ใน HTML
                     document.getElementById('project-id').textContent = project.projectId;
+                    document.getElementById('project-id-title').textContent = project.projectId;
                     document.getElementById('project-title').textContent = project.projectTitle;
                     document.getElementById('project-advisor').textContent = project.projectTitle;
                     document.getElementById('project-description').textContent = project.projectDescription;

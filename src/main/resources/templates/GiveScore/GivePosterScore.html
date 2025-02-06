@@ -70,7 +70,7 @@
     <div class="content">
 
         <div class="header-section">
-            <a href="/ShowProposalEvaProject" class="gray-link">Poster Evaluation (40%)</a> > SP2024-01
+            <a href="/ShowProposalEvaProject" class="gray-link">Poster Evaluation (40%)</a> > <span id="project-id-title"></span>
         </div>
 
         <div class="body-section">
@@ -308,7 +308,7 @@
             return;
         }
 
-        const url = `http://localhost:8080/instructor/giveScoreProposalEvaluation?projectId=${encodeURIComponent(projectId)}`;
+        const url = `http://localhost:8080/instructor/giveScorePosterEvaluation?projectId=${encodeURIComponent(projectId)}`;
 
         fetch(url)
             .then(response => {
@@ -343,6 +343,7 @@
                 .then(project => {
                     // แสดงข้อมูลที่ได้จาก API ใน HTML
                     document.getElementById('project-id').textContent = project.projectId;
+                    document.getElementById('project-id-title').textContent = project.projectId;
                     document.getElementById('project-title').textContent = project.projectTitle;
                     document.getElementById('project-advisor').textContent = project.projectTitle;
                     document.getElementById('project-description').textContent = project.projectDescription;
