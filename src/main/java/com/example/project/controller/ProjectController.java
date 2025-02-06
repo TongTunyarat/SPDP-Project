@@ -38,7 +38,7 @@ public class ProjectController {
     @GetMapping("/instructor/view")
     public String viewInstructorProjectPage() {
         System.out.println("Show project proposal page");
-        return "ShowProposalEvaProject"; // html
+        return "DashboardInstructor"; // html
     }
 
     // project list by user

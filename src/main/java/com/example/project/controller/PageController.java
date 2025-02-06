@@ -8,8 +8,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping
 public class PageController {
 
-    @GetMapping("/scoring-periods")
+    // ---------- Show Projects ---------- //
+    @GetMapping("/dashboard-instructors")
     public String index() {
+        return "DashboardInstructor";
+    }
+
+    // ---------- Admin ---------- //
+    @GetMapping("/scoring-periods")
+    public String scoringPeriods() {
         return "ScorePeriodSettings";
     }
 
