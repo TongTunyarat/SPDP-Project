@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Poster Evaluation Project</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/sidebar-instructor.css">
+    <link rel="stylesheet" href="/css/ShowProject.css">
+
+    <!-- Library -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+
+</head>
+
+<body>
+<div class="container">
+    <div class="sidebar">
+        <h2>ICT MAHIDOL</h2>
+        <ul>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                     style="fill:#FFFFFF;">
+                    <path
+                            d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+                    </path>
+                </svg>
+                Homepage
+            </h4>
+            <li><a href="#">Dashboard</a></li>
+        </ul>
+
+        <ul>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
+                    </g>
+                </svg>
+                Evaluation (40%)
+            </h4>
+            <li><a href="/show-proposal-eva-projects">Proposal Evaluation</a></li>
+            <li><a href="/show-poster-projects">Poster Evaluation</a></li>
+            <li><a href="/show-defense-eva-projects">Defense Evaluation</a></li>
+        </ul>
+
+        <ul>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
+                    </g>
+                </svg>
+                Grades (60%)
+            </h4>
+            <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>
+            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+
+        <div class="header-section">
+            Poster Evaluation (40%)
+        </div>
+
+        <div class="table-container">
+            <h1>Projects</h1>
+            <div class="filter-controls">
+                <label id="program-select"><strong>Program:</strong>
+                    <select id="program-select-box" name="program">
+                        <option value="all" selected>ALL</option>
+                        <option value="ict">ICT</option>
+                        <option value="dst">DST</option>
+                    </select>
+                </label>
+                <label id="role-select"><strong>Role:</strong>
+                    <select id="role-select-box" name="role">
+                        <option value="all" selected>ALL</option>
+                        <option value="advisor">Advisor</option>
+                        <option value="committee">Committee</option>
+                    </select>
+                </label>
+                <input id="search-keyword" type="text" placeholder="Search"/>
+            </div>
+
+            <table id="result-table">
+                <thead>
+                <tr>
+                    <th>Project ID</th>
+                    <th>Project Name</th>
+                    <th>Role</th>
+                    <th>Student ID</th>
+                    <th>Student Names</th>
+                    <th>Evaluation</th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="filter-results">
+                <!-- Record Result -->
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+
+</div>
+</body>
+
+</html>
+
+<script>
+
+    function fetchData() {
+        // JSON information fetch project list
+        let url = 'http://localhost:8080/committee/projectList';
+
+        // ทำการส่งคำขอไปยัง API หรือ Backend
+        fetch(url)
+            .then(response => {
+                // console.log(response.json());
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("Data: " + data);
+                // แสดงผลข้อมูลที่ได้รับ
+                displayResults(data);
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                document.getElementById('filter-results').innerHTML = "ไม่พบข้อมูล";
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchData();
+        // ตั้งค่า event listeners สำหรับแต่ละฟิลด์ฟิลเตอร์ เพื่อดูการเปลี่ยนแปลง
+        document.getElementById('program-select-box').addEventListener('change', debounce(applyFilters, 100));
+        document.getElementById('role-select-box').addEventListener('change', debounce(applyFilters, 100));
+        // document.getElementById('search-keyword').addEventListener('input', debounce(applyFilters, 100));
+    });
+
+    function debounce(func, delay) {
+        let timeout;
+        return function (...args) {
+            // เคลียร์ timeout ที่มีอยู่เดิมก่อน เพื่อหน่วงเวลาการเรียกฟังก์ชัน
+            clearTimeout(timeout);
+
+            // ตั้ง timeout ใหม่เพื่อเรียกฟังก์ชันหลังจากดีเลย์ที่กำหนด
+            timeout = setTimeout(() => func.apply(this, args), delay);
+        };
+    }
+
+    // ------ Script for filter function ------- //
+    function applyFilters() {
+        const programFilter = document.getElementById('program-select-box')?.value;
+        const roleFilter = document.getElementById('role-select-box')?.value;
+
+        const rows = document.querySelectorAll("#filter-results tr");
+        console.log(programFilter)
+        console.log(roleFilter)
+
+        rows.forEach(row => {
+            const programCell = row.querySelector('.tag');
+            const roleCell = row.querySelector('.role');
+
+            let matches = true;
+
+            // กรอง Program: ถ้าเลือก "All" จะไม่กรอง
+            if (matches && programFilter !== 'all' && programCell) {
+                matches = programCell.classList.contains(programFilter);
+                console.log("Filtered Program : " + programFilter)
+            }
+
+            // กรอง Role: ถ้าเลือก "All" จะไม่กรอง
+            if (matches && roleFilter !== 'all' && roleCell) {
+                matches = roleCell.classList.contains(roleFilter);
+                console.log("Filtered Role : " + roleFilter)
+            }
+
+            // แสดงหรือซ่อนแถว
+            row.style.display = matches ? '' : 'none';
+        });
+    }
+
+    // ------ Script for search function ------- //
+    document.getElementById('search-keyword').addEventListener('input', function () {
+        const searchTerm = this.value.toLowerCase();
+
+        // ดึงทุกแถวในตารางมา
+        const rows = document.querySelectorAll("#filter-results tr");
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+
+            // ตัวแปรที่ใช้ check ว่า row นี้มีข้อมูลที่ตรงกับคำค้นหามั้ย
+            let rowMatches = false;
+
+            // วนลูปผ่านทุกคอลัมน์ในแถว
+            cells.forEach(cell => {
+                if (cell.textContent.toLowerCase().includes(searchTerm)) {
+                    rowMatches = true;
+                }
+            });
+
+            // ถ้าแถวนี้มีข้อมูลที่ตรงกับคำค้นหาก็จะแสดงแถวนั้น
+            if (rowMatches) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
+
+    function displayResults(data) {
+        let tableBody = document.querySelector("tbody");
+        tableBody.innerHTML = "";  // เคลียร์ข้อมูลเก่า
+
+        try {
+            data.forEach(project => {
+                console.log("Process project: " + project);
+
+                const row = document.createElement('tr');
+
+                row.innerHTML = `
+                 <td><span class="tag ${project.projectProgram.toLowerCase()}">${project.projectProgram}</span> ${project.projectId}</td>
+                <td>${project.projectTitle}</td>
+                <td><span class="role ${project.role.toLowerCase()}">${project.role}</span></td>
+                <td>
+                    <ul>
+                        ${project.students.map(id => `<li>${id.studentId}</li>`).join('')}
+                    </ul>
+                </td>
+                <td>
+                    <ul>
+                        ${project.students.map(name => `<li>${name.studentName}</li>`).join('')}
+                    </ul>
+                </td>
+                <td class="evaluation completed"><span class="material-icons">done</span></td>
+                <td>
+                    <form action="/instructor/editPosterEvaluation" method="get">
+                        <input type="hidden" name="projectId" value="${project.projectId}">
+                        <button type="submit"><span class="material-icons">edit</span></button>
+                    </form>
+                </td>
+                `;
+                tableBody.appendChild(row);
+            })
+        } catch (error) {
+            console.error("Error display data in html: " + error);
+            document.getElementById('filter-results').innerHTML = "No valid data to display.";
+        }
+    }
+
+</script>
+
+
