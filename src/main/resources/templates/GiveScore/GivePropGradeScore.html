@@ -233,7 +233,10 @@
                     document.getElementById('project-title').textContent = project.projectTitle;
                     document.getElementById('project-advisor').textContent = project.projectTitle;
                     document.getElementById('project-description').textContent = project.projectDescription;
-                    document.getElementById('project-date').textContent = project.recordedOn;
+
+                    const recordedOn = project.recordedOn;
+                    const formattedDate = recordedOn.split("T")[0];
+                    document.getElementById('project-date').textContent = formattedDate;
                 })
                 .catch(error => {
                     console.error('Error fetching project details:', error);
