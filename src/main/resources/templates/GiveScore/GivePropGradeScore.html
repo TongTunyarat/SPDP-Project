@@ -79,7 +79,9 @@
             <div class="project-details">
                 <h1>Project Details</h1>
                 <div class="details">
-                    <div><strong>Project ID:</strong> <span id="project-id"></span></div>
+                    <div><strong>Project ID:</strong> <span id="project-id"></span>
+                        <input type="hidden" id="projectIdInput" th:value="${projectId}">
+                    </div>
                     <div><strong>Project Title:</strong> <span id="project-title"></span></div>
                     <div><strong>Project Advisor:</strong> <span id="project-advisor"></span></div>
                     <div><strong>Project Description:</strong> <span id="project-description"></span></div>
@@ -118,23 +120,23 @@
             <div class="table-container">
                 <h1> Grading (60%)</h1>
 
-                <table class="evaluation-table">
-                    <thead>
-                    <tr id="student-name-header"> <!-- Student Name Header --> </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td style="text-align: left;">
-                            <strong>Evaluate Score</strong>
-                            <div class="subtitle">Advisor Please evaluate <span class="max-score">Max Score
-                                            10</span>
-                            </div>
-                        </td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                    </tr>
-                    </tbody>
+                <table class="evaluation-table" id="grade-evaluation-table">
+<!--                    <thead>-->
+<!--                    <tr id="student-name-header"> &lt;!&ndash; Student Name Header &ndash;&gt; </tr>-->
+<!--                    </thead>-->
+<!--                    <tbody>-->
+<!--                    <tr>-->
+<!--                        <td style="text-align: left;">-->
+<!--                            <strong>Evaluate Score</strong>-->
+<!--                            <div class="subtitle">Advisor Please evaluate <span class="max-score">Max Score-->
+<!--                                            10</span>-->
+<!--                            </div>-->
+<!--                        </td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                    </tr>-->
+<!--                    </tbody>-->
                 </table>
             </div>
 
@@ -206,7 +208,6 @@
                 console.log("Data received from API:", data);
                 displayStudentScore(data);
                 displayResultsCards(data);
-                displayStudentHeader(data);
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
@@ -299,150 +300,52 @@
         }
     }
 
-    function displayStudentHeader(data) {
-        if (!Array.isArray(data)) {
-            data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
-        }
 
-        try {
-            data.forEach(project => {
-                const studentNameHeader = document.getElementById('student-name-header');
+</script>
 
-                studentNameHeader.innerHTML = '';
+<!--================================  Modal  ==========================================-->
 
-                // เพิ่ม <th> ช่องว่างแรก
-                const emptyTh = document.createElement('th');
-                emptyTh.innerHTML = '';  // ช่องว่าง
-                studentNameHeader.appendChild(emptyTh);
-
-                // เพิ่ม <th> สำหรับนักศึกษาทุกคน
-                project.students.forEach(student => {
-                    const studentTh = document.createElement('th');
-                    studentTh.innerHTML = `${student.studentId} ${student.studentName}`;
-                    studentNameHeader.appendChild(studentTh);
-                });
-
-                // ใช้ฟังก์ชันเดียวกัน สำหรับอีก Header นึง
-                const studentNameHeader2 = document.getElementById('student-name-header-2');
-                if (studentNameHeader2) {
-                    studentNameHeader2.innerHTML = '';
-                    studentNameHeader2.appendChild(emptyTh.cloneNode(true)); // เพิ่มช่องว่าง
-
-                    project.students.forEach(student => {
-                        const studentTh2 = document.createElement('th');
-                        studentTh2.innerHTML = `${student.studentId} ${student.studentName}`;
-                        studentNameHeader2.appendChild(studentTh2);  // เพิ่มข้อมูลที่เหมือนกัน
-                    });
-                }
-            });
-        } catch (error) {
-            console.error("Error displaying data: ", error);
-        }
-    }
-
+<script>
     // Modal popup logic
     const modalTemplate = `
-    <div id="popup-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6);">
-        <div style="background: white; width: 80%; margin: 5% auto; padding: 20px; position: relative;">
-                    <button id="close-modal" style="position: absolute; top: 10px; right: 10px;">Close</button>
-                    <div class="table-container">
-                        <h1> Score Evaluation </h1>
-                        <hr>
-                        <div class="user-section">
-                            <span class="icon">
-                                <i class="fa fa-user" style="font-size: 32px; color: #000;"></i>
-                                <div class="text-container">
-                                    <div class="name">Aj.Siripen Pongpaichet</div>
-                                    <div class="subtitle">Advisor</div>
-                                </div>
-                            </span>
+        <div id="popup-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6);">
+            <div style="background: white; width: 80%; margin: 5% auto; padding: 20px; position: relative;">
+                        <button id="close-modal" style="position: absolute; top: 10px; right: 10px;">Close</button>
+                        <div class="table-container">
+                            <h1> Score Evaluation </h1>
+                            <hr>
+                            <div class="user-section">
+                                <span class="icon">
+                                    <i class="fa fa-user" style="font-size: 32px; color: #000;"></i>
+                                    <div class="text-container">
+                                        <div class="name">
+                                                 <!--              value              -->
+                                        </div>
+                                        <div class="subtitle">
+                                                 <!--              value              -->
+                                        </div>
+                                    </div>
+                                </span>
+                            </div>
+
+                            <h1>Proposal Presentation (20%)</h1>
+                            <table class="evaluation-table" id="presentation-table">
+                                    <!--              value              -->
+                            </table>
+                        </div>
+                        <div class="table-container">
+                            <h1>Document (20%)</h1>
+                            <table class="evaluation-table" id="document-table">
+                                    <!--              value              -->
+                            </table>
                         </div>
 
-                        <h1>Proposal Presentation (20%)</h1>
-                        <table class="evaluation-table">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>6487002 Tunyarat</th>
-                                    <th>6487023 Chanyanuch</th>
-                                    <th>6487069 Neadnapa</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="text-align: left;"> <strong>Quality of work</strong>
-                                        <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>
-                                        </div>
-                                    </td>
-                                    <td><input type="text"/></td>
-                                    <td><input type="text"/></td>
-                                    <td><input type="text"/></td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align: left;"> <strong>Level of Progress</strong>
-                                        <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>
-                                        </div>
-                                    </td>
-                                    <td><input type="text"/></td>
-                                    <td><input type="text"/></td>
-                                    <td><input type="text"/></td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align: left;"> <strong>Presentation Language</strong>
-                                        <div class="subtitle">ภาษาในการนำเสนอ <span class="max-score">Max Score
-                                                10</span></div>
-                                    </td>
-                                    <td><input type="text"/></td>
-                                    <td><input type="text"/></td>
-                                    <td><input type="text"/></td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align: left;"> <strong>Question & Answer</strong>
-                                        <div class="subtitle">การตอบคำถาม <span class="max-score">Max Score 10</span>
-                                        </div>
-                                    </td>
-                                    <td><input type="text"/></td>
-                                    <td><input type="text"/></td>
-                                    <td><input type="text"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
+                        <div style="text-align: center; margin-top: 20px;">
+                           <button id="pre-instructor" style="margin-right: 10px;">Previous</button>
+                           <button id="next-instructor">Next</button>
+                        </div>
                     </div>
-                    <div class="table-container">
-                        <h1>Document (20%)</h1>
-                        <table class="evaluation-table">
-                            <thead>
-                                <tr>
-                                    <th></th>
-                                    <th>6487002 Tunyarat</th>
-                                    <th>6487023 Chanyanuch</th>
-                                    <th>6487069 Neadnapa</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td style="text-align: left;"> <strong>Quality of work</strong>
-                                        <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>
-                                        </div>
-                                    </td>
-                                    <td><input type="text"/></td>
-                                    <td><input type="text"/></td>
-                                    <td><input type="text"/></td>
-                                </tr>
-                                <tr>
-                                    <td style="text-align: left;"> <strong>Timeline</strong>
-                                        <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>
-                                        </div>
-                                    </td>
-                                    <td><input type="text"/></td>
-                                    <td><input type="text"/></td>
-                                    <td><input type="text"/></td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-    </div>`;
+            </div>`;
 
     document.body.insertAdjacentHTML('beforeend', modalTemplate);
 
@@ -460,7 +363,281 @@
             document.getElementById("popup-modal").style.display = "none";
         }
     });
+
+
 </script>
+
+
+<!--================================  Fern  ==========================================-->
+
+
+<script th:inline="javascript">
+
+    function criteriaProposal() {
+        let url = `http://localhost:8080/instructor/criteriaProposalGrade`;
+
+        return fetch(url)
+            .then(response =>{
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                // console.log("JSON: " + response.json());
+                return response.json();
+            });
+    }
+    function studentProposalCriteria(projectId) {
+        let url = `http://localhost:8080/instructor/studentProposalCriteria?projectId=${encodeURIComponent(projectId)}`;
+
+        return fetch(url)
+            .then(response =>{
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                // console.log("JSON: " + response.json());
+                return response.json();
+            })
+    }
+
+    function criteriaProposalEva() {
+        let url = `http://localhost:8080/instructor/criteriaProposal`;
+
+        return fetch(url)
+            .then(response =>{
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                // console.log("JSON: " + response.json());
+                return response.json();
+            });
+    }
+    function studentProposalEvaCriteria(projectId) {
+        let url = `http://localhost:8080/instructor/studentProposalCriteria?projectId=${encodeURIComponent(projectId)}`;
+
+        return fetch(url)
+            .then(response =>{
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                // console.log("JSON: " + response.json());
+                return response.json();
+            })
+    }
+
+    function projectInstructor(projectId) {
+        let url = `http://localhost:8080/project/instructor?projectId=${encodeURIComponent(projectId)}`;
+
+        return fetch(url)
+            .then(response =>{
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                // console.log("JSON: " + response.json());
+                return response.json();
+            })
+    }
+
+    function fetchData(projectId) {
+        Promise.all([
+            criteriaProposal(),
+            studentProposalCriteria(projectId),
+            criteriaProposalEva(),
+            studentProposalEvaCriteria(projectId),
+            projectInstructor(projectId)
+        ])
+            .then(data => {
+                const criteriaProposalData = data[0];
+                const studentProposalCriteriaData = data[1];
+                const criteriaProposalEva = data[2];
+                const studentProposalEvaCriteria = data[3];
+                const projectInstructor = data[4];
+
+                console.log("criteriaProposalData Length: "+ criteriaProposalData.length);
+                console.log("Show Data criteriaProposalData: " + JSON.stringify(criteriaProposalData, null, 2));
+
+                console.log("studentProposalCriteriaData Length: "+ studentProposalCriteriaData.length);
+                console.log("Show Data studentProposalCriteriaData: " + JSON.stringify(studentProposalCriteriaData, null, 2));
+
+                console.log("criteriaProposalEva Length: "+ criteriaProposalEva.length);
+                console.log("Show Data criteriaProposalEva: " + JSON.stringify(criteriaProposalEva, null, 2));
+
+                console.log("studentProposalEvaCriteria Length: "+ studentProposalEvaCriteria.length);
+                console.log("Show Data studentProposalEvaCriteria: " + JSON.stringify(studentProposalEvaCriteria, null, 2));
+
+                console.log("projectInstructor Length: "+ projectInstructor.length);
+                console.log("Show Data projectInstructor: " + JSON.stringify(projectInstructor, null, 2));
+
+                displayGradeCriteria(data)
+
+                updateInstructorModal(projectInstructor)
+                displayPresentCriteria(data)
+                displayDocumentCriteria(data)
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const projectId = document.getElementById('projectIdInput').value;
+        console.log("ID send to html: " + projectId);
+
+        if (projectId && projectId.trim() !== '') {
+            fetchData(projectId);
+        } else {
+            console.error('Project ID is not defined or is invalid.');
+        }
+
+    });
+
+    //================================  displayGradeCriteria  ==========================================
+    function displayGradeCriteria(data) {
+
+        const criterias = data[0];
+        const students = data[1];
+
+        const table = document.getElementById("grade-evaluation-table");
+        table.innerHTML = "";
+
+        const thead = document.createElement("thead");
+        const rowHeader = document.createElement("tr");
+
+        rowHeader.innerHTML = `
+            <th></th>
+            ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}
+        `;
+        thead.appendChild(rowHeader);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+
+        criterias.forEach(criteria => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td style="text-align: left;">
+                    <strong>${criteria.criteriaName}</strong><br>
+                    <span class="subtitle">${criteria.criteriaNameTH}</span>
+                    <span class="max-score">Max Score ${criteria.maxScore}</span>
+                </td>
+                ${students.map(() => `<td><input type="number" min="0" max="${criteria.maxScore}" /></td>`).join('')}
+            `;
+            tbody.appendChild(row);
+        });
+        table.appendChild(tbody)
+    }
+
+    //================================  displayProposalCriteria  ==========================================
+
+    function displayPresentCriteria(data) {
+
+        const criteria = data[2];
+        const students = data[3];
+
+        const table = document.getElementById("presentation-table");
+        table.innerHTML = "";
+
+        const thead = document.createElement("thead");
+        const rowHeader = document.createElement("tr");
+
+        rowHeader.innerHTML = `
+            <th></th>
+            ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}
+        `;
+        thead.appendChild(rowHeader);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+
+        const presentCriteria = criteria.filter(i => i.type === "Proposal Presentation");
+
+        presentCriteria.forEach(criteria => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td style="text-align: left">
+                    <strong>${criteria.criteriaName}</strong><br>
+                    <span class="subtitle">${criteria.criteriaNameTH}</span>
+                    <span class="max-score">Max Score ${criteria.maxScore}</span>
+                </td>
+                ${students.map(() => `<td></td>`).join('')}
+            `;
+            tbody.appendChild(row);
+        });
+        table.appendChild(tbody)
+    }
+
+    function displayDocumentCriteria(data) {
+
+        const criteria = data[2];
+        const students = data[3];
+
+        const table = document.getElementById("document-table");
+        table.innerHTML = "";
+
+        const thead = document.createElement("thead");
+        const rowHeader = document.createElement("tr");
+
+        rowHeader.innerHTML = `
+            <th></th>
+            ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}
+        `;
+        thead.appendChild(rowHeader);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+
+        const documentCriteria = criteria.filter(i => i.type === "Document");
+
+        documentCriteria.forEach(criteria => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td style="text-align: left">
+                    <strong>${criteria.criteriaName}</strong><br>
+                    <span class="subtitle">${criteria.criteriaNameTH}</span>
+                    <span class="max-score">Max Score ${criteria.maxScore}</span>
+                </td>
+                ${students.map(() => `<td></td>`).join('')}
+            `;
+            tbody.appendChild(row);
+        });
+        table.appendChild(tbody);
+    }
+
+
+    //================================  displayModal  ==========================================
+
+    function updateInstructorModal(instructors) {
+
+        currentInstructor = 0;
+        updateModalContent(currentInstructor, instructors);
+
+        document.getElementById("pre-instructor").addEventListener("click", function () {
+            if (currentInstructor > 0) {
+                currentInstructor --;
+                updateModalContent(currentInstructor, instructors);
+            }
+        });
+
+        document.getElementById("next-instructor").addEventListener("click", function () {
+            if (currentInstructor < instructors.length - 1) {
+                currentInstructor ++;
+                updateModalContent(currentInstructor, instructors);
+            }
+        });
+
+    }
+
+
+    //================================  displayInstructor  ==========================================
+
+    function updateModalContent(index, instructors) {
+        const instructor = instructors[index];
+        document.querySelector(".user-section .name").textContent = instructor.professorName;
+        document.querySelector(".user-section .subtitle").textContent = instructor.role;
+    }
+
+
+
+</script>
+
 
 
 </html>

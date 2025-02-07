@@ -102,7 +102,9 @@
                 <!--                </div>-->
 
                 <div class="details">
-                    <div><strong>Project ID:</strong> <span id="project-id"></span></div>
+                    <div><strong>Project ID:</strong> <span id="project-id"></span>
+                        <input type="hidden" id="projectIdInput" th:value="${projectId}">
+                    </div>
                     <div><strong>Project Title:</strong> <span id="project-title"></span></div>
                     <div><strong>Project Advisor:</strong> <span id="project-advisor"></span></div>
                     <div><strong>Project Description:</strong> <span id="project-description"></span></div>
@@ -164,59 +166,60 @@
             <div class="table-container">
                 <h1>Proposal Presentation (20%)</h1>
                 <label class="checkbox-group">
-                    <input type="checkbox"/>
+                    <input type="checkbox" id = "sameScorePresent" onchange="applySameScorePresent()"/>
                     Enter the same scores for all students
                     <div class="subtitle">
                         ต้องการกรอกคะแนนเหมือนกันทั้งหมดหรือไม่
                     </div>
                 </label>
 
-                <table class="evaluation-table">
-                    <thead>
-                    <tr id="student-name-header"> <!-- Student Name Header --> </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>
-                            <strong>Quality of work</strong>
-                            <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>
-                            </div>
-                        </td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Level of Progress</strong>
-                            <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>
-                            </div>
-                        </td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Presentation Language</strong>
-                            <div class="subtitle">ภาษาในการนำเสนอ <span class="max-score">Max Score
-                                            10</span></div>
-                        </td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Question & Answer</strong>
-                            <div class="subtitle">การตอบคำถาม <span class="max-score">Max Score 10</span>
-                            </div>
-                        </td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                    </tr>
-                    </tbody>
+
+                <table class="evaluation-table" id="presentation-table">
+<!--                    <thead>-->
+<!--                    <tr id="student-name-header"> &lt;!&ndash; Student Name Header &ndash;&gt; </tr>-->
+<!--                    </thead>-->
+<!--                    <tbody>-->
+<!--                    <tr>-->
+<!--                        <td>-->
+<!--                            <strong>Quality of work</strong>-->
+<!--                            <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>-->
+<!--                            </div>-->
+<!--                        </td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                    </tr>-->
+<!--                    <tr>-->
+<!--                        <td>-->
+<!--                            <strong>Level of Progress</strong>-->
+<!--                            <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>-->
+<!--                            </div>-->
+<!--                        </td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                    </tr>-->
+<!--                    <tr>-->
+<!--                        <td>-->
+<!--                            <strong>Presentation Language</strong>-->
+<!--                            <div class="subtitle">ภาษาในการนำเสนอ <span class="max-score">Max Score-->
+<!--                                            10</span></div>-->
+<!--                        </td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                    </tr>-->
+<!--                    <tr>-->
+<!--                        <td>-->
+<!--                            <strong>Question & Answer</strong>-->
+<!--                            <div class="subtitle">การตอบคำถาม <span class="max-score">Max Score 10</span>-->
+<!--                            </div>-->
+<!--                        </td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                    </tr>-->
+<!--                    </tbody>-->
                 </table>
             </div>
 
@@ -224,45 +227,45 @@
             <div class="table-container">
                 <h1> Document (20%)</h1>
                 <label class="checkbox-group">
-                    <input type="checkbox"/>
+                    <input type="checkbox" id="sameScoreDocument" onchange="applySameScoreDocument()"/>
                     Enter the same scores for all students
                     <div class="subtitle">
                         ต้องการกรอกคะแนนเหมือนกันทั้งหมดหรือไม่
                     </div>
                 </label>
 
-                <table class="evaluation-table">
-                    <thead>
-                    <tr id="student-name-header-2">
+                <table class="evaluation-table" id="document-table">
+<!--                    <thead>-->
+<!--                    <tr id="student-name-header-2">-->
+<!--&lt;!&ndash;                    <tr>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <th></th>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <th>6487002 Tunyarat</th>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <th>6487023 Chanyanuch</th>&ndash;&gt;-->
+<!--&lt;!&ndash;                        <th>6487069 Neadnapa</th>&ndash;&gt;-->
+<!--&lt;!&ndash;                    </tr>&ndash;&gt;-->
+<!--                    </thead>-->
+<!--                    <tbody>-->
 <!--                    <tr>-->
-<!--                        <th></th>-->
-<!--                        <th>6487002 Tunyarat</th>-->
-<!--                        <th>6487023 Chanyanuch</th>-->
-<!--                        <th>6487069 Neadnapa</th>-->
+<!--                        <td>-->
+<!--                            <strong>Quality of work</strong>-->
+<!--                            <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>-->
+<!--                            </div>-->
+<!--                        </td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
 <!--                    </tr>-->
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>
-                            <strong>Quality of work</strong>
-                            <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>
-                            </div>
-                        </td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <strong>Timeline</strong>
-                            <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>
-                            </div>
-                        </td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                        <td><input type="number" min="0" max="10" value="0"/></td>
-                    </tr>
-                    </tbody>
+<!--                    <tr>-->
+<!--                        <td>-->
+<!--                            <strong>Timeline</strong>-->
+<!--                            <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>-->
+<!--                            </div>-->
+<!--                        </td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+<!--                    </tr>-->
+<!--                    </tbody>-->
                 </table>
             </div>
 
@@ -331,7 +334,6 @@
                 console.log("Data received from API:", data);
                 displayStudentScore(data);
                 displayResultsCards(data);
-                displayStudentHeader(data);
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
@@ -425,48 +427,266 @@
         }
     }
 
-    function displayStudentHeader(data) {
-        if (!Array.isArray(data)) {
-            data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
+
+
+
+</script>
+
+
+<!--================================  Fern  ==========================================-->
+
+<script th:inline="javascript">
+
+    function criteriaProposal() {
+        let url = `http://localhost:8080/instructor/criteriaProposal`;
+
+        return fetch(url)
+            .then(response =>{
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                // console.log("JSON: " + response.json());
+                return response.json();
+            });
+    }
+    function studentProposalCriteria(projectId) {
+        let url = `http://localhost:8080/instructor/studentProposalCriteria?projectId=${encodeURIComponent(projectId)}`;
+
+        return fetch(url)
+            .then(response =>{
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                // console.log("JSON: " + response.json());
+                return response.json();
+            })
+    }
+
+    function fetchData(projectId) {
+        Promise.all([
+            criteriaProposal(),
+            studentProposalCriteria(projectId)
+        ])
+            .then(data => {
+                const criteriaProposalData = data[0];
+                const studentProposalCriteriaData = data[1];
+
+                console.log("criteriaProposalData Length: "+ criteriaProposalData.length);
+                console.log("Show Data criteriaProposalData: " + JSON.stringify(criteriaProposalData, null, 2));
+
+                console.log("studentProposalCriteriaData Length: "+ studentProposalCriteriaData.length);
+                console.log("Show Data studentProposalCriteriaData: " + JSON.stringify(studentProposalCriteriaData, null, 2));
+
+                displayPresentCriteria(data)
+                displayDocumentCriteria(data)
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const projectId = document.getElementById('projectIdInput').value;
+        console.log("ID send to html: " + projectId);
+
+        if (projectId && projectId.trim() !== '') {
+            fetchData(projectId);
+        } else {
+            console.error('Project ID is not defined or is invalid.');
         }
+    });
 
-        try {
-            data.forEach(project => {
-                const studentNameHeader = document.getElementById('student-name-header');
+    //================================  displayPresentCriteria  ==========================================
+    function displayPresentCriteria(data) {
 
-                studentNameHeader.innerHTML = '';
+        const criteria = data[0];
+        const students = data[1];
 
-                // เพิ่ม <th> ช่องว่างแรก
-                const emptyTh = document.createElement('th');
-                emptyTh.innerHTML = '';  // ช่องว่าง
-                studentNameHeader.appendChild(emptyTh);
+        const table = document.getElementById("presentation-table");
+        table.innerHTML = "";
 
-                // เพิ่ม <th> สำหรับนักศึกษาทุกคน
-                project.students.forEach(student => {
-                    const studentTh = document.createElement('th');
-                    studentTh.innerHTML = `${student.studentId} ${student.studentName}`;
-                    studentNameHeader.appendChild(studentTh);
+        const thead = document.createElement("thead");
+        const rowHeader = document.createElement("tr");
+
+        rowHeader.innerHTML = `
+            <th></th>
+            ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}
+        `;
+        thead.appendChild(rowHeader);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+
+        const presentCriteria = criteria.filter(i => i.type === "Proposal Presentation");
+
+        presentCriteria.forEach(criteria => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>
+                    <strong>${criteria.criteriaName}</strong><br>
+                    <span class="subtitle">${criteria.criteriaNameTH}</span>
+                    <span class="max-score">Max Score ${criteria.maxScore}</span>
+                </td>
+                ${students.map(() => `<td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}" /></td>`).join('')}
+            `;
+            tbody.appendChild(row);
+        });
+        table.appendChild(tbody)
+        inputListenersPresent();
+    }
+
+    function inputListenersPresent() {
+
+        // all tr
+        const rows = document.querySelectorAll("#presentation-table tbody tr");
+
+        rows.forEach(row => {
+            // all input tr
+            const inputs = row.querySelectorAll(".present-score-input");
+            inputs.forEach(input => {
+                input.addEventListener("input", (event) => {
+                    const checkbox = document.getElementById("sameScorePresent");
+                    if (checkbox.checked) {
+                        const newValue = event.target.value;
+                        // apply
+                        inputs.forEach(otherInput => {
+                            otherInput.value = newValue;
+                        });
+                    }
                 });
+            });
+        });
+    }
 
-                // ใช้ฟังก์ชันเดียวกัน สำหรับอีก Header นึง
-                const studentNameHeader2 = document.getElementById('student-name-header-2');
-                if (studentNameHeader2) {
-                    studentNameHeader2.innerHTML = '';
-                    studentNameHeader2.appendChild(emptyTh.cloneNode(true)); // เพิ่มช่องว่าง
+    // https://www.geeksforgeeks.org/javascript-auto-filling-one-field/
+    function applySameScorePresent() {
 
-                    project.students.forEach(student => {
-                        const studentTh2 = document.createElement('th');
-                        studentTh2.innerHTML = `${student.studentId} ${student.studentName}`;
-                        studentNameHeader2.appendChild(studentTh2);  // เพิ่มข้อมูลที่เหมือนกัน
+        console.log("applySameScorePresent called");
+
+        const checkBox = document.getElementById("sameScorePresent").checked;
+        // all of tr
+        const rows = document.querySelectorAll("#presentation-table tbody tr");
+
+        if (checkBox) {
+            rows.forEach(row => {
+                // ทุกตัวภายใน input tr
+                const inputs = row.querySelectorAll(".present-score-input");
+                let firstValue = "";
+
+                // check first value
+                for (let input of inputs) {
+                    if (input.value.trim() !== "") {
+                        firstValue = input.value;
+                        break;
+                    }
+                }
+
+                // apply value
+                if (firstValue !== "") {
+                    inputs.forEach(input => {
+                        input.value = firstValue;
                     });
                 }
+
             });
-        } catch (error) {
-            console.error("Error displaying data: ", error);
         }
     }
 
+    //================================  displayDocumentCriteria  ==========================================
+    function displayDocumentCriteria(data) {
 
+        const criteria = data[0];
+        const students = data[1];
+
+        const table = document.getElementById("document-table");
+        table.innerHTML = "";
+
+        const thead = document.createElement("thead");
+        const rowHeader = document.createElement("tr");
+
+        rowHeader.innerHTML = `
+            <th></th>
+            ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}
+        `;
+        thead.appendChild(rowHeader);
+        table.appendChild(thead);
+
+        const tbody = document.createElement("tbody");
+
+        const documentCriteria = criteria.filter(i => i.type === "Document");
+
+        documentCriteria.forEach(criteria => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+                <td>
+                    <strong>${criteria.criteriaName}</strong><br>
+                    <span class="subtitle">${criteria.criteriaNameTH || ""}</span>
+                    <span class="max-score">Max Score ${criteria.maxScore}</span>
+                </td>
+                ${students.map(() => `<td><input type="number" class="document-score-input" min="0" max="${criteria.maxScore}" /></td>`).join('')}
+            `;
+            tbody.appendChild(row);
+        });
+        table.appendChild(tbody);
+        inputListenersDocument();
+    }
+
+    function inputListenersDocument() {
+
+        // all tr
+        const rows = document.querySelectorAll("#document-table tbody tr");
+
+        rows.forEach(row => {
+            // all input tr
+            const inputs = row.querySelectorAll(".document-score-input");
+            inputs.forEach(input => {
+                input.addEventListener("input", (event) => {
+                    const checkbox = document.getElementById("sameScoreDocument");
+                    if (checkbox.checked) {
+                        const newValue = event.target.value;
+                        // apply
+                        inputs.forEach(otherInput => {
+                            otherInput.value = newValue;
+                        });
+                    }
+                });
+            });
+        });
+    }
+
+    // https://www.geeksforgeeks.org/javascript-auto-filling-one-field/
+    function applySameScoreDocument() {
+
+        console.log("applySameScoreDocument called");
+
+        const checkBox = document.getElementById("sameScoreDocument").checked;
+        // all of tr
+        const rows = document.querySelectorAll("#document-table tbody tr");
+
+        if (checkBox) {
+            rows.forEach(row => {
+                // ทุกตัวภายใน input tr
+                const inputs = row.querySelectorAll(".document-score-input");
+                let firstValue = "";
+
+                // check first value
+                for (let input of inputs) {
+                    if (input.value.trim() !== "") {
+                        firstValue = input.value;
+                        break;
+                    }
+                }
+
+                // apply value
+                if (firstValue !== "") {
+                    inputs.forEach(input => {
+                        input.value = firstValue;
+                    });
+                }
+
+            });
+        }
+    }
 
 </script>
 

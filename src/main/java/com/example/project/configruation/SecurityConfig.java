@@ -31,7 +31,7 @@ public class SecurityConfig {
 //                        .ignoringRequestMatchers("/user/details")
 //                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/css/**", "/js/**", "/publicProjectDetail").permitAll()
+                        .requestMatchers("/login", "/css/**", "/js/**", "/publicProjectDetail", "/instructor/criteriaDefenseGrade").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/instructor/**").hasRole("INSTRUCTOR")
                         .anyRequest().authenticated()

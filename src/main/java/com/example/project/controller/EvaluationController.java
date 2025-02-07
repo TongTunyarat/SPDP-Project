@@ -5,6 +5,7 @@ import com.example.project.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import com.example.project.DTO.InstructorProjectDTO;
@@ -24,7 +25,9 @@ public class EvaluationController {
 
     // send project when click edit
     @GetMapping("/instructor/editProposalEvaluation")
-    public String getProjectPropDetails(@RequestParam String projectId){
+    public String getProjectPropDetails(@RequestParam String projectId, Model model){
+
+        model.addAttribute("projectId", projectId);
         return "GiveScore/GivePropEvaScore";
     }
 
@@ -43,7 +46,8 @@ public class EvaluationController {
         List<StudentProjectDTO> studentProjectDTOS = ((Project) project).getStudentProjects().stream()
                 .map(studentProject -> new StudentProjectDTO(
                         studentProject.getStudent().getStudentId(),
-                        studentProject.getStudent().getStudentName()))
+                        studentProject.getStudent().getStudentName(),
+                        studentProject.getStatus()))
                 .toList();
 
         // Return DTO ตามข้อมูลโครงการที่ดึงมา
@@ -61,7 +65,9 @@ public class EvaluationController {
     // -------------------- Poster Evaluation -------------------- //
     // send project when click edit
     @GetMapping("/instructor/editPosterEvaluation")
-    public String getProjectPosterDetails(@RequestParam String projectId){
+    public String getProjectPosterDetails(@RequestParam String projectId, Model model){
+
+        model.addAttribute("projectId", projectId);
         return "GiveScore/GivePosterScore";
     }
 
@@ -80,7 +86,8 @@ public class EvaluationController {
         List<StudentProjectDTO> studentProjectDTOS = ((Project) project).getStudentProjects().stream()
                 .map(studentProject -> new StudentProjectDTO(
                         studentProject.getStudent().getStudentId(),
-                        studentProject.getStudent().getStudentName()))
+                        studentProject.getStudent().getStudentName(),
+                        studentProject.getStatus()))
                 .toList();
 
         // Return DTO ตามข้อมูลโครงการที่ดึงมา
@@ -98,15 +105,18 @@ public class EvaluationController {
 
     // send project when click edit
     @GetMapping("/instructor/editDefenseEvaluation")
-    public String getProjectDefDetails(@RequestParam String projectId){
+    public String getProjectDefDetails(@RequestParam String projectId, Model model){
+
+        model.addAttribute("projectId", projectId);
         return "GiveScore/GiveDefEvaScore";
     }
 
     // project list by user with specific projectId
     @GetMapping("/instructor/giveScoreDefenseEvaluation")
     @ResponseBody
-    public InstructorProjectDTO getProjectDefById(@RequestParam String projectId) {
+    public InstructorProjectDTO getProjectDefById(@RequestParam String projectId, Model model) {
         // ดึงข้อมูลโครงการด้วย service ที่มีอยู่
+        model.addAttribute("projectId", projectId);
         Project project = projectService.getProjectDetails(projectId);
 
         if (project == null) {
@@ -117,7 +127,8 @@ public class EvaluationController {
         List<StudentProjectDTO> studentProjectDTOS = ((Project) project).getStudentProjects().stream()
                 .map(studentProject -> new StudentProjectDTO(
                         studentProject.getStudent().getStudentId(),
-                        studentProject.getStudent().getStudentName()))
+                        studentProject.getStudent().getStudentName(),
+                        studentProject.getStatus()))
                 .toList();
 
         // Return DTO ตามข้อมูลโครงการที่ดึงมา

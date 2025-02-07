@@ -7,6 +7,7 @@ import com.example.project.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -24,7 +25,10 @@ public class GradeScoreController {
 
     // send project when click edit
     @GetMapping("/instructor/editProposalGrade")
-    public String getProjectPropDetails(@RequestParam String projectId){
+    public String getProjectPropDetails(@RequestParam String projectId, Model model){
+
+        model.addAttribute("projectId", projectId);
+
         return "GiveScore/GivePropGradeScore";
     }
 
@@ -43,7 +47,8 @@ public class GradeScoreController {
         List<StudentProjectDTO> studentProjectDTOS = ((Project) project).getStudentProjects().stream()
                 .map(studentProject -> new StudentProjectDTO(
                         studentProject.getStudent().getStudentId(),
-                        studentProject.getStudent().getStudentName()))
+                        studentProject.getStudent().getStudentName(),
+                        studentProject.getStatus()))
                 .toList();
 
         // Return DTO ตามข้อมูลโครงการที่ดึงมา
@@ -60,7 +65,8 @@ public class GradeScoreController {
 
     // send project when click edit
     @GetMapping("/instructor/editDefenseGrade")
-    public String getProjectDefDetails(@RequestParam String projectId){
+    public String getProjectDefDetails(@RequestParam String projectId, Model model){
+        model.addAttribute("projectId", projectId);
         return "GiveScore/GiveDefGradeScore";
     }
 
@@ -79,7 +85,8 @@ public class GradeScoreController {
         List<StudentProjectDTO> studentProjectDTOS = ((Project) project).getStudentProjects().stream()
                 .map(studentProject -> new StudentProjectDTO(
                         studentProject.getStudent().getStudentId(),
-                        studentProject.getStudent().getStudentName()))
+                        studentProject.getStudent().getStudentName(),
+                        studentProject.getStatus()))
                 .toList();
 
         // Return DTO ตามข้อมูลโครงการที่ดึงมา

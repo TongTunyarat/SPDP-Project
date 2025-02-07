@@ -26,6 +26,12 @@ public class Criteria {
     @Column(name = "weight")
     private float weight;
 
+    @Column(name = "evaluation_phase")
+    private String evaluationPhase;
+
+    @Column(name = "criteria_name_TH")
+    private String criteriaNameTH;
+
     // map to defense eva score
     @OneToMany(mappedBy = "criteria", cascade = CascadeType.ALL)
     @JsonBackReference
@@ -103,5 +109,21 @@ public class Criteria {
 
     public void setPosterEvaluationScores(List<PosterEvaluationScore> posterEvaluationScores) {
         this.posterEvaluationScores = posterEvaluationScores;
+    }
+
+    public String getEvaluationPhase() {
+        return evaluationPhase;
+    }
+
+    public void setEvaluationPhase(String evaluationPhase) {
+        this.evaluationPhase = evaluationPhase;
+    }
+
+    public String getCriteriaNameTH() {
+        return criteriaNameTH;
+    }
+
+    public void setCriteriaNameTH(String criteriaNameTH) {
+        this.criteriaNameTH = criteriaNameTH;
     }
 }

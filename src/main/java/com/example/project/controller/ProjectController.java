@@ -19,6 +19,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Controller
@@ -56,13 +57,19 @@ public class ProjectController {
         // return JSON
         return projectInstructorRoles.stream()
                 .map(i -> {
-                    // getStudentProjects -> studentProjects (Project Entity) => (StudentProjects Entity)
+                    // getStudentProjects -> เอา studentProjects (Project Entity) => (StudentProjects Entity)
                     List<StudentProjectDTO> studentProjectDTOS = i.getProjectIdRole().getStudentProjects().stream()
+                            .filter(studentProject -> "Active".equals(studentProject.getStatus()))
                             .map(studentProject -> new StudentProjectDTO(
                                     // getStudent() -> ใน (StudentProjects Entity)
                                     studentProject.getStudent().getStudentId(),
-                                    studentProject.getStudent().getStudentName()))
+                                    studentProject.getStudent().getStudentName(),
+                                    studentProject.getStatus()))
                             .toList();
+
+                    if (studentProjectDTOS.isEmpty()) {
+                        return null;
+                    }
 
                     return new InstructorProjectDTO(
                             // i -> projectInstructorRoles
@@ -74,8 +81,11 @@ public class ProjectController {
                             i.getRole(),
                             studentProjectDTOS
                     );
-                }).collect(Collectors.toList());
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
+
 
     // project list by user filter Advisor
     @GetMapping("/advisor/projectList")
@@ -93,13 +103,19 @@ public class ProjectController {
         return projectInstructorRoles.stream()
                 .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()))
                 .map(i -> {
-                    // getStudentProjects -> studentProjects (Project Entity) => (StudentProjects Entity)
+                    // getStudentProjects -> เอา studentProjects (Project Entity) => (StudentProjects Entity)
                     List<StudentProjectDTO> studentProjectDTOS = i.getProjectIdRole().getStudentProjects().stream()
+                            .filter(studentProject -> "Active".equals(studentProject.getStatus()))
                             .map(studentProject -> new StudentProjectDTO(
                                     // getStudent() -> ใน (StudentProjects Entity)
                                     studentProject.getStudent().getStudentId(),
-                                    studentProject.getStudent().getStudentName()))
+                                    studentProject.getStudent().getStudentName(),
+                                    studentProject.getStatus()))
                             .toList();
+
+                    if (studentProjectDTOS.isEmpty()) {
+                        return null;
+                    }
 
                     return new InstructorProjectDTO(
                             // i -> projectInstructorRoles
@@ -111,7 +127,9 @@ public class ProjectController {
                             i.getRole(),
                             studentProjectDTOS
                     );
-                }).collect(Collectors.toList());
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     // project list by user filter Committee
@@ -130,13 +148,19 @@ public class ProjectController {
         return projectInstructorRoles.stream()
                 .filter(i -> "Committee".equalsIgnoreCase(i.getRole()))
                 .map(i -> {
-                    // getStudentProjects -> studentProjects (Project Entity) => (StudentProjects Entity)
+                    // getStudentProjects -> เอา studentProjects (Project Entity) => (StudentProjects Entity)
                     List<StudentProjectDTO> studentProjectDTOS = i.getProjectIdRole().getStudentProjects().stream()
+                            .filter(studentProject -> "Active".equals(studentProject.getStatus()))
                             .map(studentProject -> new StudentProjectDTO(
                                     // getStudent() -> ใน (StudentProjects Entity)
                                     studentProject.getStudent().getStudentId(),
-                                    studentProject.getStudent().getStudentName()))
+                                    studentProject.getStudent().getStudentName(),
+                                    studentProject.getStatus()))
                             .toList();
+
+                    if (studentProjectDTOS.isEmpty()) {
+                        return null;
+                    }
 
                     return new InstructorProjectDTO(
                             // i -> projectInstructorRoles
@@ -148,7 +172,9 @@ public class ProjectController {
                             i.getRole(),
                             studentProjectDTOS
                     );
-                }).collect(Collectors.toList());
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/instructor/getProjectDetails")
