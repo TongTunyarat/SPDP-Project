@@ -3,6 +3,8 @@ package com.example.project.repository;
 import com.example.project.entity.ProposalEvaluation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface ProposalEvaluationRepository extends JpaRepository<ProposalEvaluation, String> {
+import java.util.List;
 
+public interface ProposalEvaluationRepository extends JpaRepository<ProposalEvaluation, String> {
+    List<ProposalEvaluation> findByProject_ProjectId(String projectId);
 }
