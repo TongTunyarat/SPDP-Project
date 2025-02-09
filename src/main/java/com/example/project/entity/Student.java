@@ -44,6 +44,10 @@ public class Student {
     @JsonBackReference
     private List<ProposalEvaluation> proposalEvaluations;
 
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
+    @JsonBackReference
+    private List<DefenseEvaluation> defenseEvaluations;
+
     public Student() {
 
     }
@@ -139,5 +143,11 @@ public class Student {
         this.proposalEvaluations = proposalEvaluations;
     }
 
+    public List<DefenseEvaluation> getDefenseEvaluations() {
+        return defenseEvaluations;
+    }
 
+    public void setDefenseEvaluations(List<DefenseEvaluation> defenseEvaluations) {
+        this.defenseEvaluations = defenseEvaluations;
+    }
 }

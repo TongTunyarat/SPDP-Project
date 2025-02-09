@@ -73,6 +73,7 @@ public class ProposalGradeController {
     public List<InstructorProjectListDTO> getInstructorProject(String projectId) {
         List<ProjectInstructorRole> projectInstructorRoleList = proposalGradeService.getInstructorProject(projectId);
         return projectInstructorRoleList.stream()
+                .filter(instructorRole -> "Committee".equals(instructorRole.getRole())||"Advisor".equals(instructorRole.getRole()))
                 .map(instructor ->
                         new InstructorProjectListDTO(
                                 instructor.getInstructorId(),

@@ -54,6 +54,11 @@ public class DefenseEvaluation {
     @JsonManagedReference
     private ProjectInstructorRole defenseInstructorId;
 
+    @ManyToOne
+    @JoinColumn(name="student_id")
+    @JsonManagedReference
+    private Student student;
+
 //
 //    @ManyToOne
 //    @JoinColumn(name = "student_id", referencedColumnName = "student_id")
@@ -130,5 +135,13 @@ public class DefenseEvaluation {
 
     public void setDefenseInstructorId(ProjectInstructorRole defenseInstructorId) {
         this.defenseInstructorId = defenseInstructorId;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
     }
 }
