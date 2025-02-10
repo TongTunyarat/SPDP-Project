@@ -16,6 +16,7 @@ import java.util.List;
 public class PosterEvaluation {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "poster_id")
     private String posterId;
 
@@ -61,71 +62,80 @@ public class PosterEvaluation {
         return posterId;
     }
 
-    public void setPosterId(String posterId) {
+    public PosterEvaluation setPosterId(String posterId) {
         this.posterId = posterId;
+        return this;
     }
 
     public String getComment() {
         return comment;
     }
 
-    public void setComment(String comment) {
+    public PosterEvaluation setComment(String comment) {
         this.comment = comment;
+        return this;
     }
 
     public LocalDateTime getEditedOn() {
         return editedOn;
     }
 
-    public void setEditedOn(LocalDateTime editedOn) {
+    public PosterEvaluation setEditedOn(LocalDateTime editedOn) {
         this.editedOn = editedOn;
+        return this;
     }
 
     public LocalDateTime getRecordedOn() {
         return recordedOn;
     }
 
-    public void setRecordedOn(LocalDateTime recordedOn) {
+    public PosterEvaluation setRecordedOn(LocalDateTime recordedOn) {
         this.recordedOn = recordedOn;
+        return this;
     }
 
     public Account getRecordedByPoster() {
         return recordedByPoster;
     }
 
-    public void setRecordedByPoster(Account recordedByPoster) {
+    public PosterEvaluation setRecordedByPoster(Account recordedByPoster) {
         this.recordedByPoster = recordedByPoster;
+        return this;
     }
 
     public Account getEditedByPoster() {
         return editedByPoster;
     }
 
-    public void setEditedByPoster(Account editedByPoster) {
+    public PosterEvaluation setEditedByPoster(Account editedByPoster) {
         this.editedByPoster = editedByPoster;
+        return this;
     }
 
     public Project getProjectIdPoster() {
         return projectIdPoster;
     }
 
-    public void setProjectIdPoster(Project projectIdPoster) {
+    public PosterEvaluation setProjectIdPoster(Project projectIdPoster) {
         this.projectIdPoster = projectIdPoster;
+        return this;
     }
 
     public ProjectInstructorRole getInstructorIdPoster() {
         return instructorIdPoster;
     }
 
-    public void setInstructorIdPoster(ProjectInstructorRole instructorIdPoster) {
+    public PosterEvaluation setInstructorIdPoster(ProjectInstructorRole instructorIdPoster) {
         this.instructorIdPoster = instructorIdPoster;
+        return this;
     }
 
     public List<PosterEvaluationScore> getPosterEvaluationScores() {
         return posterEvaluationScores;
     }
 
-    public void setPosterEvaluationScores(List<PosterEvaluationScore> posterEvaluationScores) {
+    public PosterEvaluation setPosterEvaluationScores(List<PosterEvaluationScore> posterEvaluationScores) {
         this.posterEvaluationScores = posterEvaluationScores;
+        return this;
     }
 }
