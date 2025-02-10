@@ -226,5 +226,6 @@ public class Project {
     public void setGradingProposalEvaluations(List<GradingProposalEvaluation> gradingProposalEvaluations) {
         this.gradingProposalEvaluations = gradingProposalEvaluations;
     }
+
 }
 

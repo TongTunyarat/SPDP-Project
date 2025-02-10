@@ -49,8 +49,10 @@ public class TestController {
 
     @Autowired
     private RoomRepository roomRepository;
+
     @Autowired
     private PosterEvaRepository posterEvaRepository;
+
     @Autowired
     private PosterEvaScoreRepository posterEvaScoreRepository;
 

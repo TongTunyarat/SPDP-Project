@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Dashboard </title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/sidebar-instructor.css">
+    <link rel="stylesheet" href="/css/dashboard-instructor.css">
+
+    <!-- Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+
+<body>
+<div class="container">
+    <div class="sidebar">
+        <h2>ICT MAHIDOL</h2>
+        <ul>
+            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                     style="fill:#FFFFFF;">
+                <path
+                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+                </path>
+            </svg> Homepage </h4>
+            <li><a href="#">Dashboard</a></li>
+        </ul>
+
+        <ul>
+            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                <g fill="#ffffff" fill-rule="nonzero">
+                    <g transform="scale(5.33333,5.33333)">
+                        <path
+                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                        </path>
+                    </g>
+                </g>
+            </svg> Evaluation (40%) </h4>
+            <li><a href="/show-proposal-eva-projects">Proposal Evaluation</a></li>
+            <li><a href="/show-poster-projects">Poster Evaluation</a></li>
+            <li><a href="/show-defense-eva-projects">Defense Evaluation</a></li>
+        </ul>
+
+        <ul>
+            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                <g fill="#ffffff" fill-rule="nonzero">
+                    <g transform="scale(5.33333,5.33333)">
+                        <path
+                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                        </path>
+                    </g>
+                </g>
+            </svg> Grades (60%) </h4>
+            <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>
+            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+
+        <div class="header-section">
+            Dashboard
+        </div>
+
+        <div class="body-section">
+
+            <!-- Card Header -->
+            <div class="card-wrapper">
+                <div class="header-container">
+                    <label class="text-header"> DST Project </label>
+
+                    <label class="text-center">
+                        <h1> 5 <span style="color: #919EAB;">Groups</span></h1>
+                    </label>
+
+                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
+                </div>
+
+                <div class="header-container">
+                    <label class="text-header"> ICT Project </label>
+                    <label class="text-center">
+                        <h1> 5 <span style="color: #919EAB;">Groups</span></h1>
+                    </label>
+                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
+                </div>
+
+                <div class="header-container">
+                    <label class="text-header"> Proposal Evaluation </label>
+                    <label class="text-center">
+                        <h1> 5 <span style="color: #919EAB;">Groups</span></h1>
+                    </label>
+
+                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
+                </div>
+
+                <div class="header-container">
+                    <label class="text-header"> Poster Evaluation </label>
+                    <label class="text-center">
+                        <h1> 5 <span style="color: #919EAB;">Groups</span></h1>
+                    </label>
+
+                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
+                </div>
+
+                <div class="header-container">
+                    <label class="text-header"> Defense Evaluation </label>
+                    <label class="text-center">
+                        <h1> 5 <span style="color: #919EAB;">Groups</span></h1>
+                    </label>
+
+                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
+                </div>
+            </div>
+
+
+            <!-- Reminder -->
+            <div class="reminder-container">
+                <div class="reminder-title">
+                    <i class="fa-solid fa-bell"></i>
+                    Reminder
+                </div>
+
+                <div class="reminder-item">
+                    <div class="reminder-content">
+                        <div>
+                            <i class="fa-solid fa-circle-notch reminder-icon"></i>
+                            <span class="reminder-text">การประเมิน Proposal Presentation</span>
+                        </div>
+                        <span class="reminder-subtitle">กรอกคะแนน Proposal Evaluation</span>
+                    </div>
+                    <div class="reminder-date">กำหนด: 15/01/2025</div>
+                </div>
+
+                <div class="reminder-item">
+                    <div class="reminder-content">
+                        <div>
+                            <i class="fa-solid fa-circle-notch reminder-icon "></i>
+                            <span class="reminder-text">การประเมิน Poster Presentation</span>
+                        </div>
+                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>
+                    </div>
+                    <div class="reminder-date">กำหนด: 15/01/2025</div>
+                </div>
+
+                <div class="reminder-item">
+                    <div class="reminder-content">
+                        <div>
+                            <i class="fa-solid fa-circle-notch reminder-icon "></i>
+                            <span class="reminder-text">การประเมิน Proposal Presentation</span>
+                        </div>
+                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>
+                    </div>
+                    <div class="reminder-date">กำหนด: 15/01/2025</div>
+                </div>
+
+            </div>
+
+
+            <!-- Schedule Present -->
+            <div class="schedule-container">
+                <div class="schedule-title">
+                    <i class="fa-solid fa-calendar"></i>
+                    Schedule for Presentation
+                </div>
+
+                <p class="warning-text">
+                    <i class="fa-solid fa-triangle-exclamation"></i> If you wish to cancel the presentation
+                    schedule, please contact staff.
+                </p>
+
+                <div class="schedule-item">
+                    <div class="schedule-header">
+                        <div class="schedule-header-tags">
+                            <span class="tag tag-advisor">Advisor</span>
+                            <span class="tag tag-proposal">Proposal</span>
+                            <span class="tag tag-ict">ICT</span>
+                        </div>
+                        <div class="status-btn status-btn-pending">รอการประเมิน</div>
+                    </div>
+
+                    <div class="schedule-content">
+                        <strong>ระบบ Senior Project Digital Platform</strong>
+                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>
+                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>
+                        <p><span class="schedule-room">Room: </span> Lab 1</p>
+                    </div>
+                </div>
+
+                <div class="schedule-item">
+                    <div class="schedule-header">
+                        <div class="schedule-header-tags">
+                            <span class="tag tag-committee">Committee</span>
+                            <span class="tag tag-proposal">Proposal</span>
+                            <span class="tag tag-dst">DST</span>
+                        </div>
+                        <div class="status-btn status-btn-pending">รอการประเมิน</div>
+                    </div>
+
+                    <div class="schedule-content">
+                        <strong>ระบบ SPDP MANAGEMENT</strong>
+                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>
+                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>
+                        <p><span class="schedule-room">Room: </span> Lab 1</p>
+                    </div>
+                </div>
+
+                <div class="schedule-item">
+                    <div class="schedule-header">
+                        <div class="schedule-header-tags">
+                            <span class="tag tag-advisor">Advisor</span>
+                            <span class="tag tag-defense">Defense</span>
+                            <span class="tag tag-dst">DST</span>
+                        </div>
+                        <div class="status-btn status-btn-in-progress">กำลังจะมาถึง</div>
+                    </div>
+
+                    <div class="schedule-content">
+                        <strong>ระบบ Senior Project Digital Platform</strong>
+                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>
+                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>
+                        <p><span class="schedule-room">Room: </span> Lab 1</p>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+</body>
+
+</html>

@@ -1,10 +1,47 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Instructor Home Page</title>
-</head>
-<body>
-    <h1>Hi Instructor</h1>
-</body>
-</html>
+<!--<!DOCTYPE html>-->
+<!--<html xmlns:th="http://www.thymeleaf.org">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <title>Instructor Home Page</title>-->
+<!--    <style>-->
+<!--        table { width: 100%; border-collapse: collapse; }-->
+<!--        th, td { border: 1px solid black; padding: 10px; text-align: left; }-->
+<!--        th { background-color: #f2f2f2; }-->
+<!--    </style>-->
+<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">-->
+<!--</head>-->
+<!--<body>-->
+<!--<h1>Hi Instructor</h1>-->
+<!--<table>-->
+<!--    <thead>-->
+<!--    <tr>-->
+<!--        <th>Project ID</th>-->
+<!--        <th>Project Title</th>-->
+<!--        <th>Role</th>-->
+<!--        <th>Students</th>-->
+<!--        <th>Action</th>-->
+<!--    </tr>-->
+<!--    </thead>-->
+<!--    <tbody>-->
+<!--    <tr th:each="project : ${projects}">-->
+<!--        <td th:text="${project.projectId}th:text="${project.projectId}"></td>-->
+<!--        <td th:text="${project.projectTitle}"></td>-->
+<!--        <td th:text="${project.role}"></td>-->
+<!--        <td>-->
+<!--            <ul>-->
+<!--                <li th:each="student : ${project.students}">-->
+<!--                    <span th:text="${student.studentId}"></span> - <span th:text="${student.studentName}"></span>-->
+<!--                </li>-->
+<!--            </ul>-->
+<!--        </td>-->
+<!--        <td>-->
+<!--            <form th:action="@{/instructor/editEvaluation}" method="get">-->
+<!--                <input type="hidden" name="projectId" th:value="${project.projectId}">-->
+<!--                <button type="submit"><i style="font-size:24px" class="fa">&#xf044;</i></button>-->
+<!--            </form>-->
+<!--        </td>-->
+<!--    </tr>-->
+<!--    </tbody>-->
+<!--</table>-->
+<!--</body>-->
+<!--</html>-->

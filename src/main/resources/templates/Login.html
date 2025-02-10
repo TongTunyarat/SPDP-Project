@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
-    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="/css/login.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 
 </head>
@@ -20,6 +20,7 @@
             <form th:action="@{/login}" method="post">
                 <div class="input-group">
                     <span class="icon"><i class="fas fa-envelope"></i></span>
+                    <!-- รับค่า -->
                     <input type="text" name="username" placeholder="Username" required>
                 </div>
                 <div class="input-group">
@@ -27,6 +28,7 @@
                     <input type="password" name="password" placeholder="Password" id="password" required>
                 </div>
                 <a th:if="${error}" th:text="${error}" style="color: red;" ></a>
+                <a th:if="${message}" th:text="${message}" style="color: green;"></a>
 
                 <!--                <a href="#">Forgot Password?</a>-->
 
