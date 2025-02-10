@@ -1,15 +1,9 @@
 package com.example.project.service;
 
 
-import com.example.project.entity.Criteria;
-import com.example.project.entity.Project;
-import com.example.project.entity.Student;
-import com.example.project.entity.StudentProject;
-import com.example.project.repository.CriteriaRepository;
-import com.example.project.repository.ProjectRepository;
-import com.example.project.repository.StudentProjectRepository;
+import com.example.project.entity.*;
+import com.example.project.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,10 +19,24 @@ public class ProposalEvaluationService {
     @Autowired
     private ProjectRepository projectRepository;
 
-    public ProposalEvaluationService(CriteriaRepository criteriaRepository, StudentProjectRepository studentProjectRepository, ProjectRepository projectRepository) {
+    @Autowired
+    private final ProposalEvaluationRepository proposalEvaluationRepository;
+
+    @Autowired
+    private final ProposalEvalScoreRepository proposalEvalScoreRepository;
+
+    @Autowired
+    public ProposalEvaluationService(ProposalEvaluationRepository proposalEvaluationRepository, ProposalEvalScoreRepository proposalEvalScoreRepository) {
+        this.proposalEvaluationRepository = proposalEvaluationRepository;
+        this.proposalEvalScoreRepository = proposalEvalScoreRepository;
+    }
+
+    public ProposalEvaluationService(CriteriaRepository criteriaRepository, StudentProjectRepository studentProjectRepository, ProjectRepository projectRepository, ProposalEvaluationRepository proposalEvaluationRepository, ProposalEvalScoreRepository proposalEvalScoreRepository) {
         this.criteriaRepository = criteriaRepository;
         this.studentProjectRepository = studentProjectRepository;
         this.projectRepository = projectRepository;
+        this.proposalEvaluationRepository = proposalEvaluationRepository;
+        this.proposalEvalScoreRepository = proposalEvalScoreRepository;
     }
 
     //=========================================== USE ===================================================
@@ -48,4 +56,11 @@ public class ProposalEvaluationService {
         List<StudentProject> studentProjectList = project.getStudentProjects();
         return studentProjectList;
     }
+
+   // get student score
+   public List<ProposalEvalScore> getProposalEvalScoresByProjectId(String projectId) {
+       // สมมุติว่า ProposalEvalScore มีการเชื่อมโยงกับ ProposalEvaluation และ Project
+       return proposalEvalScoreRepository.findByProposalEvaluation_Project_ProjectId(projectId);
+   }
+
 }

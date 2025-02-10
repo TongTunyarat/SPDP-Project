@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 import org.w3c.dom.Text;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Entity
 @Table(name = "proposalevalscore")
@@ -33,13 +34,13 @@ public class ProposalEvalScore {
     @JsonManagedReference
     private ProposalEvaluation proposalEvaluation;
 
+    public static Optional<Object> stream() {
+        return null;
+    }
+
 //    @Column(name = "proposal_id")
 //    private String proposalId;
 
-
-    public ProposalEvalScore() {
-
-    }
 
     public String getEvaId() {
         return evaId;
@@ -72,4 +73,6 @@ public class ProposalEvalScore {
     public void setCriteria(Criteria criteria) {
         this.criteria = criteria;
     }
+
+
 }
