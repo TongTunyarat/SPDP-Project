@@ -94,25 +94,24 @@
             </div>
 
             <!-- Student Score -->
-            <div class="table-container">
-                <h1>Student Score</h1>
-                <table>
+<!--            <div class="table-container">-->
+<!--                <h1>Student Score</h1>-->
+<!--                <table>-->
 
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Quality of Work</th>
-                        <th>Level of Progress</th>
-                        <th>Presentation Language</th>
-                        <th>Question & Answer</th>
-                        <th>Result</th>
-                    </tr>
-                    </thead>
+<!--                    <thead>-->
+<!--                    <tr>-->
+<!--                        <th>Name</th>-->
+<!--                        <th>Quality of Work</th>-->
+<!--                        <th>Level of Progress</th>-->
+<!--                        <th>Presentation Language</th>-->
+<!--                        <th>Question & Answer</th>-->
+<!--                        <th>Result</th>-->
+<!--                    </tr>-->
+<!--                    </thead>-->
 
-                    <tbody id="student-score">
-                    <!-- Record Result -->
-
-                    </tbody>
+<!--                    <tbody id="student-score"> </tbody>-->
+<!--                </table>-->
+<!--            </div>-->
                     <!--                    <tbody>-->
                     <!--                    <tr>-->
                     <!--                        <td style="text-align: left;"> Tunyarat Nithirunpattana</td>-->
@@ -139,8 +138,7 @@
                     <!--                        <td>40</td>-->
                     <!--                    </tr>-->
                     <!--                    </tbody>-->
-                </table>
-            </div>
+
 
             <!-- Presentation -->
             <div class="table-container">
@@ -284,6 +282,7 @@
 </div>
 
 <script>
+
     window.onload = function () {
         const projectId = getProjectIdFromURL();
 
@@ -298,7 +297,7 @@
 
 
         fetchAndDisplayInstructor(projectId)
-        fetchAndDisplayScores(projectId);
+        // fetchAndDisplayScores(projectId);
         fetchAndDisplayCardResultScores(projectId);
 
     };
@@ -364,59 +363,59 @@
         document.getElementById('project-advisor').textContent = instructor.professorName;
     }
 
-    async function fetchAndDisplayScores(projectId) {
-        const url = `http://localhost:8080/instructor/showScoreProposal?projectId=${encodeURIComponent(projectId)}`;
-
-        try {
-            const response = await fetch(url);
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            const scoreData = await response.json();
-
-            const tableBody = document.querySelector('tbody');
-            tableBody.innerHTML = ""; // Clear existing rows
-
-            // Group scores by student
-            const studentScoresMap = {};
-            scoreData.forEach(score => {
-                if (!studentScoresMap[score.studentId]) {
-                    studentScoresMap[score.studentId] = {
-                        studentName: score.studentName,
-                        scores: {
-                            "Quality of Work": 0,
-                            "Level of Progress": 0,
-                            "Presentation Language": 0,
-                            "Question & Answer": 0
-                        }
-                    };
-                }
-                if (studentScoresMap[score.studentId].scores.hasOwnProperty(score.criteriaName)) {
-                    studentScoresMap[score.studentId].scores[score.criteriaName] = score.score;
-                }
-            });
-
-            // Populate table rows
-            Object.values(studentScoresMap).forEach(studentData => {
-                const { studentName, scores } = studentData;
-                const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
-
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                <td style="text-align: left;">${studentName}</td>
-                <td>${scores["Quality of Work"]}</td>
-                <td>${scores["Level of Progress"]}</td>
-                <td>${scores["Presentation Language"]}</td>
-                <td>${scores["Question & Answer"]}</td>
-                <td>${totalScore.toFixed(2)}</td>
-            `;
-                tableBody.appendChild(row);
-            });
-
-        } catch (error) {
-            console.error('Error fetching or displaying score proposal:', error);
-        }
-    }
+    // async function fetchAndDisplayScores(projectId) {
+    //     const url = `http://localhost:8080/instructor/showScoreProposal?projectId=${encodeURIComponent(projectId)}`;
+    //
+    //     try {
+    //         const response = await fetch(url);
+    //         if (!response.ok) {
+    //             throw new Error(`HTTP error! status: ${response.status}`);
+    //         }
+    //         const scoreData = await response.json();
+    //
+    //         const tableBody = document.querySelector('tbody');
+    //         tableBody.innerHTML = ""; // Clear existing rows
+    //
+    //         // Group scores by student
+    //         const studentScoresMap = {};
+    //         scoreData.forEach(score => {
+    //             if (!studentScoresMap[score.studentId]) {
+    //                 studentScoresMap[score.studentId] = {
+    //                     studentName: score.studentName,
+    //                     scores: {
+    //                         "Quality of Work": 0,
+    //                         "Level of Progress": 0,
+    //                         "Presentation Language": 0,
+    //                         "Question & Answer": 0
+    //                     }
+    //                 };
+    //             }
+    //             if (studentScoresMap[score.studentId].scores.hasOwnProperty(score.criteriaName)) {
+    //                 studentScoresMap[score.studentId].scores[score.criteriaName] = score.score;
+    //             }
+    //         });
+    //
+    //         // Populate table rows
+    //         Object.values(studentScoresMap).forEach(studentData => {
+    //             const {studentName, scores} = studentData;
+    //             const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
+    //
+    //             const row = document.createElement('tr');
+    //             row.innerHTML = `
+    //             <td style="text-align: left;">${studentName}</td>
+    //             <td>${scores["Quality of Work"]}</td>
+    //             <td>${scores["Level of Progress"]}</td>
+    //             <td>${scores["Presentation Language"]}</td>
+    //             <td>${scores["Question & Answer"]}</td>
+    //             <td>${totalScore.toFixed(2)}</td>
+    //         `;
+    //             tableBody.appendChild(row);
+    //         });
+    //
+    //     } catch (error) {
+    //         console.error('Error fetching or displaying score proposal:', error);
+    //     }
+    // }
 
     async function fetchAndDisplayCardResultScores(projectId) {
         const url = `http://localhost:8080/instructor/showScoreProposal?projectId=${encodeURIComponent(projectId)}`;
@@ -452,7 +451,7 @@
 
             // Populate cards for each student
             Object.values(studentScoresMap).forEach(studentData => {
-                const { studentName, scores } = studentData;
+                const {studentName, scores} = studentData;
                 const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
 
                 const card = document.createElement('div');
@@ -507,7 +506,7 @@
     function fetchData(projectId) {
         Promise.all([
             criteriaProposal(),
-            studentProposalCriteria(projectId),
+            studentProposalCriteria(projectId)
         ])
             .then(data => {
                 const criteriaProposalData = data[0];
@@ -521,7 +520,6 @@
 
                 displayPresentCriteria(data)
                 displayDocumentCriteria(data)
-
             })
             .catch(error => {
                 console.error('Error fetching data:', error);

@@ -103,6 +103,29 @@ public class ProposalGradeController {
                                         )).collect(Collectors.toList());
     }
 
+    // request and response modal
+//    @GetMapping("/instructor/showScorePropGrade")
+//    @ResponseBody
+//    public List<ProposalEvaResponseDTO> getPropGradeScore(@RequestParam String projectId) {
+//
+//        List<ProposalEvalScore> proposalGradeScoreList = proposalGradeService.getProposalEvalScoresByProjectId(projectId);
+//
+//        return proposalGradeService.getFilterProposalEvaScore(projectId)
+//
+//
+//                .map(evaScore -> new ProposalEvaResponseDTO(
+//                        evaScore.getEvaId(),
+//                        evaScore.getProposalEvaluation().getStudent().getStudentId(),
+//                        evaScore.getProposalEvaluation().getStudent().getStudentName(),
+//                        evaScore.getCriteria().getCriteriaId(),
+//                        evaScore.getCriteria().getCriteriaName(),
+//                        evaScore.getCriteria().getType(),
+//                        evaScore.getScore().doubleValue()
+//                ))
+//                .collect(Collectors.toList());
+//    }
+
+
 
 
 

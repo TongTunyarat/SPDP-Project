@@ -1,9 +1,12 @@
 package com.example.project.controller;
 
 import com.example.project.DTO.*;
-import com.example.project.entity.Criteria;
-import com.example.project.entity.ProjectInstructorRole;
+import com.example.project.entity.*;
+import com.example.project.repository.ProjectInstructorRoleRepository;
+import com.example.project.service.DefenseEvaluationService;
 import com.example.project.service.DefenseGradeService;
+import com.example.project.service.ProposalEvaluationService;
+import com.example.project.service.ProposalGradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -37,6 +40,12 @@ public class DefenseGradeController {
 
     @Autowired
     private DefenseGradeService defenseGradeService;
+
+    @Autowired
+    private ProjectInstructorRoleRepository projectInstructorRoleRepository;
+
+    @Autowired
+    private DefenseEvaluationService defenseEvaluationService;
 
     // get criteria DTO
     @GetMapping("/instructor/criteriaDefenseGrade")
@@ -91,5 +100,32 @@ public class DefenseGradeController {
                                 evaScore.getScore().doubleValue()
                         )).collect(Collectors.toList());
     }
+
+    public DefenseGradeController(DefenseEvaluationService defenseEvaluationService, DefenseGradeService defenseGradeService ) {
+        this.defenseEvaluationService = defenseEvaluationService;
+        this.defenseGradeService = defenseGradeService;
+    }
+
+    @GetMapping("/instructor/showGradeScoreDefense")
+    @ResponseBody
+    public List<DefenseEvaResponseDTO> getScoreDefense(@RequestParam String projectId) {
+        // ดึงข้อมูล DefenseEvalScore ตาม projectId
+        List<DefenseEvaResponseDTO> defenseEvalScoreList = defenseGradeService.getDefenseEvalScoresByProjectId(projectId);
+
+        return defenseEvalScoreList.stream()
+                .map(score -> new DefenseEvaResponseDTO(
+                        score.getEvaId(),
+                        score.getStudentId(),
+                        score.getStudentName(),
+                        score.getCriteriaId(),
+                        score.getCriteriaName(),
+                        score.getType(),
+                        score.getScore()
+                ))
+                .collect(Collectors.toList());
+    }
+
+
+
 
 }

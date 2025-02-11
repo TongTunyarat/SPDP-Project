@@ -1,5 +1,7 @@
 package com.example.project.DTO;
 
+import java.math.BigDecimal;
+
 public class DefenseEvaResponseDTO {
     private String evaId;
     private String studentId;
