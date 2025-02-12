@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,6 +27,9 @@ public class DefenseEvaluation {
 
     @Column(name = "edited_on")
     private LocalDateTime editedOn;
+
+    @Column(name="total_score")
+    private BigDecimal totalScore;
 
     @OneToMany(mappedBy = "defenseEvaluation", cascade = CascadeType.ALL)
     @JsonManagedReference
@@ -149,6 +153,15 @@ public class DefenseEvaluation {
 
     public DefenseEvaluation setStudentDefense(Student studentDefense) {
         this.studentDefense = studentDefense;
+        return this;
+    }
+
+    public BigDecimal getTotalScore() {
+        return totalScore;
+    }
+
+    public DefenseEvaluation setTotalScore(BigDecimal totalScore) {
+        this.totalScore = totalScore;
         return this;
     }
 }

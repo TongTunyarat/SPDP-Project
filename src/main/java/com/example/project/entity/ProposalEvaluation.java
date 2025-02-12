@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -31,6 +32,9 @@ public class ProposalEvaluation {
 
     @Column(name="edited_on")
     private LocalDateTime editedOn;
+
+    @Column(name="total_score")
+    private BigDecimal totalScore;
 
     @ManyToOne
     @JoinColumn(name = "recorded_by")
@@ -149,6 +153,15 @@ public class ProposalEvaluation {
 
     public ProposalEvaluation setProposalEvalScores(List<ProposalEvalScore> proposalEvalScores) {
         this.proposalEvalScores = proposalEvalScores;
+        return this;
+    }
+
+    public BigDecimal getTotalScore() {
+        return totalScore;
+    }
+
+    public ProposalEvaluation setTotalScore(BigDecimal totalScore) {
+        this.totalScore = totalScore;
         return this;
     }
 }

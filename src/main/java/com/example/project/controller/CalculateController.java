@@ -38,6 +38,10 @@ public class CalculateController {
     private DefenseEvaluationRepository defenseEvaluationRepository;
     @Autowired
     private PosterEvaRepository posterEvaRepository;
+    @Autowired
+    private GradingProposalEvaluationRepository gradingProposalEvaluationRepository;
+    @Autowired
+    private GradingDefenseEvaluationRepository gradingDefenseEvaluationRepository;
 
 
     @PostMapping("/testsave")
@@ -233,7 +237,7 @@ public class CalculateController {
             if (evalType.equalsIgnoreCase("proposal")) {
                 studentScoreDTO = calculateService.calculateTotalScoreProposal(instructor, project, student);
             } else if (evalType.equalsIgnoreCase("defense")) {
-//                studentScoreDTO = calculateService.calculateTotalScoreDefense(instructor, project, student);
+                studentScoreDTO = calculateService.calculateTotalScoreDefense(instructor, project, student);
             } else {
                 return ResponseEntity.badRequest().body(null);
             }
@@ -295,6 +299,90 @@ public class CalculateController {
     }
 
 
+    // ------------------ Grade --------------------------//
+    @PostMapping("/saveProposalGrade")
+    public ResponseEntity<String> saveProposalGrade(
+            @RequestParam String projectId,
+            @RequestParam String studentId,
+            @RequestBody List<ScoreDTO> scores) {
+        try {
+            System.out.println("Save Grade Controller");
+
+            Project project = findProject(projectId);
+            Student student = findStudent(studentId);
+
+            // ✅ เรียกใช้ Service
+            String grade = calculateService.saveProposalGrade(project, student, scores);
+
+            return ResponseEntity.ok("Grading Result: "+grade);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/getGradeProposal")
+    public ResponseEntity<?> getGradeProposal(
+            @RequestParam String projectId,
+            @RequestParam String studentId) {
+        try {
+            System.out.println("Get Grade Controller");
+
+            Project project = findProject(projectId);
+            Student student = findStudent(studentId);
+
+            GradingProposalEvaluation score = gradingProposalEvaluationRepository.findByProjectAndStudent(project, student);
+            System.out.println("[Controller] Get Score Response: "+score);
+
+            return ResponseEntity.ok(score); // ส่งค่าคะแนนกลับไป
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/saveDefenseGrade")
+    public ResponseEntity<String> saveDefenseGrade(
+            @RequestParam String instructorId,
+            @RequestParam String projectId,
+            @RequestParam String studentId,
+            @RequestBody List<ScoreDTO> scores) {
+        try {
+            System.out.println("Save Grade Controller");
+
+            ProjectInstructorRole instructor = findInstructor(instructorId);
+            Project project = findProject(projectId);
+            Student student = findStudent(studentId);
+
+            // ✅ เรียกใช้ Service
+            String grade = calculateService.saveDefenseGrade(instructor, project, student, scores);
+
+            return ResponseEntity.ok("Grading Result: "+grade);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/getGradeDefense")
+    public ResponseEntity<?> getGradeDefense(
+//            @RequestParam String instructorId,
+            @RequestParam String projectId,
+            @RequestParam String studentId) {
+        try {
+            System.out.println("Get Grade Controller");
+
+//            ProjectInstructorRole instructor = findInstructor(instructorId);
+            Project project = findProject(projectId);
+            Student student = findStudent(studentId);
+
+            GradingDefenseEvaluation score = gradingDefenseEvaluationRepository.findByProjectIdAndStudentId(project, student);
+            System.out.println("[Controller] Get Score Response: "+score);
+
+            return ResponseEntity.ok(score); // ส่งค่าคะแนนกลับไป
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+        }
+    }
+
+
 
 
 
@@ -323,17 +411,5 @@ public class CalculateController {
         return studentRepository.findById(studentId)
                 .orElseThrow(() -> new RuntimeException("Student not found: " + studentId));
     }
-
-//            ProjectInstructorRole instructor = projectInstructorRoleRepository.findById(instructorId)
-//                    .orElseThrow(() -> new RuntimeException("Instructor not found"));
-//            System.out.println("[Controller] Instructor: " + instructor.getInstructorId());
-//
-//            Project project = projectRepository.findById(projectId)
-//                    .orElseThrow(() -> new RuntimeException("Project not found"));
-//            System.out.println("[Controller] Project: " + project.getProjectId());
-
-//            Student student = studentRepository.findById(studentId)
-//                    .orElseThrow(() -> new RuntimeException("Student not found"));
-//            System.out.println("[Controller] Student: " + student.getStudentName());
 
 }

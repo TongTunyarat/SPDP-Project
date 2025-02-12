@@ -5,13 +5,17 @@ import com.example.project.DTO.Score.ScoreDetail;
 import com.example.project.DTO.Score.StudentScoreDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
-import jakarta.persistence.EntityNotFoundException;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.*;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.time.LocalDateTime;
+import java.util.*;
 
 @Service
 public class CalculateService {
@@ -33,9 +37,14 @@ public class CalculateService {
     @Autowired
     private ProposalEvaluationRepository proposalEvaluationRepository;
 
+    @Autowired
+    private GradingProposalEvaluationRepository gradingProposalEvaluationRepository;
+    @Autowired
+    private GradingDefenseEvaluationRepository gradingDefenseEvaluationRepository;
+    @Autowired
+    private ProjectInstructorRoleRepository projectInstructorRoleRepository;
 
-
-
+    // ---------------------- Proposal Eva -------------------------//
     @Transactional
     public void saveEvaluation(ProjectInstructorRole instructor, Project project, Student student, List<ScoreDTO> scores) {
         System.out.println("[Service] Inside saveEvaluation");
@@ -95,6 +104,58 @@ public class CalculateService {
         }
     }
 
+    public StudentScoreDTO calculateTotalScoreProposal(ProjectInstructorRole instructor, Project project, Student student) {
+        // 🔍 ค้นหา Evaluation ของนักศึกษา
+        ProposalEvaluation evaluation = evaluationRepository.findByProjectInstructorRoleAndProjectAndStudent(instructor, project, student);
+
+        if (evaluation == null) {
+            throw new EntityNotFoundException("Proposal evaluation not found");
+        }
+
+        double rawTotalScore = 0.0;
+        List<ScoreDetail> scoreDetails = new ArrayList<>();
+
+        for (ProposalEvalScore score : evaluation.getProposalEvalScores()) {
+            // ✅ ดึงค่า Max Score และแปลงเป็น Double
+            String maxScoreStr = score.getCriteria().getMaxScore();
+            double maxScore = (maxScoreStr != null && !maxScoreStr.isEmpty()) ?
+                    Double.parseDouble(maxScoreStr) : 10.0; // Default เป็น 10
+
+            // ✅ ดึงค่า Weight และแปลงเป็น Double
+            Float weightObj = score.getCriteria().getWeight();
+            double finalWeight = (weightObj != null) ? weightObj.doubleValue() : 1.0;
+
+            // ✅ ดึงค่า Score และตรวจสอบ null
+            Float scoreObj = score.getScore().floatValue();
+            double scoreValue = (scoreObj != null) ? scoreObj.doubleValue() : 0.0;
+
+            // ✅ คำนวณ Weighted Score โดยให้ Weight เป็นคะแนนจริง
+            double weightedScore = (scoreValue / maxScore) * (finalWeight * 100.0);
+            rawTotalScore += weightedScore;
+
+            // ✅ Debug log เพื่อตรวจสอบค่าที่ใช้คำนวณ
+            System.out.println("📌 Criteria: " + score.getCriteria().getCriteriaId());
+            System.out.println("📌 Score: " + scoreValue + ", Max Score: " + maxScore + ", Weight: " + finalWeight + ", Weighted Score: " + weightedScore);
+
+            scoreDetails.add(new ScoreDetail(score.getCriteria().getCriteriaId(), weightedScore));
+        }
+
+        // ✅ คำนวณคะแนนรวมให้เป็น 40%
+        double totalScore = Math.min(rawTotalScore, 40.0);
+
+        // ✅ บันทึกค่า rawTotalScore ลงใน Column `totalScore` ของ Evaluation
+        evaluation.setTotalScore(BigDecimal.valueOf(rawTotalScore));
+        evaluationRepository.save(evaluation);
+
+        // ✅ Debug ค่า rawTotalScore และ totalScore
+        System.out.println("📌 Raw Total Score: " + rawTotalScore);
+        System.out.println("📌 Final Total Score (40%): " + totalScore);
+
+        return new StudentScoreDTO(scoreDetails, rawTotalScore, totalScore);
+    }
+
+
+    // ---------------- Defense Eva ------------------------ //
     @Transactional
     public void saveDefenseEvaluation(ProjectInstructorRole instructor, Project project, Student student, List<ScoreDTO> scores) {
         System.out.println("[Service] Inside saveDefenseEvaluation");
@@ -154,6 +215,58 @@ public class CalculateService {
         }
     }
 
+    public StudentScoreDTO calculateTotalScoreDefense(ProjectInstructorRole instructor, Project project, Student student) {
+        // 🔍 ค้นหา Evaluation ของนักศึกษา
+        DefenseEvaluation evaluation = defenseEvaluationRepository.findByDefenseInstructorIdAndProjectIdAndStudentDefense(instructor, project, student);
+
+        if (evaluation == null) {
+            throw new EntityNotFoundException("Defense evaluation not found");
+        }
+
+        double rawTotalScore = 0.0;
+        List<ScoreDetail> scoreDetails = new ArrayList<>();
+
+        for (DefenseEvalScore score : evaluation.getDefenseEvalScore()) {
+            // ✅ ดึงค่า Max Score และแปลงเป็น Double
+            String maxScoreStr = score.getCriteria().getMaxScore();
+            double maxScore = (maxScoreStr != null && !maxScoreStr.isEmpty()) ?
+                    Double.parseDouble(maxScoreStr) : 10.0; // Default เป็น 10
+
+            // ✅ ดึงค่า Weight และแปลงเป็น Double
+            Float weightObj = score.getCriteria().getWeight();
+            double finalWeight = (weightObj != null) ? weightObj.doubleValue() : 1.0;
+
+            // ✅ ดึงค่า Score และตรวจสอบ null
+            Float scoreObj = (float) score.getScore();
+            double scoreValue = (scoreObj != null) ? scoreObj.doubleValue() : 0.0;
+
+            // ✅ คำนวณ Weighted Score โดยให้ Weight เป็นคะแนนจริง
+            double weightedScore = (scoreValue / maxScore) * (finalWeight * 100.0);
+            rawTotalScore += weightedScore;
+
+            // ✅ Debug log เพื่อตรวจสอบค่าที่ใช้คำนวณ
+            System.out.println("📌 Criteria: " + score.getCriteria().getCriteriaId());
+            System.out.println("📌 Score: " + scoreValue + ", Max Score: " + maxScore + ", Weight: " + finalWeight + ", Weighted Score: " + weightedScore);
+
+            scoreDetails.add(new ScoreDetail(score.getCriteria().getCriteriaId(), weightedScore));
+        }
+
+        // ✅ คำนวณคะแนนรวมให้เป็น 40%
+        double totalScore = Math.min(rawTotalScore, 40.0);
+
+        evaluation.setTotalScore(BigDecimal.valueOf(rawTotalScore));
+        defenseEvaluationRepository.save(evaluation);
+
+        // ✅ Debug ค่า rawTotalScore และ totalScore
+        System.out.println("📌 Raw Total Score: " + rawTotalScore);
+        System.out.println("📌 Final Total Score (40%): " + totalScore);
+
+
+        return new StudentScoreDTO(scoreDetails, rawTotalScore, totalScore);
+    }
+
+
+    // ---------------- Poster Eva ------------------------ //
     @Transactional
     public void savePosterEvaluation(ProjectInstructorRole instructor, Project project, List<ScoreDTO> scores) {
         System.out.println("[Service] Inside savePosterEvaluation");
@@ -231,163 +344,378 @@ public class CalculateService {
 
         double totalScore = rawTotalScore * 0.1; // แปลงเป็น 10%
 
-        return new StudentScoreDTO(scoreDetails, rawTotalScore, totalScore);
-    }
-
-    public StudentScoreDTO calculateTotalScoreProposal(ProjectInstructorRole instructor, Project project, Student student) {
-        ProposalEvaluation evaluation = evaluationRepository.findByProjectInstructorRoleAndProjectAndStudent(instructor, project, student);
-
-        if (evaluation == null) {
-            throw new EntityNotFoundException("Proposal evaluation not found");
-        }
-
-        double rawTotalScore = 0.0;
-        List<ScoreDetail> scoreDetails = new ArrayList<>();
-
-        for (ProposalEvalScore score : evaluation.getProposalEvalScores()) {
-            double weightedScore = score.getScore().doubleValue() * score.getCriteria().getWeight(); // แปลง BigDecimal เป็น double ก่อนคูณ
-            rawTotalScore += weightedScore;
-
-            ScoreDetail detail = new ScoreDetail(score.getCriteria().getCriteriaId(), weightedScore);
-            scoreDetails.add(detail);
-        }
-
-        double totalScore = rawTotalScore * 0.4; // แปลงเป็น 40%
+        evaluation.setTotalScore(BigDecimal.valueOf(rawTotalScore));
+        posterEvaRepository.save(evaluation);
 
         return new StudentScoreDTO(scoreDetails, rawTotalScore, totalScore);
     }
 
 
-//        ใน evaluation จะแสดง
-//        {
-//            "proposalId": "3ee7dec2-19ce-4564-a51b-1547a7d4aa87",
-//            "comment": null,
-//            "projectId": {
-//                "projectId": "DST SP2024-04",
-//            },
-//            "instructorId": {
-//                "instructorId": "INST002",
-//                "projectIdRole":{
-//                    "projectId":"DST SP2024-04",
-//                }
-//            },
-//            "instructor": {
-//                "professorId": "PROF001",
-//                "professorName": "Aj.Akara",
-//            },
-//            "EvaluationScores": [
-//                {
-//                    "EvaId": "3ee7dec2-19ce-4564-a51b-1547a7d4aa87_CRIT013",
-//                    "score": 10.0,
-//                    "criteria": {
-//                        "criteriaId": "CRIT013",
-//                        "maxScore": "5.00",
-//                        "weight": 0.5,
-//                    }
-//                },
-//                {
-//                    "EvaId": "3ee7dec2-19ce-4564-a51b-1547a7d4aa87_CRIT014",
-//                    "score": 10.0,
-//                    "criteria": {
-//                        "criteriaId": "CRIT014",
-//                        "maxScore": "10.00",
-//                        "weight": 0.5,
-//                    }
-//                },
-//                ...
-//            ]
-//        }
-//        ให้คำนวณคะแนนรวมว่าได้ทั้งหมดเท่าไหร่ โดยคิดคะแนนรวมเป็น 10%
 
 
-//        ใน evaluation จะแสดง
-//        {
-//            "posterId": "3ee7dec2-19ce-4564-a51b-1547a7d4aa87",
-//            "comment": null,
-//            "projectIdPoster": {
-//                "projectId": "DST SP2024-04",
-//            },
-//            "instructorIdPoster": {
-//                "instructorId": "INST002",
-//                "projectIdRole":{
-//                    "projectId":"DST SP2024-04",
-//                }
-//            },
-//            "instructor": {
-//                "professorId": "PROF001",
-//                "professorName": "Aj.Akara",
-//            },
-//            "posterEvaluationScores": [
-//                {
-//                    "posterEvaId": "3ee7dec2-19ce-4564-a51b-1547a7d4aa87_CRIT013",
-//                    "score": 10.0,
-//                    "criteriaPoster": {
-//                        "criteriaId": "CRIT013",
-//                        "maxScore": "5.00",
-//                        "weight": 0.0,
-//                    }
-//                },
-//                {
-//                    "posterEvaId": "3ee7dec2-19ce-4564-a51b-1547a7d4aa87_CRIT014",
-//                    "score": 10.0,
-//                    "criteriaPoster": {
-//                        "criteriaId": "CRIT014",
-//                        "maxScore": "5.00",
-//                        "weight": 0.0,
-//                    }
-//                },
-//                ...
-//            ]
-//        }
-//        ให้คำนวณคะแนนรวมว่าได้ทั้งหมดเท่าไหร่ โดยคิดคะแนนรวมเป็น 10%
 
 
-//    public StudentScoreDTO calculateTotalScore(ProjectInstructorRole instructor, Project project, Student student) {
-//        List<ScoreDetail> allScores = new ArrayList<>();
-//        double totalScore = 0.0;
+    // ---------------------- GRADE ---------------------- //
+    @Transactional
+    public String saveProposalGrade(Project project, Student student, List<ScoreDTO> scores) {
+        System.out.println("🪄 [Service] Inside saveProposalGrade");
+
+        // 🔍 ดึงรายการ ProjectInstructorRole ทั้งหมดที่เกี่ยวข้องกับ Project นี้
+        List<ProjectInstructorRole> projectList = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(project.getProjectId());
+        System.out.println("📌 Total ProjectInstructorRole: " + projectList.size());
+
+        // 🔍 ค้นหา ProposalEvaluation ทั้งหมดที่เกี่ยวข้องกับ Project และ Student
+        List<ProposalEvaluation> evaluations = evaluationRepository.findByProjectAndStudent(project, student);
+        System.out.println("📑 Found evaluations: " + evaluations.size());
+
+
+        // ✅ คำนวณค่าเฉลี่ย Proposal Score (ถ้ามีข้อมูล)
+        BigDecimal avgScoreProposal = BigDecimal.ZERO;
+        int totalEvaluators = projectList.size(); // ใช้จำนวนคนที่ต้องให้คะแนนแทน
+//        if (!evaluations.isEmpty()) {
+//            avgScoreProposal = evaluations.stream()
+//                    .map(evaluation -> evaluation.getTotalScore() != null ? evaluation.getTotalScore() : BigDecimal.ZERO)
+//                    .peek(score -> System.out.println("📌 Processed Score: " + score))
+//                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+//                    .divide(BigDecimal.valueOf(evaluations.size()), 2, RoundingMode.HALF_UP);
+//        }
+        if (!evaluations.isEmpty()) {
+            avgScoreProposal = evaluations.stream()
+                    .map(evaluation -> evaluation.getTotalScore() != null ? evaluation.getTotalScore() : BigDecimal.ZERO)
+                    .peek(score -> System.out.println("📌 Processed Score: " + score))
+                    .reduce(BigDecimal.ZERO, BigDecimal::add)
+                    .divide(BigDecimal.valueOf(totalEvaluators), 2, RoundingMode.HALF_UP); // ใช้จำนวนกรรมการทั้งหมดเป็นตัวหาร
+        }
+        System.out.println("💯 avgScoreProposal: " + avgScoreProposal);
+
+        // ✅ คำนวณ evaluateScore จาก `scores`
+        BigDecimal evaluateScore = scores.stream()
+                .map(ScoreDTO::getScore)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        // ✅ คำนวณ Evaluate Weight (เต็ม 60 คะแนน)
+        BigDecimal maxEvaluateScore = BigDecimal.TEN;
+        BigDecimal weight = new BigDecimal("60");
+        BigDecimal weightedScore = evaluateScore.multiply(weight).divide(maxEvaluateScore, 2, RoundingMode.HALF_UP);
+
+        System.out.println("💯 evaluateScore (เต็ม 10): " + evaluateScore);
+        System.out.println("⚖️ Weighted Score (60%): " + weightedScore);
+
+        // ✅ คำนวณ Total Score (รวม Proposal + Evaluate) **แต่ไม่ให้เกิน 100**
+        BigDecimal totalScore = avgScoreProposal.add(weightedScore);
+        totalScore = totalScore.min(new BigDecimal("100")); // จำกัดคะแนนที่ 100
+        System.out.println("💯 totalScore (capped at 100): " + totalScore);
+
+        // ✅ ถ้าจำนวน projectList และ evaluations ไม่ตรงกัน → บันทึก "I" ในฐานข้อมูลก่อน return
+        if (projectList.size() != evaluations.size()) {
+            System.out.println("⚠️ Project list size does not match evaluations! Saving grade 'I'...");
+
+            // 🔍 ค้นหา GradingProposalEvaluation ที่มีอยู่แล้ว
+            GradingProposalEvaluation existingGrading = gradingProposalEvaluationRepository.findByProjectAndStudent(project, student);
+
+            if (existingGrading != null) {
+                // ✅ อัปเดตข้อมูลเดิมเป็น "I"
+                existingGrading.setDateTime(LocalDateTime.now());
+                existingGrading.setAvgScoreProposal(avgScoreProposal);
+                existingGrading.setEvaluateScore(evaluateScore);
+                existingGrading.setTotalScore(totalScore);
+                existingGrading.setGradeResult("I");
+
+                gradingProposalEvaluationRepository.save(existingGrading);
+                System.out.println("✅ [Service] Updated existing grade to 'I'");
+            } else {
+                // ✅ สร้างใหม่ถ้ายังไม่มี
+                GradingProposalEvaluation grading = new GradingProposalEvaluation();
+                grading.setProposalGradeId(UUID.randomUUID().toString());
+                grading.setDateTime(LocalDateTime.now());
+                existingGrading.setDateTime(LocalDateTime.now());
+                existingGrading.setAvgScoreProposal(avgScoreProposal);
+                existingGrading.setEvaluateScore(evaluateScore);
+                existingGrading.setTotalScore(totalScore);
+                grading.setGradeResult("I");
+                grading.setProject(project);
+                grading.setStudent(student);
+
+                gradingProposalEvaluationRepository.save(grading);
+                System.out.println("✅ [Service] Created new grade entry with 'I'");
+            }
+
+            return "I";
+        }
+
+        // ✅ คำนวณเกรดตามเงื่อนไข
+        String gradeResult = calculateGrade(totalScore);
+        System.out.println("🅰️ gradeResult: " + gradeResult);
+
+        // 🔍 ค้นหา GradingProposalEvaluation ที่มีอยู่แล้ว
+        GradingProposalEvaluation existingGrading = gradingProposalEvaluationRepository.findByProjectAndStudent(project, student);
+
+        if (existingGrading != null) {
+            // ✅ อัปเดตข้อมูลเดิม
+            existingGrading.setDateTime(LocalDateTime.now());
+            existingGrading.setAvgScoreProposal(avgScoreProposal);
+            existingGrading.setEvaluateScore(evaluateScore);
+            existingGrading.setTotalScore(totalScore);
+            existingGrading.setGradeResult(gradeResult);
+
+            gradingProposalEvaluationRepository.save(existingGrading);
+            System.out.println("✅ [Service] Proposal Grade Updated Successfully!");
+
+            return existingGrading.getGradeResult();
+        } else {
+            // ✅ สร้างใหม่ถ้ายังไม่มี
+            GradingProposalEvaluation grading = new GradingProposalEvaluation();
+            grading.setProposalGradeId(UUID.randomUUID().toString());
+            grading.setDateTime(LocalDateTime.now());
+            grading.setAvgScoreProposal(avgScoreProposal);
+            grading.setEvaluateScore(evaluateScore);
+            grading.setTotalScore(totalScore);
+            grading.setGradeResult(gradeResult);
+            grading.setProject(project);
+            grading.setStudent(student);
+
+            gradingProposalEvaluationRepository.save(grading);
+            System.out.println("✅ [Service] Proposal Grade Created Successfully!");
+
+            return grading.getGradeResult();
+        }
+    }
+
+
+//    @Transactional
+//    public String saveDefenseGrade(ProjectInstructorRole instructor, Project project, Student student, List<ScoreDTO> scores) {
+//        System.out.println("🪄 [Service] Inside saveDefenseGrade");
 //
-//        // Get proposal evaluation scores
-//        ProposalEvaluation proposalScores = proposalEvaluationRepository
-//                .findByProjectInstructorRoleAndProjectAndStudent(instructor, project, student);
-//        if (proposalScores != null) {
-//            allScores.addAll(convertToScoreDetails(proposalScores.get));
-//            totalScore += calculateSubTotal(proposalScores.getScores());
+//        // 🔍 ดึงรายการ ProjectInstructorRole ตามบทบาทที่เกี่ยวข้องกับการให้คะแนน
+//        List<ProjectInstructorRole> allInstructors = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(project.getProjectId());
+//        long committeeAdvisorCount = allInstructors.stream()
+//                .filter(role -> "Committee".equals(role.getRole()) || "Advisor".equals(role.getRole()))
+//                .count();
+//        long posterCommitteeCount = allInstructors.stream()
+//                .filter(role -> "Committee".equals(role.getRole()) || "Poster-Committee".equals(role.getRole()))
+//                .count();
+//
+//        System.out.println("📌 Total Committee & Advisor: " + committeeAdvisorCount);
+//        System.out.println("📌 Total Committee & Poster-Committee: " + posterCommitteeCount);
+//
+//        // 🔍 ค้นหา DefenseEvaluation
+//        List<DefenseEvaluation> defenseEvaluations = defenseEvaluationRepository.findByProjectIdAndStudentDefense(project,student);
+//        if (defenseEvaluations.isEmpty()) {
+//            throw new EntityNotFoundException("Defense evaluation not found");
+//        }
+//        System.out.println("💯 Total Defense Evaluation: " + defenseEvaluations.size());
+//
+//        BigDecimal avgScoreDefense = defenseEvaluations.stream()
+//                .map(DefenseEvaluation::getTotalScore)
+//                .filter(Objects::nonNull)
+//                .peek(score -> System.out.println("📌 Processed Score: " + score))
+//                .reduce(BigDecimal.ZERO, BigDecimal::add)
+//                .divide(BigDecimal.valueOf(defenseEvaluations.size()), RoundingMode.HALF_UP);
+//        System.out.println("💯 avgScoreDefense: " + avgScoreDefense );
+//
+//        // 🔍 ค้นหา PosterEvaluation
+//        List<PosterEvaluation> posterEvaluations = posterEvaRepository.findByProjectIdPoster(project);
+//        if (posterEvaluations.isEmpty()) {
+//            throw new EntityNotFoundException("Poster evaluation not found");
+//        }
+//        System.out.println("💯 Total Poster Evaluation: " + posterEvaluations.size());
+//
+//        BigDecimal posterScore = posterEvaluations.stream()
+//                .map(PosterEvaluation::getTotalScore)
+//                .filter(Objects::nonNull)
+//                .peek(score -> System.out.println("📌 Processed Score: " + score))
+//                .reduce(BigDecimal.ZERO, BigDecimal::add)
+//                .divide(BigDecimal.valueOf(posterEvaluations.size()), RoundingMode.HALF_UP);
+//        System.out.println("💯 posterScore: " + posterScore );
+//
+//        // ✅ ดึงคะแนน Evaluate และ Extra
+//        BigDecimal evaluateScore = BigDecimal.ZERO;
+//        BigDecimal extraScore = BigDecimal.ZERO;
+//
+//        for (ScoreDTO score : scores) {
+//            if ("CRIT022".equals(score.getScoreCriteriaId())) {
+//                evaluateScore = score.getScore();
+//            } else if ("CRIT023".equals(score.getScoreCriteriaId())) {
+//                extraScore = score.getScore();
+//            }
+//        }
+//        System.out.println("💯 evaluateScore: " + evaluateScore);
+//        System.out.println("💯 extraScore: " + extraScore);
+//
+//        BigDecimal totalScore = avgScoreDefense.add(posterScore).add(evaluateScore).add(extraScore);
+//        System.out.println("💯 totalScore: " + totalScore);
+//
+//        // 🔍 ค้นหา GradingDefenseEvaluation
+//        GradingDefenseEvaluation gradingDefense = gradingDefenseEvaluationRepository.findByProjectIdAndStudentId(project, student);
+//        if (gradingDefense == null) {
+//            gradingDefense = new GradingDefenseEvaluation();
+//            gradingDefense.setDefenseGradeEvalId(UUID.randomUUID().toString());
+//            gradingDefense.setDatetime(LocalDateTime.now());
+//            gradingDefense.setProjectId(project);
+//            gradingDefense.setStudentId(student);
 //        }
 //
-//        // Get defense evaluation scores
-//        DefenseEvaluation defenseScores = defenseEvaRepository
-//                .findByDefenseInstructorIdAndProjectIdAndStudentDefense(instructor, project, student);
-//        if (defenseScores != null) {
-//            allScores.addAll(convertToScoreDetails(defenseScores.getScores()));
-//            totalScore += calculateSubTotal(defenseScores.getScores());
+//        // ✅ อัปเดตค่าต่างๆ และบันทึกลง Database
+//        gradingDefense.setAvgScoreDefense(avgScoreDefense.doubleValue());
+//        gradingDefense.setAvgPosterScore(posterScore.doubleValue());
+//        gradingDefense.setEvaluateScore(evaluateScore.doubleValue());
+//        gradingDefense.setExtraScore(extraScore.doubleValue());
+//        gradingDefense.setTotalScore(totalScore.doubleValue());
+//
+//        // ✅ ตรวจสอบเงื่อนไขเพื่อกำหนดเกรด "I" หากจำนวน Evaluations ไม่ครบ
+//        if (defenseEvaluations.size() < committeeAdvisorCount || posterEvaluations.size() < posterCommitteeCount) {
+//            gradingDefense.setGradeResult("I");
+//            gradingDefenseEvaluationRepository.save(gradingDefense);
+//            return "I";
 //        }
 //
-//        // Get poster evaluation scores
-//        PosterEvaluation posterScores = posterEvaRepository
-//                .findByInstructorIdPosterAndProjectIdPoster(instructor, project);
-//        if (posterScores != null) {
-//            allScores.addAll(convertToScoreDetails(posterScores.getScores()));
-//            totalScore += calculateSubTotal(posterScores.getScores());
-//        }
+//        // ✅ คำนวณเกรด
+//        String grade = calculateGrade(totalScore);
+//        gradingDefense.setGradeResult(grade);
 //
-//        return new StudentScoreDTO(allScores, totalScore);
+//        gradingDefenseEvaluationRepository.save(gradingDefense);
+//
+//        return grade;
 //    }
 
-//    private List<ScoreDetail> convertToScoreDetails(List<EvaluationScore> scores) {
-//        return scores.stream()
-//                .map(score -> new ScoreDetail(
-//                        score.getCriteria().getCriteriaId(),
-//                        score.getCriteria().getCriteriaName(),
-//                        score.getScore(),
-//                        score.getCriteria().getMaxScore()
-//                ))
-//                .collect(Collectors.toList());
-//    }
-//
-//    private double calculateSubTotal(List<EvaluationScore> scores) {
-//        return scores.stream()
-//                .mapToDouble(EvaluationScore::getScore)
-//                .sum();
-//    }
+    @Transactional
+    public String saveDefenseGrade(ProjectInstructorRole instructor, Project project, Student student, List<ScoreDTO> scores) {
+        System.out.println("🪄 [Service] Inside saveDefenseGrade");
+
+        // 🔍 ดึงรายการ ProjectInstructorRole
+        List<ProjectInstructorRole> allInstructors = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(project.getProjectId());
+        long committeeAdvisorCount = allInstructors.stream()
+                .filter(role -> "Committee".equals(role.getRole()) || "Advisor".equals(role.getRole()))
+                .count();
+        long posterCommitteeCount = allInstructors.stream()
+                .filter(role -> "Committee".equals(role.getRole()) || "Poster-Committee".equals(role.getRole()))
+                .count();
+
+        System.out.println("📌 Total Committee & Advisor: " + committeeAdvisorCount);
+        System.out.println("📌 Total Committee & Poster-Committee: " + posterCommitteeCount);
+
+        // 🔍 ค้นหา DefenseEvaluation
+        List<DefenseEvaluation> defenseEvaluations = defenseEvaluationRepository.findByProjectIdAndStudentDefense(project, student);
+        if (defenseEvaluations.isEmpty()) {
+            throw new EntityNotFoundException("Defense evaluation not found");
+        }
+        System.out.println("💯 Total Defense Evaluation: " + defenseEvaluations.size());
+
+        BigDecimal avgScoreDefense = defenseEvaluations.stream()
+                .map(DefenseEvaluation::getTotalScore)
+                .filter(Objects::nonNull)
+                .peek(score -> System.out.println("📌 Processed Defense Score: " + score))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(defenseEvaluations.size()), RoundingMode.HALF_UP);
+        System.out.println("💯 avgScoreDefense: " + avgScoreDefense);
+
+        // 🔍 ค้นหา PosterEvaluation
+        List<PosterEvaluation> posterEvaluations = posterEvaRepository.findByProjectIdPoster(project);
+        if (posterEvaluations.isEmpty()) {
+            throw new EntityNotFoundException("Poster evaluation not found");
+        }
+        System.out.println("💯 Total Poster Evaluation: " + posterEvaluations.size());
+
+        BigDecimal avgPosterScore = posterEvaluations.stream()
+                .map(PosterEvaluation::getTotalScore)
+                .filter(Objects::nonNull)
+                .peek(score -> System.out.println("📌 Processed Poster Score: " + score))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .divide(BigDecimal.valueOf(posterEvaluations.size()), RoundingMode.HALF_UP);
+        System.out.println("💯 avgPosterScore: " + avgPosterScore);
+
+        // ✅ ดึงคะแนน Evaluate และ Extra
+        BigDecimal advisorScore = BigDecimal.ZERO;
+        BigDecimal extraScore = BigDecimal.ZERO;
+
+        for (ScoreDTO score : scores) {
+            if ("CRIT022".equals(score.getScoreCriteriaId())) {
+                advisorScore = score.getScore();
+            } else if ("CRIT023".equals(score.getScoreCriteriaId())) {
+                extraScore = score.getScore();
+            }
+        }
+        System.out.println("💯 advisorScore: " + advisorScore);
+        System.out.println("💯 extraScore: " + extraScore);
+
+        // 🔹 Normalize คะแนน Defense และ Poster เป็นเปอร์เซ็นต์ของ 100
+        BigDecimal normalizedDefenseScore = avgScoreDefense.multiply(BigDecimal.valueOf(10)).divide(BigDecimal.valueOf(3), RoundingMode.HALF_UP);
+        BigDecimal normalizedPosterScore = avgPosterScore.multiply(BigDecimal.valueOf(4));
+
+        // ✅ คำนวณตามเปอร์เซ็นต์จริง
+        BigDecimal weightedDefenseScore = normalizedDefenseScore.multiply(BigDecimal.valueOf(0.30)); // 30%
+        BigDecimal weightedPosterScore = normalizedPosterScore.multiply(BigDecimal.valueOf(0.10));  // 10%
+        BigDecimal weightedAdvisorScore = advisorScore.multiply(BigDecimal.valueOf(6));  // 60%
+        BigDecimal weightedExtraScore = extraScore.multiply(BigDecimal.valueOf(1));      // 10%
+
+        BigDecimal totalScore = weightedDefenseScore
+                .add(weightedPosterScore)
+                .add(weightedAdvisorScore)
+                .add(weightedExtraScore);
+
+
+        System.out.println("💯 weightedDefenseScore: " + weightedDefenseScore);
+        System.out.println("💯 weightedPosterScore: " + weightedPosterScore);
+        System.out.println("💯 weightedAdvisorScore: " + weightedAdvisorScore);
+        System.out.println("💯 weightedExtraScore: " + weightedExtraScore);
+        System.out.println("💯 totalScore: " + totalScore);
+
+        // 🔍 ค้นหา GradingDefenseEvaluation
+        GradingDefenseEvaluation gradingDefense = gradingDefenseEvaluationRepository.findByProjectIdAndStudentId(project, student);
+        if (gradingDefense == null) {
+            gradingDefense = new GradingDefenseEvaluation();
+            gradingDefense.setDefenseGradeEvalId(UUID.randomUUID().toString());
+            gradingDefense.setDatetime(LocalDateTime.now());
+            gradingDefense.setProjectId(project);
+            gradingDefense.setStudentId(student);
+        }
+
+        // ✅ อัปเดตค่าต่างๆ และบันทึกลง Database
+        gradingDefense.setAvgScoreDefense(avgScoreDefense.doubleValue());
+        gradingDefense.setAvgPosterScore(avgPosterScore.doubleValue());
+        gradingDefense.setEvaluateScore(advisorScore.doubleValue());
+        gradingDefense.setExtraScore(extraScore.doubleValue());
+        gradingDefense.setTotalScore(totalScore.doubleValue());
+
+        // ✅ ตรวจสอบว่าคะแนนครบทุกหมวดหมู่ก่อนให้เกรด "I"
+        if (defenseEvaluations.size() < committeeAdvisorCount ||
+                posterEvaluations.size() < posterCommitteeCount ||
+                advisorScore.compareTo(BigDecimal.ZERO) == 0) { // ถ้าไม่มีคะแนนจาก Advisor
+            gradingDefense.setGradeResult("I");
+            gradingDefenseEvaluationRepository.save(gradingDefense);
+            System.out.println("❌ Assigned Grade: I (Incomplete)");
+            return "I";
+        }
+
+        // ✅ คำนวณเกรดตามเกณฑ์
+        String grade = calculateGrade(totalScore);
+        gradingDefense.setGradeResult(grade);
+        gradingDefenseEvaluationRepository.save(gradingDefense);
+
+        System.out.println("✅ Assigned Grade: " + grade);
+        return grade;
+    }
+
+
+
+    private String calculateGrade(BigDecimal totalScore) {
+        if (totalScore.compareTo(BigDecimal.valueOf(80)) >= 0) {
+            return "A";
+        } else if (totalScore.compareTo(BigDecimal.valueOf(75)) >= 0) {
+            return "B+";
+        } else if (totalScore.compareTo(BigDecimal.valueOf(70)) >= 0) {
+            return "B";
+        } else if (totalScore.compareTo(BigDecimal.valueOf(65)) >= 0) {
+            return "C+";
+        } else if (totalScore.compareTo(BigDecimal.valueOf(60)) >= 0) {
+            return "C";
+        } else if (totalScore.compareTo(BigDecimal.valueOf(55)) >= 0) {
+            return "D+";
+        } else if (totalScore.compareTo(BigDecimal.valueOf(50)) >= 0) {
+            return "D";
+        } else {
+            return "F";
+        }
+    }
 
 }

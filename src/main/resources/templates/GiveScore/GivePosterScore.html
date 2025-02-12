@@ -141,12 +141,12 @@
                 </table>
             </div>
 
-            <div class="table-container">
-                <h1> Comment </h1>
-                <label class="comment-poster">
-                    <input type="text">
-                </label>
-            </div>
+<!--            <div class="table-container">-->
+<!--                <h1> Comment </h1>-->
+<!--                <label class="comment-poster">-->
+<!--                    <input type="text">-->
+<!--                </label>-->
+<!--            </div>-->
 
 
             <!-- Score Result -->
@@ -431,6 +431,20 @@
         });
         table.appendChild(tbody)
     }
+
+    document.addEventListener("input", function (event) {
+        if (event.target.classList.contains("present-score-input")) {
+            let max = parseFloat(event.target.max);
+            let value = parseFloat(event.target.value);
+
+            if (value > max) {
+                event.target.value = max; // ปรับค่าให้ไม่เกิน max
+            } else if (value < 0) {
+                event.target.value = 0; // ไม่ให้เป็นค่าติดลบ
+            }
+        }
+    });
+
 </script>
 
 
@@ -527,7 +541,35 @@
 <!-- -------------- Show Evaluation Score -------------- -->
 <script>
     // Load evaluation data when page loads
-    document.addEventListener("DOMContentLoaded", async function() {
+    // document.addEventListener("DOMContentLoaded", async function() {
+    //     const projectId = getProjectIdFromURL();
+    //     if (!projectId) {
+    //         console.error('❌ No project ID found');
+    //         return;
+    //     }
+    //
+    //     try {
+    //         const instructorId = await fetchInstructorId(projectId);
+    //         if (!instructorId) {
+    //             console.error('❌ No instructor ID found');
+    //             return;
+    //         }
+    //
+    //         console.log('📌 Loading scores for Project:', projectId, 'Instructor:', instructorId);
+    //         await loadEvaluationData(instructorId, projectId);
+    //
+    //         // Add event listeners to all score inputs
+    //         addScoreInputListeners();
+    //
+    //         console.log("✅ Script Loaded");
+    //         calculateMaxScore();
+    //         displayResultsCards();
+    //         addInputListeners();
+    //     } catch (error) {
+    //         console.error('❌ Error in initialization:', error);
+    //     }
+    // });
+    document.addEventListener("DOMContentLoaded", async function () {
         const projectId = getProjectIdFromURL();
         if (!projectId) {
             console.error('❌ No project ID found');
@@ -542,14 +584,28 @@
             }
 
             console.log('📌 Loading scores for Project:', projectId, 'Instructor:', instructorId);
-            await loadEvaluationData(instructorId, projectId);
 
-            // Add event listeners to all score inputs
+            // ✅ โหลดคะแนนให้เสร็จก่อน
+            await loadEvaluationData(instructorId, projectId);
+            console.log("✅ Scores Loaded");
+
+            // ✅ ผูก event listener หลังจากโหลดคะแนนเสร็จ
             addScoreInputListeners();
+            addInputListeners();
+
+            // ✅ คำนวณคะแนนสูงสุด
+            calculateMaxScore();
+
+            // ✅ คำนวณคะแนนรวม และ สร้าง Card หลังจากคะแนนถูกโหลดครบ
+            updateTotalScore();
+            displayResultsCards();
+
+            console.log("✅ Script Fully Loaded");
         } catch (error) {
             console.error('❌ Error in initialization:', error);
         }
     });
+
 
     // Add event listeners to score inputs
     function addScoreInputListeners() {
@@ -700,86 +756,91 @@
             total += parseFloat(input.value) || 0;
         });
 
-        const scoreDisplays = document.querySelectorAll('.card-score-result.score');
-        scoreDisplays.forEach(display => {
-            display.textContent = `${total.toFixed(2)} / 100`;
-        });
     }
 </script>
 
 
 <!-- --------------- Show Score Result ------------------ -->
 <script>
-    document.addEventListener("DOMContentLoaded", async function () {
-        const data = await fetchStudentScore();
-        if (data) { // ✅ เช็คว่ามีข้อมูลก่อนเรียก display
-            displayResultsCards(data);
-        } else {
-            console.warn("⚠️ No data returned from fetchStudentScore().");
-        }
-    });
-
-
-    function displayResultsCards(data) {
+    function displayResultsCards() {
+        console.log("📌 Creating card result...");
         const cardContainer = document.querySelector('#card-container');
-        cardContainer.innerHTML = ""; // ล้างค่าก่อน
+        cardContainer.innerHTML = "";
 
-        if (!data || data.rawTotalScore === undefined) {
-            console.error("⚠️ ไม่พบข้อมูลคะแนน:", data);
-            cardContainer.innerHTML = "<p>ไม่พบคะแนนสำหรับ Poster</p>";
-            return;
-        }
+        const maxScore = calculateMaxScore();
+        let totalScore = calculateTotalScore();
 
-        // ดึงค่าคะแนน (ถ้าไม่มี ให้แสดง N/A)
-        const score = data.rawTotalScore !== undefined ? data.rawTotalScore : "N/A";
+        // ป้องกัน totalScore ไม่ให้เกิน maxScore
+        totalScore = Math.min(totalScore, maxScore);
+
+        console.log(`📊 Adjusted Score: ${totalScore} / ${maxScore}`);
 
         const card = document.createElement('div');
         card.className = 'card-score-result';
+        card.dataset.type = "poster";
         card.innerHTML = `
         <h3>คะแนนรวม Poster</h3>
-        <span class="score">${score} / 40</span>
+        <span class="score">${totalScore} / ${maxScore}</span>
     `;
 
         cardContainer.appendChild(card);
     }
 
-    async function fetchStudentScore() {
-        try {
-            console.log("📌 Fetching student score...");
 
-            const projectId = getProjectIdFromURL();
-            const instructorId = await fetchInstructorId(projectId);
+    function addInputListeners() {
+        console.log("🎯 Adding event listeners...");
+        const inputs = document.querySelectorAll('.present-score-input');
+        inputs.forEach(input => {
+            console.log(`📌 Found input: ${input.name}, Value: ${input.value}, Max: ${input.dataset.maxScore}`);
+            input.addEventListener("input", updatePosterTotalScore);
+        });
+    }
 
-            const response = await fetch(`http://localhost:8080/scoreTotalPoster?instructorId=${instructorId}&projectId=${projectId}`);
+    function updatePosterTotalScore() {
+        console.log("✏️ Input changed! Updating...");
+        let totalScore = calculateTotalScore();
+        const maxScore = calculateMaxScore();
 
-            if (!response.ok) {
-                console.error(`❌ HTTP Error: ${response.status}`);
-                return null; // ❗ เปลี่ยนเป็น return null
-            }
+        // ป้องกัน totalScore ไม่ให้เกิน maxScore
+        totalScore = Math.min(totalScore, maxScore);
 
-            const text = await response.text();
-            console.log("📌 Raw API Response:", text);
+        let scoreDisplay = document.querySelector('.card-score-result[data-type="poster"] .score');
 
-            try {
-                const data = JSON.parse(text);
-                console.log("✅ Student Score Data:", data);
+        if (!scoreDisplay) {
+            console.warn("⚠️ Score display not found. Creating new card...");
+            displayResultsCards();
+            scoreDisplay = document.querySelector('.card-score-result[data-type="poster"] .score');
+        }
 
-                if (!data.rawTotalScore) {
-                    console.warn("⚠️ API response is missing score data.");
-                    return null; // ❗ เปลี่ยนเป็น return null
-                }
-
-                return data; // ✅ Return ค่า data ที่ถูกต้อง
-            } catch (jsonError) {
-                console.error("⚠️ JSON Parse Error:", jsonError);
-                return null;
-            }
-
-        } catch (error) {
-            console.error("❌ Error fetching student score:", error);
-            return null;
+        if (scoreDisplay) {
+            console.log(`🎯 Updating Score: ${totalScore} / ${maxScore}`);
+            scoreDisplay.textContent = `${totalScore} / ${maxScore}`;
         }
     }
+
+
+    function calculateTotalScore() {
+        let total = 0;
+        document.querySelectorAll('.present-score-input').forEach(input => {
+            let value = parseFloat(input.value);
+            // console.log(`➕ Adding: ${value || 0}`);
+            total += value || 0;
+        });
+        return Math.round(total);
+    }
+
+    function calculateMaxScore() {
+        let maxScore = 0;
+        document.querySelectorAll('.present-score-input').forEach(input => {
+            let max = parseFloat(input.max);
+            // console.log(`🛠️ Max Score Found: ${max || 0}`);
+            maxScore += max || 0;
+        });
+        return maxScore;
+    }
+
 </script>
+
+
 
 </html>

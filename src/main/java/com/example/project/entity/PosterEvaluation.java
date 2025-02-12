@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -28,6 +29,9 @@ public class PosterEvaluation {
 
     @Column(name = "recorded_on")
     private LocalDateTime recordedOn;
+
+    @Column(name = "total_score")
+    private BigDecimal totalScore;
 
     // recorded_by
     @ManyToOne
@@ -138,4 +142,14 @@ public class PosterEvaluation {
         this.posterEvaluationScores = posterEvaluationScores;
         return this;
     }
+
+    public BigDecimal getTotalScore() {
+        return totalScore;
+    }
+
+    public PosterEvaluation setTotalScore(BigDecimal totalScore) {
+        this.totalScore = totalScore;
+        return this;
+    }
+
 }
