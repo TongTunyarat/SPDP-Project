@@ -46,8 +46,20 @@ public class ProjectService {
 
 //     get project details
     public Project getProjectDetails(String projectId) {
+
         return projectRepository.findByProjectId(projectId);
+
     }
+//
+//    public static List<StudentProject> getProjectById(String projectId) {
+//
+//        Project project = projectRepository.findByProjectId(projectId);
+//
+//        List<StudentProject> studentProjects = project.getStudentProjects();
+//
+//        return studentProjects;
+//
+//    }
 
 
 //

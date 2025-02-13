@@ -13,4 +13,7 @@ public interface ProposalEvaluationRepository extends JpaRepository<ProposalEval
     ProposalEvaluation findByProjectInstructorRoleAndProjectAndStudent(ProjectInstructorRole instructor, Project project, Student student);
 
     List<ProposalEvaluation> findByProjectAndStudent(Project project, Student student);
+
+    List<ProposalEvaluation> findByProject_ProjectId(String projectId);
+
 }

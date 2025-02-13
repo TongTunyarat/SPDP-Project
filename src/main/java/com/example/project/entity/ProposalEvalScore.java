@@ -8,6 +8,7 @@ import lombok.experimental.Accessors;
 import org.w3c.dom.Text;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 
 @Data
 @Accessors(chain = true)
@@ -33,6 +34,10 @@ public class ProposalEvalScore {
     @JoinColumn(name = "proposal_id")
     @JsonBackReference
     private ProposalEvaluation proposalEvaluation;
+
+    public static Optional<Object> stream() {
+        return null;
+    }
 
     public String getEvaId() {
         return evaId;
@@ -69,4 +74,6 @@ public class ProposalEvalScore {
         this.proposalEvaluation = proposalEvaluation;
         return this;
     }
+
+
 }

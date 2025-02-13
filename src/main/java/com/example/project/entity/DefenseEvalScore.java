@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 @Entity
 @Table(name = "defenseevalscore")
@@ -15,7 +17,7 @@ public class DefenseEvalScore {
     private String evalId;
 
     @Column(name = "score")
-    private int score;
+    private BigDecimal score;
 
     // criteria_id
     @ManyToOne
@@ -38,7 +40,7 @@ public class DefenseEvalScore {
         return this;
     }
 
-    public int getScore() {
+    public BigDecimal getScore() {
         return score;
     }
 

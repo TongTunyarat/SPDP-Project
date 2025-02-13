@@ -1,12 +1,12 @@
 package com.example.project.controller;
 
 import com.example.project.DTO.InstructorProjectDTO;
+import com.example.project.DTO.InstructorProjectListDTO;
+import com.example.project.DTO.ProjectDetailsDTO;
 import com.example.project.DTO.StudentProjectDTO;
-import com.example.project.entity.Admin;
-import com.example.project.entity.Instructor;
-import com.example.project.entity.Project;
-import com.example.project.entity.ProjectInstructorRole;
+import com.example.project.entity.*;
 import com.example.project.service.ProjectService;
+import com.example.project.service.ProposalGradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -28,9 +30,13 @@ public class ProjectController {
     @Autowired
     private final ProjectService projectService;
 
+    @Autowired
+    private ProposalGradeService proposalGradeService;
 
-    public ProjectController(ProjectService projectService) {
+
+    public ProjectController(ProjectService projectService, ProposalGradeService proposalGradeService) {
         this.projectService = projectService;
+        this.proposalGradeService = proposalGradeService;
     }
 
     //=========================================== USE ===================================================
@@ -176,6 +182,21 @@ public class ProjectController {
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
+
+//    @GetMapping("/instructor/getProjectDetails")
+//    @ResponseBody
+//    public List<ProjectDetailsDTO> getProjectDetails(@RequestParam String projectId) {
+//
+//        List<StudentProject> projectDetail = ProjectService.getProjectById(projectId);
+//
+//        return projectDetail.stream()
+//                .map(project ->
+//                        new ProjectDetailsDTO(
+//                                project.getProject().getProjectId(),
+//                                project.getProject().getProjectTitle(),
+//                                project.getProject().
+//                        )).collect(Collectors.toList());
+//    }
 
     @GetMapping("/instructor/getProjectDetails")
     @ResponseBody

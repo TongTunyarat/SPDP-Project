@@ -10,9 +10,10 @@ public interface DefenseEvaluationRepository extends JpaRepository<DefenseEvalua
 
     DefenseEvaluation findByDefenseInstructorIdAndProjectIdAndStudentDefense(ProjectInstructorRole defenseInstructorId, Project projectId, Student studentDefense);
 
-//    DefenseEvaluation findByProjectIdAndStudentDefense(Project project, Student student);
-
     List<DefenseEvaluation> findByProjectId(Project project);
 
     List<DefenseEvaluation> findByProjectIdAndStudentDefense(Project projectId, Student studentDefense);
+
+    List<DefenseEvaluation> findByProjectId_ProjectId(String projectId);
+
 }

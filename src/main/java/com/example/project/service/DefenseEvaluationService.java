@@ -1,9 +1,8 @@
 package com.example.project.service;
 
-import com.example.project.entity.Criteria;
-import com.example.project.entity.Project;
-import com.example.project.entity.StudentProject;
+import com.example.project.entity.*;
 import com.example.project.repository.CriteriaRepository;
+import com.example.project.repository.DefenseEvaluationRepository;
 import com.example.project.repository.ProjectRepository;
 import com.example.project.repository.StudentProjectRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,10 +21,14 @@ public class DefenseEvaluationService {
     @Autowired
     private ProjectRepository projectRepository;
 
-    public DefenseEvaluationService(CriteriaRepository criteriaRepository, StudentProjectRepository studentProjectRepository, ProjectRepository projectRepository) {
+    @Autowired
+    private DefenseEvaluationRepository defenseEvaluationRepository;
+
+    public DefenseEvaluationService(CriteriaRepository criteriaRepository, StudentProjectRepository studentProjectRepository, ProjectRepository projectRepository, DefenseEvaluationRepository defenseEvaluationRepository) {
         this.criteriaRepository = criteriaRepository;
         this.studentProjectRepository = studentProjectRepository;
         this.projectRepository = projectRepository;
+        this.defenseEvaluationRepository = defenseEvaluationRepository;
     }
 
     //=========================================== USE ===================================================
@@ -45,4 +48,6 @@ public class DefenseEvaluationService {
         List<StudentProject> studentProjectList = project.getStudentProjects();
         return studentProjectList;
     }
+
+
 }

@@ -16,6 +16,7 @@ public class InstructorProjectListDTO {
         this.professorName = professorName;
     }
 
+    // Getters and Setters
     public String getInstructorId() {
         return instructorId;
     }

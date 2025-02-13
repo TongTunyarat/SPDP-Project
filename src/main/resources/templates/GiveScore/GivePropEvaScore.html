@@ -70,7 +70,8 @@
     <div class="content">
 
         <div class="header-section">
-            <a href="/show-proposal-eva-projects" class="gray-link">Proposal Evaluation (40%)</a> > <span id="project-id-title"></span>
+            <a href="/show-proposal-eva-projects" class="gray-link">Proposal Evaluation (40%)</a> > <span
+                id="project-id-title"></span>
         </div>
 
         <div class="body-section">
@@ -80,7 +81,7 @@
 
                 <h1>Project Details</h1>
 
-                <div class="details">
+                <div class="details" id="project-details">
                     <div><strong>Project ID:</strong> <span id="project-id"></span>
                         <input type="hidden" id="projectIdInput" th:value="${projectId}">
                     </div>
@@ -93,41 +94,109 @@
             </div>
 
             <!-- Student Score -->
-            <div class="table-container">
-                <h1>Student Score</h1>
-                <table>
+<!--            <div class="table-container">-->
+<!--                <h1>Student Score</h1>-->
+<!--                <table>-->
 
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Quality of Work</th>
-                        <th>Level of Progress</th>
-                        <th>Presentation Language</th>
-                        <th>Question & Answer</th>
-                        <th>Result</th>
-                    </tr>
-                    </thead>
+<!--                    <thead>-->
+<!--                    <tr>-->
+<!--                        <th>Name</th>-->
+<!--                        <th>Quality of Work</th>-->
+<!--                        <th>Level of Progress</th>-->
+<!--                        <th>Presentation Language</th>-->
+<!--                        <th>Question & Answer</th>-->
+<!--                        <th>Result</th>-->
+<!--                    </tr>-->
+<!--                    </thead>-->
 
-                    <tbody id="student-score">
-                    <!-- Record Result -->
-
-                    </tbody>
-                </table>
-            </div>
+<!--                    <tbody id="student-score"> </tbody>-->
+<!--                </table>-->
+<!--            </div>-->
+                    <!--                    <tbody>-->
+                    <!--                    <tr>-->
+                    <!--                        <td style="text-align: left;"> Tunyarat Nithirunpattana</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>40</td>-->
+                    <!--                    </tr>-->
+                    <!--                    <tr>-->
+                    <!--                        <td style="text-align: left;"> Chanyanuch Nuangjumnong</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>40</td>-->
+                    <!--                    </tr>-->
+                    <!--                    <tr>-->
+                    <!--                        <td style="text-align: left;"> Neadnapa Tawontaweekul</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>10</td>-->
+                    <!--                        <td>40</td>-->
+                    <!--                    </tr>-->
+                    <!--                    </tbody>-->
 
             <!-- Presentation -->
             <div class="table-container">
                 <h1>Proposal Presentation (20%)</h1>
                 <label class="checkbox-group">
-                    <input type="checkbox" id = "sameScorePresent" onchange="applySameScorePresent()"/>
+                    <input type="checkbox" id="sameScorePresent" onchange="applySameScorePresent()"/>
                     Enter the same scores for all students
                     <div class="subtitle">
                         ต้องการกรอกคะแนนเหมือนกันทั้งหมดหรือไม่
                     </div>
                 </label>
 
-
                 <table class="evaluation-table" id="presentation-table">
+
+                    <!--                    <thead>-->
+                    <!--                    <tr id="student-name-header"> &lt;!&ndash; Student Name Header &ndash;&gt; </tr>-->
+                    <!--                    </thead>-->
+                    <!--                    <tbody>-->
+                    <!--                    <tr>-->
+                    <!--                        <td>-->
+                    <!--                            <strong>Quality of work</strong>-->
+                    <!--                            <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>-->
+                    <!--                            </div>-->
+                    <!--                        </td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                    </tr>-->
+                    <!--                    <tr>-->
+                    <!--                        <td>-->
+                    <!--                            <strong>Level of Progress</strong>-->
+                    <!--                            <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>-->
+                    <!--                            </div>-->
+                    <!--                        </td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                    </tr>-->
+                    <!--                    <tr>-->
+                    <!--                        <td>-->
+                    <!--                            <strong>Presentation Language</strong>-->
+                    <!--                            <div class="subtitle">ภาษาในการนำเสนอ <span class="max-score">Max Score-->
+                    <!--                                            10</span></div>-->
+                    <!--                        </td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                    </tr>-->
+                    <!--                    <tr>-->
+                    <!--                        <td>-->
+                    <!--                            <strong>Question & Answer</strong>-->
+                    <!--                            <div class="subtitle">การตอบคำถาม <span class="max-score">Max Score 10</span>-->
+                    <!--                            </div>-->
+                    <!--                        </td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                    </tr>-->
+                    <!--                    </tbody>-->
                 </table>
             </div>
 
@@ -143,6 +212,37 @@
                 </label>
 
                 <table class="evaluation-table" id="document-table">
+                    <!--                    <thead>-->
+                    <!--                    <tr id="student-name-header-2">-->
+                    <!--&lt;!&ndash;                    <tr>&ndash;&gt;-->
+                    <!--&lt;!&ndash;                        <th></th>&ndash;&gt;-->
+                    <!--&lt;!&ndash;                        <th>6487002 Tunyarat</th>&ndash;&gt;-->
+                    <!--&lt;!&ndash;                        <th>6487023 Chanyanuch</th>&ndash;&gt;-->
+                    <!--&lt;!&ndash;                        <th>6487069 Neadnapa</th>&ndash;&gt;-->
+                    <!--&lt;!&ndash;                    </tr>&ndash;&gt;-->
+                    <!--                    </thead>-->
+                    <!--                    <tbody>-->
+                    <!--                    <tr>-->
+                    <!--                        <td>-->
+                    <!--                            <strong>Quality of work</strong>-->
+                    <!--                            <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>-->
+                    <!--                            </div>-->
+                    <!--                        </td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                    </tr>-->
+                    <!--                    <tr>-->
+                    <!--                        <td>-->
+                    <!--                            <strong>Timeline</strong>-->
+                    <!--                            <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>-->
+                    <!--                            </div>-->
+                    <!--                        </td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
+                    <!--                    </tr>-->
+                    <!--                    </tbody>-->
                 </table>
             </div>
 
@@ -150,7 +250,7 @@
             <div class="table-container">
                 <h1> Score Result </h1>
 
-                <div id="card-container"> </div>
+                <div id="card-container"></div>
 
                 <button class="save-button"> Save</button>
             </div>
@@ -161,127 +261,142 @@
 
 <!-- -------------- Show Project Detail -------------- -->
 <script>
-    window.onload = fetchData;
 
-    function getProjectIdFromURL() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get("projectId"); // ดึงค่าจาก ?projectId=xxxx
-    }
+    window.onload = function () {
 
-    function fetchData() {
-        // รับค่า projectId จาก URL
         const projectId = getProjectIdFromURL();
 
         if (!projectId) {
-            document.getElementById('student-score').innerHTML = "ไม่พบข้อมูล projectId";
+            displayError("ไม่พบข้อมูล projectId");
             return;
         }
 
-        const url = `http://localhost:8080/instructor/giveScoreProposalEvaluation?projectId=${encodeURIComponent(projectId)}`;
+        fetchProjectDetails(projectId)
+            .then(displayProjectDetails)
+            .catch(error => handleFetchError(error, 'ไม่พบข้อมูลโปรเจกต์'));
 
-        fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Data received from API:", data);
-                displayStudentScore(data);
-                displayResultsCards(data);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                document.getElementById('student-score').innerHTML = "ไม่พบข้อมูล";
-            });
+
+        fetchAndDisplayInstructor(projectId)
+        // fetchAndDisplayScores(projectId);
+        fetchAndDisplayCardResultScores(projectId);
+
+    };
+
+    // Utility Functions
+    function getProjectIdFromURL() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get("projectId");
+    }
+
+    function displayError(message) {
+        document.getElementById('student-score').innerHTML = message;
+    }
+
+    function handleFetchError(error, userMessage) {
+        console.error("Error fetching data:", error);
+        alert(userMessage);
+    }
+
+    // Fetch Functions
+    async function fetchProjectDetails(projectId) {
+        const url = `http://localhost:8080/instructor/getProjectDetails?projectId=${encodeURIComponent(projectId)}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
     }
 
 
-    // Show Project Details //
-    document.addEventListener('DOMContentLoaded', function () {
-        // ดึงค่า projectId จาก URL
-        const urlParams = new URLSearchParams(window.location.search);
-        const projectId = urlParams.get('projectId');
+    // Display Functions
+    function displayProjectDetails(project) {
+        document.getElementById('project-id').textContent = project.projectId;
+        document.getElementById('project-id-title').textContent = project.projectId;
+        document.getElementById('project-title').textContent = project.projectTitle;
+        document.getElementById('project-description').textContent = project.projectDescription;
+        document.getElementById('project-date').textContent = project.recordedOn.split("T")[0];
+    }
 
-        if (projectId) {
-            // ถ้ามี projectId ใน URL
-            fetch(`http://localhost:8080/instructor/getProjectDetails?projectId=${projectId}`)
-                .then(response => response.json())
-                .then(project => {
-                    // แสดงข้อมูลที่ได้จาก API ใน HTML
-                    document.getElementById('project-id').textContent = project.projectId;
-                    document.getElementById('project-id-title').textContent = project.projectId;
-                    document.getElementById('project-title').textContent = project.projectTitle;
-                    document.getElementById('project-advisor').textContent = project.projectTitle;
-                    document.getElementById('project-description').textContent = project.projectDescription;
-                    document.getElementById('project-date').textContent = project.recordedOn;
-                })
-                .catch(error => {
-                    console.error('Error fetching project details:', error);
-                    alert('ไม่พบข้อมูลโปรเจกต์');
-                });
-        } else {
-            alert('ไม่พบ projectId ใน URL');
-        }
-    });
-
-    // Show Student Score
-    function displayStudentScore(data) {
-        let tableBody = document.querySelector("tbody");
-        tableBody.innerHTML = "";
-
-        if (!Array.isArray(data)) {
-            data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
-        }
+    async function fetchAndDisplayInstructor(projectId) {
+        const url = `http://localhost:8080/project/instructor?projectId=${encodeURIComponent(projectId)}`;
 
         try {
-            data.forEach(project => {
-                project.students.forEach(student => {
-                    const row = document.createElement('tr');
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const instructorData = await response.json();
 
-                    row.innerHTML = `
-                <td style="text-align: left;">${student.studentName}</td>
-                <td>${project.score}</td>
-                <td>${project.score}</td>
-                <td>${project.score}</td>
-                <td>${project.score}</td>
-                <td>${project.score * 4}</td>
-            `;
-                    tableBody.appendChild(row);
-                });
-            });
+            if (Array.isArray(instructorData) && instructorData.length > 0) {
+                displayInstructorDetails(instructorData[0]); // Assume only one record is needed
+            } else {
+                console.warn("No instructor data found for this project.");
+                document.getElementById('project-advisor').textContent = "N/A";
+            }
         } catch (error) {
-            console.error("Error displaying data in HTML:", error);
-            document.getElementById('student-score').innerHTML = "No valid data to display.";
+            console.error('Error fetching instructor details:', error);
         }
     }
 
-    // function displayResultsCards(data) {
-    //     const cardContainer = document.querySelector('#card-container');
-    //     cardContainer.innerHTML = "";
-    //
-    //     if (!Array.isArray(data)) {
-    //         data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
-    //     }
-    //
-    //     try {
-    //         data.forEach(project => {
-    //             project.students.forEach(student => {
-    //                 const card = document.createElement('div');
-    //                 card.className = 'card-score-result';
-    //                 card.innerHTML = `
-    //                     <span class="icon"><i class="fa fa-user"></i> ${student.studentId} ${student.studentName}</span>
-    //                     <span class="score"> / 100</span>
-    //                 `;
-    //                 cardContainer.appendChild(card);
-    //             });
-    //         });
-    //     } catch (error) {
-    //         console.error("Error displaying data in HTML:", error);
-    //         document.getElementById('student-score').innerHTML = "No valid data to display.";
-    //     }
-    // }
+
+    function displayInstructorDetails(instructor) {
+        document.getElementById('project-advisor').textContent = instructor.professorName;
+    }
+
+    
+    async function fetchAndDisplayCardResultScores(projectId) {
+        const url = `http://localhost:8080/instructor/showScoreProposal?projectId=${encodeURIComponent(projectId)}`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const scoreData = await response.json();
+
+            const cardContainer = document.querySelector('#card-container');
+            cardContainer.innerHTML = ""; // Clear existing cards
+
+            // Group scores by student
+            const studentScoresMap = {};
+            scoreData.forEach(score => {
+                if (!studentScoresMap[score.studentId]) {
+                    studentScoresMap[score.studentId] = {
+                        studentName: score.studentName,
+                        scores: {
+                            "Quality of Work": 0,
+                            "Level of Progress": 0,
+                            "Presentation Language": 0,
+                            "Question & Answer": 0
+                        }
+                    };
+                }
+                if (studentScoresMap[score.studentId].scores.hasOwnProperty(score.criteriaName)) {
+                    studentScoresMap[score.studentId].scores[score.criteriaName] = score.score;
+                }
+            });
+
+            // Populate cards for each student
+            Object.values(studentScoresMap).forEach(studentData => {
+                const {studentName, scores} = studentData;
+                const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
+
+                const card = document.createElement('div');
+                card.className = 'card-score-result';
+                card.innerHTML = `
+                <span class="icon"><i class="fa fa-user"></i> ${studentName}</span>
+                <span class="score">${totalScore.toFixed(2)} / 100</span>
+
+            `;
+                cardContainer.appendChild(card);
+            });
+
+        } catch (error) {
+            console.error('Error fetching or displaying score proposal:', error);
+        }
+    }
+
 </script>
 
 
@@ -292,7 +407,7 @@
         let url = `http://localhost:8080/instructor/criteriaProposal`;
 
         return fetch(url)
-            .then(response =>{
+            .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok ' + response.statusText);
                 }
@@ -300,11 +415,12 @@
                 return response.json();
             });
     }
+
     function studentProposalCriteria(projectId) {
         let url = `http://localhost:8080/instructor/studentProposalCriteria?projectId=${encodeURIComponent(projectId)}`;
 
         return fetch(url)
-            .then(response =>{
+            .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok ' + response.statusText);
                 }
@@ -322,10 +438,10 @@
                 const criteriaProposalData = data[0];
                 const studentProposalCriteriaData = data[1];
 
-                console.log("criteriaProposalData Length: "+ criteriaProposalData.length);
+                console.log("criteriaProposalData Length: " + criteriaProposalData.length);
                 console.log("Show Data criteriaProposalData: " + JSON.stringify(criteriaProposalData, null, 2));
 
-                console.log("studentProposalCriteriaData Length: "+ studentProposalCriteriaData.length);
+                console.log("studentProposalCriteriaData Length: " + studentProposalCriteriaData.length);
                 console.log("Show Data studentProposalCriteriaData: " + JSON.stringify(studentProposalCriteriaData, null, 2));
 
                 displayPresentCriteria(data)
@@ -830,182 +946,6 @@
 
 
 <!-- --------------- Show Score Result ------------------ -->
-<!--<script>-->
-<!--    document.addEventListener("DOMContentLoaded", async function () {-->
-<!--        await fetchAllStudentScores();-->
-<!--    });-->
-
-
-<!--    function displayResultsCards(data) {-->
-<!--        const cardContainer = document.querySelector('#card-container');-->
-<!--        cardContainer.innerHTML = ""; // ล้างข้อมูลก่อน-->
-
-<!--        if (!data || !Array.isArray(data.students) || data.students.length === 0) {-->
-<!--            console.error("⚠️ ไม่พบข้อมูลนักศึกษา:", data);-->
-<!--            cardContainer.innerHTML = "<p>ไม่พบคะแนนสำหรับโครงการนี้</p>";-->
-<!--            return;-->
-<!--        }-->
-
-<!--        try {-->
-<!--            data.students.forEach(student => {-->
-<!--                const score = student.totalScore !== undefined ? student.totalScore.toFixed(2) : "N/A";-->
-
-<!--                const card = document.createElement('div');-->
-<!--                card.className = 'card-score-result';-->
-<!--                card.setAttribute("data-student-id", student.studentId);-->
-<!--                card.innerHTML = `-->
-<!--            <span class="icon"><i class="fa fa-user"></i> ${student.studentId} ${student.studentName || ""}</span>-->
-<!--            <span class="score">${score} / 40</span>-->
-<!--        `;-->
-<!--                cardContainer.appendChild(card);-->
-<!--            });-->
-<!--        } catch (error) {-->
-<!--            console.error("❌ Error displaying data in HTML:", error);-->
-<!--            cardContainer.innerHTML = "<p>เกิดข้อผิดพลาดในการแสดงผลข้อมูล</p>";-->
-<!--        }-->
-<!--    }-->
-
-
-<!--    async function fetchAllStudentScores() {-->
-<!--        try {-->
-<!--            const projectId = getProjectIdFromURL();-->
-<!--            const instructorId = await fetchInstructorId(projectId);-->
-
-<!--            if (!projectId || !instructorId) {-->
-<!--                console.error("❌ Missing projectId or instructorId");-->
-<!--                return;-->
-<!--            }-->
-
-<!--            // ✅ ดึง studentId ทั้งหมดจาก input fields-->
-<!--            const studentScores = document.querySelectorAll('.present-score-input, .document-score-input');-->
-<!--            console.log("🧐 studentScores NodeList:", studentScores); // ดูค่าเต็ม ๆ ของ NodeList-->
-
-<!--            // ✅ เก็บ studentId ลง Array (กรองค่า null/undefined ออก)-->
-<!--            let studentIds = [];-->
-
-<!--            for (const input of studentScores) {-->
-<!--                const studentId = input.dataset.studentId;-->
-<!--                if (studentId && !studentIds.includes(studentId)) { // ตรวจสอบซ้ำก่อน push-->
-<!--                    studentIds.push(studentId);-->
-<!--                    console.log("📊 Added studentId:", studentId);-->
-<!--                }-->
-<!--            }-->
-
-<!--            console.log("📌 Final studentIds:", studentIds);-->
-
-<!--            if (studentIds.length === 0) {-->
-<!--                console.warn("⚠️ No students found for this project.");-->
-<!--                return;-->
-<!--            }-->
-
-<!--            // ✅ วนลูป fetch คะแนนของนักศึกษาแต่ละคน-->
-<!--            const scores = await Promise.all(studentIds.map(async (studentId) => {-->
-<!--                return await fetchStudentScore(instructorId, projectId, studentId);-->
-<!--            }));-->
-
-<!--            console.log("📌 All Student Scores:", scores);-->
-
-<!--            // ✅ แสดงคะแนนในหน้าเว็บ-->
-<!--            displayResultsCards({ students: scores.filter(score => score !== null) });-->
-
-<!--        } catch (error) {-->
-<!--            console.error("❌ Error fetching all student scores:", error);-->
-<!--        }-->
-<!--    }-->
-
-<!--    async function fetchStudentScore(instructorId, projectId, studentId) {-->
-<!--        try {-->
-<!--            console.log("📌 Fetching student score with parameters:");-->
-
-<!--            const evalType = "proposal";-->
-
-<!--            console.log(`   └ instructorId: ${instructorId}`);-->
-<!--            console.log(`   └ projectId: ${projectId}`);-->
-<!--            console.log(`   └ studentId: ${studentId}`);-->
-<!--            console.log(`   └ evalType: ${evalType}`);-->
-
-<!--            const response = await fetch(`http://localhost:8080/scoreTotal?instructorId=${instructorId}&projectId=${projectId}&studentId=${studentId}&evalType=${evalType}`);-->
-
-<!--            if (!response.ok) {-->
-<!--                console.error(`❌ HTTP Error: ${response.status}`);-->
-<!--                return null;-->
-<!--            }-->
-
-<!--            const text = await response.text();-->
-<!--            console.log("📌 Raw API Response:", text);-->
-
-<!--            try {-->
-<!--                const data = JSON.parse(text);-->
-<!--                console.log(`✅ Score for ${studentId}:`, data);-->
-
-<!--                if (!data.rawTotalScore) {-->
-<!--                    console.warn(`⚠️ No score data for studentId: ${studentId}`);-->
-<!--                    return null;-->
-<!--                }-->
-
-<!--                return { studentId, totalScore: data.rawTotalScore }; // ✅ Return ค่า studentId และ totalScore-->
-<!--            } catch (jsonError) {-->
-<!--                console.error("⚠️ JSON Parse Error:", jsonError);-->
-<!--                return null;-->
-<!--            }-->
-<!--        } catch (error) {-->
-<!--            console.error("❌ Error fetching student score:", error);-->
-<!--            return null;-->
-<!--        }-->
-<!--    }-->
-
-<!--    // function updateStudentTotalScore(studentId) {-->
-<!--    //     // ดึง input ทั้งหมดที่เกี่ยวข้องกับ studentId นี้-->
-<!--    //     const inputs = document.querySelectorAll(`input[data-student-id="${studentId}"]`);-->
-<!--    //     let total = 0;-->
-<!--    //-->
-<!--    //     // รวมคะแนนจากทุก input-->
-<!--    //     inputs.forEach(input => {-->
-<!--    //         total += parseFloat(input.value) || 0; // ถ้า input ว่างให้ถือว่าเป็น 0-->
-<!--    //     });-->
-<!--    //-->
-<!--    //     // อัปเดตคะแนนใน card result-->
-<!--    //     const scoreDisplay = document.querySelector(`.card-score-result[data-student-id="${studentId}"] .score`);-->
-<!--    //     if (scoreDisplay) {-->
-<!--    //         scoreDisplay.textContent = `${total.toFixed(2)} / 40`;-->
-<!--    //     }-->
-<!--    // }-->
-
-<!--    // &#45;&#45;&#45;&#45;&#45;&#45; อันใหม่ &#45;&#45;&#45;&#45;&#45;&#45;-->
-<!--    document.addEventListener("DOMContentLoaded", function () {-->
-<!--        const inputs = document.querySelectorAll('.present-score-input, .document-score-input');-->
-
-<!--        inputs.forEach(input => {-->
-<!--            input.addEventListener("input", function () {-->
-<!--                const studentId = input.dataset.studentId;-->
-<!--                console.log(`📌 Student ${studentId} changed score: ${input.value}`); // ตรวจสอบว่าค่าถูกเปลี่ยนจริง-->
-
-<!--                updateStudentTotalScore(studentId);-->
-<!--            });-->
-<!--        });-->
-<!--    });-->
-
-<!--    function updateStudentTotalScore(studentId) {-->
-<!--        const inputs = document.querySelectorAll(`input[data-student-id="${studentId}"]`);-->
-<!--        let total = 0;-->
-
-<!--        inputs.forEach(input => {-->
-<!--            total += parseFloat(input.value) || 0; // ถ้า input ว่างให้ถือว่าเป็น 0-->
-<!--        });-->
-
-<!--        // ค้นหา card result ของ studentId นั้น ๆ-->
-<!--        const scoreDisplay = document.querySelector(`.card-score-result[data-student-id="${studentId}"] .score`);-->
-<!--        console.log(`🧐 Updating Student ${studentId} score to: ${total}`); // Debugging log-->
-
-<!--        if (scoreDisplay) {-->
-<!--            scoreDisplay.textContent = `${total.toFixed(2)} / 40`;-->
-<!--        } else {-->
-<!--            console.warn(`⚠️ Card result for student ${studentId} not found!`);-->
-<!--        }-->
-<!--    }-->
-
-<!--</script>-->
-
 <script>
     // ✅ 1. โหลดข้อมูลนักศึกษาและสร้าง Card Result
     async function fetchAllStudentScores() {

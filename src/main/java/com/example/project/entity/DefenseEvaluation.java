@@ -59,6 +59,10 @@ public class DefenseEvaluation {
     @JsonManagedReference
     private ProjectInstructorRole defenseInstructorId;
 
+    @ManyToOne
+    @JoinColumn(name="student_id")
+    @JsonManagedReference
+    private Student student;
 
     @ManyToOne
     @JoinColumn(name="student_id")
@@ -163,5 +167,13 @@ public class DefenseEvaluation {
     public DefenseEvaluation setTotalScore(BigDecimal totalScore) {
         this.totalScore = totalScore;
         return this;
+    }
+
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
     }
 }

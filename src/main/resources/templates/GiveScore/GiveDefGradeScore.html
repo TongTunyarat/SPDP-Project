@@ -76,8 +76,10 @@
 
             <!-- Project Details-->
             <div class="project-details">
+
                 <h1>Project Details</h1>
-                <div class="details">
+
+                <div id="project-details">
                     <div><strong>Project ID:</strong> <span id="project-id"></span>
                         <input type="hidden" id="projectIdInput" th:value="${projectId}">
                     </div>
@@ -86,6 +88,7 @@
                     <div><strong>Project Description:</strong> <span id="project-description"></span></div>
                     <div><strong>Date:</strong> <span id="project-date"></span></div>
                 </div>
+
             </div>
 
             <!-- Score Prop -->
@@ -180,135 +183,243 @@
 
 
 <script>
-    window.onload = fetchData;
-
-    function getProjectIdFromURL() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get("projectId"); // ดึงค่าจาก ?projectId=xxxx
-    }
-
-    function fetchData() {
-        // รับค่า projectId จาก URL
+    window.onload = function () {
         const projectId = getProjectIdFromURL();
 
         if (!projectId) {
-            document.getElementById('student-score').innerHTML = "ไม่พบข้อมูล projectId";
+            displayError("ไม่พบข้อมูล projectId");
             return;
         }
 
-        const url = `http://localhost:8080/instructor/giveScoreProposalEvaluation?projectId=${encodeURIComponent(projectId)}`;
-
-        fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Data received from API:", data);
-                displayStudentScore(data);
-                displayResultsCards(data);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                document.getElementById('student-score').innerHTML = "ไม่พบข้อมูล";
-            });
-    }
+        fetchProjectDetails(projectId)
+            .then(displayProjectDetails)
+            .catch(error => handleFetchError(error, 'ไม่พบข้อมูลโปรเจกต์'));
 
 
-    // Show Project Details //
-    document.addEventListener('DOMContentLoaded', function () {
-        // ดึงค่า projectId จาก URL
+        fetchAndDisplayInstructor(projectId)
+        fetchAndDisplayScores(projectId);
+        fetchAndDisplayCardResultScores(projectId);
+
+    };
+
+    // Utility Functions
+    function getProjectIdFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
-        const projectId = urlParams.get('projectId');
+        return urlParams.get("projectId");
+    }
 
-        if (projectId) {
-            // ถ้ามี projectId ใน URL
-            fetch(`http://localhost:8080/instructor/getProjectDetails?projectId=${projectId}`)
-                .then(response => response.json())
-                .then(project => {
-                    // แสดงข้อมูลที่ได้จาก API ใน HTML
-                    document.getElementById('project-id').textContent = project.projectId;
-                    document.getElementById('project-id-title').textContent = project.projectId;
-                    document.getElementById('project-title').textContent = project.projectTitle;
-                    document.getElementById('project-advisor').textContent = project.projectTitle;
-                    document.getElementById('project-description').textContent = project.projectDescription;
-                    document.getElementById('project-date').textContent = project.recordedOn;
-                })
-                .catch(error => {
-                    console.error('Error fetching project details:', error);
-                    alert('ไม่พบข้อมูลโปรเจกต์');
-                });
-        } else {
-            alert('ไม่พบ projectId ใน URL');
+    function displayError(message) {
+        document.getElementById('student-score').innerHTML = message;
+    }
+
+    function handleFetchError(error, userMessage) {
+        console.error("Error fetching data:", error);
+        alert(userMessage);
+    }
+
+    // Fetch Functions
+    async function fetchProjectDetails(projectId) {
+        const url = `http://localhost:8080/instructor/getProjectDetails?projectId=${encodeURIComponent(projectId)}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-    });
+        return response.json();
+    }
 
-    // Show Student Score
-    function displayStudentScore(data) {
-        let tableBody = document.querySelector("tbody");
-        tableBody.innerHTML = "";
 
-        if (!Array.isArray(data)) {
-            data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
-        }
+    // Display Functions
+    function displayProjectDetails(project) {
+        document.getElementById('project-id').textContent = project.projectId;
+        document.getElementById('project-id-title').textContent = project.projectId;
+        document.getElementById('project-title').textContent = project.projectTitle;
+        document.getElementById('project-description').textContent = project.projectDescription;
+        document.getElementById('project-date').textContent = project.recordedOn.split("T")[0];
+    }
+
+    async function fetchAndDisplayInstructor(projectId) {
+        const url = `http://localhost:8080/project/instructor?projectId=${encodeURIComponent(projectId)}`;
 
         try {
-            data.forEach(project => {
-                project.students.forEach(student => {
-                    const row = document.createElement('tr');
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const instructorData = await response.json();
 
-                    row.innerHTML = `
-                <td style="text-align: left;">${student.studentName}</td>
-                <td>${project.score}</td>
-                <td>${project.score}</td>
-                <td>${project.score}</td>
-                <td>${project.score * 4}</td>
-            `;
-                    tableBody.appendChild(row);
-                });
-            });
+            if (Array.isArray(instructorData) && instructorData.length > 0) {
+                displayInstructorDetails(instructorData[0]); // Assume only one record is needed
+            } else {
+                console.warn("No instructor data found for this project.");
+                document.getElementById('project-advisor').textContent = "N/A";
+            }
         } catch (error) {
-            console.error("Error displaying data in HTML:", error);
-            document.getElementById('student-score').innerHTML = "No valid data to display.";
+            console.error('Error fetching instructor details:', error);
         }
     }
 
-    function displayResultsCards(data) {
-        const cardContainer = document.querySelector('#card-container');
-        cardContainer.innerHTML = "";
-
-        if (!Array.isArray(data)) {
-            data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
-        }
+    async function fetchAndDisplayScores(projectId) {
+        const url = `http://localhost:8080/instructor/showGradeScoreDefense?projectId=${encodeURIComponent(projectId)}`;
 
         try {
-            data.forEach(project => {
-                project.students.forEach(student => {
-                    const card = document.createElement('div');
-                    card.className = 'card-score-result';
-                    card.innerHTML = `
-                        <span class="icon"><i class="fa fa-user"></i> ${student.studentId} ${student.studentName}</span>
-                        <span class="grade">A</span>
-                        <span class="score"> / 100</span>
-                    `;
-                    cardContainer.appendChild(card);
-                });
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const scoreData = await response.json();
+            console.log(scoreData);
+
+            const tableBody = document.getElementById('student-score');
+            tableBody.innerHTML = ""; // Clear existing rows
+
+            const studentScoresMap = {};
+
+            scoreData.forEach(score => {
+                const studentId = score.studentId;
+                const studentName = score.studentName || `Unknown (${studentId})`; // ใช้ studentName ถ้ามี
+
+                if (!studentScoresMap[studentId]) {
+                    studentScoresMap[studentId] = {
+                        studentName: studentName,
+                        presentationScores: [],
+                        documentScores: { qualityScores: [], timeliness: 0 },
+                        posterScores: []
+                    };
+                }
+
+                // Map คะแนนแต่ละหมวด
+                if (["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"].includes(score.criteriaName)) {
+                    studentScoresMap[studentId].presentationScores.push(score.score);
+                }
+
+                if (score.criteriaName === "Quality") {
+                    studentScoresMap[studentId].documentScores.qualityScores.push(score.score);
+                } else if (score.criteriaName === "Timeliness") {
+                    studentScoresMap[studentId].documentScores.timeliness = Math.min(score.score, 3); // คะแนนเต็ม 3%
+                }
+
+                if (["Poster Presentation (Appearance)", "Contents", "Presentation (Verbal)"].includes(score.criteriaName)) {
+                    studentScoresMap[studentId].posterScores.push(score.score);
+                }
             });
+
+            // คำนวณคะแนนและแสดงผล
+            Object.values(studentScoresMap).forEach(studentData => {
+                const { studentName, presentationScores, documentScores, posterScores } = studentData;
+
+                // Presentation (20%)
+                const presentationSum = presentationScores.reduce((sum, score) => sum + score, 0);
+                const presentationScore = ((presentationSum * 5) / 30).toFixed(2);
+
+                // Document (10%)
+                const documentQualitySum = documentScores.qualityScores.reduce((sum, score) => sum + score, 0);
+                const documentQualityScore = ((documentQualitySum * 7) / 30).toFixed(2);
+                const documentScore = Math.min(parseFloat(documentQualityScore) + documentScores.timeliness, 10).toFixed(2);
+
+                // Poster (10%)
+                const posterSum = posterScores.reduce((sum, score) => sum + score, 0);
+                const posterScore = ((posterSum * 10) / 40).toFixed(2);
+
+                // Result (40%)
+                const resultScore = (parseFloat(presentationScore) + parseFloat(documentScore) + parseFloat(posterScore)).toFixed(2);
+
+                // Grade
+                let grade = "F";
+                if (resultScore >= 80) grade = "A";
+                else if (resultScore >= 75) grade = "B+";
+                else if (resultScore >= 70) grade = "B";
+                else if (resultScore >= 65) grade = "C+";
+                else if (resultScore >= 60) grade = "C";
+                else if (resultScore >= 55) grade = "D+";
+                else if (resultScore >= 50) grade = "D";
+
+
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                <td>${studentName}</td>
+                <td>${presentationScore}</td>
+                <td>${documentScore}</td>
+                <td>${posterScore}</td>
+                <td>${resultScore} (${grade})</td>
+            `;
+                tableBody.appendChild(row);
+            });
+
         } catch (error) {
-            console.error("Error displaying data in HTML:", error);
-            document.getElementById('student-score').innerHTML = "No valid data to display.";
+            console.error('Error fetching or displaying score defense:', error);
+        }
+    }
+
+    async function fetchAndDisplayCardResultScores(projectId) {
+        const url = `http://localhost:8080/instructor/showScoreProposal?projectId=${encodeURIComponent(projectId)}`;
+
+        try {
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const scoreData = await response.json();
+
+            const cardContainer = document.querySelector('#card-container');
+            cardContainer.innerHTML = ""; // Clear existing cards
+
+            // Group scores by student
+            const studentScoresMap = {};
+            scoreData.forEach(score => {
+                if (!studentScoresMap[score.studentId]) {
+                    studentScoresMap[score.studentId] = {
+                        studentName: score.studentName,
+                        scores: {
+                            "Quality of Work": 0,
+                            "Level of Progress": 0,
+                            "Presentation Language": 0,
+                            "Question & Answer": 0
+                        }
+                    };
+                }
+                if (studentScoresMap[score.studentId].scores.hasOwnProperty(score.criteriaName)) {
+                    studentScoresMap[score.studentId].scores[score.criteriaName] = score.score;
+                }
+            });
+
+            // Populate cards for each student
+            Object.values(studentScoresMap).forEach(studentData => {
+                const { studentName, scores } = studentData;
+                const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
+
+                // Calculate grade based on total score
+                let grade = "F";
+                if (totalScore >= 80) grade = "A";
+                else if (totalScore >= 75) grade = "B+";
+                else if (totalScore >= 70) grade = "B";
+                else if (totalScore >= 65) grade = "C+";
+                else if (totalScore >= 60) grade = "C";
+                else if (totalScore >= 55) grade = "D+";
+                else if (totalScore >= 50) grade = "D";
+
+                const card = document.createElement('div');
+                card.className = 'card-score-result';
+                card.innerHTML = `
+                <span class="icon"><i class="fa fa-user"></i> ${studentName}</span>
+                <span class="grade">${grade}</span>
+                <span class="score">${totalScore.toFixed(2)} / 100</span>
+            `;
+                cardContainer.appendChild(card);
+            });
+
+        } catch (error) {
+            console.error('Error fetching or displaying score proposal:', error);
         }
     }
 
 </script>
 
-<!--  ================================  Modal  ==========================================-->
+<!--================================  Modal  ==========================================-->
 
-    <script>
-        // Modal popup logic
-        const modalTemplate = `
+<script>
+    // Modal popup logic
+    const modalTemplate = `
         <div id="popup-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.6);">
             <div style="background: white; width: 80%; margin: 5% auto; padding: 20px; position: relative;">
                         <button id="close-modal" style="position: absolute; top: 10px; right: 10px;">Close</button>
@@ -319,120 +430,67 @@
                                 <span class="icon">
                                     <i class="fa fa-user" style="font-size: 32px; color: #000;"></i>
                                     <div class="text-container">
-                                        <div class="name">Aj.Siripen Pongpaichet</div>
-                                        <div class="subtitle">Advisor</div>
+                                        <div class="name">
+                                                 <!--              value              -->
+                                        </div>
+                                        <div class="subtitle">
+                                                 <!--              value              -->
+                                        </div>
                                     </div>
                                 </span>
                             </div>
 
                             <h1>Proposal Presentation (20%)</h1>
-                            <table class="evaluation-table">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th>6487002 Tunyarat</th>
-                                        <th>6487023 Chanyanuch</th>
-                                        <th>6487069 Neadnapa</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td style="text-align: left;"> <strong>Quality of work</strong>
-                                            <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>
-                                            </div>
-                                        </td>
-                                        <td><input type="text"/></td>
-                                        <td><input type="text"/></td>
-                                        <td><input type="text"/></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="text-align: left;"> <strong>Level of Progress</strong>
-                                            <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>
-                                            </div>
-                                        </td>
-                                        <td><input type="text"/></td>
-                                        <td><input type="text"/></td>
-                                        <td><input type="text"/></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="text-align: left;"> <strong>Presentation Language</strong>
-                                            <div class="subtitle">ภาษาในการนำเสนอ <span class="max-score">Max Score
-                                                    10</span></div>
-                                        </td>
-                                        <td><input type="text"/></td>
-                                        <td><input type="text"/></td>
-                                        <td><input type="text"/></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="text-align: left;"> <strong>Question & Answer</strong>
-                                            <div class="subtitle">การตอบคำถาม <span class="max-score">Max Score 10</span>
-                                            </div>
-                                        </td>
-                                        <td><input type="text"/></td>
-                                        <td><input type="text"/></td>
-                                        <td><input type="text"/></td>
-                                    </tr>
-                                </tbody>
+                            <table class="evaluation-table" id="presentation-table">
+                                    <!--              value              -->
                             </table>
                         </div>
                         <div class="table-container">
-                            <h1>Document (20%)</h1>
-                            <table class="evaluation-table">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        <th>6487002 Tunyarat</th>
-                                        <th>6487023 Chanyanuch</th>
-                                        <th>6487069 Neadnapa</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td style="text-align: left;"> <strong>Quality of work</strong>
-                                            <div class="subtitle">คุณภาพของงาน <span class="max-score">Max Score 10</span>
-                                            </div>
-                                        </td>
-                                        <td><input type="text"/></td>
-                                        <td><input type="text"/></td>
-                                        <td><input type="text"/></td>
-                                    </tr>
-                                    <tr>
-                                        <td style="text-align: left;"> <strong>Timeline</strong>
-                                            <div class="subtitle">กระบวนการ <span class="max-score">Max Score 10</span>
-                                            </div>
-                                        </td>
-                                        <td><input type="text"/></td>
-                                        <td><input type="text"/></td>
-                                        <td><input type="text"/></td>
-                                    </tr>
-                                </tbody>
+                            <h1>Document (10%)</h1>
+                            <table class="evaluation-table" id="document-table">
+                                    <!--              value              -->
                             </table>
                         </div>
+
+<!--                        <div class="table-container">-->
+<!--                            <h1>Poster (10%)</h1>-->
+<!--                            <table class="evaluation-table" id="poster-table">-->
+<!--                                    &lt;!&ndash;              value              &ndash;&gt;-->
+<!--                            </table>-->
+<!--                        </div>-->
+
+                        <div style="text-align: center; margin-top: 20px;">
+                           <button id="pre-instructor" style="margin-right: 10px;">Previous</button>
+                           <button id="next-instructor">Next</button>
+                        </div>
                     </div>
-        </div>`;
+            </div>`;
 
-        document.body.insertAdjacentHTML('beforeend', modalTemplate);
+    document.body.insertAdjacentHTML('beforeend', modalTemplate);
 
-        document.getElementById("preview-button").addEventListener("click", function () {
-            document.getElementById("popup-modal").style.display = "block";
-        });
+    document.getElementById("preview-button").addEventListener("click", function () {
+        document.getElementById("popup-modal").style.display = "block";
 
-        document.getElementById("close-modal").addEventListener("click", function () {
+    });
+
+    document.getElementById("close-modal").addEventListener("click", function () {
+        document.getElementById("popup-modal").style.display = "none";
+    });
+
+    // ปิด modal เมื่อคลิกนอก modal
+    document.getElementById("popup-modal").addEventListener("click", function (event) {
+        if (event.target === document.getElementById("popup-modal")) {
             document.getElementById("popup-modal").style.display = "none";
-        });
+        }
+    });
+</script>
 
-        // ปิด modal เมื่อคลิกนอก modal
-        document.getElementById("popup-modal").addEventListener("click", function (event) {
-            if (event.target === document.getElementById("popup-modal")) {
-                document.getElementById("popup-modal").style.display = "none";
-            }
-        });
-    </script>
+
 <!-- ================================  Fern  ==========================================-->
 
     <script th:inline="javascript">
 
-        function criteriaProposal() {
+        function criteriaDefense() {
             let url = `http://localhost:8080/instructor/criteriaDefenseGrade`;
 
             return fetch(url)
@@ -457,14 +515,63 @@
                 })
         }
 
+        function criteriaDefenseEva() {
+            let url = `http://localhost:8080/instructor/criteriaDefense`;
+
+            return fetch(url)
+                .then(response =>{
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    // console.log("JSON: " + response.json());
+                    return response.json();
+                });
+        }
+
+        function criteriaPosterEva() {
+            let url = `http://localhost:8080/instructor/criteriaPoster`;
+
+            return fetch(url)
+                .then(response =>{
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    // console.log("JSON: " + response.json());
+                    return response.json();
+                });
+        }
+
+        function projectInstructor(projectId) {
+            let url = `http://localhost:8080/instructor/projectDefense?projectId=${encodeURIComponent(projectId)}`;
+
+            return fetch(url)
+                .then(response =>{
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok ' + response.statusText);
+                    }
+                    // console.log("JSON: " + response.json());
+                    return response.json();
+                })
+        }
+
+
         function fetchData(projectId) {
             Promise.all([
-                criteriaProposal(),
-                studentProposalCriteria(projectId)
+                criteriaDefense(),
+                studentProposalCriteria(projectId),
+
+                // modal
+                criteriaDefenseEva(),
+                projectInstructor(projectId),
+                criteriaPosterEva()
             ])
                 .then(data => {
                     const criteriaProposalData = data[0];
                     const studentProposalCriteriaData = data[1];
+
+                    const criteriaDefenseEva = data[2];
+                    const projectInstructor = data[3];
+                    const criteriaPosterData = data[4];
 
                     console.log("criteriaProposalData Length: "+ criteriaProposalData.length);
                     console.log("Show Data criteriaProposalData: " + JSON.stringify(criteriaProposalData, null, 2));
@@ -472,8 +579,22 @@
                     console.log("studentProposalCriteriaData Length: "+ studentProposalCriteriaData.length);
                     console.log("Show Data studentProposalCriteriaData: " + JSON.stringify(studentProposalCriteriaData, null, 2));
 
+                    console.log("criteriaDefenseEva Length: "+ criteriaDefenseEva.length);
+                    console.log("Show Data criteriaDefenseEva: " + JSON.stringify(criteriaDefenseEva, null, 2));
+
+                    console.log("projectInstructor Length: "+ projectInstructor.length);
+                    console.log("Show Data projectInstructor: " + JSON.stringify(projectInstructor, null, 2));
+
+                    console.log("criteriaPosterData Length: "+ criteriaPosterData.length);
+                    console.log("Show Data criteriaPosterData: " + JSON.stringify(criteriaPosterData, null, 2));
+
                     displayGradeCriteria(data)
                     displayExtraScoreCriteria(data)
+
+                    displayPresentCriteria(data)
+                    displayDocumentCriteria(data)
+                    // displayPosterCriteria(data)
+                    updateInstructorModal(projectInstructor)
                 })
                 .catch(error => {
                     console.error('Error fetching data:', error);
@@ -578,6 +699,7 @@
             });
             table.appendChild(tbody)
         }
+// <<<<<<< Calculate
 
         document.addEventListener("input", function (event) {
             if (event.target.classList.contains("present-score-input")) {
@@ -966,4 +1088,255 @@
     // }
 </script>
 
+<!-- ======= -->
+
+        //================================  displayDefenseCriteria + Poster (Modal)  ==========================================
+
+        function displayPresentCriteria(data) {
+
+            const criteria = data[2];
+            const students = data[1];
+
+            const table = document.getElementById("presentation-table");
+            table.innerHTML = "";
+
+            const thead = document.createElement("thead");
+            const rowHeader = document.createElement("tr");
+
+            rowHeader.innerHTML = `
+            <th></th>
+            ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}
+        `;
+            thead.appendChild(rowHeader);
+            table.appendChild(thead);
+
+            const tbody = document.createElement("tbody");
+
+            const presentCriteria = criteria.filter(i => i.type === "Defense Presentation");
+
+            presentCriteria.forEach(criteria => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                <td style="text-align: left">
+                    <strong>${criteria.criteriaName}</strong><br>
+                    <span class="subtitle">${criteria.criteriaNameTH}</span>
+                    <span class="max-score">Max Score ${criteria.maxScore}</span>
+                </td>
+                ${students.map(() => `<td></td>`).join('')}
+            `;
+                tbody.appendChild(row);
+            });
+            table.appendChild(tbody)
+        }
+
+        function displayDocumentCriteria(data) {
+
+            const criteria = data[2];
+            const students = data[1];
+
+            const table = document.getElementById("document-table");
+            table.innerHTML = "";
+
+            const thead = document.createElement("thead");
+            const rowHeader = document.createElement("tr");
+
+            rowHeader.innerHTML = `
+            <th></th>
+            ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}
+        `;
+            thead.appendChild(rowHeader);
+            table.appendChild(thead);
+
+            const tbody = document.createElement("tbody");
+
+            const documentCriteria = criteria.filter(i => i.type === "Document");
+
+            documentCriteria.forEach(criteria => {
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                <td style="text-align: left">
+                    <strong>${criteria.criteriaName}</strong><br>
+                    <span class="subtitle">${criteria.criteriaNameTH}</span>
+                    <span class="max-score">Max Score ${criteria.maxScore}</span>
+                </td>
+                ${students.map(() => `<td></td>`).join('')}
+            `;
+                tbody.appendChild(row);
+            });
+            table.appendChild(tbody);
+        }
+
+        // async function displayPosterCriteria(data) {
+        //
+        //     const criteria = data[4];
+        //     const students = data[1];
+        //
+        //     const table = document.getElementById("poster-table");
+        //     table.innerHTML = "";
+        //
+        //     const thead = document.createElement("thead");
+        //     const rowHeader = document.createElement("tr");
+        //
+        //     rowHeader.innerHTML = `
+        //     <th></th>
+        //     ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}
+        // `;
+        //     thead.appendChild(rowHeader);
+        //     table.appendChild(thead);
+        //
+        //     const tbody = document.createElement("tbody");
+        //
+        //     const posterCriteria = criteria.filter(i => i.type === "Poster Presentation (Appearance)" || i.type === "Contents" || i.type === "Presentation (Verbal)");
+        //
+        //     posterCriteria.forEach(criteria => {
+        //         const row = document.createElement("tr");
+        //         row.innerHTML = `
+        //         <td style="text-align: left">
+        //             <strong>${criteria.criteriaName}</strong><br>
+        //             <span class="subtitle">${criteria.criteriaNameTH}</span>
+        //             <span class="max-score">Max Score ${criteria.maxScore}</span>
+        //         </td>
+        //         ${students.map(() => `<td></td>`).join('')}
+        //     `;
+        //         tbody.appendChild(row);
+        //     });
+        //     table.appendChild(tbody);
+        //
+        //     const modal = document.getElementById("popup-modal")
+        //     try {
+        //         await displayScoreModal(modal, posterCriteria);
+        //     } catch (error) {
+        //         console.error('Error displaying scores:', error);
+        //     }
+        // }
+
+        //================================  displayModal  (Modal)  ==========================================
+
+        function updateInstructorModal(instructors) {
+
+            currentInstructor = 0;
+            updateModalContent(currentInstructor, instructors);
+
+            const modal = document.getElementById("popup-modal")
+            displayScoreModal(modal);
+
+            document.getElementById("pre-instructor").addEventListener("click", function () {
+                if (currentInstructor > 0) {
+                    currentInstructor --;
+                    updateModalContent(currentInstructor, instructors);
+
+                    displayScoreModal(modal);
+                }
+            });
+
+            document.getElementById("next-instructor").addEventListener("click", function () {
+                if (currentInstructor < instructors.length - 1) {
+                    currentInstructor ++;
+                    updateModalContent(currentInstructor, instructors);
+
+                    displayScoreModal(modal);
+                }
+            });
+
+        }
+
+
+        //================================  displayInstructor  (Modal)  ==========================================
+
+        function updateModalContent(index, instructors) {
+            const instructor = instructors[index];
+            document.querySelector(".user-section .name").textContent = instructor.professorName;
+            document.querySelector(".user-section .subtitle").textContent = instructor.role;
+        }
+
+        //================================  displayInstructor  (Modal)  ==========================================
+
+        async function displayScoreModal(modal) {
+            try {
+                const projectId = document.getElementById('projectIdInput').value;
+                const instructorName = modal.querySelector(".user-section .name").textContent;
+                const instructorRole = modal.querySelector(".user-section .subtitle").textContent;
+
+                console.log('Fetch score parameter:' , {
+                    projectId,
+                    instructorName,
+                    instructorRole
+                });
+
+                // https://www.geeksforgeeks.org/node-js-urlsearchparams-append/
+                const url = new URL('http://localhost:8080/instructor/GetDefenseEvalScoreModal')
+                url.searchParams.append('projectId', projectId);
+                url.searchParams.append('instructorName', instructorName);
+                url.searchParams.append('role', instructorRole);
+
+                console.log('Request URL: ', url.toString());
+
+                // fetch
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const scoreData = await response.json();
+
+                console.log('Received score data: ', scoreData);
+
+                clearExistingScore(modal);
+
+                const tableList = modal.querySelectorAll('table');
+
+                // check type of table
+                tableList.forEach(table => {
+                    let type;
+
+                    if (table.id === 'presentation-table') {
+                        type = 'Defense Presentation';
+                    } else if(table.id === 'document-table'){
+                        type = 'Document'
+                    }
+
+                    console.log('Processing table type: ', type);
+
+                    // all row
+                    const rows = table.querySelectorAll('tbody tr');
+                    rows.forEach(row => {
+
+                        //https://stackoverflow.com/questions/9362800/how-to-select-not-first-tr-and-not-last-td
+                        // criteria td
+                        const criteriaName = row.querySelector('strong').textContent;
+                        const cells = row.querySelectorAll('td:not(:first-child)')
+
+                        cells.forEach((cell, index) => {
+                            const studentId = table.querySelector(`thead th:nth-child(${index + 2})`).textContent.split(' ')[0];
+                            const matchScore = scoreData.find(score =>
+                                score.studentId === studentId &&
+                                score.criteriaName === criteriaName &&
+                                score.type === type);
+
+                            if(matchScore) {
+                                // toFixed x.xx
+                                cell.textContent = matchScore.score.toFixed(2);
+                                console.log(`Found score: ${matchScore.score.toFixed(2)}`);
+                            } else {
+                                console.log(`No matching score found for Student ID ${studentId}, Criteria ${criteriaName}`);
+                            }
+                        })
+                    })
+                })
+            } catch (error) {
+                console.error('Error fetch score: ', error)
+                throw error;
+            }
+        }
+
+        function clearExistingScore(modal) {
+            const cells = modal.querySelectorAll('table tbody td:not(:first-child)')
+            cells.forEach(cell => {
+                cell.textContent = '';
+            })
+        }
+
+    </script>
+
+<!-- >>>>>>> merge-modal&calculate -->
 </html>
