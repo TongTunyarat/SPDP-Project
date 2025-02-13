@@ -81,7 +81,7 @@
 
                 <h1>Project Details</h1>
 
-                <div id="project-details">
+                <div class="details" id="project-details">
                     <div><strong>Project ID:</strong> <span id="project-id"></span>
                         <input type="hidden" id="projectIdInput" th:value="${projectId}">
                     </div>
@@ -139,7 +139,6 @@
                     <!--                    </tr>-->
                     <!--                    </tbody>-->
 
-
             <!-- Presentation -->
             <div class="table-container">
                 <h1>Proposal Presentation (20%)</h1>
@@ -151,8 +150,8 @@
                     </div>
                 </label>
 
-
                 <table class="evaluation-table" id="presentation-table">
+
                     <!--                    <thead>-->
                     <!--                    <tr id="student-name-header"> &lt;!&ndash; Student Name Header &ndash;&gt; </tr>-->
                     <!--                    </thead>-->
@@ -250,29 +249,8 @@
             <!-- Score Result -->
             <div class="table-container">
                 <h1> Score Result </h1>
-                <label class="score-subtitle">
-                    <i class="fa fa-exclamation-triangle"></i>
-                    Unable to calculate the grade because not all committee members have submitted their scores.
-                </label>
 
                 <div id="card-container"></div>
-
-                <!--                <div class="card-container">-->
-                <!--                    <div class="card-score-result">-->
-                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
-                <!--                        <span class="score">100 / 100</span>-->
-                <!--                    </div>-->
-
-                <!--                    <div class="card-score-result">-->
-                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
-                <!--                        <span class="score">100 / 100</span>-->
-                <!--                    </div>-->
-
-                <!--                    <div class="card-score-result">-->
-                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
-                <!--                        <span class="score">100 / 100</span>-->
-                <!--                    </div>-->
-                <!--                </div>-->
 
                 <button class="save-button"> Save</button>
             </div>
@@ -281,9 +259,11 @@
     </div>
 </div>
 
+<!-- -------------- Show Project Detail -------------- -->
 <script>
 
     window.onload = function () {
+
         const projectId = getProjectIdFromURL();
 
         if (!projectId) {
@@ -359,64 +339,12 @@
         }
     }
 
+
     function displayInstructorDetails(instructor) {
         document.getElementById('project-advisor').textContent = instructor.professorName;
     }
 
-    // async function fetchAndDisplayScores(projectId) {
-    //     const url = `http://localhost:8080/instructor/showScoreProposal?projectId=${encodeURIComponent(projectId)}`;
-    //
-    //     try {
-    //         const response = await fetch(url);
-    //         if (!response.ok) {
-    //             throw new Error(`HTTP error! status: ${response.status}`);
-    //         }
-    //         const scoreData = await response.json();
-    //
-    //         const tableBody = document.querySelector('tbody');
-    //         tableBody.innerHTML = ""; // Clear existing rows
-    //
-    //         // Group scores by student
-    //         const studentScoresMap = {};
-    //         scoreData.forEach(score => {
-    //             if (!studentScoresMap[score.studentId]) {
-    //                 studentScoresMap[score.studentId] = {
-    //                     studentName: score.studentName,
-    //                     scores: {
-    //                         "Quality of Work": 0,
-    //                         "Level of Progress": 0,
-    //                         "Presentation Language": 0,
-    //                         "Question & Answer": 0
-    //                     }
-    //                 };
-    //             }
-    //             if (studentScoresMap[score.studentId].scores.hasOwnProperty(score.criteriaName)) {
-    //                 studentScoresMap[score.studentId].scores[score.criteriaName] = score.score;
-    //             }
-    //         });
-    //
-    //         // Populate table rows
-    //         Object.values(studentScoresMap).forEach(studentData => {
-    //             const {studentName, scores} = studentData;
-    //             const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
-    //
-    //             const row = document.createElement('tr');
-    //             row.innerHTML = `
-    //             <td style="text-align: left;">${studentName}</td>
-    //             <td>${scores["Quality of Work"]}</td>
-    //             <td>${scores["Level of Progress"]}</td>
-    //             <td>${scores["Presentation Language"]}</td>
-    //             <td>${scores["Question & Answer"]}</td>
-    //             <td>${totalScore.toFixed(2)}</td>
-    //         `;
-    //             tableBody.appendChild(row);
-    //         });
-    //
-    //     } catch (error) {
-    //         console.error('Error fetching or displaying score proposal:', error);
-    //     }
-    // }
-
+    
     async function fetchAndDisplayCardResultScores(projectId) {
         const url = `http://localhost:8080/instructor/showScoreProposal?projectId=${encodeURIComponent(projectId)}`;
 
@@ -469,12 +397,10 @@
         }
     }
 
-
 </script>
 
 
-<!--================================  Fern  ==========================================-->
-
+<!-- -------------- Show Criteria -------------- -->
 <script th:inline="javascript">
 
     function criteriaProposal() {
@@ -537,9 +463,8 @@
         }
     });
 
-    //================================  displayPresentCriteria  ==========================================
+    // ================================  displayPresentCriteria  ==========================================
     function displayPresentCriteria(data) {
-
         const criteria = data[0];
         const students = data[1];
 
@@ -550,9 +475,9 @@
         const rowHeader = document.createElement("tr");
 
         rowHeader.innerHTML = `
-            <th></th>
-            ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}
-        `;
+        <th></th>
+        ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}
+    `;
         thead.appendChild(rowHeader);
         table.appendChild(thead);
 
@@ -560,32 +485,60 @@
 
         const presentCriteria = criteria.filter(i => i.type === "Proposal Presentation");
 
+        // จัดเก็บข้อมูลคะแนน
+        let scoreData = {};
+
         presentCriteria.forEach(criteria => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>
-                    <strong>${criteria.criteriaName}</strong><br>
-                    <span class="subtitle">${criteria.criteriaNameTH}</span>
-                    <span class="max-score">Max Score ${criteria.maxScore}</span>
-                </td>
-                ${students.map(() => `<td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}" /></td>`).join('')}
-            `;
+        <td>
+            <strong>${criteria.criteriaName}</strong><br>
+            <span class="subtitle">${criteria.criteriaNameTH}</span>
+            <span class="max-score">Max Score ${criteria.maxScore}</span>
+        </td>
+        ${students.map(student => {
+                // สร้าง input สำหรับคะแนน
+                return `<td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}"
+                    data-student-id="${student.studentId}" data-criteria-id="${criteria.criteriaId}" /></td>`;
+            }).join('')}
+    `;
             tbody.appendChild(row);
         });
-        table.appendChild(tbody)
+        table.appendChild(tbody);
+
         inputListenersPresent();
-    }
 
-    function inputListenersPresent() {
+        // ฟังก์ชันที่จับการเปลี่ยนแปลงคะแนน
+        function inputListenersPresent() {
+            const inputs = document.querySelectorAll(".present-score-input");
+            inputs.forEach(input => {
+                input.addEventListener("input", (event) => {
+                    const studentId = event.target.getAttribute('data-student-id');
+                    const criteriaId = event.target.getAttribute('data-criteria-id');
+                    const score = event.target.value;
 
-        // all tr
+                    // เก็บข้อมูลคะแนนใน scoreData
+                    if (!scoreData[studentId]) {
+                        scoreData[studentId] = {};
+                    }
+                    scoreData[studentId][criteriaId] = score;
+                });
+            });
+        }
+
+        // การตรวจสอบการกรอกคะแนน
         const rows = document.querySelectorAll("#presentation-table tbody tr");
 
         rows.forEach(row => {
-            // all input tr
             const inputs = row.querySelectorAll(".present-score-input");
             inputs.forEach(input => {
                 input.addEventListener("input", (event) => {
+                    const value = parseFloat(event.target.value);
+                    if (value > 10) {
+                        event.target.value = 10;  // รีเซ็ตค่าเป็น 10 ถ้ากรอกเกิน
+                    }
+
+                    // ตรวจสอบว่า checkbox "sameScoreDocument" ถูกเลือกหรือไม่
                     const checkbox = document.getElementById("sameScorePresent");
                     if (checkbox.checked) {
                         const newValue = event.target.value;
@@ -664,16 +617,24 @@
                     <span class="subtitle">${criteria.criteriaNameTH || ""}</span>
                     <span class="max-score">Max Score ${criteria.maxScore}</span>
                 </td>
-                ${students.map(() => `<td><input type="number" class="document-score-input" min="0" max="${criteria.maxScore}" /></td>`).join('')}
+
+            ${students.map(student => {
+                // สร้าง input สำหรับคะแนน
+                return `<td><input type="number" class="document-score-input" min="0" max="${criteria.maxScore}"
+                        data-student-id="${student.studentId}" data-criteria-id="${criteria.criteriaId}" /></td>`;
+            }).join('')}
             `;
             tbody.appendChild(row);
         });
         table.appendChild(tbody);
         inputListenersDocument();
+        //     ${students.map(() => `<td><input type="number" class="document-score-input" min="0" max="${criteria.maxScore}" /></td>`).join('')}
+        // \`;
+        return `<td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}"
+                        data-student-id="${student.studentId}" data-criteria-id="${criteria.criteriaId}" /></td>`;
     }
 
     function inputListenersDocument() {
-
         // all tr
         const rows = document.querySelectorAll("#document-table tbody tr");
 
@@ -682,6 +643,13 @@
             const inputs = row.querySelectorAll(".document-score-input");
             inputs.forEach(input => {
                 input.addEventListener("input", (event) => {
+                    // ตรวจสอบค่าเมื่อกรอก input
+                    const value = parseFloat(event.target.value);
+                    if (value > 10) {
+                        event.target.value = 10;  // รีเซ็ตค่าเป็น 10 ถ้ากรอกเกิน
+                    }
+
+                    // ตรวจสอบว่า checkbox "sameScoreDocument" ถูกเลือกหรือไม่
                     const checkbox = document.getElementById("sameScoreDocument");
                     if (checkbox.checked) {
                         const newValue = event.target.value;
@@ -694,6 +662,7 @@
             });
         });
     }
+
 
     // https://www.geeksforgeeks.org/javascript-auto-filling-one-field/
     function applySameScoreDocument() {
@@ -728,7 +697,451 @@
             });
         }
     }
+</script>
+
+
+<!-- -------------- Insert Score to Database -------------- -->
+<script>
+    document.querySelector('.save-button').addEventListener('click', function(event) {
+        console.log("Save Process");
+        event.preventDefault();
+
+        // ===== projectId ===== //
+        var projectId = getProjectIdFromURL();
+        console.log("projectId: " + projectId);
+
+        // ===== student score ===== //
+        var studentScores = document.querySelectorAll('.present-score-input, .document-score-input'); // ดึงข้อมูลจาก input ในตาราง (scores)
+
+        var studentData = {};
+
+        studentScores.forEach((input) => {
+            let studentId = input.dataset.studentId; // ดึง studentId
+            let scoreCriteriaId = input.getAttribute('data-criteria-id'); // ดึง criteria ID จาก data-attribute
+            let score = parseFloat(input.value) || 0;
+
+            if (!studentData[studentId]) {
+                studentData[studentId] = [];
+            }
+            studentData[studentId].push({scoreCriteriaId, score});
+        });
+
+        console.log(studentData);
+
+        // ===== instructorId ===== //
+        var instructorId = "";
+        fetchInstructorId();
+
+        function fetchInstructorId() {
+            fetch(`http://localhost:8080/get-instructorId?projectId=${projectId}`)
+                .then(response => response.text())
+                .then(data => {
+                    instructorId = data;
+                    console.log("Instructor Id: " + instructorId);
+                    sendEvaluationData();  // Call the function to send data after instructorId is fetched
+                })
+                .catch(error => console.error('Error fetching instructorId:', error));
+        }
+
+        function sendEvaluationData() {
+            // ส่งข้อมูลไปที่ /saveEvaluation สำหรับแต่ละ student
+            for (let studentId in studentData) {
+                let scoreDTOList = studentData[studentId];
+
+                console.log(studentId);
+                console.log(JSON.stringify(scoreDTOList));
+
+                fetch('http://localhost:8080/saveEvaluation?' +
+                    new URLSearchParams({
+                        instructorId: instructorId,
+                        projectId: projectId,
+                        studentId: studentId
+                    }), {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    credentials: 'include',
+                    body: JSON.stringify(scoreDTOList)
+                })
+                    .then(response => {
+                        console.log(response.status)
+                        if (!response.ok) {
+                            return response.text().then(text => {
+                                console.error("Error response from server:", text);
+                                throw new Error(text);
+                            });
+                        }
+                        return response;
+                    })
+                    .then(data => {
+                        console.log(`Evaluation saved successfully:`, data);
+                    })
+                    .catch(error => {
+                        console.error('Error saving evaluation:', error);
+                    });
+            }
+            // แสดงข้อความ alert ว่าการบันทึกสำเร็จ
+            alert('Evaluation saved successfully!');
+
+            // เปลี่ยน path ไปที่ /show-proposal-eva-projects
+            window.location.href = '/show-proposal-eva-projects';
+        }
+    });
+</script>
+
+
+<!-- -------------- Show Evaluation Score -------------- -->
+<script>
+    // Load evaluation data when page loads
+    document.addEventListener("DOMContentLoaded", async function() {
+        const projectId = getProjectIdFromURL();
+        if (!projectId) {
+            console.error('❌ No project ID found');
+            return;
+        }
+
+        try {
+            const instructorId = await fetchInstructorId(projectId);
+            if (!instructorId) {
+                console.error('❌ No instructor ID found');
+                return;
+            }
+
+            console.log('📌 Loading scores for Project:', projectId, 'Instructor:', instructorId);
+            await loadEvaluationData(instructorId, projectId);
+        } catch (error) {
+            console.error('❌ Error in initialization:', error);
+        }
+    });
+
+    // Fetch instructor ID
+    async function fetchInstructorId(projectId) {
+        try {
+            const response = await fetch(`http://localhost:8080/get-instructorId?projectId=${projectId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const instructorId = await response.text();
+            console.log('📌 Retrieved instructor ID:', instructorId);
+            return instructorId;
+        } catch (error) {
+            console.error('❌ Error fetching instructor ID:', error);
+            throw error;
+        }
+    }
+
+    // Load all evaluation data
+    async function loadEvaluationData(instructorId, projectId) {
+        // Get all score input fields
+        const scoreInputs = document.querySelectorAll('.present-score-input, .document-score-input');
+        const processedStudents = new Set();
+
+        for (const input of scoreInputs) {
+            const studentId = input.dataset.studentId;
+
+            // Skip if we've already processed this student
+            if (processedStudents.has(studentId)) continue;
+            processedStudents.add(studentId);
+
+            try {
+                const scores = await fetchStudentScores(instructorId, projectId, studentId);
+                if (scores && scores.length > 0) {
+                    populateStudentScores(scores, studentId);
+                }
+            } catch (error) {
+                console.warn(`⚠️ No existing scores found for student ${studentId}`);
+                // Initialize empty scores for this student
+                initializeEmptyScores(studentId);
+            }
+        }
+    }
+
+    // Fetch scores for a specific student
+    async function fetchStudentScores(instructorId, projectId, studentId) {
+        try {
+            const response = await fetch(`http://localhost:8080/getEvaluation?` +
+                new URLSearchParams({
+                    instructorId: instructorId,
+                    projectId: projectId,
+                    studentId: studentId
+                }));
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            // Check if response is empty
+            const text = await response.text();
+            if (!text || text.trim() === '') {
+                console.log(`📝 No existing scores found for student ${studentId}`);
+                return [];
+            }
+
+            // Try parsing the JSON
+            try {
+                const data = JSON.parse(text);
+                const scores = data.proposalEvalScores || [];
+                console.log(`✅ Retrieved scores for student ${studentId}:`, scores);
+                return scores;
+            } catch (e) {
+                console.warn(`⚠️ Invalid JSON response for student ${studentId}:`, text);
+                return [];
+            }
+        } catch (error) {
+            console.error(`❌ Error fetching scores for student ${studentId}:`, error);
+            return [];
+        }
+    }
+
+    // Initialize empty scores for a student
+    function initializeEmptyScores(studentId) {
+        const inputs = document.querySelectorAll(`input[data-student-id="${studentId}"]`);
+        inputs.forEach(input => {
+            input.value = '0';
+        });
+        updateStudentTotalScore(studentId);
+    }
+
+    // Populate score fields for a student
+    function populateStudentScores(scores, studentId) {
+        if (!Array.isArray(scores)) {
+            console.warn(`⚠️ Invalid scores data for student ${studentId}`);
+            initializeEmptyScores(studentId);
+            return;
+        }
+
+        scores.forEach(score => {
+            const selector = `input[data-student-id="${studentId}"][data-criteria-id="${score.criteria.criteriaId}"]`;
+            const inputField = document.querySelector(selector);
+
+            if (inputField) {
+                inputField.value = score.score || '0';
+                console.log(`✅ Populated score ${score.score} for student ${studentId}, criteria ${score.criteria.criteriaId}`);
+            } else {
+                console.warn(`⚠️ No input field found for selector: ${selector}`);
+            }
+        });
+
+        // Update total scores after populating individual scores
+        updateStudentTotalScore(studentId);
+    }
+
+    // Update total score display for a student
+    function updateStudentTotalScore(studentId) {
+        const inputs = document.querySelectorAll(`input[data-student-id="${studentId}"]`);
+        let total = 0;
+
+        inputs.forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+
+        // Update the score display in the results card
+        const scoreDisplay = document.querySelector(`.card-score-result[data-student-id="${studentId}"] .score`);
+        if (scoreDisplay) {
+            scoreDisplay.textContent = `${total.toFixed(2)} / 100`;
+        }
+    }
+</script>
+
+
+<!-- --------------- Show Score Result ------------------ -->
+<script>
+    // ✅ 1. โหลดข้อมูลนักศึกษาและสร้าง Card Result
+    async function fetchAllStudentScores() {
+        try {
+            const projectId = getProjectIdFromURL();
+            const instructorId = await fetchInstructorId(projectId);
+
+            if (!projectId || !instructorId) {
+                console.error("❌ Missing projectId or instructorId");
+                return;
+            }
+
+            // ✅ ดึง studentId ทั้งหมดจาก input fields
+            const studentScores = document.querySelectorAll('.present-score-input, .document-score-input');
+            let studentIds = [];
+
+            for (const input of studentScores) {
+                const studentId = input.dataset.studentId;
+                if (studentId && !studentIds.includes(studentId)) {
+                    studentIds.push(studentId);
+                }
+            }
+
+            if (studentIds.length === 0) {
+                console.warn("⚠️ No students found for this project.");
+                return;
+            }
+
+            // ✅ Fetch คะแนนของนักศึกษาแต่ละคน
+            const scores = await Promise.all(studentIds.map(async (studentId) => {
+                return await fetchStudentScore(instructorId, projectId, studentId);
+            }));
+
+            console.log("📌 All Student Scores:", scores);
+
+            // ✅ สร้าง Card Result
+            displayResultsCards({ students: scores.filter(score => score !== null) });
+
+            // ✅ ✅ ✅ รอให้ `displayResultsCards()` ทำงานเสร็จแล้วค่อยเรียก `updateStudentTotalScore()`
+            setTimeout(() => {
+                addInputListeners(); // ✅ เพิ่ม Event Listener ให้กับ input ที่โหลดมาใหม่
+                studentIds.forEach(studentId => updateStudentTotalScore(studentId));
+            }, 500); // หน่วงเวลาเล็กน้อยเพื่อให้ DOM อัปเดต
+        } catch (error) {
+            console.error("❌ Error fetching all student scores:", error);
+        }
+    }
+
+    // ✅ 2. สร้าง Card Result และแสดงผลใน `#card-container`
+    function displayResultsCards(data) {
+        const cardContainer = document.querySelector('#card-container');
+        cardContainer.innerHTML = ""; // ล้างข้อมูลก่อน
+
+        if (!data || !Array.isArray(data.students) || data.students.length === 0) {
+            console.error("⚠️ ไม่พบข้อมูลนักศึกษา:", data);
+            cardContainer.innerHTML = "<p>ไม่พบคะแนนสำหรับโครงการนี้</p>";
+            return;
+        }
+
+        const totalMaxScore = calculateMaxScore(); // ✅ ดึง maxScore ที่คำนวณได้
+
+        try {
+            data.students.forEach(student => {
+                const score = student.totalScore !== undefined ? Math.round(student.totalScore) : "N/A";
+                // const score = student.totalScore !== undefined ? student.totalScore.toFixed(2) : "N/A";
+
+                const card = document.createElement('div');
+                card.className = 'card-score-result';
+                card.setAttribute("data-student-id", student.studentId);
+                card.innerHTML = `
+                <span class="icon"><i class="fa fa-user"></i> ${student.studentId} ${student.studentName || ""}</span>
+                <span class="score">${score} / ${totalMaxScore}</span> <!-- ✅ ใช้ maxScore ที่คำนวณ -->
+            `;
+
+                console.log(`✅ Created card for student ${student.studentId} with maxScore ${totalMaxScore}`);
+                cardContainer.appendChild(card);
+            });
+        } catch (error) {
+            console.error("❌ Error displaying data in HTML:", error);
+            cardContainer.innerHTML = "<p>เกิดข้อผิดพลาดในการแสดงผลข้อมูล</p>";
+        }
+    }
+
+
+    // ✅ 3. เพิ่ม Event Listener ให้ input อัปเดตผลรวมทันทีเมื่อมีการเปลี่ยนแปลง
+    function addInputListeners() {
+        const inputs = document.querySelectorAll('.present-score-input, .document-score-input');
+
+        inputs.forEach(input => {
+            input.removeEventListener("input", handleInputChange); // ป้องกัน Event ซ้ำ
+            input.addEventListener("input", handleInputChange);
+        });
+    }
+
+    // ✅ 4. ฟังก์ชันที่ทำงานเมื่อเปลี่ยนค่าคะแนนใน `<input>`
+    function handleInputChange(event) {
+        const studentId = event.target.dataset.studentId;
+        console.log(`📌 Student ${studentId} changed score: ${event.target.value}`);
+        updateStudentTotalScore(studentId);
+    }
+
+    // ✅ 5. คำนวณผลรวมคะแนนและอัปเดตใน Card Result
+    function updateStudentTotalScore(studentId) {
+        const inputs = document.querySelectorAll(`input[data-student-id="${studentId}"]`);
+        let total = 0;
+
+        inputs.forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+
+        // ✅ ดึง maxScore ใหม่ (ถ้ามีการเปลี่ยนแปลง)
+        const totalMaxScore = calculateMaxScore();
+
+        // ✅ ค้นหา card result ของ studentId นั้น ๆ
+        const scoreDisplay = document.querySelector(`.card-score-result[data-student-id="${studentId}"] .score`);
+
+        console.log(`🧐 Looking for card with data-student-id="${studentId}"`);
+
+        if (scoreDisplay) {
+            console.log(`✅ Updating Student ${studentId} score to: ${total} / ${totalMaxScore}`);
+            scoreDisplay.textContent = `${Math.round(total)} / ${totalMaxScore}`;
+            // scoreDisplay.textContent = `${total.toFixed(2)} / ${totalMaxScore}`;
+        } else {
+            console.warn(`⚠️ Card result for student ${studentId} not found!`);
+            console.log("🧐 Available cards in DOM:", document.querySelectorAll(".card-score-result"));
+        }
+    }
+
+
+    // ✅ 6. ฟังก์ชันโหลดข้อมูลคะแนนของนักศึกษาแต่ละคน
+    async function fetchStudentScore(instructorId, projectId, studentId) {
+        try {
+            console.log("📌 Fetching student score with parameters:");
+
+            const evalType = "proposal";
+
+            console.log(`   └ instructorId: ${instructorId}`);
+            console.log(`   └ projectId: ${projectId}`);
+            console.log(`   └ studentId: ${studentId}`);
+            console.log(`   └ evalType: ${evalType}`);
+
+            const response = await fetch(`http://localhost:8080/scoreTotal?instructorId=${instructorId}&projectId=${projectId}&studentId=${studentId}&evalType=${evalType}`);
+
+            if (!response.ok) {
+                console.error(`❌ HTTP Error: ${response.status}`);
+                return null;
+            }
+
+            const text = await response.text();
+            console.log("📌 Raw API Response:", text);
+
+            try {
+                const data = JSON.parse(text);
+                console.log(`✅ Score for ${studentId}:`, data);
+
+                if (!data.rawTotalScore) {
+                    console.warn(`⚠️ No score data for studentId: ${studentId}`);
+                    return null;
+                }
+
+                return { studentId, totalScore: data.rawTotalScore }; // ✅ Return ค่า studentId และ totalScore
+            } catch (jsonError) {
+                console.error("⚠️ JSON Parse Error:", jsonError);
+                return null;
+            }
+        } catch (error) {
+            console.error("❌ Error fetching student score:", error);
+            return null;
+        }
+    }
+
+    function calculateMaxScore() {
+        let totalMaxScore = 0;
+
+        // ✅ ดึงค่าคะแนนสูงสุดของทุก criteria
+        const maxScores = document.querySelectorAll('.max-score');
+
+        maxScores.forEach(maxScoreElement => {
+            const maxScoreText = maxScoreElement.textContent.match(/\d+/); // ดึงตัวเลขออกมา
+            if (maxScoreText) {
+                totalMaxScore += parseInt(maxScoreText[0]); // บวกค่าลงไป
+            }
+        });
+
+        console.log(`🎯 Total Max Score: ${totalMaxScore}`);
+        return totalMaxScore;
+    }
+
+
+    document.addEventListener("DOMContentLoaded", async function () {
+        console.log("🚀 Page Loaded - Fetching Student Scores...");
+        await fetchAllStudentScores(); // ✅ โหลดคะแนนและสร้าง Card Result
+    });
 
 </script>
+
+
 
 </html>

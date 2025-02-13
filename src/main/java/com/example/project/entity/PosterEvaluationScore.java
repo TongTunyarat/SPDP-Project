@@ -35,32 +35,36 @@ public class PosterEvaluationScore {
         return posterEvaId;
     }
 
-    public void setPosterEvaId(String posterEvaId) {
+    public PosterEvaluationScore setPosterEvaId(String posterEvaId) {
         this.posterEvaId = posterEvaId;
+        return this;
     }
 
     public float getScore() {
         return score;
     }
 
-    public void setScore(float score) {
+    public PosterEvaluationScore setScore(float score) {
         this.score = score;
+        return this;
     }
 
     public Criteria getCriteriaPoster() {
         return criteriaPoster;
     }
 
-    public void setCriteriaPoster(Criteria criteriaPoster) {
+    public PosterEvaluationScore setCriteriaPoster(Criteria criteriaPoster) {
         this.criteriaPoster = criteriaPoster;
+        return this;
     }
 
     public PosterEvaluation getPosterEvaluation() {
         return posterEvaluation;
     }
 
-    public void setPosterEvaluation(PosterEvaluation posterEvaluation) {
+    public PosterEvaluationScore setPosterEvaluation(PosterEvaluation posterEvaluation) {
         this.posterEvaluation = posterEvaluation;
+        return this;
     }
 }
 

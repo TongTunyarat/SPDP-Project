@@ -12,6 +12,8 @@ import java.util.List;
 @Repository
 public interface DefenseEvalScoreRepository extends JpaRepository<DefenseEvalScore, String> {
 
+    DefenseEvalScore findByEvalId(String s);
+
     @Query("SELECT new com.example.project.DTO.DefenseEvaResponseDTO( " +
             "d.defenseEvaluation.defenseEvaId, " +
             "d.defenseEvaluation.student.studentId, " +
