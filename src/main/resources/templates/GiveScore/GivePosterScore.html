@@ -164,26 +164,23 @@
     </div>
 </div>
 
-<!-- <<<<<<< Calculate
-
 <!-- ------------ Show Project detail ----------------- -->
 <script>
-    window.onload = fetchData;
-
-    function getProjectIdFromURL() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get("projectId"); // ดึงค่าจาก ?projectId=xxxx
-    }
-
-    function fetchData() {
-        // รับค่า projectId จาก URL
-        const projectId = "DST SP2024-01"
-        // const projectId = getProjectIdFromURL(); -->
-// =======
-<script>
+//     window.onload = fetchData;
+//
+//     function getProjectIdFromURL() {
+//         const urlParams = new URLSearchParams(window.location.search);
+//         return urlParams.get("projectId"); // ดึงค่าจาก ?projectId=xxxx
+//     }
+//
+//     function fetchData() {
+//         // รับค่า projectId จาก URL
+//         const projectId = "DST SP2024-01"
+//         // const projectId = getProjectIdFromURL(); -->
+// // =======
+// <script>
     window.onload = function () {
         const projectId = getProjectIdFromURL();
-// >>>>>>> merge-modal&calculate
 
         if (!projectId) {
             displayError("ไม่พบข้อมูล projectId");

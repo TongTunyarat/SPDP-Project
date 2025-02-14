@@ -1,9 +1,6 @@
 package com.example.project.controller;
 
-import com.example.project.DTO.Score.ScoreDTO;
-import com.example.project.DTO.Score.StudentScoreDTO;
-import com.example.project.DTO.Score.StudentScorePosterResponse;
-import com.example.project.DTO.Score.StudentScoreResponse;
+import com.example.project.DTO.Score.*;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
 import com.example.project.service.CalculateService;
@@ -165,7 +162,7 @@ public class CalculateController {
             Project project = findProject(projectId);
             Student student = findStudent(studentId);
 
-            DefenseEvaluation scores = defenseEvaluationRepository.findByDefenseInstructorIdAndProjectIdAndStudentDefense(
+            DefenseEvaluation scores = defenseEvaluationRepository.findByDefenseInstructorIdAndProjectIdAndStudent(
                     instructor, project, student);
             System.out.println("[Controller] Get Score Response: "+scores);
 
@@ -304,7 +301,7 @@ public class CalculateController {
     public ResponseEntity<String> saveProposalGrade(
             @RequestParam String projectId,
             @RequestParam String studentId,
-            @RequestBody List<ScoreDTO> scores) {
+            @RequestBody ScoreRequestDTO scoreRequest) {
         try {
             System.out.println("Save Grade Controller");
 
@@ -312,13 +309,14 @@ public class CalculateController {
             Student student = findStudent(studentId);
 
             // ✅ เรียกใช้ Service
-            String grade = calculateService.saveProposalGrade(project, student, scores);
+            String grade = calculateService.saveProposalGrade(project, student, scoreRequest);
 
-            return ResponseEntity.ok("Grading Result: "+grade);
+            return ResponseEntity.ok("Grading Result: " + grade);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
+
 
     @GetMapping("/getGradeProposal")
     public ResponseEntity<?> getGradeProposal(
@@ -341,19 +339,17 @@ public class CalculateController {
 
     @PostMapping("/saveDefenseGrade")
     public ResponseEntity<String> saveDefenseGrade(
-            @RequestParam String instructorId,
             @RequestParam String projectId,
             @RequestParam String studentId,
-            @RequestBody List<ScoreDTO> scores) {
+            @RequestBody DefenseScoreRequestDTO scoreRequest) {
         try {
             System.out.println("Save Grade Controller");
 
-            ProjectInstructorRole instructor = findInstructor(instructorId);
             Project project = findProject(projectId);
             Student student = findStudent(studentId);
 
             // ✅ เรียกใช้ Service
-            String grade = calculateService.saveDefenseGrade(instructor, project, student, scores);
+            String grade = calculateService.saveDefenseGrade(project, student, scoreRequest);
 
             return ResponseEntity.ok("Grading Result: "+grade);
         } catch (Exception e) {

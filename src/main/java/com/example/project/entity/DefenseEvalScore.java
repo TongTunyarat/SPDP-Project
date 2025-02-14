@@ -45,7 +45,7 @@ public class DefenseEvalScore {
     }
 
     public DefenseEvalScore setScore(int score) {
-        this.score = score;
+        this.score = BigDecimal.valueOf(score);
         return this;
     }
 

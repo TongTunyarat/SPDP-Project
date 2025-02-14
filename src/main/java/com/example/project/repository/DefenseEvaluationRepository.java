@@ -8,11 +8,11 @@ import java.util.List;
 
 public interface DefenseEvaluationRepository extends JpaRepository<DefenseEvaluation, String> {
 
-    DefenseEvaluation findByDefenseInstructorIdAndProjectIdAndStudentDefense(ProjectInstructorRole defenseInstructorId, Project projectId, Student studentDefense);
+    DefenseEvaluation findByDefenseInstructorIdAndProjectIdAndStudent(ProjectInstructorRole defenseInstructorId, Project projectId, Student studentDefense);
 
     List<DefenseEvaluation> findByProjectId(Project project);
 
-    List<DefenseEvaluation> findByProjectIdAndStudentDefense(Project projectId, Student studentDefense);
+    List<DefenseEvaluation> findByProjectIdAndStudent(Project projectId, Student studentDefense);
 
     List<DefenseEvaluation> findByProjectId_ProjectId(String projectId);
 

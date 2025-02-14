@@ -64,10 +64,10 @@ public class DefenseEvaluation {
     @JsonManagedReference
     private Student student;
 
-    @ManyToOne
-    @JoinColumn(name="student_id")
-    @JsonManagedReference
-    private Student studentDefense;
+//    @ManyToOne
+//    @JoinColumn(name="student_id")
+//    @JsonManagedReference
+//    private Student studentDefense;
 
     public String getDefenseEvaId() {
         return defenseEvaId;
@@ -151,14 +151,14 @@ public class DefenseEvaluation {
         return this;
     }
 
-    public Student getStudentDefense() {
-        return studentDefense;
-    }
-
-    public DefenseEvaluation setStudentDefense(Student studentDefense) {
-        this.studentDefense = studentDefense;
-        return this;
-    }
+//    public Student getStudentDefense() {
+//        return studentDefense;
+//    }
+//
+//    public DefenseEvaluation setStudentDefense(Student studentDefense) {
+//        this.studentDefense = studentDefense;
+//        return this;
+//    }
 
     public BigDecimal getTotalScore() {
         return totalScore;
@@ -173,7 +173,8 @@ public class DefenseEvaluation {
         return student;
     }
 
-    public void setStudent(Student student) {
+    public DefenseEvaluation setStudent(Student student) {
         this.student = student;
+        return this;
     }
 }

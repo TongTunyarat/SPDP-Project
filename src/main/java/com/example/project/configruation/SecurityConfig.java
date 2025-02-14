@@ -29,10 +29,10 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf
-                        .ignoringRequestMatchers("/user/details", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade","/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense")
+                        .ignoringRequestMatchers("/user/details", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade","/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense")
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/css/**", "/js/**", "/publicProjectDetail", "/instructor/criteriaDefenseGrade", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade", "/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense").permitAll() // อนุญาตให้ทุกคนเข้าถึง
+                        .requestMatchers("/login", "/css/**", "/js/**", "/publicProjectDetail", "/instructor/criteriaDefenseGrade", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade", "/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense").permitAll() // อนุญาตให้ทุกคนเข้าถึง
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/instructor/**").hasRole("INSTRUCTOR")
                         .anyRequest().authenticated()

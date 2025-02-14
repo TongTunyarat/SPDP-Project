@@ -12,6 +12,14 @@ public class ScoreDTO {
     private String scoreCriteriaId;
     private BigDecimal score;
 
+    @Override
+    public String toString() {
+        return "ScoreDTO{" +
+                "scoreCriteriaId='" + scoreCriteriaId + '\'' +
+                ", score=" + score +
+                '}';
+    }
+
     public ScoreDTO(String scoreCriteriaId, BigDecimal score) {
         this.scoreCriteriaId = scoreCriteriaId;
         this.score = score;

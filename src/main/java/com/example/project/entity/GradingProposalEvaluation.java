@@ -47,7 +47,21 @@ public class GradingProposalEvaluation {
 
     }
 
-    public String getProposalGradeId() {
+ @Override
+ public String toString() {
+  return "GradingProposalEvaluation{" +
+          "proposalGradeId='" + proposalGradeId + '\'' +
+          ", dateTime=" + dateTime +
+          ", avgScoreProposal=" + avgScoreProposal +
+          ", evaluateScore=" + evaluateScore +
+          ", totalScore=" + totalScore +
+          ", gradeResult='" + gradeResult + '\'' +
+          ", project=" + project +
+          ", student=" + student +
+          '}';
+ }
+
+ public String getProposalGradeId() {
      return proposalGradeId;
     }
 
@@ -103,11 +117,11 @@ public class GradingProposalEvaluation {
      this.project = project;
     }
 
- public Student getStudent() {
+    public Student getStudent() {
   return student;
  }
 
- public void setStudent(Student student) {
+    public void setStudent(Student student) {
   this.student = student;
  }
 }
