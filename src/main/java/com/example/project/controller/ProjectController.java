@@ -62,6 +62,7 @@ public class ProjectController {
 
         // return JSON
         return projectInstructorRoles.stream()
+                .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
                 .map(i -> {
                     // getStudentProjects -> เอา studentProjects (Project Entity) => (StudentProjects Entity)
                     List<StudentProjectDTO> studentProjectDTOS = i.getProjectIdRole().getStudentProjects().stream()
@@ -153,6 +154,51 @@ public class ProjectController {
         // return JSON
         return projectInstructorRoles.stream()
                 .filter(i -> "Committee".equalsIgnoreCase(i.getRole()))
+                .map(i -> {
+                    // getStudentProjects -> เอา studentProjects (Project Entity) => (StudentProjects Entity)
+                    List<StudentProjectDTO> studentProjectDTOS = i.getProjectIdRole().getStudentProjects().stream()
+                            .filter(studentProject -> "Active".equals(studentProject.getStatus()))
+                            .map(studentProject -> new StudentProjectDTO(
+                                    // getStudent() -> ใน (StudentProjects Entity)
+                                    studentProject.getStudent().getStudentId(),
+                                    studentProject.getStudent().getStudentName(),
+                                    studentProject.getStatus()))
+                            .toList();
+
+                    if (studentProjectDTOS.isEmpty()) {
+                        return null;
+                    }
+
+                    return new InstructorProjectDTO(
+                            // i -> projectInstructorRoles
+                            // i.getProjectIdRole() -> Project (ProjectInstructorRole Entity)
+                            // getProjectId() -> Id (Project Entity)
+                            i.getProjectIdRole().getProgram(),
+                            i.getProjectIdRole().getProjectId(),
+                            i.getProjectIdRole().getProjectTitle(),
+                            i.getRole(),
+                            studentProjectDTOS
+                    );
+                })
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+    }
+
+    // project list by user filter Poster-Committee
+    @GetMapping("/postercommittee/projectList")
+    @ResponseBody
+    public List<InstructorProjectDTO> getPosterCommitteeData() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        System.out.println("Account username: " + authentication.getName());
+        System.out.println("Session ID: " + RequestContextHolder.currentRequestAttributes().getSessionId());
+
+        List<ProjectInstructorRole> projectInstructorRoles = projectService.getInstructorProject();
+
+        System.out.println("Find project list");
+
+        // return JSON
+        return projectInstructorRoles.stream()
+                .filter(i -> "Poster-Committee".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
                 .map(i -> {
                     // getStudentProjects -> เอา studentProjects (Project Entity) => (StudentProjects Entity)
                     List<StudentProjectDTO> studentProjectDTOS = i.getProjectIdRole().getStudentProjects().stream()
