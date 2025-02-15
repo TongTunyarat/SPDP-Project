@@ -16,47 +16,186 @@
 
 <body>
 <div class="container">
+    <!-- script ในการเปิดปิด period -->
+    <script>
+        const accessPeriods = {
+            proposalEvaluation: {
+                start: "2025-02-01T00:00:00",
+                end: "2025-07-14T23:59:59",
+                isActive: true,
+                path: "/show-proposal-eva-projects",
+                title: "Proposal Evaluation"
+            },
+            posterEvaluation: {
+                start: "2025-02-01T00:00:00",
+                end: "2025-07-14T23:59:59",
+                isActive: true,
+                path: "/show-poster-projects",
+                title: "Poster Evaluation"
+            },
+            proposalGrade: {
+                start: "2025-02-01T00:00:00",
+                end: "2025-07-14T23:59:59",
+                isActive: true,
+                path: "/show-proposal-grade-projects",
+                title: "Proposal Grade"
+            },
+            defenseEvaluation: {
+                start: "2025-02-15T00:00:00",
+                end: "2025-07-15T23:59:59",
+                isActive: true,
+                path: "/show-defense-eva-projects",
+                title: "Defense Evaluation"
+            },
+            defenseGrade: {
+                start: "2025-02-15T00:00:00",
+                end: "2025-07-15T23:59:59",
+                isActive: true,
+                path: "/show-defense-grade-projects",
+                title: "Defense Grade"
+            }
+        };
+
+        function updateLinkStatus() {
+            const currentTime = new Date(); // Get current time
+            console.log("Current Time: ", currentTime); // Debugging line
+
+            // Get all links with data-period
+            const links = document.querySelectorAll('a[data-period]');
+
+            links.forEach(link => {
+                const periodKey = link.getAttribute('data-period');
+                const period = accessPeriods[periodKey];
+
+                if (period) {
+                    const startTime = new Date(period.start);
+                    const endTime = new Date(period.end);
+                    console.log(`Checking link ${periodKey}:`, currentTime, startTime, endTime); // Debugging line
+
+                    const isAccessible = currentTime >= startTime && currentTime <= endTime && period.isActive;
+                    console.log(`Is Accessible: ${isAccessible}`); // Debugging line
+
+                    if (!isAccessible) {
+                        link.classList.add('disabled-link');
+                        link.onclick = (e) => e.preventDefault(); // Prevent default action when link is disabled
+
+                        // Add tooltip if not already present
+                        if (!link.querySelector('.tooltip')) {
+                            const tooltipText = currentTime < startTime
+                                ? `Available from ${startTime.toLocaleDateString()}`
+                                : `Period ended on ${endTime.toLocaleDateString()}`;
+
+                            const tooltip = document.createElement('span');
+                            tooltip.className = 'tooltip';
+                            tooltip.textContent = tooltipText;
+                            link.appendChild(tooltip);
+                        }
+                    } else {
+                        link.classList.remove('disabled-link');
+                        link.onclick = null;
+                        const tooltip = link.querySelector('.tooltip');
+                        if (tooltip) {
+                            tooltip.remove();
+                        }
+                    }
+                }
+            });
+        }
+
+        console.log('Calling updateLinkStatus function');
+        // First execution to update link status
+        // เรียก updateLinkStatus ทันทีเมื่อโหลดหน้า
+        window.onload = updateLinkStatus;
+
+        // ตั้งเวลาอัปเดตทุก 1 นาที
+        setInterval(updateLinkStatus, 60000);
+
+    </script>
+
+
     <div class="sidebar">
-        <h2>ICT MAHIDOL</h2>
-        <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
-                     style="fill:#FFFFFF;">
-                <path
-                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
-                </path>
-            </svg> Homepage </h4>
-            <li><a href="#">Dashboard</a></li>
-        </ul>
+            <h2>ICT MAHIDOL</h2>
+            <ul>
+                <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                         style="fill:#FFFFFF;">
+                    <path
+                            d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+                    </path>
+                </svg> Homepage </h4>
+                <li><a href="#">Dashboard</a></li>
+            </ul>
 
-        <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-                <g fill="#ffffff" fill-rule="nonzero">
-                    <g transform="scale(5.33333,5.33333)">
-                        <path
-                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-                        </path>
+            <ul>
+                <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
                     </g>
-                </g>
-            </svg> Evaluation (40%) </h4>
-            <li><a href="/show-proposal-eva-projects">Proposal Evaluation</a></li>
-            <li><a href="/show-poster-projects">Poster Evaluation</a></li>
-            <li><a href="/show-defense-eva-projects">Defense Evaluation</a></li>
-        </ul>
+                </svg> Evaluation (40%) </h4>
+                <li><a href="/show-proposal-eva-projects" data-period="proposalEvaluation">Proposal Evaluation</a></li>
+                <li><a href="/show-poster-projects" data-period="posterEvaluation">Poster Evaluation</a></li>
+                <li><a href="/show-defense-eva-projects" data-period="defenseEvaluation">Defense Evaluation</a></li>
+            </ul>
 
-        <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-                <g fill="#ffffff" fill-rule="nonzero">
-                    <g transform="scale(5.33333,5.33333)">
-                        <path
-                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-                        </path>
+            <ul>
+                <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
                     </g>
-                </g>
-            </svg> Grades (60%) </h4>
-            <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>
-            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>
-        </ul>
+                </svg> Grades (60%) </h4>
+                <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Proposal Grade</a></li>
+                <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Defense Grade</a></li>
+            </ul>
     </div>
+
+    <!--    <div class="sidebar">-->
+<!--        <h2>ICT MAHIDOL</h2>-->
+<!--        <ul>-->
+<!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"-->
+<!--                     style="fill:#FFFFFF;">-->
+<!--                <path-->
+<!--                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">-->
+<!--                </path>-->
+<!--            </svg> Homepage </h4>-->
+<!--            <li><a href="#">Dashboard</a></li>-->
+<!--        </ul>-->
+
+<!--        <ul>-->
+<!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
+<!--                <g fill="#ffffff" fill-rule="nonzero">-->
+<!--                    <g transform="scale(5.33333,5.33333)">-->
+<!--                        <path-->
+<!--                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
+<!--                        </path>-->
+<!--                    </g>-->
+<!--                </g>-->
+<!--            </svg> Evaluation (40%) </h4>-->
+<!--            <li><a href="/show-proposal-eva-projects">Proposal Evaluation</a></li>-->
+<!--            <li><a href="/show-poster-projects">Poster Evaluation</a></li>-->
+<!--            <li><a href="/show-defense-eva-projects">Defense Evaluation</a></li>-->
+<!--        </ul>-->
+
+<!--        <ul>-->
+<!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
+<!--                <g fill="#ffffff" fill-rule="nonzero">-->
+<!--                    <g transform="scale(5.33333,5.33333)">-->
+<!--                        <path-->
+<!--                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
+<!--                        </path>-->
+<!--                    </g>-->
+<!--                </g>-->
+<!--            </svg> Grades (60%) </h4>-->
+<!--            <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>-->
+<!--            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>-->
+<!--        </ul>-->
+<!--    </div>-->
 
     <div class="content">
 

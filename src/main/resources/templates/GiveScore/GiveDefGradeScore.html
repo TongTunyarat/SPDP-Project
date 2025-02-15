@@ -380,7 +380,6 @@
         });
     }
 
-
 </script>
 
 
@@ -1247,62 +1246,18 @@
         return totalScore;
     }
 
-    async function checkForZeroScores(studentId) {
-        const modal = document.getElementById("popup-modal");
-        if (!modal) {
-            console.warn("⚠️ Modal ไม่ถูกพบ");
-            return true; // ถือว่าเป็น I ไปก่อน
-        }
+    function checkForInvalidScores(row, studentName) {
+        for (let i = 1; i <= 3; i++) {
+            const scoreCell = row.cells[i];
+            const scoreText = scoreCell.textContent.trim();
 
-        // ✅ รอให้ modal โหลดข้อมูลเสร็จ ก่อนตรวจสอบคะแนน
-        await displayScoreModal(modal);
-
-        console.log("✅ Modal ถูกพบ และโหลดข้อมูลเสร็จ กำลังตรวจสอบคะแนน...");
-
-        let hasMissingScore = false;
-
-        const instructors = document.querySelectorAll('.instructor-card');
-        for (let i = 0; i < instructors.length; i++) {
-            updateModalContent(i, instructors);
-
-            // รอให้โหลดข้อมูลคะแนนจาก instructor คนนี้เสร็จ
-            await displayScoreModal(modal);
-
-            const tables = modal.querySelectorAll('table');
-            let isScoreFound = false;
-
-            tables.forEach(table => {
-                table.querySelectorAll('tbody tr').forEach(row => {
-                    const studentCell = row.querySelector('td:first-child');
-                    const studentIdInRow = studentCell ? studentCell.textContent.trim() : '';
-
-                    if (studentIdInRow === studentId) {
-                        row.querySelectorAll('td:not(:first-child)').forEach(cell => {
-                            const scoreText = cell.textContent.trim();
-                            const score = scoreText === "" ? NaN : parseFloat(scoreText);
-
-                            console.log(`📊 Checking score: '${scoreText}' → Parsed: ${score}`);
-
-                            if (!isNaN(score) && score !== 0) {
-                                isScoreFound = true;
-                            } else {
-                                console.warn(`⚠️ พบคะแนนที่เป็น 0 หรือไม่มีค่า (Instructor ${i + 1})`);
-                                hasMissingScore = true;
-                            }
-                        });
-                    }
-                });
-            });
-
-            // ถ้าไม่มีคะแนนเลยทั้ง modal
-            if (!isScoreFound) {
-                console.warn(`⚠️ Instructor ${i + 1} ไม่มีคะแนนให้ Student ${studentId}`);
-                hasMissingScore = true;
+            // ถ้าค่าคะแนนเป็น "-", 0 หรือ null
+            if (scoreText === "-" || scoreText === "" || scoreText === "0" || parseFloat(scoreText) === 0) {
+                console.warn(`⚠️ Invalid score detected in column ${i} for ${studentName}`);
+                return true; // ถ้าพบค่าที่ไม่ถูกต้อง คืนค่า true
             }
         }
-
-        console.log(`✅ Final result: ${hasMissingScore ? 'มีคะแนนที่ขาด' : 'คะแนนครบ'}`);
-        return hasMissingScore;
+        return false; // ถ้าคะแนนถูกต้อง คืนค่า false
     }
 
     // Updated function to calculate grade with zero or null score check
@@ -1330,47 +1285,92 @@
         return 'F';
     }
 
+    // async function updateStudentScore(studentId, studentName) {
+    //     // Get the individual scores (make sure these functions return numeric values)
+    //     const defenseScore = getResultScoreFromTable(studentName);
+    //     const evaluationScore = getEvaluationScore(studentId);
+    //     const extraScore = getExtraScore(studentId);
+    //
+    //     // Ensure values are numbers (parse them to float to handle decimal scores as well)
+    //     const totalDefenseScore = parseFloat(defenseScore) || 0;
+    //     const totalEvaluationScore = parseFloat(evaluationScore) || 0;
+    //     const totalExtraScore = parseFloat(extraScore) || 0;
+    //
+    //     // Calculate raw total score
+    //     const rawTotalScore = totalDefenseScore + totalEvaluationScore + totalExtraScore;
+    //
+    //     // Cap the total score at 100
+    //     const totalScore = Math.min(rawTotalScore, 100);
+    //
+    //     // ดึงรายชื่ออาจารย์ของโปรเจคก่อน
+    //     const instructors = await projectInstructor(getProjectIdFromURL());
+    //     console.log('📚 Instructors:', instructors);
+    //
+    //     // ✅ ตรวจสอบคะแนนที่เป็น 0 หรือไม่มีค่า
+    //     const hasZeroOrNullScores = await checkForZeroScoresForAllInstructors(studentId, instructors);
+    //     const grade = hasZeroOrNullScores ? 'I' : await calculateGradeWithCheck(totalScore, studentId);
+    //
+    //     console.log(`📊 Score Breakdown for ${studentName} (${studentId}):`);
+    //     console.log(`Defense Score (40%): ${totalDefenseScore}`);
+    //     console.log(`Evaluation Score (60%): ${totalEvaluationScore}`);
+    //     console.log(`Extra Score (10%): ${totalExtraScore}`);
+    //     console.log(`Raw Total Score: ${rawTotalScore}`);
+    //     console.log(`Final Capped Score: ${totalScore}`);
+    //
+    //     // ✅ ตรวจสอบว่าค่าที่ได้มาเป็น 'I' จริงหรือไม่
+    //     if (grade !== 'I') {
+    //         console.log("✅ เกรดถูกคำนวณใหม่: " + grade);
+    //     } else {
+    //         console.warn("⚠️ เกรดยังคงเป็น 'I'");
+    //     }
+    //
+    //     // Update the UI
+    //     updateScoreCard(studentId, totalScore, grade);
+    // }
     async function updateStudentScore(studentId, studentName) {
-        // Get the individual scores (make sure these functions return numeric values)
-        const defenseScore = getResultScoreFromTable(studentName);
-        const evaluationScore = getEvaluationScore(studentId);
-        const extraScore = getExtraScore(studentId);
-
-        // Ensure values are numbers (parse them to float to handle decimal scores as well)
-        const totalDefenseScore = parseFloat(defenseScore) || 0;
-        const totalEvaluationScore = parseFloat(evaluationScore) || 0;
-        const totalExtraScore = parseFloat(extraScore) || 0;
-
-        // Calculate raw total score
-        const rawTotalScore = totalDefenseScore + totalEvaluationScore + totalExtraScore;
-
-        // Cap the total score at 100
-        const totalScore = Math.min(rawTotalScore, 100);
-
-        // ดึงรายชื่ออาจารย์ของโปรเจคก่อน
-        const instructors = await projectInstructor(getProjectIdFromURL());
-        console.log('📚 Instructors:', instructors);
-
-        // ✅ ตรวจสอบคะแนนที่เป็น 0 หรือไม่มีค่า
-        const hasZeroOrNullScores = await checkForZeroScoresForAllInstructors(studentId, instructors);
-        const grade = hasZeroOrNullScores ? 'I' : await calculateGradeWithCheck(totalScore, studentId);
-
-        console.log(`📊 Score Breakdown for ${studentName} (${studentId}):`);
-        console.log(`Defense Score (40%): ${totalDefenseScore}`);
-        console.log(`Evaluation Score (60%): ${totalEvaluationScore}`);
-        console.log(`Extra Score (10%): ${totalExtraScore}`);
-        console.log(`Raw Total Score: ${rawTotalScore}`);
-        console.log(`Final Capped Score: ${totalScore}`);
-
-        // ✅ ตรวจสอบว่าค่าที่ได้มาเป็น 'I' จริงหรือไม่
-        if (grade !== 'I') {
-            console.log("✅ เกรดถูกคำนวณใหม่: " + grade);
-        } else {
-            console.warn("⚠️ เกรดยังคงเป็น 'I'");
+        // ดึงตารางข้อมูลของนักศึกษา
+        const table = document.querySelector('#student-score');
+        if (!table) {
+            console.warn('⚠️ Table not found');
+            return;
         }
 
-        // Update the UI
-        updateScoreCard(studentId, totalScore, grade);
+        const rows = table.querySelectorAll('tr');
+
+        for (const row of rows) {
+            const nameCell = row.cells[0]; // คอลัมน์ชื่อ
+            if (!nameCell) continue;
+
+            const currentStudentName = nameCell.textContent.trim(); // ดึงชื่อจากตารางโดยตรง
+
+            if (currentStudentName === studentName) {
+                // เรียกใช้งาน checkForInvalidScores เพื่อเช็คค่าผิดปกติในคอลัมน์คะแนน
+                if (checkForInvalidScores(row, studentName)) {
+                    console.warn(`⚠️ Invalid score detected for ${studentName}. Setting grade to 'I'`);
+                    updateScoreCard(studentId, 0, 'I'); // อัปเดตคะแนนเป็น 'I'
+                    return; // หยุดการคำนวณคะแนน
+                }
+
+                // ถ้าผ่านการตรวจสอบคะแนน เราก็ทำการคำนวณคะแนนอื่นๆ
+                const defenseScore = getResultScoreFromTable(studentName);
+                const evaluationScore = getEvaluationScore(studentId);
+                const extraScore = getExtraScore(studentId);
+
+                const totalDefenseScore = parseFloat(defenseScore) || 0;
+                const totalEvaluationScore = parseFloat(evaluationScore) || 0;
+                const totalExtraScore = parseFloat(extraScore) || 0;
+
+                const rawTotalScore = totalDefenseScore + totalEvaluationScore + totalExtraScore;
+                const totalScore = Math.min(rawTotalScore, 100);
+
+                const instructors = await projectInstructor(getProjectIdFromURL());
+                const hasZeroOrNullScores = await checkForZeroScoresForAllInstructors(studentId, instructors);
+                const grade = hasZeroOrNullScores ? 'I' : await calculateGradeWithCheck(totalScore, studentId);
+
+                // อัปเดตผลคะแนน
+                updateScoreCard(studentId, totalScore, grade);
+            }
+        }
     }
 
 
@@ -1461,12 +1461,12 @@
                 }
 
                 // ✅ ตรวจสอบว่ามีคะแนนเป็น 0 หรือไม่
-                const zeroScoreFound = scoreData.some(score => score.studentId === studentId && score.score === 0);
-
-                if (zeroScoreFound) {
-                    console.log(`⚠️ Zero score found for Student ${studentId} from Instructor ${instructorName}`);
-                    return true; // ถ้ามี 0 → ถือว่าเป็น `I`
-                }
+                // const zeroScoreFound = scoreData.some(score => score.studentId === studentId && score.score === 0);
+                //
+                // if (zeroScoreFound) {
+                //     console.log(`⚠️ Zero score found for Student ${studentId} from Instructor ${instructorName}`);
+                //     return true; // ถ้ามี 0 → ถือว่าเป็น `I`
+                // }
 
             } catch (error) {
                 console.error('Error fetching scores for instructor:', error);
