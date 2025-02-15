@@ -92,6 +92,7 @@
                         <option value="all" selected>ALL</option>
                         <option value="advisor">Advisor</option>
                         <option value="committee">Committee</option>
+                        <option value="poster_committee">Poster_Committee</option>
                     </select>
                 </label>
                 <input id="search-keyword" type="text" placeholder="Search"/>
@@ -127,7 +128,7 @@
 
     function fetchData() {
         // JSON information fetch project list
-        let url = 'http://localhost:8080/committee/projectList';
+        let url = 'http://localhost:8080/postercommittee/projectList';
 
         // ทำการส่งคำขอไปยัง API หรือ Backend
         fetch(url)

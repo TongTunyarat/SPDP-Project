@@ -115,6 +115,11 @@ tbody td {
     color: white;
 }
 
+.role.poster-committee {
+    background-color: #9b59b6;
+    color: white;
+}
+
 .evaluation {
     font-size: 18px;
 }

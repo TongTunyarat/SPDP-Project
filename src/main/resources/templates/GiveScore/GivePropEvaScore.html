@@ -415,6 +415,9 @@
         const criteria = data[0];
         const students = data[1];
 
+        console.log("### Fetch in criteria: " + criteria);
+        console.log("### Fetch in students: " +  JSON.stringify(students, null, 2));
+
         const table = document.getElementById("document-table");
         table.innerHTML = "";
 
@@ -452,8 +455,8 @@
         table.appendChild(tbody);
         inputListenersDocument();
 
-        return `<td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}"
-                        data-student-id="${student.studentId}" data-criteria-id="${criteria.criteriaId}" /></td>`;
+        // return `<td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}"
+        //                 data-student-id="${student.studentId}" data-criteria-id="${criteria.criteriaId}" /></td>`;
     }
 
     function inputListenersDocument() {
