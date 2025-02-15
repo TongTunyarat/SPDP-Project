@@ -226,8 +226,97 @@
         document.getElementById('project-advisor').textContent = instructor.professorName;
     }
 
+//     async function fetchAndDisplayScores(projectId) {
+//         const url = `http://localhost:8080/instructor/showScoreProposal?projectId=${encodeURIComponent(projectId)}`;
+//
+//         try {
+//             const response = await fetch(url);
+//             if (!response.ok) {
+//                 throw new Error(`HTTP error! status: ${response.status}`);
+//             }
+//             const scoreData = await response.json();
+//
+//             const tableBody = document.getElementById('student-score');
+//             tableBody.innerHTML = ""; // Clear existing rows
+//
+//             const studentScoresMap = {};
+//
+//             scoreData.forEach(score => {
+//                 const studentId = score.studentId;
+//                 if (!studentScoresMap[studentId]) {
+//                     studentScoresMap[studentId] = {
+//                         studentName: score.studentName,
+//                         presentationScores: [],
+//                         documentScores: {
+//                             qualityScores: [],
+//                             timeliness: null // เริ่มต้นเป็น null เพื่อเช็คว่ามีค่าหรือไม่
+//                         }
+//                     };
+//                 }
+//
+//                 // Group and store scores
+//                 if (["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"].includes(score.criteriaName)) {
+//                     studentScoresMap[studentId].presentationScores.push(score.score);
+//                 }
+//
+//                 if (score.criteriaName === "Quality") {
+//                     studentScoresMap[studentId].documentScores.qualityScores.push(score.score);
+//                 } else if (score.criteriaName === "Timeliness") {
+//                     studentScoresMap[studentId].documentScores.timeliness = score.score;
+//                 }
+//             });
+//
+// // Populate table rows with calculated scores
+//             Object.values(studentScoresMap).forEach(studentData => {
+//                 const {studentName, presentationScores, documentScores} = studentData;
+//
+//                 // Calculate Presentation (20%) score
+//                 const presentationSum = presentationScores.reduce((sum, score) => sum + score, 0);
+//                 let presentationScore = presentationScores.length > 0 ? ((presentationSum * 5) / 30).toFixed(2) : "-"; // แสดง "-" ถ้าไม่มีคะแนน
+//
+//                 // หากคะแนนมากกว่า 20% (20 คะแนน) ให้จำกัดที่ 20%
+//                 if (presentationScore !== "-") {
+//                     presentationScore = Math.min(parseFloat(presentationScore), 20).toFixed(2);
+//                 }
+//
+//                 // Calculate Document (20%) score
+//                 const documentQualitySum = documentScores.qualityScores.reduce((sum, score) => sum + score, 0);
+//                 let documentQualityScore = documentScores.qualityScores.length > 0 ? ((documentQualitySum * 15) / 30).toFixed(2) : "-";
+//                 let documentScore = (documentQualityScore !== "-" && documentScores.timeliness !== null)
+//                     ? (parseFloat(documentQualityScore) + documentScores.timeliness).toFixed(2)
+//                     : "-";
+//
+//                 // หากคะแนนมากกว่า 20% (20 คะแนน) ให้จำกัดที่ 20%
+//                 if (documentScore !== "-") {
+//                     documentScore = Math.min(parseFloat(documentScore), 20).toFixed(2);
+//                 }
+//
+//                 // Calculate Result (40%) score หรือแสดง "-"
+//                 const resultScore = (presentationScore !== "-" && documentScore !== "-")
+//                     ? (parseFloat(presentationScore) + parseFloat(documentScore)).toFixed(2)
+//                     : "-";
+//
+//                 // Create row for each student
+//                 const row = document.createElement('tr');
+//                 row.innerHTML = `
+//         <td>${studentName}</td>
+//         <td>${presentationScore}</td>
+//         <td>${documentScore}</td>
+//         <td>${resultScore}</td>
+//     `;
+//                 tableBody.appendChild(row);
+//             });
+//
+//
+//         } catch (error) {
+//             console.error('Error fetching or displaying score proposal:', error);
+//         }
+//     }
+
     async function fetchAndDisplayScores(projectId) {
         const url = `http://localhost:8080/instructor/showScoreProposal?projectId=${encodeURIComponent(projectId)}`;
+        const tableBody = document.getElementById('student-score');
+        tableBody.innerHTML = ""; // ล้างข้อมูลตารางก่อน
 
         try {
             const response = await fetch(url);
@@ -236,84 +325,137 @@
             }
             const scoreData = await response.json();
 
-            const tableBody = document.getElementById('student-score');
-            tableBody.innerHTML = ""; // Clear existing rows
+            // 🔍 **เช็คว่า scoreData ว่างเปล่าหรือมีแต่ null**
+            const hasValidScores = scoreData.some(score => score.score !== null);
 
-            const studentScoresMap = {};
-
-            scoreData.forEach(score => {
-                const studentId = score.studentId;
-                if (!studentScoresMap[studentId]) {
-                    studentScoresMap[studentId] = {
-                        studentName: score.studentName,
-                        presentationScores: [],
-                        documentScores: {
-                            qualityScores: [],
-                            timeliness: 0
-                        }
-                    };
-                }
-
-                // Group and store scores
-                if (["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"].includes(score.criteriaName)) {
-                    studentScoresMap[studentId].presentationScores.push(score.score);
-                }
-
-                if (score.criteriaName === "Quality") {
-                    studentScoresMap[studentId].documentScores.qualityScores.push(score.score);
-                } else if (score.criteriaName === "Timeliness") {
-                    studentScoresMap[studentId].documentScores.timeliness = score.score;
-                }
-            });
-
-            // Populate table rows with calculated scores
-            Object.values(studentScoresMap).forEach(studentData => {
-                const { studentName, presentationScores, documentScores } = studentData;
-
-                // Calculate Presentation (20%) score
-                const presentationSum = presentationScores.reduce((sum, score) => sum + score, 0);
-                let presentationScore = ((presentationSum * 5) / 30).toFixed(2); // 5 คะแนนจาก 30 คะแนน
-
-                // หากคะแนนมากกว่า 20% (20 คะแนน) ให้จำกัดที่ 20%
-                presentationScore = Math.min(presentationScore, 20).toFixed(2);
-
-                // Calculate Document (20%) score
-                const documentQualitySum = documentScores.qualityScores.reduce((sum, score) => sum + score, 0);
-                let documentQualityScore = ((documentQualitySum * 15) / 30).toFixed(2); // 15 คะแนนจาก 30 คะแนน
-                let documentScore = (parseFloat(documentQualityScore) + documentScores.timeliness).toFixed(2);
-
-                // หากคะแนนมากกว่า 20% (20 คะแนน) ให้จำกัดที่ 20%
-                documentScore = Math.min(documentScore, 20).toFixed(2);
-
-                // Calculate Result (40%) score
-                const resultScore = ((parseFloat(presentationScore) + parseFloat(documentScore))).toFixed(2);
-
-                // Create row for each student
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                <td>${studentName}</td>
-                <td>${presentationScore}</td>
-                <td>${documentScore}</td>
-                <td>${resultScore}</td>
-            `;
-                tableBody.appendChild(row);
-            });
-
-
+            if (!scoreData || scoreData.length === 0 || !hasValidScores) {
+                // 🛑 ถ้าไม่มีคะแนน → ไปดึงเฉพาะรายชื่อนักเรียน
+                tableBody.innerHTML = "";
+                await fetchStudentNamesOnly(projectId, tableBody);
+            } else {
+                // ✅ มีคะแนน → แสดงผลปกติ
+                tableBody.innerHTML = "";
+                displayScoreData(scoreData, tableBody);
+            }
         } catch (error) {
             console.error('Error fetching or displaying score proposal:', error);
         }
     }
 
-    window.addEventListener('load', () => {
-        const projectId = new URLSearchParams(window.location.search).get('projectId');
-        if (projectId) {
-            fetchAndDisplayScores(projectId);
-            // fetchAndDisplayCardResultScores(projectId);
-        } else {
-            console.warn("No project ID provided in the URL.");
+    // 🔵 Fetch รายชื่อนักเรียนจาก Backend (ถ้าไม่มีคะแนน)
+    async function fetchStudentNamesOnly(projectId, tableBody) {
+        const url = `http://localhost:8080/instructor/showStudentDetails?projectId=${encodeURIComponent(projectId)}`;
+
+        try {
+            // ล้างข้อมูลตารางก่อนทุกครั้ง
+            tableBody.innerHTML = "";
+
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const studentList = await response.json();
+
+            if (studentList.length === 0) {
+                // ถ้าไม่มีข้อมูลนักเรียน
+                const noDataRow = document.createElement('tr');
+                noDataRow.innerHTML = `
+                <td colspan="4" style="text-align: center; color: red;">ไม่มีข้อมูลนักเรียน</td>
+            `;
+                tableBody.appendChild(noDataRow);
+            } else {
+                // ถ้ามีข้อมูลนักเรียน
+                studentList.forEach(student => {
+                    const row = document.createElement('tr');
+                    row.innerHTML = `
+                    <td>${student.studentName}</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                `;
+                    tableBody.appendChild(row);
+                });
+            }
+
+        } catch (error) {
+            console.error('Error fetching student list:', error);
+            // แสดงข้อความ error เมื่อไม่สามารถดึงข้อมูลได้
+            const errorRow = document.createElement('tr');
+            errorRow.innerHTML = `
+            <td colspan="4" style="text-align: center; color: red;">ไม่สามารถดึงข้อมูลนักเรียนได้</td>
+        `;
+            tableBody.appendChild(errorRow);
         }
-    });
+    }
+
+
+    // 🔵 แสดงตารางคะแนนปกติ (ถ้ามีคะแนน)
+    function displayScoreData(scoreData, tableBody) {
+        const studentScoresMap = {};
+
+        scoreData.forEach(score => {
+            const studentId = score.studentId;
+            if (!studentScoresMap[studentId]) {
+                studentScoresMap[studentId] = {
+                    studentName: score.studentName,
+                    presentationScores: [],
+                    documentScores: {
+                        qualityScores: [],
+                        timeliness: null
+                    }
+                };
+            }
+
+            // Group and store scores
+            if (["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"].includes(score.criteriaName)) {
+                studentScoresMap[studentId].presentationScores.push(score.score);
+            }
+
+            if (score.criteriaName === "Quality") {
+                studentScoresMap[studentId].documentScores.qualityScores.push(score.score);
+            } else if (score.criteriaName === "Timeliness") {
+                studentScoresMap[studentId].documentScores.timeliness = score.score;
+            }
+        });
+
+        Object.values(studentScoresMap).forEach(studentData => {
+            const { studentName, presentationScores, documentScores } = studentData;
+
+            // คำนวณคะแนน Presentation
+            const presentationSum = presentationScores.reduce((sum, score) => sum + score, 0);
+            let presentationScore = presentationScores.length > 0 ? ((presentationSum * 5) / 30).toFixed(2) : "-";
+            if (presentationScore !== "-") {
+                presentationScore = Math.min(parseFloat(presentationScore), 20).toFixed(2);
+            }
+
+            // คำนวณคะแนน Document
+            const documentQualitySum = documentScores.qualityScores.reduce((sum, score) => sum + score, 0);
+            let documentQualityScore = documentScores.qualityScores.length > 0 ? ((documentQualitySum * 15) / 30).toFixed(2) : "-";
+            let documentScore = (documentQualityScore !== "-" && documentScores.timeliness !== null)
+                ? (parseFloat(documentQualityScore) + documentScores.timeliness).toFixed(2)
+                : "-";
+            if (documentScore !== "-") {
+                documentScore = Math.min(parseFloat(documentScore), 20).toFixed(2);
+            }
+
+            // คำนวณคะแนนรวม
+            const resultScore = (presentationScore !== "-" && documentScore !== "-")
+                ? (parseFloat(presentationScore) + parseFloat(documentScore)).toFixed(2)
+                : "-";
+
+            // แสดงผลข้อมูล
+            const row = document.createElement('tr');
+            row.innerHTML = `
+            <td>${studentName}</td>
+            <td>${presentationScore}</td>
+            <td>${documentScore}</td>
+            <td>${resultScore}</td>
+        `;
+            tableBody.appendChild(row);
+        });
+    }
+
+
 
 </script>
 
@@ -757,7 +899,7 @@
 
 <!-- -------------- Insert Score to Database -------------- -->
 <script>
-    document.querySelector('.save-button').addEventListener('click', function(event) {
+    document.querySelector('.save-button').addEventListener('click', function (event) {
         console.log("Save Process");
         event.preventDefault();
 
@@ -886,7 +1028,7 @@
                         studentId: id
                     }), {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     credentials: 'include',
                     body: JSON.stringify(transformedData)
                 })
@@ -922,7 +1064,7 @@
 
 <!-- --------------- Show Evaluate Score ------------------ -->
 <script>
-    document.addEventListener("DOMContentLoaded", async function() {
+    document.addEventListener("DOMContentLoaded", async function () {
         console.log("🚀 DOMContentLoaded Triggered");
 
         const projectId = getProjectIdFromURL();
@@ -952,7 +1094,7 @@
                 }
             });
 
-            observer.observe(document.body, { childList: true, subtree: true });
+            observer.observe(document.body, {childList: true, subtree: true});
 
             // Timeout after 5 seconds
             setTimeout(() => {
@@ -1149,7 +1291,7 @@
     // Updated function to initialize score calculation
     function initializeScoreCalculation() {
         // Add event listeners to all score inputs
-        document.addEventListener('input', function(event) {
+        document.addEventListener('input', function (event) {
             if (event.target.classList.contains('present-score-input')) {
                 const studentId = event.target.dataset.studentId;
                 const studentName = event.target.dataset.studentName;

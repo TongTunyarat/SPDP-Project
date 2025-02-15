@@ -50,6 +50,12 @@ public class ProjectService {
         return projectRepository.findByProjectId(projectId);
 
     }
+
+    public List<StudentProject> getStudentDetails(String projectId) {
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+        return project.getStudentProjects();
+    }
+
 //
 //    public static List<StudentProject> getProjectById(String projectId) {
 //

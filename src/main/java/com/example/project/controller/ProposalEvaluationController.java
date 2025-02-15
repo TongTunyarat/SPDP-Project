@@ -1,12 +1,10 @@
 package com.example.project.controller;
 
 
-import com.example.project.DTO.ProposalEvaResponseDTO;
-import com.example.project.DTO.ProposalEvalScoreDTO;
-import com.example.project.DTO.ShowProposalCriteriaDTO;
-import com.example.project.DTO.StudentCriteriaDTO;
+import com.example.project.DTO.*;
 import com.example.project.entity.*;
 import com.example.project.repository.ProjectInstructorRoleRepository;
+import com.example.project.service.ProjectService;
 import com.example.project.service.ProposalEvaluationService;
 import com.example.project.service.ProposalGradeService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +39,9 @@ public class ProposalEvaluationController {
 
     @Autowired
     private ProjectInstructorRoleRepository projectInstructorRoleRepository;
+
+    @Autowired
+    private ProjectService projectService;
 
     // get criteria DTO
     @GetMapping("/criteriaProposal")
@@ -88,10 +89,13 @@ public class ProposalEvaluationController {
 
     //======================================= GET ProposalEvalScore ========================================
 
-    public ProposalEvaluationController(ProposalEvaluationService proposalEvaluationService, ProposalGradeService proposalGradeService, ProjectInstructorRoleRepository projectInstructorRoleRepository) {
-        this.proposalGradeService = proposalGradeService;
+    public ProposalEvaluationController(ProposalEvaluationService proposalEvaluationService, ProposalGradeService proposalGradeService, ProjectInstructorRoleRepository projectInstructorRoleRepository, ProjectService projectService) {
         this.proposalEvaluationService = proposalEvaluationService;
+        this.proposalGradeService = proposalGradeService;
+        this.projectInstructorRoleRepository = projectInstructorRoleRepository;
+        this.projectService = projectService;
     }
+
 
     //     get score DTO
     @GetMapping("/showScoreProposal")
@@ -108,10 +112,23 @@ public class ProposalEvaluationController {
                         score.getProposalEvaluation().getProject().getProjectId(),
                         score.getCriteria().getCriteriaId(),
                         score.getCriteria().getCriteriaName(),
-                        score.getScore().doubleValue()
+                        score.getScore() != null ? score.getScore().doubleValue() : 0.0
 
                 )).collect(Collectors.toList());
     }
+
+    @GetMapping("/showStudentDetails")
+    @ResponseBody
+    public List<StudentProjectDTO> getStudentDetails(@RequestParam String projectId) {
+        List<StudentProject> studentProjectList = projectService.getStudentDetails(projectId);
+                return studentProjectList.stream()
+                .map(studentProject -> new StudentProjectDTO(
+                        studentProject.getStudent().getStudentId(),
+                        studentProject.getStudent().getStudentName(),
+                        studentProject.getStatus()))
+                .toList();
+    }
+
 
 //
 //    @GetMapping("/GetProposalEvalScore")
