@@ -30,6 +30,7 @@ public class LoginService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Account account = accountRepository.findAccountByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User account not found"));
+        // GrantedAuthority - interface กำหนด role
         List<GrantedAuthority> authorities = new ArrayList<>();
         if(account.getAdmins() != null) {
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));

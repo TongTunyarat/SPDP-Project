@@ -1,15 +1,15 @@
 package com.example.project.controller;
 
-import com.example.project.DTO.*;
+import com.example.project.DTO.Criteria.ShowProposalCriteriaDTO;
+import com.example.project.DTO.DefenseEvaRequestDTO;
+import com.example.project.DTO.DefenseEvaResponseDTO;
+import com.example.project.DTO.InstructorProjectListDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.ProjectInstructorRoleRepository;
 import com.example.project.service.DefenseEvaluationService;
 import com.example.project.service.DefenseGradeService;
-import com.example.project.service.ProposalEvaluationService;
-import com.example.project.service.ProposalGradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestParam;

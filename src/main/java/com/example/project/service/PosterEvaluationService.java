@@ -30,7 +30,7 @@ public class PosterEvaluationService {
     //=========================================== USE ===================================================
 
     // get proposal criteria
-    public List<Criteria> getProposalCriteria() {
+    public List<Criteria> getPosterCriteria() {
         List<Criteria> criteriaList = criteriaRepository.findByEvaluationPhase("Poster Evaluation");
 //        List<Criteria> criteriaList = criteriaRepository.findAll();
         return criteriaList;

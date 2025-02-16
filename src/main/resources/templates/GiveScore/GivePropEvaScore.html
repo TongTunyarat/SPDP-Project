@@ -341,86 +341,191 @@
             tbody.appendChild(row);
         });
         table.appendChild(tbody);
-
         inputListenersPresent();
+    }
 
         // ฟังก์ชันที่จับการเปลี่ยนแปลงคะแนน
-        function inputListenersPresent() {
-            const inputs = document.querySelectorAll(".present-score-input");
-            inputs.forEach(input => {
-                input.addEventListener("input", (event) => {
-                    const studentId = event.target.getAttribute('data-student-id');
-                    const criteriaId = event.target.getAttribute('data-criteria-id');
-                    const score = event.target.value;
+    //     function inputListenersPresent() {
+    //         const inputs = document.querySelectorAll(".present-score-input");
+    //         inputs.forEach(input => {
+    //             input.addEventListener("input", (event) => {
+    //                 const studentId = event.target.getAttribute('data-student-id');
+    //                 const criteriaId = event.target.getAttribute('data-criteria-id');
+    //                 const score = event.target.value;
+    //
+    //                 // เก็บข้อมูลคะแนนใน scoreData
+    //                 if (!scoreData[studentId]) {
+    //                     scoreData[studentId] = {};
+    //                 }
+    //                 scoreData[studentId][criteriaId] = score;
+    //             });
+    //         });
+    //     }
+    //
+    //     // การตรวจสอบการกรอกคะแนน
+    //     const rows = document.querySelectorAll("#presentation-table tbody tr");
+    //
+    //     rows.forEach(row => {
+    //         const inputs = row.querySelectorAll(".present-score-input");
+    //         inputs.forEach(input => {
+    //             input.addEventListener("input", (event) => {
+    //                 const maxScore = parseFloat(input.getAttribute("max"))
+    //                 const value = parseFloat(event.target.value);
+    //                 if (value > maxScore) {
+    //                     event.target.value = maxScore;  // รีเซ็ตค่าเป็น 10 ถ้ากรอกเกิน
+    //                 }
+    //
+    //                 // ตรวจสอบว่า checkbox "sameScoreDocument" ถูกเลือกหรือไม่
+    //                 const checkbox = document.getElementById("sameScorePresent");
+    //                 if (checkbox.checked) {
+    //                     const newValue = event.target.value;
+    //                     // apply
+    //                     inputs.forEach(otherInput => {
+    //                         otherInput.value = newValue;
+    //                     });
+    //                 }
+    //             });
+    //         });
+    //     });
+    // }
+    //
+    // // https://www.geeksforgeeks.org/javascript-auto-filling-one-field/
+    // function applySameScorePresent() {
+    //
+    //     console.log("applySameScorePresent called");
+    //
+    //     const checkBox = document.getElementById("sameScorePresent").checked;
+    //     // all of tr
+    //     const rows = document.querySelectorAll("#presentation-table tbody tr");
+    //
+    //     if (checkBox) {
+    //         rows.forEach(row => {
+    //             // ทุกตัวภายใน input tr
+    //             const inputs = row.querySelectorAll(".present-score-input");
+    //             let firstValue = "";
+    //
+    //             // check first value
+    //             for (let input of inputs) {
+    //                 if (input.value.trim() !== "") {
+    //                     firstValue = input.value;
+    //                     break;
+    //                 }
+    //             }
+    //
+    //             // apply value
+    //             if (firstValue !== "") {
+    //                 inputs.forEach(input => {
+    //                     input.value = firstValue;
+    //                 });
+    //             }
+    //
+    //         });
+    //     }
+    // }
 
-                    // เก็บข้อมูลคะแนนใน scoreData
-                    if (!scoreData[studentId]) {
-                        scoreData[studentId] = {};
-                    }
-                    scoreData[studentId][criteriaId] = score;
-                });
-            });
-        }
+    function inputListenersPresent() {
 
-        // การตรวจสอบการกรอกคะแนน
         const rows = document.querySelectorAll("#presentation-table tbody tr");
 
         rows.forEach(row => {
-            const inputs = row.querySelectorAll(".present-score-input");
-            inputs.forEach(input => {
-                input.addEventListener("input", (event) => {
-                    const maxScore = parseFloat(input.getAttribute("max"))
-                    const value = parseFloat(event.target.value);
-                    if (value > maxScore) {
-                        event.target.value = maxScore;  // รีเซ็ตค่าเป็น 10 ถ้ากรอกเกิน
-                    }
 
-                    // ตรวจสอบว่า checkbox "sameScoreDocument" ถูกเลือกหรือไม่
-                    const checkbox = document.getElementById("sameScorePresent");
-                    if (checkbox.checked) {
-                        const newValue = event.target.value;
-                        // apply
-                        inputs.forEach(otherInput => {
-                            otherInput.value = newValue;
+            const inputs = row.querySelectorAll(".present-score-input");
+
+            if (inputs.length > 0) {
+
+                const firstInput = inputs[0];
+
+                inputs.forEach((input, index) => {
+
+                    input.addEventListener("input", (event) => {
+
+                        // each input
+                        const maxScore = parseFloat(input.getAttribute("max"));
+                        let value = parseFloat(event.target.value);
+
+                        // protect maxScore
+                        if (value > maxScore) {
+
+                            value = maxScore;
+
+                        } else if (value < 0 || isNaN(value)) {
+
+                            value = 0;
+
+                        }
+                        event.target.value = value;
+
+                        const checkbox = document.getElementById("sameScorePresent");
+
+                        if (checkbox.checked && index === 0) {
+
+                           const newValue = firstInput.value || "0";
+
+                           inputs.forEach((otherInput, otherIndex) => {
+
+                               if (otherIndex !== 0) {
+
+                                otherInput.value = newValue;
+                                            otherInput.readOnly = true;
+
+                                        }
+
+                                    });
+                                }
                         });
-                    }
-                });
+                    });
+                }
             });
-        });
     }
 
     // https://www.geeksforgeeks.org/javascript-auto-filling-one-field/
     function applySameScorePresent() {
 
-        console.log("applySameScorePresent called");
+        console.log("applySameScoreDocument called ❗️");
 
         const checkBox = document.getElementById("sameScorePresent").checked;
-        // all of tr
         const rows = document.querySelectorAll("#presentation-table tbody tr");
 
-        if (checkBox) {
-            rows.forEach(row => {
-                // ทุกตัวภายใน input tr
-                const inputs = row.querySelectorAll(".present-score-input");
-                let firstValue = "";
+        rows.forEach(row => {
 
-                // check first value
-                for (let input of inputs) {
-                    if (input.value.trim() !== "") {
-                        firstValue = input.value;
-                        break;
+            const inputs = row.querySelectorAll(".present-score-input");
+
+            if (inputs.length > 0) {
+
+                const firstInput = inputs[0];
+
+                if (checkBox) {
+
+                    let firstValue = firstInput.value.trim();
+
+                    if (firstValue === "") {
+                        firstValue = "0";
+                        // set
+                        firstInput.value = "0";
                     }
-                }
 
-                // apply value
-                if (firstValue !== "") {
-                    inputs.forEach(input => {
-                        input.value = firstValue;
+                    // otherInput
+                    inputs.forEach((input, index) => {
+
+                        if (index !== 0) {
+                            input.value = firstValue;
+                            input.readOnly = true;
+                        }
+
+                    });
+                } else {
+
+                    inputs.forEach((input, index) => {
+
+                        if (index !== 0) {
+                            input.readOnly = false;
+                        }
+
                     });
                 }
+            }
+        });
 
-            });
-        }
     }
 
     //================================  displayDocumentCriteria  ==========================================
@@ -452,7 +557,7 @@
         documentCriteria.forEach(criteria => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>
+                <td style="text-align: left">
                     <strong>${criteria.criteriaName}</strong><br>
                     <span class="subtitle">${criteria.criteriaNameTH || ""}</span>
                     <span class="max-score">Max Score ${criteria.maxScore}</span>
@@ -464,6 +569,7 @@
                         data-student-id="${student.studentId}" data-criteria-id="${criteria.criteriaId}" /></td>`;
             }).join('')}
             `;
+
             tbody.appendChild(row);
         });
         table.appendChild(tbody);
@@ -471,71 +577,176 @@
 
     }
 
+
+
+    // function inputListenersDocument() {
+    //     // all tr
+    //     const rows = document.querySelectorAll("#document-table tbody tr");
+    //
+    //     rows.forEach(row => {
+    //         // all input tr
+    //         const inputs = row.querySelectorAll(".document-score-input");
+    //         inputs.forEach(input => {
+    //             input.addEventListener("input", (event) => {
+    //                 const maxScore = parseFloat(input.getAttribute("max"))
+    //                 // ตรวจสอบค่าเมื่อกรอก input
+    //                 const value = parseFloat(event.target.value);
+    //                 if (value > maxScore) {
+    //                     event.target.value = maxScore;  // รีเซ็ตค่าเป็น 10 ถ้ากรอกเกิน
+    //                 }
+    //
+    //                 // ตรวจสอบว่า checkbox "sameScoreDocument" ถูกเลือกหรือไม่
+    //                 const checkbox = document.getElementById("sameScoreDocument");
+    //                 if (checkbox.checked) {
+    //                     const newValue = event.target.value;
+    //                     // apply
+    //                     inputs.forEach(otherInput => {
+    //                         otherInput.value = newValue;
+    //                     });
+    //                 }
+    //             });
+    //         });
+    //     });
+    // }
+    //
+    //
+    // // https://www.geeksforgeeks.org/javascript-auto-filling-one-field/
+    // function applySameScoreDocument() {
+    //
+    //     console.log("applySameScoreDocument called");
+    //
+    //     const checkBox = document.getElementById("sameScoreDocument").checked;
+    //     // all of tr
+    //     const rows = document.querySelectorAll("#document-table tbody tr");
+    //
+    //     if (checkBox) {
+    //         rows.forEach(row => {
+    //             // ทุกตัวภายใน input tr
+    //             const inputs = row.querySelectorAll(".document-score-input");
+    //             let firstValue = "";
+    //
+    //             // check first value
+    //             for (let input of inputs) {
+    //                 if (input.value.trim() !== "") {
+    //                     firstValue = input.value;
+    //                     break;
+    //                 }
+    //             }
+    //
+    //             // apply value
+    //             if (firstValue !== "") {
+    //                 inputs.forEach(input => {
+    //                     input.value = firstValue;
+    //
+    //                 });
+    //             }
+    //
+    //         });
+    //     }
+    // }
+
+
     function inputListenersDocument() {
-        // all tr
+
         const rows = document.querySelectorAll("#document-table tbody tr");
 
         rows.forEach(row => {
-            // all input tr
             const inputs = row.querySelectorAll(".document-score-input");
-            inputs.forEach(input => {
-                input.addEventListener("input", (event) => {
-                    const maxScore = parseFloat(input.getAttribute("max"))
-                    // ตรวจสอบค่าเมื่อกรอก input
-                    const value = parseFloat(event.target.value);
-                    if (value > maxScore) {
-                        event.target.value = maxScore;  // รีเซ็ตค่าเป็น 10 ถ้ากรอกเกิน
-                    }
 
-                    // ตรวจสอบว่า checkbox "sameScoreDocument" ถูกเลือกหรือไม่
-                    const checkbox = document.getElementById("sameScoreDocument");
-                    if (checkbox.checked) {
-                        const newValue = event.target.value;
-                        // apply
-                        inputs.forEach(otherInput => {
-                            otherInput.value = newValue;
-                        });
-                    }
+            if (inputs.length > 0) {
+                const firstInput = inputs[0];
+
+                inputs.forEach((input, index) => {
+
+                    input.addEventListener("input", (event) => {
+
+                        // each input
+                        const maxScore = parseFloat(input.getAttribute("max"));
+                        let value = parseFloat(event.target.value);
+
+                        // protect maxScore
+                        if (value > maxScore) {
+
+                            value = maxScore;
+
+                        } else if (value < 0 || isNaN(value)) {
+
+                            value = 0;
+
+                        }
+                        event.target.value = value;
+
+                        const checkbox = document.getElementById("sameScoreDocument");
+
+                        if (checkbox.checked && index === 0) {
+
+                            const newValue = firstInput.value || "0";
+
+                            inputs.forEach((otherInput, otherIndex) => {
+
+                                if (otherIndex !== 0) {
+
+                                    otherInput.value = newValue;
+                                    otherInput.readOnly = true;
+
+                                }
+
+                            });
+                        }
+                    });
                 });
-            });
+            }
         });
     }
 
-
-    // https://www.geeksforgeeks.org/javascript-auto-filling-one-field/
     function applySameScoreDocument() {
 
-        console.log("applySameScoreDocument called");
+        console.log("applySameScoreDocument called ❗️");
 
         const checkBox = document.getElementById("sameScoreDocument").checked;
-        // all of tr
         const rows = document.querySelectorAll("#document-table tbody tr");
 
-        if (checkBox) {
-            rows.forEach(row => {
-                // ทุกตัวภายใน input tr
-                const inputs = row.querySelectorAll(".document-score-input");
-                let firstValue = "";
+        rows.forEach(row => {
 
-                // check first value
-                for (let input of inputs) {
-                    if (input.value.trim() !== "") {
-                        firstValue = input.value;
-                        break;
+            const inputs = row.querySelectorAll(".document-score-input");
+
+            if (inputs.length > 0) {
+
+                const firstInput = inputs[0];
+
+                if (checkBox) {
+
+                    let firstValue = firstInput.value.trim();
+
+                    if (firstValue === "") {
+                        firstValue = "0";
+                        // set
+                        firstInput.value = "0";
                     }
-                }
 
-                // apply value
-                if (firstValue !== "") {
-                    inputs.forEach(input => {
-                        input.value = firstValue;
+                    // otherInput
+                    inputs.forEach((input, index) => {
+
+                        if (index !== 0) {
+                            input.value = firstValue;
+                            input.readOnly = true;
+                        }
+
+                    });
+                } else {
+
+                    inputs.forEach((input, index) => {
+
+                        if (index !== 0) {
+                            input.readOnly = false;
+                        }
 
                     });
                 }
-
-            });
-        }
+            }
+        });
     }
+
 
 </script>
 

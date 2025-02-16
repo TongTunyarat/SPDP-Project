@@ -3,17 +3,15 @@ package com.example.project.controller;
 import com.example.project.DTO.InstructorProjectListDTO;
 import com.example.project.DTO.ProposalEvaResponseDTO;
 import com.example.project.DTO.ProposalEvaResquestDTO;
-import com.example.project.DTO.ShowProposalCriteriaDTO;
+import com.example.project.DTO.Criteria.ShowProposalCriteriaDTO;
 import com.example.project.entity.Criteria;
 import com.example.project.entity.ProjectInstructorRole;
-import com.example.project.entity.ProposalEvalScore;
 import com.example.project.repository.ProposalEvalScoreRepository;
 import com.example.project.service.ProposalGradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;

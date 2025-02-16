@@ -2,6 +2,9 @@ package com.example.project.controller;
 
 
 import com.example.project.DTO.*;
+import com.example.project.DTO.Criteria.ShowProposalCriteriaDTO;
+import com.example.project.DTO.Criteria.StudentCriteriaDTO;
+import com.example.project.DTO.StudentProjectDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.ProjectInstructorRoleRepository;
 import com.example.project.service.ProjectService;

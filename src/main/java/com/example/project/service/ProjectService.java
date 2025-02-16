@@ -24,7 +24,7 @@ public class ProjectService {
 
     //=========================================== USE ===================================================
 
-    // find project by instructor user
+    // find project by instructor user - show project page
     public List<ProjectInstructorRole> getInstructorProject() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -44,7 +44,7 @@ public class ProjectService {
         throw new UsernameNotFoundException("User is not authenticated");
     }
 
-//     get project details
+    //    get project details after click edit
     public Project getProjectDetails(String projectId) {
 
         return projectRepository.findByProjectId(projectId);
@@ -56,26 +56,6 @@ public class ProjectService {
         return project.getStudentProjects();
     }
 
-//
-//    public static List<StudentProject> getProjectById(String projectId) {
-//
-//        Project project = projectRepository.findByProjectId(projectId);
-//
-//        List<StudentProject> studentProjects = project.getStudentProjects();
-//
-//        return studentProjects;
-//
-//    }
-
-
-//
-//    public Project getProjectDetails(String projectId) {
-//        Object[] result = projectRepository.findProfessorNameByProjectId(projectId);
-//        Project project = (Project) result[0];
-//        String professorName = (String) result[1];
-//        project.setProfessorName(professorName);  // ตั้งค่า professorName ให้กับ Project
-//        return project;
-//    }
 
 
 

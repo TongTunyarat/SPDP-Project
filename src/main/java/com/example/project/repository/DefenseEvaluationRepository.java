@@ -1,6 +1,7 @@
 package com.example.project.repository;
 
 import com.example.project.entity.*;
+import com.example.project.service.DefenseEvaluationService;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 

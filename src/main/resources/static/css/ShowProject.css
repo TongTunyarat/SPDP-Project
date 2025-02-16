@@ -121,11 +121,15 @@ tbody td {
 }
 
 .evaluation {
-    font-size: 18px;
+    font-size: 25px;
 }
 
 .evaluation.completed {
     color: green;
+}
+
+.evaluation.uncompleted {
+    color: #ec9c40;
 }
 
 .evaluation.pending {

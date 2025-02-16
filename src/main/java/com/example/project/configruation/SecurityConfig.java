@@ -39,9 +39,11 @@ public class SecurityConfig {
                 )
                 .formLogin(form -> form
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")
+                        .loginProcessingUrl("/login") // url ใน post method
                         .successHandler((request, response, authentication) -> {
+                            //[SimpleGrantedAuthority("ROLE_ADMIN"), SimpleGrantedAuthority("ROLE_INSTRUCTOR")]
                             Set<String> roles = authentication.getAuthorities().stream()
+                                    // string
                                     .map(GrantedAuthority::getAuthority)
                                     .collect(Collectors.toSet());
                             if(roles.contains("ROLE_ADMIN")){
@@ -57,7 +59,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login?logout")
-                        .invalidateHttpSession(true)
+                        .invalidateHttpSession(true) // delete
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 );
