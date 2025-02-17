@@ -142,6 +142,18 @@
 
                 <button class="save-button"> Save</button>
             </div>
+
+            <!-- Modal -->
+            <div id="confirmationModal" class="modal">
+                <div class="modal-content">
+                    <span class="close-button" id="closeModal">&times;</span>
+                    <h3>Are you sure you want to submit the scores?</h3>
+                    <div>
+                        <button id="confirmSave" class="confirm-button">Yes, Submit</button>
+                        <button id="cancelSave" class="cancel-button">Cancel</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -876,174 +888,363 @@
 
 <!-- -------------- Insert Score to Database -------------- -->
 <script>
+    // document.querySelector('.save-button').addEventListener('click', function(event) {
+    //     console.log("Save Process");
+    //     event.preventDefault();
+    //
+    //     // projectId
+    //     var projectId = getProjectIdFromURL();
+    //     console.log("projectId: " + projectId);
+    //
+    //     // student score
+    //     var studentScores = document.querySelectorAll('.present-score-input'); // ดึงข้อมูลจาก input ในตาราง (scores)
+    //
+    //     var studentData = {};
+    //
+    //     studentScores.forEach((input) => {
+    //         let studentId = input.dataset.studentId; // ดึง studentId
+    //         let scoreCriteriaId = input.getAttribute('data-criteria-id'); // ดึง criteria ID จาก data-attribute
+    //         let score = parseFloat(input.value) || 0;
+    //
+    //         if (!studentData[studentId]) {
+    //             studentData[studentId] = [];
+    //         }
+    //         studentData[studentId].push({scoreCriteriaId, score});
+    //     });
+    //
+    //     console.log(studentData);
+    //
+    //     // instructorId
+    //     var instructorId = "";
+    //     fetchInstructorId();
+    //
+    //     function fetchInstructorId() {
+    //         fetch(`http://localhost:8080/get-instructorId?projectId=${projectId}`)
+    //             .then(response => response.text())
+    //             .then(data => {
+    //                 instructorId = data;
+    //                 console.log("Instructor Id: " + instructorId);
+    //                 sendEvaluationData();  // Call the function to send data after instructorId is fetched
+    //             })
+    //             .catch(error => console.error('Error fetching instructorId:', error));
+    //     }
+    //
+    //     function sendEvaluationData() {
+    //         const fetchPromises = [];
+    //
+    //         // ดึง studentIds ทั้งหมดจาก DOM
+    //         const studentIds = new Set();
+    //         document.querySelectorAll('.present-score-input').forEach(input => {
+    //             studentIds.add(input.dataset.studentId);
+    //         });
+    //
+    //         // Loop ตาม studentIds ที่ถูกต้อง
+    //         studentIds.forEach(id => {
+    //             let scoreDTOList = studentData[id]; // ✅ ใช้ `id` แทน `studentId`
+    //
+    //             if (!scoreDTOList) {
+    //                 console.error(`⚠️ No score data found for student ${id}`);
+    //                 return; // ข้าม student ที่ไม่มีข้อมูล
+    //             }
+    //
+    //             let studentName = document.querySelector(`[data-student-id="${id}"]`)?.dataset.studentName || 'Unknown';
+    //
+    //             console.log("📌 Original scoreDTOList:", JSON.stringify(scoreDTOList));
+    //
+    //             // ใช้ `getResultScore` เพื่อดึง defenseScore และ posterScore จากตาราง
+    //             let { defenseScore, posterScore } = getResultScore(studentName); // ดึงคะแนนจากฟังก์ชัน getResultScore
+    //
+    //             // ใช้ `data-student-id` ในการดึง totalScore และ grade ของแต่ละคน
+    //             let totalScore = parseFloat(document.querySelector(`[data-student-id="${id}"] .score`)?.textContent.split(' / ')[0] || '0');
+    //             let grade = document.querySelector(`[data-student-id="${id}"] .grade`)?.textContent.trim() || 'N/A';
+    //
+    //             // สร้างข้อมูลที่จะแปลงเป็น JSON
+    //             let transformedData = {
+    //                 defenseScore: defenseScore,
+    //                 posterScore: posterScore,
+    //                 grade: grade,
+    //                 totalScore: totalScore,
+    //                 scores: Array.isArray(scoreDTOList) ? scoreDTOList : [scoreDTOList] // ✅ Ensure array format
+    //             };
+    //
+    //             console.log("🚀 Transformed Data:", JSON.stringify(transformedData));
+    //
+    //             // ส่งข้อมูลไปยัง backend
+    //             let fetchPromise = fetch(`http://localhost:8080/saveDefenseGrade?` +
+    //                 new URLSearchParams({
+    //                     projectId: projectId,
+    //                     studentId: id
+    //                 }), {
+    //                 method: 'POST',
+    //                 headers: { 'Content-Type': 'application/json' },
+    //                 credentials: 'include',
+    //                 body: JSON.stringify(transformedData)
+    //             })
+    //                 .then(async response => {
+    //                     if (!response.ok) {
+    //                         const errorMessage = await response.text();
+    //                         console.error("❌ Error response from server:", errorMessage);
+    //                         throw new Error(errorMessage);
+    //                     }
+    //
+    //                     const contentType = response.headers.get("content-type");
+    //                     return contentType && contentType.includes("application/json")
+    //                         ? response.json()
+    //                         : response.text();
+    //                 })
+    //                 .then(data => console.log(`✅ Evaluation saved successfully for student ${id}:`, data))
+    //                 .catch(error => console.error(`⚠️ Unexpected error for student ${id}:`, error));
+    //
+    //             fetchPromises.push(fetchPromise);
+    //         });
+    //
+    //         // รอให้ส่งข้อมูลทั้งหมดเสร็จสิ้น
+    //         Promise.all(fetchPromises)
+    //             .then(() => {
+    //                 alert('✅ Evaluation saved successfully!');
+    //                 loadEvaluationData(projectId);
+    //                 window.location.href = '/show-defense-grade-projects';
+    //             })
+    //             .catch(error => console.error('⚠️ Error saving evaluations:', error));
+    //     }
+    //
+    //     function getResultScore(studentName) {
+    //         const table = document.querySelector('#student-score');
+    //         if (!table) {
+    //             console.warn('⚠️ Table not found');
+    //             return 0;
+    //         }
+    //
+    //         const rows = table.querySelectorAll('tr');
+    //         console.log("🧑‍🎓 Checking score for: " + studentName);
+    //
+    //         for (const row of rows) {
+    //             const nameCell = row.cells[0]; // คอลัมน์ชื่อ (studentName)
+    //             if (!nameCell) continue;
+    //
+    //             // ตรวจสอบว่า studentName ตรงกับชื่อในคอลัมน์ที่ 1 หรือไม่
+    //             if (nameCell.textContent.trim() === studentName) {
+    //                 const defenseScoreCell1 = row.cells[1]; // คอลัมน์ที่ 2 (defenseScore - part 1)
+    //                 const defenseScoreCell2 = row.cells[2]; // คอลัมน์ที่ 3 (defenseScore - part 2)
+    //                 const posterScoreCell = row.cells[3]; // คอลัมน์ที่ 4 (posterScore)
+    //
+    //                 if (defenseScoreCell1 && defenseScoreCell2 && posterScoreCell) {
+    //                     // คำนวณ defenseScore โดยการบวกค่าจากคอลัมน์ที่ 2 และ 3
+    //                     const defenseScore = (parseFloat(defenseScoreCell1.textContent.trim()) || 0) +
+    //                         (parseFloat(defenseScoreCell2.textContent.trim()) || 0);
+    //
+    //                     // ดึงค่า posterScore จากคอลัมน์ที่ 4
+    //                     const posterScore = parseFloat(posterScoreCell.textContent.trim()) || 0;
+    //
+    //                     console.log(`✅ Found scores for ${studentName}: defenseScore = ${defenseScore}, posterScore = ${posterScore}`);
+    //
+    //                     // คืนค่าผลลัพธ์
+    //                     return {
+    //                         defenseScore: defenseScore,
+    //                         posterScore: posterScore
+    //                     };
+    //                 }
+    //             }
+    //         }
+    //
+    //         // กรณีที่ไม่พบชื่อในตาราง
+    //         console.warn(`⚠️ No scores found for ${studentName}`);
+    //         return {
+    //             defenseScore: 0,
+    //             posterScore: 0
+    //         };
+    //     }
+    //
+    // });
     document.querySelector('.save-button').addEventListener('click', function(event) {
         console.log("Save Process");
         event.preventDefault();
 
-        // projectId
-        var projectId = getProjectIdFromURL();
-        console.log("projectId: " + projectId);
+        // แสดง Modal ก่อนทำการบันทึกข้อมูล
+        const modal = document.getElementById('confirmationModal');
+        const closeButton = document.getElementById('closeModal');
+        const confirmSaveButton = document.getElementById('confirmSave');
+        const cancelSaveButton = document.getElementById('cancelSave');
 
-        // student score
-        var studentScores = document.querySelectorAll('.present-score-input'); // ดึงข้อมูลจาก input ในตาราง (scores)
+        modal.style.display = "block"; // เปิด Modal
 
-        var studentData = {};
-
-        studentScores.forEach((input) => {
-            let studentId = input.dataset.studentId; // ดึง studentId
-            let scoreCriteriaId = input.getAttribute('data-criteria-id'); // ดึง criteria ID จาก data-attribute
-            let score = parseFloat(input.value) || 0;
-
-            if (!studentData[studentId]) {
-                studentData[studentId] = [];
-            }
-            studentData[studentId].push({scoreCriteriaId, score});
-        });
-
-        console.log(studentData);
-
-        // instructorId
-        var instructorId = "";
-        fetchInstructorId();
-
-        function fetchInstructorId() {
-            fetch(`http://localhost:8080/get-instructorId?projectId=${projectId}`)
-                .then(response => response.text())
-                .then(data => {
-                    instructorId = data;
-                    console.log("Instructor Id: " + instructorId);
-                    sendEvaluationData();  // Call the function to send data after instructorId is fetched
-                })
-                .catch(error => console.error('Error fetching instructorId:', error));
+        // เมื่อปิด modal หรือคลิก cancel ให้ปิด modal
+        function closeModal() {
+            modal.style.display = "none";
         }
 
-        function sendEvaluationData() {
-            const fetchPromises = [];
+        closeButton.addEventListener('click', closeModal, { once: true });
+        cancelSaveButton.addEventListener('click', closeModal, { once: true });
 
-            // ดึง studentIds ทั้งหมดจาก DOM
-            const studentIds = new Set();
-            document.querySelectorAll('.present-score-input').forEach(input => {
-                studentIds.add(input.dataset.studentId);
+        // เมื่อกดปุ่ม Confirm (Save) ใน Modal จะทำการบันทึกข้อมูล
+        confirmSaveButton.addEventListener('click', function() {
+            closeModal(); // ปิด Modal
+
+            // projectId
+            var projectId = getProjectIdFromURL();
+            console.log("projectId: " + projectId);
+
+            // student score
+            var studentScores = document.querySelectorAll('.present-score-input'); // ดึงข้อมูลจาก input ในตาราง (scores)
+            var studentData = {};
+
+            studentScores.forEach((input) => {
+                let studentId = input.dataset.studentId; // ดึง studentId
+                let scoreCriteriaId = input.getAttribute('data-criteria-id'); // ดึง criteria ID จาก data-attribute
+                let score = parseFloat(input.value) || 0;
+
+                if (!studentData[studentId]) {
+                    studentData[studentId] = [];
+                }
+                studentData[studentId].push({scoreCriteriaId, score});
             });
 
-            // Loop ตาม studentIds ที่ถูกต้อง
-            studentIds.forEach(id => {
-                let scoreDTOList = studentData[id]; // ✅ ใช้ `id` แทน `studentId`
+            console.log(studentData);
 
-                if (!scoreDTOList) {
-                    console.error(`⚠️ No score data found for student ${id}`);
-                    return; // ข้าม student ที่ไม่มีข้อมูล
+            // Fetch instructorId and then send evaluation data
+            fetchInstructorId();
+
+            function fetchInstructorId() {
+                fetch(`http://localhost:8080/get-instructorId?projectId=${projectId}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        var instructorId = data;
+                        console.log("Instructor Id: " + instructorId);
+                        sendEvaluationData();  // Call the function to send data after instructorId is fetched
+                    })
+                    .catch(error => console.error('Error fetching instructorId:', error));
+            }
+
+            function sendEvaluationData() {
+                const fetchPromises = [];
+
+                // Get all studentIds from DOM
+                const studentIds = new Set();
+                document.querySelectorAll('.present-score-input').forEach(input => {
+                    studentIds.add(input.dataset.studentId);
+                });
+
+                // Loop through valid studentIds
+                studentIds.forEach(id => {
+                    let scoreDTOList = studentData[id]; // ✅ Use `id` instead of `studentId`
+
+                    if (!scoreDTOList) {
+                        console.error(`⚠️ No score data found for student ${id}`);
+                        return; // Skip students with no data
+                    }
+
+                    let studentName = document.querySelector(`[data-student-id="${id}"]`)?.dataset.studentName || 'Unknown';
+
+                    console.log("📌 Original scoreDTOList:", JSON.stringify(scoreDTOList));
+
+                    // Use `getResultScore` to get defenseScore and posterScore from the table
+                    let { defenseScore, posterScore } = getResultScore(studentName); // Get scores from getResultScore function
+
+                    // Use `data-student-id` to get totalScore and grade for each student
+                    let totalScore = parseFloat(document.querySelector(`[data-student-id="${id}"] .score`)?.textContent.split(' / ')[0] || '0');
+                    let grade = document.querySelector(`[data-student-id="${id}"] .grade`)?.textContent.trim() || 'N/A';
+
+                    // Create the data to be sent as JSON
+                    let transformedData = {
+                        defenseScore: defenseScore,
+                        posterScore: posterScore,
+                        grade: grade,
+                        totalScore: totalScore,
+                        scores: Array.isArray(scoreDTOList) ? scoreDTOList : [scoreDTOList] // Ensure array format
+                    };
+
+                    console.log("🚀 Transformed Data:", JSON.stringify(transformedData));
+
+                    // Send data to backend
+                    let fetchPromise = fetch(`http://localhost:8080/saveDefenseGrade?` +
+                        new URLSearchParams({
+                            projectId: projectId,
+                            studentId: id
+                        }), {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        credentials: 'include',
+                        body: JSON.stringify(transformedData)
+                    })
+                        .then(async response => {
+                            if (!response.ok) {
+                                const errorMessage = await response.text();
+                                console.error("❌ Error response from server:", errorMessage);
+                                throw new Error(errorMessage);
+                            }
+
+                            const contentType = response.headers.get("content-type");
+                            return contentType && contentType.includes("application/json")
+                                ? response.json()
+                                : response.text();
+                        })
+                        .then(data => console.log(`✅ Evaluation saved successfully for student ${id}:`, data))
+                        .catch(error => console.error(`⚠️ Unexpected error for student ${id}:`, error));
+
+                    fetchPromises.push(fetchPromise);
+                });
+
+                // Wait for all fetch requests to complete
+                Promise.all(fetchPromises)
+                    .then(() => {
+                        alert('✅ Evaluation saved successfully!');
+                        loadEvaluationData(projectId); // Reload evaluation data after saving
+                        window.location.href = '/show-defense-grade-projects'; // Redirect to the results page
+                    })
+                    .catch(error => console.error('⚠️ Error saving evaluations:', error));
+            }
+
+            function getResultScore(studentName) {
+                const table = document.querySelector('#student-score');
+                if (!table) {
+                    console.warn('⚠️ Table not found');
+                    return { defenseScore: 0, posterScore: 0 };
                 }
 
-                let studentName = document.querySelector(`[data-student-id="${id}"]`)?.dataset.studentName || 'Unknown';
+                const rows = table.querySelectorAll('tr');
+                console.log("🧑‍🎓 Checking score for: " + studentName);
 
-                console.log("📌 Original scoreDTOList:", JSON.stringify(scoreDTOList));
+                for (const row of rows) {
+                    const nameCell = row.cells[0]; // Column for student name
+                    if (!nameCell) continue;
 
-                // ใช้ `getResultScore` เพื่อดึง defenseScore และ posterScore จากตาราง
-                let { defenseScore, posterScore } = getResultScore(studentName); // ดึงคะแนนจากฟังก์ชัน getResultScore
+                    // Check if studentName matches the one in the first column
+                    if (nameCell.textContent.trim() === studentName) {
+                        const defenseScoreCell1 = row.cells[1]; // Column 2 (defenseScore - part 1)
+                        const defenseScoreCell2 = row.cells[2]; // Column 3 (defenseScore - part 2)
+                        const posterScoreCell = row.cells[3]; // Column 4 (posterScore)
 
-                // ใช้ `data-student-id` ในการดึง totalScore และ grade ของแต่ละคน
-                let totalScore = parseFloat(document.querySelector(`[data-student-id="${id}"] .score`)?.textContent.split(' / ')[0] || '0');
-                let grade = document.querySelector(`[data-student-id="${id}"] .grade`)?.textContent.trim() || 'N/A';
+                        if (defenseScoreCell1 && defenseScoreCell2 && posterScoreCell) {
+                            // Calculate defenseScore by adding values from columns 2 and 3
+                            const defenseScore = (parseFloat(defenseScoreCell1.textContent.trim()) || 0) +
+                                (parseFloat(defenseScoreCell2.textContent.trim()) || 0);
 
-                // สร้างข้อมูลที่จะแปลงเป็น JSON
-                let transformedData = {
-                    defenseScore: defenseScore,
-                    posterScore: posterScore,
-                    grade: grade,
-                    totalScore: totalScore,
-                    scores: Array.isArray(scoreDTOList) ? scoreDTOList : [scoreDTOList] // ✅ Ensure array format
-                };
+                            // Get posterScore from column 4
+                            const posterScore = parseFloat(posterScoreCell.textContent.trim()) || 0;
 
-                console.log("🚀 Transformed Data:", JSON.stringify(transformedData));
+                            console.log(`✅ Found scores for ${studentName}: defenseScore = ${defenseScore}, posterScore = ${posterScore}`);
 
-                // ส่งข้อมูลไปยัง backend
-                let fetchPromise = fetch(`http://localhost:8080/saveDefenseGrade?` +
-                    new URLSearchParams({
-                        projectId: projectId,
-                        studentId: id
-                    }), {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify(transformedData)
-                })
-                    .then(async response => {
-                        if (!response.ok) {
-                            const errorMessage = await response.text();
-                            console.error("❌ Error response from server:", errorMessage);
-                            throw new Error(errorMessage);
+                            // Return the result
+                            return {
+                                defenseScore: defenseScore,
+                                posterScore: posterScore
+                            };
                         }
-
-                        const contentType = response.headers.get("content-type");
-                        return contentType && contentType.includes("application/json")
-                            ? response.json()
-                            : response.text();
-                    })
-                    .then(data => console.log(`✅ Evaluation saved successfully for student ${id}:`, data))
-                    .catch(error => console.error(`⚠️ Unexpected error for student ${id}:`, error));
-
-                fetchPromises.push(fetchPromise);
-            });
-
-            // รอให้ส่งข้อมูลทั้งหมดเสร็จสิ้น
-            Promise.all(fetchPromises)
-                .then(() => {
-                    alert('✅ Evaluation saved successfully!');
-                    loadEvaluationData(projectId);
-                    window.location.href = '/show-defense-grade-projects';
-                })
-                .catch(error => console.error('⚠️ Error saving evaluations:', error));
-        }
-
-        function getResultScore(studentName) {
-            const table = document.querySelector('#student-score');
-            if (!table) {
-                console.warn('⚠️ Table not found');
-                return 0;
-            }
-
-            const rows = table.querySelectorAll('tr');
-            console.log("🧑‍🎓 Checking score for: " + studentName);
-
-            for (const row of rows) {
-                const nameCell = row.cells[0]; // คอลัมน์ชื่อ (studentName)
-                if (!nameCell) continue;
-
-                // ตรวจสอบว่า studentName ตรงกับชื่อในคอลัมน์ที่ 1 หรือไม่
-                if (nameCell.textContent.trim() === studentName) {
-                    const defenseScoreCell1 = row.cells[1]; // คอลัมน์ที่ 2 (defenseScore - part 1)
-                    const defenseScoreCell2 = row.cells[2]; // คอลัมน์ที่ 3 (defenseScore - part 2)
-                    const posterScoreCell = row.cells[3]; // คอลัมน์ที่ 4 (posterScore)
-
-                    if (defenseScoreCell1 && defenseScoreCell2 && posterScoreCell) {
-                        // คำนวณ defenseScore โดยการบวกค่าจากคอลัมน์ที่ 2 และ 3
-                        const defenseScore = (parseFloat(defenseScoreCell1.textContent.trim()) || 0) +
-                            (parseFloat(defenseScoreCell2.textContent.trim()) || 0);
-
-                        // ดึงค่า posterScore จากคอลัมน์ที่ 4
-                        const posterScore = parseFloat(posterScoreCell.textContent.trim()) || 0;
-
-                        console.log(`✅ Found scores for ${studentName}: defenseScore = ${defenseScore}, posterScore = ${posterScore}`);
-
-                        // คืนค่าผลลัพธ์
-                        return {
-                            defenseScore: defenseScore,
-                            posterScore: posterScore
-                        };
                     }
                 }
+
+                // In case no scores are found in the table
+                console.warn(`⚠️ No scores found for ${studentName}`);
+                return {
+                    defenseScore: 0,
+                    posterScore: 0
+                };
             }
 
-            // กรณีที่ไม่พบชื่อในตาราง
-            console.warn(`⚠️ No scores found for ${studentName}`);
-            return {
-                defenseScore: 0,
-                posterScore: 0
-            };
-        }
+        });
 
     });
+
 </script>
 
 
@@ -1285,48 +1486,6 @@
         return 'F';
     }
 
-    // async function updateStudentScore(studentId, studentName) {
-    //     // Get the individual scores (make sure these functions return numeric values)
-    //     const defenseScore = getResultScoreFromTable(studentName);
-    //     const evaluationScore = getEvaluationScore(studentId);
-    //     const extraScore = getExtraScore(studentId);
-    //
-    //     // Ensure values are numbers (parse them to float to handle decimal scores as well)
-    //     const totalDefenseScore = parseFloat(defenseScore) || 0;
-    //     const totalEvaluationScore = parseFloat(evaluationScore) || 0;
-    //     const totalExtraScore = parseFloat(extraScore) || 0;
-    //
-    //     // Calculate raw total score
-    //     const rawTotalScore = totalDefenseScore + totalEvaluationScore + totalExtraScore;
-    //
-    //     // Cap the total score at 100
-    //     const totalScore = Math.min(rawTotalScore, 100);
-    //
-    //     // ดึงรายชื่ออาจารย์ของโปรเจคก่อน
-    //     const instructors = await projectInstructor(getProjectIdFromURL());
-    //     console.log('📚 Instructors:', instructors);
-    //
-    //     // ✅ ตรวจสอบคะแนนที่เป็น 0 หรือไม่มีค่า
-    //     const hasZeroOrNullScores = await checkForZeroScoresForAllInstructors(studentId, instructors);
-    //     const grade = hasZeroOrNullScores ? 'I' : await calculateGradeWithCheck(totalScore, studentId);
-    //
-    //     console.log(`📊 Score Breakdown for ${studentName} (${studentId}):`);
-    //     console.log(`Defense Score (40%): ${totalDefenseScore}`);
-    //     console.log(`Evaluation Score (60%): ${totalEvaluationScore}`);
-    //     console.log(`Extra Score (10%): ${totalExtraScore}`);
-    //     console.log(`Raw Total Score: ${rawTotalScore}`);
-    //     console.log(`Final Capped Score: ${totalScore}`);
-    //
-    //     // ✅ ตรวจสอบว่าค่าที่ได้มาเป็น 'I' จริงหรือไม่
-    //     if (grade !== 'I') {
-    //         console.log("✅ เกรดถูกคำนวณใหม่: " + grade);
-    //     } else {
-    //         console.warn("⚠️ เกรดยังคงเป็น 'I'");
-    //     }
-    //
-    //     // Update the UI
-    //     updateScoreCard(studentId, totalScore, grade);
-    // }
     async function updateStudentScore(studentId, studentName) {
         // ดึงตารางข้อมูลของนักศึกษา
         const table = document.querySelector('#student-score');

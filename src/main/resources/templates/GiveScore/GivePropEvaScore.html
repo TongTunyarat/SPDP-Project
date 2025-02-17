@@ -344,188 +344,101 @@
         inputListenersPresent();
     }
 
-        // ฟังก์ชันที่จับการเปลี่ยนแปลงคะแนน
-    //     function inputListenersPresent() {
-    //         const inputs = document.querySelectorAll(".present-score-input");
-    //         inputs.forEach(input => {
-    //             input.addEventListener("input", (event) => {
-    //                 const studentId = event.target.getAttribute('data-student-id');
-    //                 const criteriaId = event.target.getAttribute('data-criteria-id');
-    //                 const score = event.target.value;
-    //
-    //                 // เก็บข้อมูลคะแนนใน scoreData
-    //                 if (!scoreData[studentId]) {
-    //                     scoreData[studentId] = {};
-    //                 }
-    //                 scoreData[studentId][criteriaId] = score;
-    //             });
-    //         });
-    //     }
-    //
-    //     // การตรวจสอบการกรอกคะแนน
-    //     const rows = document.querySelectorAll("#presentation-table tbody tr");
-    //
-    //     rows.forEach(row => {
-    //         const inputs = row.querySelectorAll(".present-score-input");
-    //         inputs.forEach(input => {
-    //             input.addEventListener("input", (event) => {
-    //                 const maxScore = parseFloat(input.getAttribute("max"))
-    //                 const value = parseFloat(event.target.value);
-    //                 if (value > maxScore) {
-    //                     event.target.value = maxScore;  // รีเซ็ตค่าเป็น 10 ถ้ากรอกเกิน
-    //                 }
-    //
-    //                 // ตรวจสอบว่า checkbox "sameScoreDocument" ถูกเลือกหรือไม่
-    //                 const checkbox = document.getElementById("sameScorePresent");
-    //                 if (checkbox.checked) {
-    //                     const newValue = event.target.value;
-    //                     // apply
-    //                     inputs.forEach(otherInput => {
-    //                         otherInput.value = newValue;
-    //                     });
-    //                 }
-    //             });
-    //         });
-    //     });
-    // }
-    //
-    // // https://www.geeksforgeeks.org/javascript-auto-filling-one-field/
-    // function applySameScorePresent() {
-    //
-    //     console.log("applySameScorePresent called");
-    //
-    //     const checkBox = document.getElementById("sameScorePresent").checked;
-    //     // all of tr
-    //     const rows = document.querySelectorAll("#presentation-table tbody tr");
-    //
-    //     if (checkBox) {
-    //         rows.forEach(row => {
-    //             // ทุกตัวภายใน input tr
-    //             const inputs = row.querySelectorAll(".present-score-input");
-    //             let firstValue = "";
-    //
-    //             // check first value
-    //             for (let input of inputs) {
-    //                 if (input.value.trim() !== "") {
-    //                     firstValue = input.value;
-    //                     break;
-    //                 }
-    //             }
-    //
-    //             // apply value
-    //             if (firstValue !== "") {
-    //                 inputs.forEach(input => {
-    //                     input.value = firstValue;
-    //                 });
-    //             }
-    //
-    //         });
-    //     }
-    // }
-
     function inputListenersPresent() {
-
         const rows = document.querySelectorAll("#presentation-table tbody tr");
 
         rows.forEach(row => {
-
             const inputs = row.querySelectorAll(".present-score-input");
 
             if (inputs.length > 0) {
-
                 const firstInput = inputs[0];
 
                 inputs.forEach((input, index) => {
-
                     input.addEventListener("input", (event) => {
-
-                        // each input
                         const maxScore = parseFloat(input.getAttribute("max"));
                         let value = parseFloat(event.target.value);
 
-                        // protect maxScore
                         if (value > maxScore) {
-
                             value = maxScore;
-
                         } else if (value < 0 || isNaN(value)) {
-
                             value = 0;
-
                         }
                         event.target.value = value;
 
                         const checkbox = document.getElementById("sameScorePresent");
-
                         if (checkbox.checked && index === 0) {
+                            const newValue = firstInput.value || "0";
+                            const affectedStudentIds = new Set();
 
-                           const newValue = firstInput.value || "0";
-
-                           inputs.forEach((otherInput, otherIndex) => {
-
-                               if (otherIndex !== 0) {
-
-                                otherInput.value = newValue;
-                                            otherInput.readOnly = true;
-
-                                        }
-
-                                    });
+                            inputs.forEach((otherInput, otherIndex) => {
+                                if (otherIndex !== 0) {
+                                    otherInput.value = newValue;
+                                    otherInput.readOnly = true;
+                                    affectedStudentIds.add(otherInput.getAttribute('data-student-id'));
                                 }
-                        });
+                            });
+
+                            // Update scores for all affected students
+                            affectedStudentIds.add(firstInput.getAttribute('data-student-id'));
+                            affectedStudentIds.forEach(studentId => {
+                                updateStudentTotalScore(studentId);
+                            });
+                        } else {
+                            updateStudentTotalScore(input.getAttribute('data-student-id'));
+                        }
                     });
-                }
-            });
+                });
+            }
+        });
     }
 
     // https://www.geeksforgeeks.org/javascript-auto-filling-one-field/
     function applySameScorePresent() {
-
-        console.log("applySameScoreDocument called ❗️");
+        console.log("applySameScorePresent called ❗️");
 
         const checkBox = document.getElementById("sameScorePresent").checked;
         const rows = document.querySelectorAll("#presentation-table tbody tr");
+        const affectedStudentIds = new Set(); // Track affected students
 
         rows.forEach(row => {
-
             const inputs = row.querySelectorAll(".present-score-input");
 
             if (inputs.length > 0) {
-
                 const firstInput = inputs[0];
 
                 if (checkBox) {
-
                     let firstValue = firstInput.value.trim();
 
                     if (firstValue === "") {
                         firstValue = "0";
-                        // set
                         firstInput.value = "0";
                     }
 
-                    // otherInput
+                    // Collect all affected student IDs
                     inputs.forEach((input, index) => {
-
                         if (index !== 0) {
                             input.value = firstValue;
                             input.readOnly = true;
+                            affectedStudentIds.add(input.getAttribute('data-student-id'));
                         }
-
                     });
+
+                    // Add first student's ID
+                    affectedStudentIds.add(firstInput.getAttribute('data-student-id'));
                 } else {
-
                     inputs.forEach((input, index) => {
-
                         if (index !== 0) {
                             input.readOnly = false;
                         }
-
                     });
                 }
             }
         });
 
+        // Update all affected student scores
+        affectedStudentIds.forEach(studentId => {
+            updateStudentTotalScore(studentId);
+        });
     }
 
     //================================  displayDocumentCriteria  ==========================================
@@ -577,75 +490,6 @@
 
     }
 
-
-
-    // function inputListenersDocument() {
-    //     // all tr
-    //     const rows = document.querySelectorAll("#document-table tbody tr");
-    //
-    //     rows.forEach(row => {
-    //         // all input tr
-    //         const inputs = row.querySelectorAll(".document-score-input");
-    //         inputs.forEach(input => {
-    //             input.addEventListener("input", (event) => {
-    //                 const maxScore = parseFloat(input.getAttribute("max"))
-    //                 // ตรวจสอบค่าเมื่อกรอก input
-    //                 const value = parseFloat(event.target.value);
-    //                 if (value > maxScore) {
-    //                     event.target.value = maxScore;  // รีเซ็ตค่าเป็น 10 ถ้ากรอกเกิน
-    //                 }
-    //
-    //                 // ตรวจสอบว่า checkbox "sameScoreDocument" ถูกเลือกหรือไม่
-    //                 const checkbox = document.getElementById("sameScoreDocument");
-    //                 if (checkbox.checked) {
-    //                     const newValue = event.target.value;
-    //                     // apply
-    //                     inputs.forEach(otherInput => {
-    //                         otherInput.value = newValue;
-    //                     });
-    //                 }
-    //             });
-    //         });
-    //     });
-    // }
-    //
-    //
-    // // https://www.geeksforgeeks.org/javascript-auto-filling-one-field/
-    // function applySameScoreDocument() {
-    //
-    //     console.log("applySameScoreDocument called");
-    //
-    //     const checkBox = document.getElementById("sameScoreDocument").checked;
-    //     // all of tr
-    //     const rows = document.querySelectorAll("#document-table tbody tr");
-    //
-    //     if (checkBox) {
-    //         rows.forEach(row => {
-    //             // ทุกตัวภายใน input tr
-    //             const inputs = row.querySelectorAll(".document-score-input");
-    //             let firstValue = "";
-    //
-    //             // check first value
-    //             for (let input of inputs) {
-    //                 if (input.value.trim() !== "") {
-    //                     firstValue = input.value;
-    //                     break;
-    //                 }
-    //             }
-    //
-    //             // apply value
-    //             if (firstValue !== "") {
-    //                 inputs.forEach(input => {
-    //                     input.value = firstValue;
-    //
-    //                 });
-    //             }
-    //
-    //         });
-    //     }
-    // }
-
-
     function inputListenersDocument() {
 
         const rows = document.querySelectorAll("#document-table tbody tr");
@@ -657,41 +501,39 @@
                 const firstInput = inputs[0];
 
                 inputs.forEach((input, index) => {
-
                     input.addEventListener("input", (event) => {
-
                         // each input
                         const maxScore = parseFloat(input.getAttribute("max"));
                         let value = parseFloat(event.target.value);
 
                         // protect maxScore
                         if (value > maxScore) {
-
                             value = maxScore;
-
                         } else if (value < 0 || isNaN(value)) {
-
                             value = 0;
-
                         }
                         event.target.value = value;
 
                         const checkbox = document.getElementById("sameScoreDocument");
-
                         if (checkbox.checked && index === 0) {
-
                             const newValue = firstInput.value || "0";
+                            const affectedStudentIds = new Set();
 
                             inputs.forEach((otherInput, otherIndex) => {
-
                                 if (otherIndex !== 0) {
-
                                     otherInput.value = newValue;
                                     otherInput.readOnly = true;
-
+                                    affectedStudentIds.add(otherInput.getAttribute('data-student-id'));
                                 }
-
                             });
+
+                            // Update scores for all affected students
+                            affectedStudentIds.add(firstInput.getAttribute('data-student-id'));
+                            affectedStudentIds.forEach(studentId => {
+                                updateStudentTotalScore(studentId);
+                            });
+                        }else {
+                            updateStudentTotalScore(input.getAttribute('data-student-id'));
                         }
                     });
                 });
@@ -699,146 +541,61 @@
         });
     }
 
-    function applySameScoreDocument() {
 
+    // Update applySameScoreDocument function
+    function applySameScoreDocument() {
         console.log("applySameScoreDocument called ❗️");
 
         const checkBox = document.getElementById("sameScoreDocument").checked;
         const rows = document.querySelectorAll("#document-table tbody tr");
+        const affectedStudentIds = new Set(); // Track affected students
 
         rows.forEach(row => {
-
             const inputs = row.querySelectorAll(".document-score-input");
 
             if (inputs.length > 0) {
-
                 const firstInput = inputs[0];
 
                 if (checkBox) {
-
                     let firstValue = firstInput.value.trim();
 
                     if (firstValue === "") {
                         firstValue = "0";
-                        // set
                         firstInput.value = "0";
                     }
 
-                    // otherInput
+                    // Collect all affected student IDs
                     inputs.forEach((input, index) => {
-
                         if (index !== 0) {
                             input.value = firstValue;
                             input.readOnly = true;
+                            affectedStudentIds.add(input.getAttribute('data-student-id'));
                         }
-
                     });
+
+                    // Add first student's ID
+                    affectedStudentIds.add(firstInput.getAttribute('data-student-id'));
                 } else {
-
                     inputs.forEach((input, index) => {
-
                         if (index !== 0) {
                             input.readOnly = false;
                         }
-
                     });
                 }
             }
         });
-    }
 
+        // Update all affected student scores
+        affectedStudentIds.forEach(studentId => {
+            updateStudentTotalScore(studentId);
+        });
+    }
 
 </script>
 
 
 <!-- -------------- Insert Score to Database -------------- -->
 <script>
-    // document.querySelector('.save-button').addEventListener('click', function(event) {
-    //     console.log("Save Process");
-    //     event.preventDefault();
-    //
-    //     // ===== projectId ===== //
-    //     var projectId = getProjectIdFromURL();
-    //     console.log("projectId: " + projectId);
-    //
-    //     // ===== student score ===== //
-    //     var studentScores = document.querySelectorAll('.present-score-input, .document-score-input'); // ดึงข้อมูลจาก input ในตาราง (scores)
-    //
-    //     var studentData = {};
-    //
-    //     studentScores.forEach((input) => {
-    //         let studentId = input.dataset.studentId; // ดึง studentId
-    //         let scoreCriteriaId = input.getAttribute('data-criteria-id'); // ดึง criteria ID จาก data-attribute
-    //         let score = parseFloat(input.value) || 0;
-    //
-    //         if (!studentData[studentId]) {
-    //             studentData[studentId] = [];
-    //         }
-    //         studentData[studentId].push({scoreCriteriaId, score});
-    //     });
-    //
-    //     console.log(studentData);
-    //
-    //     // ===== instructorId ===== //
-    //     var instructorId = "";
-    //     fetchInstructorId();
-    //
-    //     function fetchInstructorId() {
-    //         fetch(`http://localhost:8080/get-instructorId?projectId=${projectId}`)
-    //             .then(response => response.text())
-    //             .then(data => {
-    //                 instructorId = data;
-    //                 console.log("Instructor Id: " + instructorId);
-    //                 sendEvaluationData();
-    //             })
-    //             .catch(error => console.error('Error fetching instructorId:', error));
-    //     }
-    //
-    //     function sendEvaluationData() {
-    //         // ส่งข้อมูลไปที่ /saveEvaluation สำหรับแต่ละ student
-    //         for (let studentId in studentData) {
-    //             let scoreDTOList = studentData[studentId];
-    //
-    //             console.log(studentId);
-    //             console.log(JSON.stringify(scoreDTOList));
-    //
-    //             fetch('http://localhost:8080/saveEvaluation?' +
-    //                 new URLSearchParams({
-    //                     instructorId: instructorId,
-    //                     projectId: projectId,
-    //                     studentId: studentId
-    //                 }), {
-    //                 method: 'POST',
-    //                 headers: {
-    //                     'Content-Type': 'application/json',
-    //                 },
-    //                 credentials: 'include',
-    //                 body: JSON.stringify(scoreDTOList)
-    //             })
-    //                 .then(response => {
-    //                     console.log(response.status)
-    //                     if (!response.ok) {
-    //                         return response.text().then(text => {
-    //                             console.error("Error response from server:", text);
-    //                             throw new Error(text);
-    //                         });
-    //                     }
-    //                     return response;
-    //                 })
-    //                 .then(data => {
-    //                     console.log(`Evaluation saved successfully:`, data);
-    //                 })
-    //                 .catch(error => {
-    //                     console.error('Error saving evaluation:', error);
-    //                 });
-    //         }
-    //         // แสดงข้อความ alert ว่าการบันทึกสำเร็จ
-    //         alert('Evaluation saved successfully!');
-    //
-    //         // เปลี่ยน path ไปที่ /show-proposal-eva-projects
-    //         window.location.href = '/show-proposal-eva-projects';
-    //     }
-    // });
 
     document.querySelector('.save-button').addEventListener('click', function(event) {
         console.log("Save Process");
