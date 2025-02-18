@@ -107,6 +107,8 @@ h1 {
 table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed; /* ทำให้ตารางใช้ขนาดที่กำหนด */
+
 }
 
 thead th {
@@ -157,6 +159,13 @@ tbody td {
 
 .evaluation-table th {
     background-color: #f0f0f0;
+}
+
+thead th:first-child,
+tbody td:first-child {
+    width: 500px; /* ปรับค่าตามที่ต้องการ */
+    overflow: hidden;
+    text-align: left;
 }
 
 input[type="number"], input[type="text"] {
@@ -247,6 +256,14 @@ input[type="number"], input[type="text"] {
 #popup-modal .table-container {
     border-collapse: collapse;
     margin-top: 32px;
+}
+
+#confirmationModal {
+    width: 100%; /* ทำให้ครอบคลุมทั้งหน้าจอ */
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* เพิ่มพื้นหลังโปร่งแสง */
+    justify-content: center; /* จัดให้อยู่กลางแนวนอน */
+    align-items: center; /* จัดให้อยู่กลางแนวตั้ง */
 }
 
 

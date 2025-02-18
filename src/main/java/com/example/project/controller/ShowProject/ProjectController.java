@@ -177,7 +177,19 @@ public class ProjectController {
                     return score.isPresent() && score.get().getScore() != null;
                 });
 
-        return hasAllScores;
+        if (!hasAllScores) {
+            return false;
+        }
+
+        boolean allScoreAreZero = allPropEvaCriteria.stream()
+                .allMatch(criteria -> {
+                    Optional<ProposalEvalScore> score = proposalEvaluation.getProposalEvalScores().stream()
+                            .filter(s -> s.getCriteria().getCriteriaId().equals(criteria.getCriteriaId()))
+                            .findFirst();
+                    return score.map(proposalEvalScore -> proposalEvalScore.getScore().intValue() == 0).orElse(false);
+                });
+
+        return !allScoreAreZero;
 
 //        // collect all criteria in eva
 //        Set<String> scoreCriteriaId = evaluation.get().getProposalEvalScores().stream()

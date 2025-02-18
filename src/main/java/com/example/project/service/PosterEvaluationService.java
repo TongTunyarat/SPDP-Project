@@ -1,11 +1,7 @@
 package com.example.project.service;
 
-import com.example.project.entity.Criteria;
-import com.example.project.entity.Project;
-import com.example.project.entity.StudentProject;
-import com.example.project.repository.CriteriaRepository;
-import com.example.project.repository.ProjectRepository;
-import com.example.project.repository.StudentProjectRepository;
+import com.example.project.entity.*;
+import com.example.project.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,14 +16,20 @@ public class PosterEvaluationService {
     private StudentProjectRepository studentProjectRepository;
     @Autowired
     private ProjectRepository projectRepository;
+    @Autowired
+    private PosterEvaRepository posterEvaRepository;
+    @Autowired
+    private PosterEvaScoreRepository posterEvaScoreRepository;
 
-    public PosterEvaluationService(CriteriaRepository criteriaRepository, StudentProjectRepository studentProjectRepository, ProjectRepository projectRepository) {
+    public PosterEvaluationService(CriteriaRepository criteriaRepository, StudentProjectRepository studentProjectRepository, ProjectRepository projectRepository, PosterEvaRepository posterEvaRepository, PosterEvaScoreRepository posterEvaScoreRepository) {
         this.criteriaRepository = criteriaRepository;
         this.studentProjectRepository = studentProjectRepository;
         this.projectRepository = projectRepository;
+        this.posterEvaRepository = posterEvaRepository;
+        this.posterEvaScoreRepository = posterEvaScoreRepository;
     }
 
-    //=========================================== USE ===================================================
+//=========================================== USE ===================================================
 
     // get proposal criteria
     public List<Criteria> getPosterCriteria() {
@@ -44,5 +46,11 @@ public class PosterEvaluationService {
 //        List<StudentProject> studentProjectList = project.getStudentProjects();
 //        return studentProjectList;
 //    }
+
+    // get student score
+    public List<PosterEvaluationScore> getPosterEvalScoresByProjectId(String projectId) {
+
+        return posterEvaScoreRepository.findByPosterEvaluation_ProjectIdPoster_ProjectId(projectId);
+    }
 
 }

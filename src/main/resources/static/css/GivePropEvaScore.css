@@ -94,12 +94,12 @@ h1 {
 table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed; /* ทำให้ตารางใช้ขนาดที่กำหนด */
 }
 
 thead th {
     background-color: #f4f4f4;
     padding: 12px;
-    text-align: left;
     border-bottom: 2px solid #ddd;
     text-align: center;
 }
@@ -109,6 +109,7 @@ tbody td {
     border-bottom: 1px solid #ddd;
     text-align: center;
 }
+
 
 .checkbox-group {
     display: block;
@@ -138,7 +139,7 @@ tbody td {
 .evaluation-table td {
     border: 1px solid #ccc;
     padding: 12px;
-    text-align: left;
+    text-align: center;
     vertical-align: top;
 }
 
@@ -149,6 +150,17 @@ tbody td {
 
 .evaluation-table th {
     background-color: #f0f0f0;
+}
+
+thead th:first-child,
+tbody td:first-child {
+    width: 500px; /* ปรับค่าตามที่ต้องการ */
+    overflow: hidden;
+    text-align: left;
+}
+
+#document-table td{
+    text-align: left;
 }
 
 input[type="number"] {
@@ -284,4 +296,19 @@ button {
     background-color: #f44336;
     color: white;
     border: none;
+}
+
+#appearance-table td:last-child,
+#content-table td:last-child,
+#presentation-table td:last-child{
+    width: 100px;
+    text-align: center;
+    vertical-align: middle;
+    padding-right: 10px;
+}
+
+#appearance-table td:last-child input,
+#content-table td:last-child input,
+#presentation-table td:last-child input{
+    width: 80%;
 }

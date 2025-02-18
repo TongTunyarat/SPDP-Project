@@ -2,6 +2,7 @@ package com.example.project.repository;
 
 import com.example.project.DTO.DefenseEvaResponseDTO;
 import com.example.project.entity.DefenseEvalScore;
+import com.example.project.entity.ProposalEvalScore;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -27,4 +28,6 @@ public interface DefenseEvalScoreRepository extends JpaRepository<DefenseEvalSco
             "JOIN d.criteria c " +
             "WHERE d.defenseEvaluation.projectId.projectId = :projectId")
     List<DefenseEvaResponseDTO> findByDefenseEvaluation_ProjectId_ProjectId(@Param("projectId") String projectId);
+
+//    List<DefenseEvalScore> findByDefenseEvaluation_ProjectId_ProjectId(String projectId);
 }

@@ -229,10 +229,10 @@
         }
     }
 
-
     function displayInstructorDetails(instructor) {
         document.getElementById('project-advisor').textContent = instructor.professorName;
     }
+
 </script>
 
 
@@ -312,8 +312,13 @@
 
         rowHeader.innerHTML = `
         <th></th>
-        ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}
-    `;
+        ${students.map(student => {
+            const nameParts = student.studentName.split(' '); // แยกชื่อกับนามสกุล
+            const lastNameAbbr = nameParts[1] ? nameParts[1].slice(0, 3) + '.' : ''; // ตัดเหลือ 3 ตัว + จุด
+            return `<th>${student.studentId} ${nameParts[0]} ${lastNameAbbr}</th>`;
+        }).join('')}
+        `;
+
         thead.appendChild(rowHeader);
         table.appendChild(thead);
 
@@ -448,7 +453,7 @@
         const students = data[1];
 
         console.log("### Fetch in criteria: " + criteria);
-        console.log("### Fetch in students: " +  JSON.stringify(students, null, 2));
+        console.log("### Fetch in students: " + JSON.stringify(students, null, 2));
 
         const table = document.getElementById("document-table");
         table.innerHTML = "";
@@ -457,9 +462,14 @@
         const rowHeader = document.createElement("tr");
 
         rowHeader.innerHTML = `
-            <th></th>
-            ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}
+        <th></th>
+        ${students.map(student => {
+            const nameParts = student.studentName.split(' '); // แยกชื่อกับนามสกุล
+            const lastNameAbbr = nameParts[1] ? nameParts[1].slice(0, 3) + '.' : ''; // ตัดเหลือ 3 ตัว + จุด
+            return `<th>${student.studentId} ${nameParts[0]} ${lastNameAbbr}</th>`;
+        }).join('')}
         `;
+
         thead.appendChild(rowHeader);
         table.appendChild(thead);
 
@@ -532,7 +542,7 @@
                             affectedStudentIds.forEach(studentId => {
                                 updateStudentTotalScore(studentId);
                             });
-                        }else {
+                        } else {
                             updateStudentTotalScore(input.getAttribute('data-student-id'));
                         }
                     });
@@ -597,7 +607,7 @@
 <!-- -------------- Insert Score to Database -------------- -->
 <script>
 
-    document.querySelector('.save-button').addEventListener('click', function(event) {
+    document.querySelector('.save-button').addEventListener('click', function (event) {
         console.log("Save Process");
         event.preventDefault();
 
@@ -610,12 +620,12 @@
         modal.style.display = "block"; // แสดง modal
 
         // ถ้าผู้ใช้กดปิด modal
-        closeButton.addEventListener('click', function() {
+        closeButton.addEventListener('click', function () {
             modal.style.display = "none"; // ซ่อน modal
         });
 
         // ถ้าผู้ใช้กดยืนยันการบันทึกคะแนน
-        confirmSaveButton.addEventListener('click', function() {
+        confirmSaveButton.addEventListener('click', function () {
             modal.style.display = "none"; // ซ่อน modal
 
             // ===== projectId ===== //
@@ -702,7 +712,7 @@
         });
 
         // ถ้าผู้ใช้กดยกเลิกการบันทึก
-        cancelSaveButton.addEventListener('click', function() {
+        cancelSaveButton.addEventListener('click', function () {
             modal.style.display = "none"; // ซ่อน modal
         });
     });
@@ -713,7 +723,7 @@
 <!-- -------------- Show Evaluation Score -------------- -->
 <script>
     // ✅ Load evaluation data when page loads
-    document.addEventListener("DOMContentLoaded", async function() {
+    document.addEventListener("DOMContentLoaded", async function () {
         const projectId = getProjectIdFromURL();
         if (!projectId) {
             console.error('❌ No project ID found');
@@ -890,13 +900,13 @@
             // Fetch คะแนนของนักศึกษาแต่ละคน
             const scores = await Promise.all(studentIds.map(async (studentId) => {
                 const scoreData = await fetchStudentScore(instructorId, projectId, studentId);
-                return scoreData || { studentId, totalScore: 0 }; // ถ้าไม่มีข้อมูล ให้ใส่ค่า 0
+                return scoreData || {studentId, totalScore: 0}; // ถ้าไม่มีข้อมูล ให้ใส่ค่า 0
             }));
 
             console.log("📌 All Student Scores:", scores);
 
             // สร้าง Card Result
-            displayResultsCards({ students: scores });
+            displayResultsCards({students: scores});
 
             setTimeout(() => {
                 addInputListeners();
@@ -941,7 +951,6 @@
             cardContainer.innerHTML = "<p>เกิดข้อผิดพลาดในการแสดงผลข้อมูล</p>";
         }
     }
-
 
 
     // ✅ เพิ่ม Event Listener ให้ input อัปเดตผลรวมทันทีเมื่อมีการเปลี่ยนแปลง
@@ -1021,7 +1030,7 @@
                     return null;
                 }
 
-                return { studentId, totalScore: data.rawTotalScore }; // Return ค่า studentId และ totalScore
+                return {studentId, totalScore: data.rawTotalScore}; // Return ค่า studentId และ totalScore
             } catch (jsonError) {
                 console.error("⚠️ JSON Parse Error:", jsonError);
                 return null;
