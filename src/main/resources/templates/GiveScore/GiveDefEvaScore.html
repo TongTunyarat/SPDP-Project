@@ -378,12 +378,13 @@
                         const maxScore = parseFloat(input.getAttribute("max"));
                         let value = parseFloat(event.target.value);
 
+                        // protect maxScore
                         if (value > maxScore) {
-                            value = maxScore;
+                            event.target.value = maxScore;
                         } else if (value < 0 || isNaN(value)) {
-                            value = 0;
+                            event.target.value = 0;
                         }
-                        event.target.value = value;
+                        // event.target.value = value;
 
                         const checkbox = document.getElementById("sameScorePresent");
                         if (checkbox.checked && index === 0) {
@@ -585,11 +586,11 @@
 
                         // protect maxScore
                         if (value > maxScore) {
-                            value = maxScore;
+                            event.target.value = maxScore;
                         } else if (value < 0 || isNaN(value)) {
-                            value = 0;
+                            event.target.value = 0;
                         }
-                        event.target.value = value;
+                        // event.target.value = value;
 
                         const checkbox = document.getElementById("sameScoreDocument");
                         if (checkbox.checked && index === 0) {

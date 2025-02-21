@@ -363,12 +363,13 @@
                         const maxScore = parseFloat(input.getAttribute("max"));
                         let value = parseFloat(event.target.value);
 
+                        // protect maxScore
                         if (value > maxScore) {
-                            value = maxScore;
-                        } else if (value < 0 || isNaN(value)) {
-                            value = 0;
+                            event.target.value = maxScore;
+                        } else if (value < 0 ) {
+                            event.target.value = 0;
                         }
-                        event.target.value = value;
+                        // event.target.value = value;
 
                         const checkbox = document.getElementById("sameScorePresent");
                         if (checkbox.checked && index === 0) {
@@ -416,7 +417,7 @@
 
                     if (firstValue === "") {
                         firstValue = "0";
-                        firstInput.value = "0";
+                        firstInput.value = " ";
                     }
 
                     // Collect all affected student IDs
@@ -518,11 +519,11 @@
 
                         // protect maxScore
                         if (value > maxScore) {
-                            value = maxScore;
+                            event.target.value = maxScore;
                         } else if (value < 0 || isNaN(value)) {
-                            value = 0;
+                            event.target.value = 0;
                         }
-                        event.target.value = value;
+                        // event.target.value = value;
 
                         const checkbox = document.getElementById("sameScoreDocument");
                         if (checkbox.checked && index === 0) {
@@ -571,7 +572,7 @@
 
                     if (firstValue === "") {
                         firstValue = "0";
-                        firstInput.value = "0";
+                        firstInput.value = " ";
                     }
 
                     // Collect all affected student IDs
@@ -665,7 +666,10 @@
                     .catch(error => console.error('Error fetching instructorId:', error));
             }
 
+
+
             function sendEvaluationData() {
+
                 // ส่งข้อมูลไปที่ /saveEvaluation สำหรับแต่ละ student
                 for (let studentId in studentData) {
                     let scoreDTOList = studentData[studentId];
@@ -916,7 +920,6 @@
             console.error("❌ Error fetching all student scores:", error);
         }
     }
-
 
     // ✅ สร้าง Card Result และแสดงผลใน `#card-container`
     function displayResultsCards(data) {

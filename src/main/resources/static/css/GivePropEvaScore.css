@@ -20,6 +20,13 @@ body {
 /*    min-width: 50px;*/
 /*    text-align: center;*/
 /*}*/
+.document-score-input[readonly],
+.present-score-input[readonly]{
+    background-color: #f0f0f0;
+    border-color: #ddd;
+    color: #666;
+    cursor: not-allowed;
+}
 
 #document-table td {
     padding: 8px;
