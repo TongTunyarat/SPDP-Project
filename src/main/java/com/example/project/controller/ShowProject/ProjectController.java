@@ -6,6 +6,7 @@ import com.example.project.DTO.StudentProjectDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
 import com.example.project.service.*;
+import org.aspectj.lang.annotation.DeclareError;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.swing.text.html.Option;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
@@ -62,7 +64,10 @@ public class ProjectController {
     @Autowired
     PosterEvaRepository posterEvaRepository;
 
-    public ProjectController(ProjectService projectService, ProposalEvaluationRepository proposalEvaluationRepository, ProposalEvaluationService proposalEvaluationService, GradingProposalEvaluationRepository gradingProposalEvaluationRepository, ProposalGradeService proposalGradeService, DefenseEvaluationService defenseEvaluationService, DefenseEvaluationRepository defenseEvaluationRepository, DefenseGradeService defenseGradeService, GradingDefenseEvaluationRepository gradingDefenseEvaluationRepository, PosterEvaluationService posterEvaluationService, PosterEvaRepository posterEvaRepository) {
+    @Autowired
+    ProjectInstructorRoleRepository projectInstructorRoleRepository;
+
+    public ProjectController(ProjectService projectService, ProposalEvaluationRepository proposalEvaluationRepository, ProposalEvaluationService proposalEvaluationService, GradingProposalEvaluationRepository gradingProposalEvaluationRepository, ProposalGradeService proposalGradeService, DefenseEvaluationService defenseEvaluationService, DefenseEvaluationRepository defenseEvaluationRepository, DefenseGradeService defenseGradeService, GradingDefenseEvaluationRepository gradingDefenseEvaluationRepository, PosterEvaluationService posterEvaluationService, PosterEvaRepository posterEvaRepository, ProjectInstructorRoleRepository projectInstructorRoleRepository) {
         this.projectService = projectService;
         this.proposalEvaluationRepository = proposalEvaluationRepository;
         this.proposalEvaluationService = proposalEvaluationService;
@@ -74,7 +79,9 @@ public class ProjectController {
         this.gradingDefenseEvaluationRepository = gradingDefenseEvaluationRepository;
         this.posterEvaluationService = posterEvaluationService;
         this.posterEvaRepository = posterEvaRepository;
+        this.projectInstructorRoleRepository = projectInstructorRoleRepository;
     }
+
 
     //=========================================== USE ===================================================
 
@@ -213,8 +220,6 @@ public class ProjectController {
         System.out.println("Session ID: " + RequestContextHolder.currentRequestAttributes().getSessionId());
 
         List<ProjectInstructorRole> projectInstructorRoles = projectService.getInstructorProject();
-        // get all criteria
-        List<Criteria> allPropGradeCriteria = proposalGradeService.getProposalCriteria();
 
         // return JSON
         return projectInstructorRoles.stream()
@@ -225,6 +230,11 @@ public class ProjectController {
                     String projectId = i.getProjectIdRole().getProjectId();
                     List<GradingProposalEvaluation> gradingProposalEvaluationList = gradingProposalEvaluationRepository.findByProject_ProjectId(projectId);
 
+                    // get all project instructor
+                    List<ProposalEvaluation> proposalEvaluationList = proposalEvaluationRepository.findByProject_ProjectId(projectId);
+                    List<ProjectInstructorRole> projectInstructorRoleList = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(projectId);
+                    List<Criteria> allPropEvaCriteria = proposalEvaluationService.getProposalCriteria();
+
                     // getStudentProjects -> เอา studentProjects (Project Entity) => (StudentProjects Entity)
                     List<StudentProjectPropGradeDTO> studentProjectPropGradeDTOS = i.getProjectIdRole().getStudentProjects().stream()
                             .filter(studentProject -> "Active".equals(studentProject.getStatus()))
@@ -234,12 +244,22 @@ public class ProjectController {
                                         gradingProposalEvaluationList
                                 );
 
+                                // check status for each instructor
+                                InstructorEvaluationStatusDTO instructorEvaStatus = checkInstructorEva(
+                                        studentProject.getStudent().getStudentId(),
+                                        allPropEvaCriteria,
+                                        proposalEvaluationList,
+                                        projectInstructorRoleList
+                                );
+
                                 return new StudentProjectPropGradeDTO(
                                         // getStudent() -> ใน (StudentProjects Entity)
                                         studentProject.getStudent().getStudentId(),
                                         studentProject.getStudent().getStudentName(),
                                         studentProject.getStatus(),
-                                        isComplete);
+                                        // การประเมินจาก user คนนั้น
+                                        isComplete,
+                                        instructorEvaStatus);
                             })
                             .toList();
 
@@ -247,6 +267,7 @@ public class ProjectController {
                         return null;
                     }
 
+                    // ทุกค่า isComplete ใน DTO มีค่า
                     boolean isAllComplete = studentProjectPropGradeDTOS.stream()
                             .allMatch(StudentProjectPropGradeDTO::isEvaluationComplete);
 
@@ -268,7 +289,7 @@ public class ProjectController {
 
     private boolean checkStudentPropGradeStatus(String studentId, List<GradingProposalEvaluation> gradingProposalEvaluationList) {
 
-        // find instructor & student
+        // find student
         Optional<GradingProposalEvaluation> evaluation = gradingProposalEvaluationList.stream()
                 .filter(e -> e.getStudent().getStudentId().equals(studentId))
                 .findFirst();
@@ -281,6 +302,51 @@ public class ProjectController {
         BigDecimal scoreCriteriaId = evaluation.get().getEvaluateScore();
 
         return scoreCriteriaId != null;
+    }
+
+
+    // proposal eva status instructor
+    private InstructorEvaluationStatusDTO checkInstructorEva(String studentId, List<Criteria> allPropEvaCriteria, List<ProposalEvaluation> proposalEvaluationList, List<ProjectInstructorRole> projectInstructorRoleList) {
+
+        long allinstructor = projectInstructorRoleList.size();
+
+        // loop projectInstructorRole
+        long instructorSuccessEva = projectInstructorRoleList.stream()
+                .filter(instructor -> {
+
+                    Optional<ProposalEvaluation> instructorEvaCheck = proposalEvaluationList.stream()
+                            .filter(e -> e.getStudent().getStudentId().equals(studentId) &&
+                                    // eva == projectInstructorRole
+                                    e.getProjectInstructorRole().getInstructorId().equals(instructor.getInstructorId()))
+                            .findFirst();
+
+                    // not create
+                    if (instructorEvaCheck.isEmpty()) {
+                        return false;
+                    }
+
+                    // pull instructor have eva
+                    ProposalEvaluation proposalEvaluation = instructorEvaCheck.get();
+
+                    // ให้คะแนนครบทุก criteria & score != null ?
+                    boolean hasAllScores = allPropEvaCriteria.stream()
+                            .allMatch(criteria -> {
+                                Optional<ProposalEvalScore> score = proposalEvaluation.getProposalEvalScores().stream()
+                                        .filter(s -> s.getCriteria().getCriteriaId().equals(criteria.getCriteriaId()))
+                                        .findFirst();
+
+                                return score.isPresent() && score.get().getScore() != null;
+                            });
+
+                    return hasAllScores;
+
+                }).count();
+
+        System.out.println("👨‍🏫 Total Instructors Proposal: " + allinstructor);
+        System.out.println("✅ Instructors with complete proposal evaluation: " + instructorSuccessEva);
+
+        return new InstructorEvaluationStatusDTO(allinstructor, instructorSuccessEva);
+
     }
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -401,8 +467,7 @@ public class ProjectController {
         System.out.println("Session ID: " + RequestContextHolder.currentRequestAttributes().getSessionId());
 
         List<ProjectInstructorRole> projectInstructorRoles = projectService.getInstructorProject();
-        // get all criteria
-//        List<Criteria> allDefenseGradeCriteria = defenseGradeService.getDefenseCriteria();
+
 
         // return JSON
         return projectInstructorRoles.stream()
@@ -413,6 +478,14 @@ public class ProjectController {
                     String projectId = i.getProjectIdRole().getProjectId();
                     List<GradingDefenseEvaluation> gradingDefenseEvaluationList = gradingDefenseEvaluationRepository.findByProjectId_ProjectId(projectId);
 
+                    // get all project instructor
+                    List<DefenseEvaluation> defenseEvaluationList = defenseEvaluationRepository.findByProjectId_ProjectId(projectId);
+                    System.out.println("📋Project: " + projectId);
+                    List<ProjectInstructorRole> projectInstructorRoleList = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(projectId);
+                    List<Criteria> allDefenseCriteria = defenseEvaluationService.getDefenseCriteria();
+//                    System.out.println("📝Criteria: " + allDefenseGradeCriteria);
+
+
                     // getStudentProjects -> เอา studentProjects (Project Entity) => (StudentProjects Entity)
                     List<StudentProjectDefenseGradeDTO> studentProjectDefenseGradeDTOList = i.getProjectIdRole().getStudentProjects().stream()
                             .filter(studentProject -> "Active".equals(studentProject.getStatus()))
@@ -422,12 +495,21 @@ public class ProjectController {
                                         gradingDefenseEvaluationList
                                 );
 
+                                // check status for each instructor
+                                InstructorEvaluationDefenseStatusDTO instructorEvaStatus = checkInstructorDefenseEva(
+                                        studentProject.getStudent().getStudentId(),
+                                        allDefenseCriteria,
+                                        defenseEvaluationList,
+                                        projectInstructorRoleList
+                                );
+
                                 return new StudentProjectDefenseGradeDTO(
                                         // getStudent() -> ใน (StudentProjects Entity)
                                         studentProject.getStudent().getStudentId(),
                                         studentProject.getStudent().getStudentName(),
                                         studentProject.getStatus(),
-                                        isComplete);
+                                        isComplete,
+                                        instructorEvaStatus);
                             })
                             .toList();
 
@@ -458,6 +540,56 @@ public class ProjectController {
 
             return gradingDefenseEvaluationList.stream()
                     .anyMatch(e -> e.getStudentId() != null && studentId.equals(e.getStudentId().getStudentId()));
+
+    }
+
+    // defense eva status instructor
+    private InstructorEvaluationDefenseStatusDTO checkInstructorDefenseEva(String studentId, List<Criteria> allDefenseCriteria, List<DefenseEvaluation> defenseEvaluationList, List<ProjectInstructorRole> projectInstructorRoleList) {
+
+//        System.out.println("⭐️Check input: ");
+//        System.out.println("StudentID: " + studentId);
+//        System.out.println("All Criteria: " + allDefenseCriteria.size());
+//        System.out.println("Defense Evaluation List: " + defenseEvaluationList.size());
+//        System.out.println("Project Instructor Roles: " + projectInstructorRoleList.size());
+
+        long allInstructor = projectInstructorRoleList.size();
+
+        // loop projectInstructorRole
+        long instructorDefenseSuccessEva = projectInstructorRoleList.stream()
+                .filter(instructor -> {
+
+                    Optional<DefenseEvaluation> instructorDefenseEvaCheck = defenseEvaluationList.stream()
+                            .filter(e -> e.getStudent().getStudentId().equals(studentId) &&
+                                    // eva == projectInstructorRole
+                                    e.getDefenseInstructorId().getInstructorId().equals(instructor.getInstructorId()))
+                            .findFirst();
+
+                    // not create
+                    if (instructorDefenseEvaCheck.isEmpty()) {
+                        return false;
+                    }
+
+                    // pull instructor have eva
+                    DefenseEvaluation defenseEvaluation = instructorDefenseEvaCheck.get();
+
+                    // ให้คะแนนครบทุก criteria & score != null ?
+                    boolean hasAllDefenseScores = allDefenseCriteria.stream()
+                            .allMatch(criteria -> {
+                                Optional<DefenseEvalScore> score = defenseEvaluation.getDefenseEvalScore().stream()
+                                        .filter(s -> s.getCriteria().getCriteriaId().equals(criteria.getCriteriaId()))
+                                        .findFirst();
+
+                                return score.isPresent() && score.get().getScore() != null;
+                            });
+
+                    return hasAllDefenseScores;
+
+                }).count();
+
+        System.out.println("👨‍🏫 Total Instructors Defense: " + allInstructor);
+        System.out.println("✅ Instructors with complete defense evaluation: " + instructorDefenseSuccessEva);
+
+        return new InstructorEvaluationDefenseStatusDTO(allInstructor, instructorDefenseSuccessEva);
 
     }
 
@@ -588,6 +720,7 @@ public class ProjectController {
 
                     return new InstructorProjectDTO(
                             // i -> projectInstructorRoles
+
                             // i.getProjectIdRole() -> Project (ProjectInstructorRole Entity)
                             // getProjectId() -> Id (Project Entity)
                             i.getProjectIdRole().getProgram(),

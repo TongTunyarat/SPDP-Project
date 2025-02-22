@@ -5,12 +5,14 @@ public class StudentProjectPropGradeDTO {
     private String studentName;
     private String status;
     private boolean isEvaluationComplete;
+    private InstructorEvaluationStatusDTO instructorEvaluation;
 
-    public StudentProjectPropGradeDTO(String studentId, String studentName, String status, boolean isEvaluationComplete) {
+    public StudentProjectPropGradeDTO(String studentId, String studentName, String status, boolean isEvaluationComplete, InstructorEvaluationStatusDTO instructorEvaluation) {
         this.studentId = studentId;
         this.studentName = studentName;
         this.status = status;
         this.isEvaluationComplete = isEvaluationComplete;
+        this.instructorEvaluation = instructorEvaluation;
     }
 
     public String getStudentId() {
@@ -43,5 +45,13 @@ public class StudentProjectPropGradeDTO {
 
     public void setEvaluationComplete(boolean evaluationComplete) {
         isEvaluationComplete = evaluationComplete;
+    }
+
+    public InstructorEvaluationStatusDTO getInstructorEvaluation() {
+        return instructorEvaluation;
+    }
+
+    public void setInstructorEvaluation(InstructorEvaluationStatusDTO instructorEvaluation) {
+        this.instructorEvaluation = instructorEvaluation;
     }
 }

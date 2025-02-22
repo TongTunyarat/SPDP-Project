@@ -96,6 +96,7 @@
           <th>Role</th>
           <th>Student ID</th>
           <th>Student Names</th>
+          <th>Proposal Evaluation</th>
           <th>Evaluation</th>
           <th>Actions</th>
         </tr>
@@ -235,6 +236,19 @@
                 ? `<td class="evaluation completed" title="Complete Evaluation"><i class="fa-solid fa-check"></i></td>`
                 : `<td class="evaluation uncompleted" title="Incomplete Evaluation"><i class="fa-solid fa-spinner"></i></td>`;
 
+        let maxInstructor = project.students[0].instructorEvaluation.totalInstructors;
+        let completeEva = Math.min(...project.students.map(student => student.instructorEvaluation.completedInstructors));
+        let waitEva = maxInstructor - completeEva;
+
+        let completeEvaIcons = "";
+        for (let i = 0; i < completeEva; i++) {
+          completeEvaIcons += '<i class=\'fas fa-user-alt\' style=\'font-size:1.7rem;color:#78adc5\'></i>'
+        }
+
+        let waitEvaIcons = "";
+        for (let i = 0; i < waitEva; i++) {
+          waitEvaIcons += '<i class=\'fas fa-user-alt\' style=\'font-size:1.7rem;color:#dbdbdb\'></i>'
+        }
 
         row.innerHTML = `
                  <td><span class="tag ${project.projectProgram.toLowerCase()}">${project.projectProgram}</span> ${project.projectId}</td>
@@ -242,13 +256,16 @@
                 <td><span class="role ${project.role.toLowerCase()}">${project.role}</span></td>
                 <td>
                     <ul>
-                        ${project.students.map(id => `<li>${id.studentId}</li>`).join('')}
+                        ${project.students.map(student => `<li>${student.studentId}</li>`).join('')}
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        ${project.students.map(name => `<li>${name.studentName}</li>`).join('')}
+                        ${project.students.map(student => `<li>${student.studentName}</li>`).join('')}
                     </ul>
+                </td>
+                <td>
+                 ${completeEvaIcons}${waitEvaIcons}
                 </td>
                  ${evaluationStatus}
                 <td>

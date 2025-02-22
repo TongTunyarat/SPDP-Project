@@ -3,7 +3,10 @@ package com.example.project.service;
 
 import com.example.project.entity.*;
 import com.example.project.repository.AccountRepository;
+import com.example.project.repository.ProjectInstructorRoleRepository;
 import com.example.project.repository.ProjectRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.SpringVersion;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,12 +17,17 @@ import java.util.List;
 @Service
 public class ProjectService {
 
-    private final AccountRepository accountRepository;
-    private final ProjectRepository projectRepository;
+    @Autowired
+    private AccountRepository accountRepository;
+    @Autowired
+    private ProjectRepository projectRepository;
+    @Autowired
+    private ProjectInstructorRoleRepository projectInstructorRoleRepository;
 
-    public ProjectService(AccountRepository accountRepository, ProjectRepository projectRepository) {
+    public ProjectService(AccountRepository accountRepository, ProjectRepository projectRepository, ProjectInstructorRoleRepository projectInstructorRoleRepository) {
         this.accountRepository = accountRepository;
         this.projectRepository = projectRepository;
+        this.projectInstructorRoleRepository = projectInstructorRoleRepository;
     }
 
     //=========================================== USE ===================================================
@@ -43,6 +51,7 @@ public class ProjectService {
         }
         throw new UsernameNotFoundException("User is not authenticated");
     }
+
 
     //    get project details after click edit
     public Project getProjectDetails(String projectId) {

@@ -524,9 +524,18 @@
         const thead = document.createElement("thead");
         const rowHeader = document.createElement("tr");
 
+
+
         rowHeader.innerHTML = `
+<!--             <th></th>-->
+<!--            ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}-->
+
             <th></th>
-            ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}
+        ${students.map(student => {
+            const nameParts = student.studentName.split(' '); // แยกชื่อกับนามสกุล
+            const lastNameAbbr = nameParts[1] ? nameParts[1].slice(0, 3) + '.' : ''; // ตัดเหลือ 3 ตัว + จุด
+            return `<th>${student.studentId} ${nameParts[0]} ${lastNameAbbr}</th>`;
+        }).join('')}
         `;
         thead.appendChild(rowHeader);
         table.appendChild(thead);
@@ -562,8 +571,12 @@
         const rowHeader = document.createElement("tr");
 
         rowHeader.innerHTML = `
-            <th></th>
-            ${students.map(student => `<th>${student.studentId} ${student.studentName}</th>`).join('')}
+               <th></th>
+                ${students.map(student => {
+                    const nameParts = student.studentName.split(' '); // แยกชื่อกับนามสกุล
+                    const lastNameAbbr = nameParts[1] ? nameParts[1].slice(0, 3) + '.' : ''; // ตัดเหลือ 3 ตัว + จุด
+                    return `<th>${student.studentId} ${nameParts[0]} ${lastNameAbbr}</th>`;
+                }).join('')}
         `;
         thead.appendChild(rowHeader);
         table.appendChild(thead);
