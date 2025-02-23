@@ -4,13 +4,15 @@ public class StudentProjectDefenseGradeDTO {
     private String studentId;
     private String studentName;
     private String status;
+    private String gradeResult;
     private boolean isEvaluationComplete;
     private InstructorEvaluationDefenseStatusDTO instructorEvaluation;
 
-    public StudentProjectDefenseGradeDTO(String studentId, String studentName, String status, boolean isEvaluationComplete, InstructorEvaluationDefenseStatusDTO instructorEvaluation) {
+    public StudentProjectDefenseGradeDTO(String studentId, String studentName, String status, boolean isEvaluationComplete, InstructorEvaluationDefenseStatusDTO instructorEvaluation, String gradeResult) {
         this.studentId = studentId;
         this.studentName = studentName;
         this.status = status;
+        this.gradeResult = gradeResult;
         this.isEvaluationComplete = isEvaluationComplete;
         this.instructorEvaluation = instructorEvaluation;
     }
@@ -53,5 +55,13 @@ public class StudentProjectDefenseGradeDTO {
 
     public void setInstructorEvaluation(InstructorEvaluationDefenseStatusDTO instructorEvaluation) {
         this.instructorEvaluation = instructorEvaluation;
+    }
+
+    public String getGradeResult() {
+        return gradeResult;
+    }
+
+    public void setGradeResult(String gradeResult) {
+        this.gradeResult = gradeResult;
     }
 }

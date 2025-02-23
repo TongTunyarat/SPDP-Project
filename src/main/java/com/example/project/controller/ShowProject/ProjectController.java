@@ -252,6 +252,8 @@ public class ProjectController {
                                         projectInstructorRoleList
                                 );
 
+                                String gradeResult = getGradePropResult(studentProject.getStudent().getStudentId(), gradingProposalEvaluationList);
+
                                 return new StudentProjectPropGradeDTO(
                                         // getStudent() -> ใน (StudentProjects Entity)
                                         studentProject.getStudent().getStudentId(),
@@ -259,7 +261,8 @@ public class ProjectController {
                                         studentProject.getStatus(),
                                         // การประเมินจาก user คนนั้น
                                         isComplete,
-                                        instructorEvaStatus);
+                                        instructorEvaStatus,
+                                        gradeResult);
                             })
                             .toList();
 
@@ -419,6 +422,22 @@ public class ProjectController {
                 .collect(Collectors.toList());
     }
 
+    private String getGradePropResult(String studentId, List<GradingProposalEvaluation> gradingProposalEvaluationList) {
+        return gradingProposalEvaluationList.stream()
+                .filter(eva -> eva.getStudent().getStudentId().equals(studentId))
+                .map(GradingProposalEvaluation::getGradeResult) // สมมติว่า entity มีเมทอด getGradeResult()
+                .findFirst()
+                .orElse("-"); // ถ้าไม่พบข้อมูล ให้คืนค่า "N/A"
+    }
+
+    private String getGradeDefenseResult(String studentId, List<GradingDefenseEvaluation> gradingDefenseEvaluationList) {
+        return gradingDefenseEvaluationList.stream()
+                .filter(eva -> eva.getStudentId().getStudentId().equals(studentId))
+                .map(GradingDefenseEvaluation::getGradeResult) // สมมติว่า entity มีเมทอด getGradeResult()
+                .findFirst()
+                .orElse("-"); // ถ้าไม่พบข้อมูล ให้คืนค่า "N/A"
+    }
+
     private boolean checkStudentDefenseEvaStatus(String instructorUsername, String studentId, List<Criteria> allDefenseEvaCriteria, List<DefenseEvaluation> defenseEvaluationList) {
 
         // find instructor & student
@@ -503,13 +522,18 @@ public class ProjectController {
                                         projectInstructorRoleList
                                 );
 
+                                List<GradingDefenseEvaluation> gradingDefenseEvaluationList1 = gradingDefenseEvaluationRepository.findByProjectId_ProjectId(projectId);
+
+                                String gradeResult = getGradeDefenseResult(studentProject.getStudent().getStudentId(), gradingDefenseEvaluationList1);
+
                                 return new StudentProjectDefenseGradeDTO(
                                         // getStudent() -> ใน (StudentProjects Entity)
                                         studentProject.getStudent().getStudentId(),
                                         studentProject.getStudent().getStudentName(),
                                         studentProject.getStatus(),
                                         isComplete,
-                                        instructorEvaStatus);
+                                        instructorEvaStatus,
+                                        gradeResult);
                             })
                             .toList();
 

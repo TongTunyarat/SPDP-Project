@@ -98,6 +98,7 @@
                     <th>Student Names</th>
                     <th>Defense Evaluation</th>
                     <th>Evaluation</th>
+                    <th>Grade</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -369,8 +370,14 @@
                 </td>
                 <td>
                  ${completeEvaIcons}${waitEvaIcons}
-                </td>
+
                  ${evaluationStatus}
+                </td>
+                <td>
+                    <ul>
+                        ${project.students.map(student => `<li>${student.gradeResult}</li>`).join('')}
+                    </ul>
+                </td>
                 <td>
                     <form action="/instructor/editDefenseGrade" method="get">
                         <input type="hidden" name="projectId" value="${project.projectId}">

@@ -98,6 +98,7 @@
           <th>Student Names</th>
           <th>Proposal Evaluation</th>
           <th>Evaluation</th>
+          <th>Grade</th>
           <th>Actions</th>
         </tr>
         </thead>
@@ -118,10 +119,9 @@
 <script>
 
   function fetchData() {
-    // JSON information fetch project list
+
     let url = 'http://localhost:8080/instructor/projectPropGradeList';
 
-    // ทำการส่งคำขอไปยัง API หรือ Backend
     fetch(url)
             .then(response => {
               // console.log(response.json());
@@ -234,7 +234,7 @@
         // status
         const evaluationStatus = project.allEvaluationsComplete
                 ? `<td class="evaluation completed" title="Complete Evaluation"><i class="fa-solid fa-check"></i></td>`
-                : `<td class="evaluation uncompleted" title="Incomplete Evaluation"><i class="fa-solid fa-spinner"></i></td>`;
+                : `<td class="evaluation uncompleted" title="Incomplete Evaluation"><i class="fa-solid fa-spinner"></i></td>`
 
         let maxInstructor = project.students[0].instructorEvaluation.totalInstructors;
         let completeEva = Math.min(...project.students.map(student => student.instructorEvaluation.completedInstructors));
@@ -266,8 +266,14 @@
                 </td>
                 <td>
                  ${completeEvaIcons}${waitEvaIcons}
+
+                  ${evaluationStatus}
                 </td>
-                 ${evaluationStatus}
+                <td>
+                    <ul>
+                        ${project.students.map(student => `<li>${student.gradeResult}</li>`).join('')}
+                    </ul>
+                </td>
                 <td>
                     <form action="/instructor/editProposalGrade" method="get">
                         <input type="hidden" name="projectId" value="${project.projectId}">
