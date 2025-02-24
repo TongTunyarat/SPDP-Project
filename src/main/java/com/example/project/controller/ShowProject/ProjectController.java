@@ -184,26 +184,7 @@ public class ProjectController {
                     return score.isPresent() && score.get().getScore() != null;
                 });
 
-        if (!hasAllScores) {
-            return false;
-        }
-
-        boolean allScoreAreZero = allPropEvaCriteria.stream()
-                .allMatch(criteria -> {
-                    Optional<ProposalEvalScore> score = proposalEvaluation.getProposalEvalScores().stream()
-                            .filter(s -> s.getCriteria().getCriteriaId().equals(criteria.getCriteriaId()))
-                            .findFirst();
-                    return score.map(proposalEvalScore -> proposalEvalScore.getScore().intValue() == 0).orElse(false);
-                });
-
-        return !allScoreAreZero;
-
-//        // collect all criteria in eva
-//        Set<String> scoreCriteriaId = evaluation.get().getProposalEvalScores().stream()
-//                .map(score -> score.getCriteria().getCriteriaId())
-//                .collect(Collectors.toSet());
-//
-//        return allPropEvaCriteria.stream().allMatch(criteria -> scoreCriteriaId.contains(criteria.getCriteriaId()));
+            return hasAllScores;
     }
 
 //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -465,12 +446,6 @@ public class ProjectController {
 
         return hasAllScores;
 
-//        // collect all criteria in eva
-//        Set<String> scoreCriteriaId = evaluation.get().getProposalEvalScores().stream()
-//                .map(score -> score.getCriteria().getCriteriaId())
-//                .collect(Collectors.toSet());
-//
-//        return allPropEvaCriteria.stream().allMatch(criteria -> scoreCriteriaId.contains(criteria.getCriteriaId()));
     }
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -499,10 +474,12 @@ public class ProjectController {
                     List<GradingDefenseEvaluation> gradingDefenseEvaluationList = gradingDefenseEvaluationRepository.findByProjectId_ProjectId(projectId);
 
                     // get all project instructor
-                    List<DefenseEvaluation> defenseEvaluationList = defenseEvaluationRepository.findByProjectId_ProjectId(projectId);
                     System.out.println("📋Project: " + projectId);
+                    List<DefenseEvaluation> defenseEvaluationList = defenseEvaluationRepository.findByProjectId_ProjectId(projectId);
+                    List<PosterEvaluation> posterEvaluationList = posterEvaRepository.findByProjectIdPoster_ProjectId(projectId);
                     List<ProjectInstructorRole> projectInstructorRoleList = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(projectId);
                     List<Criteria> allDefenseCriteria = defenseEvaluationService.getDefenseCriteria();
+                    List<Criteria> allPosterCriteria = posterEvaluationService.getPosterCriteria();
 //                    System.out.println("📝Criteria: " + allDefenseGradeCriteria);
 
 
@@ -519,7 +496,9 @@ public class ProjectController {
                                 InstructorEvaluationDefenseStatusDTO instructorEvaStatus = checkInstructorDefenseEva(
                                         studentProject.getStudent().getStudentId(),
                                         allDefenseCriteria,
+                                        allPosterCriteria,
                                         defenseEvaluationList,
+                                        posterEvaluationList,
                                         projectInstructorRoleList
                                 );
 
@@ -569,7 +548,7 @@ public class ProjectController {
     }
 
     // defense eva status instructor
-    private InstructorEvaluationDefenseStatusDTO checkInstructorDefenseEva(String studentId, List<Criteria> allDefenseCriteria, List<DefenseEvaluation> defenseEvaluationList, List<ProjectInstructorRole> projectInstructorRoleList) {
+    private InstructorEvaluationDefenseStatusDTO checkInstructorDefenseEva(String studentId, List<Criteria> allDefenseCriteria, List<Criteria> allPosterCriteria, List<DefenseEvaluation> defenseEvaluationList, List<PosterEvaluation> posterEvaluationList, List<ProjectInstructorRole> projectInstructorRoleList) {
 
 //        System.out.println("⭐️Check input: ");
 //        System.out.println("StudentID: " + studentId);
@@ -594,8 +573,17 @@ public class ProjectController {
                         return false;
                     }
 
+                    Optional<PosterEvaluation> instructorPosterCheck = posterEvaluationList.stream()
+                            .filter(pe -> pe.getInstructorIdPoster().getInstructorId().equals(instructor.getInstructorId()))
+                            .findFirst();
+
+                    if (instructorPosterCheck.isEmpty()) {
+                        return false;
+                    }
+
                     // pull instructor have eva
                     DefenseEvaluation defenseEvaluation = instructorDefenseEvaCheck.get();
+                    PosterEvaluation posterEvaluation = instructorPosterCheck.get();
 
                     // ให้คะแนนครบทุก criteria & score != null ?
                     boolean hasAllDefenseScores = allDefenseCriteria.stream()
@@ -607,7 +595,16 @@ public class ProjectController {
                                 return score.isPresent() && score.get().getScore() != null;
                             });
 
-                    return hasAllDefenseScores;
+                    // float
+                    boolean hasAllPosterScores = allPosterCriteria.stream()
+                            .allMatch(criteria -> {
+                                Optional<PosterEvaluationScore> score = posterEvaluation.getPosterEvaluationScores().stream()
+                                        .filter(ps -> ps.getCriteriaPoster().getCriteriaId().equals(criteria.getCriteriaId()))
+                                        .findFirst();
+                                return score.isPresent();
+                            });
+
+                    return hasAllDefenseScores && hasAllPosterScores;
 
                 }).count();
 
@@ -699,19 +696,28 @@ public class ProjectController {
             return false;
         }
 
-        // collect all criteria in eva
-        Set<String> scoreCriteriaId = evaluation.get().getPosterEvaluationScores().stream()
-                .map(score -> score.getCriteriaPoster().getCriteriaId())
-                .collect(Collectors.toSet());
+        PosterEvaluation posterEvaluation = evaluation.get();
 
-        return allPosterEvaCriteria.stream().allMatch(criteria -> scoreCriteriaId.contains(criteria.getCriteriaId()));
+        // ให้คะแนนครบทุก criteria & score != null ?
+        boolean hasAllScores = allPosterEvaCriteria.stream()
+                .allMatch(criteria -> {
+                    Optional<PosterEvaluationScore> score = posterEvaluation.getPosterEvaluationScores().stream()
+                            .filter(s -> s.getCriteriaPoster().getCriteriaId().equals(criteria.getCriteriaId()))
+                            .findFirst();
+
+                    return score.isPresent();
+                });
+
+        return hasAllScores;
+
+        // collect all criteria in eva
+//        Set<String> scoreCriteriaId = evaluation.get().getPosterEvaluationScores().stream()
+//                .map(score -> score.getCriteriaPoster().getCriteriaId())
+//                .collect(Collectors.toSet());
+//
+//        return allPosterEvaCriteria.stream().allMatch(criteria -> scoreCriteriaId.contains(criteria.getCriteriaId()));
     }
 
-//    @GetMapping("/instructor/prop")
-//    @ResponseBody
-//    public List<ProposalEvaluation> getPropEva() {
-//        return proposalEvaluationRepository.findAll();
-//    }
 
     // project list by user filter Advisor
     @GetMapping("/advisor/projectList")
@@ -810,43 +816,42 @@ public class ProjectController {
 //        return ResponseEntity.ok(projectDetails);
 //    }
 
-    //=========================================== See Result (Not Use) ===================================================
-    // ข้อมูล instructor project
-    @GetMapping("/instructor/project")
-    public ResponseEntity<?> getInstructorProject() {
-        try {
-            List<ProjectInstructorRole> projectInstructorRoles = projectService.getInstructorProject();
-            if (projectInstructorRoles.isEmpty()){
-                return ResponseEntity.ok("No project data available.");
-            }
-            return ResponseEntity.ok(projectInstructorRoles);
-        } catch (UsernameNotFoundException ex) {
-            // ไม่พบข้อมูล หรือ ผู้ใช้ไม่ได้ login
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);  // 401 Unauthorized
-        }
-    }
-
-    // ดึงข้อมูลผู้ใช้เมื่อ login เข้าระบบ
-    @GetMapping("/instructor/details")
-    public ResponseEntity<Instructor> getInstructorUserDetails() {
-        try {
-            Instructor instructor = projectService.getInstructorUserDetails();
-            return ResponseEntity.ok(instructor);
-        } catch (UsernameNotFoundException ex) {
-            // ไม่พบข้อมูล หรือ ผู้ใช้ไม่ได้ login
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);  // 401 Unauthorized
-        }
-    }
-
-    @GetMapping("/admin/details")
-    @ResponseBody
-    public ResponseEntity<Admin> getAdminUserDetails() {
-        try {
-            Admin admin = projectService.getAdminUserDetails();
-            return ResponseEntity.ok(admin);
-        } catch (UsernameNotFoundException ex) {
-            // ไม่พบข้อมูล หรือ ผู้ใช้ไม่ได้ login
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);  // 401 Unauthorized
-        }
-    }
+//    // ข้อมูล instructor project
+//    @GetMapping("/instructor/project")
+//    public ResponseEntity<?> getInstructorProject() {
+//        try {
+//            List<ProjectInstructorRole> projectInstructorRoles = projectService.getInstructorProject();
+//            if (projectInstructorRoles.isEmpty()){
+//                return ResponseEntity.ok("No project data available.");
+//            }
+//            return ResponseEntity.ok(projectInstructorRoles);
+//        } catch (UsernameNotFoundException ex) {
+//            // ไม่พบข้อมูล หรือ ผู้ใช้ไม่ได้ login
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);  // 401 Unauthorized
+//        }
+//    }
+//
+//    // ดึงข้อมูลผู้ใช้เมื่อ login เข้าระบบ
+//    @GetMapping("/instructor/details")
+//    public ResponseEntity<Instructor> getInstructorUserDetails() {
+//        try {
+//            Instructor instructor = projectService.getInstructorUserDetails();
+//            return ResponseEntity.ok(instructor);
+//        } catch (UsernameNotFoundException ex) {
+//            // ไม่พบข้อมูล หรือ ผู้ใช้ไม่ได้ login
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);  // 401 Unauthorized
+//        }
+//    }
+//
+//    @GetMapping("/admin/details")
+//    @ResponseBody
+//    public ResponseEntity<Admin> getAdminUserDetails() {
+//        try {
+//            Admin admin = projectService.getAdminUserDetails();
+//            return ResponseEntity.ok(admin);
+//        } catch (UsernameNotFoundException ex) {
+//            // ไม่พบข้อมูล หรือ ผู้ใช้ไม่ได้ login
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);  // 401 Unauthorized
+//        }
+//    }
 }
