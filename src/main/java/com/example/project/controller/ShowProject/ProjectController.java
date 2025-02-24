@@ -424,19 +424,20 @@ public class ProjectController {
 
     private String getGradePropResult(String studentId, List<GradingProposalEvaluation> gradingProposalEvaluationList) {
         return gradingProposalEvaluationList.stream()
-                .filter(eva -> eva.getStudent().getStudentId().equals(studentId))
-                .map(GradingProposalEvaluation::getGradeResult) // สมมติว่า entity มีเมทอด getGradeResult()
+                .filter(eva -> eva.getStudent() != null && studentId.equals(eva.getStudent().getStudentId()))
+                .map(eva -> Optional.ofNullable(eva.getGradeResult()).orElse("-"))
                 .findFirst()
-                .orElse("-"); // ถ้าไม่พบข้อมูล ให้คืนค่า "N/A"
+                .orElse("-");
     }
 
     private String getGradeDefenseResult(String studentId, List<GradingDefenseEvaluation> gradingDefenseEvaluationList) {
         return gradingDefenseEvaluationList.stream()
-                .filter(eva -> eva.getStudentId().getStudentId().equals(studentId))
-                .map(GradingDefenseEvaluation::getGradeResult) // สมมติว่า entity มีเมทอด getGradeResult()
+                .filter(eva -> eva.getStudentId() != null && studentId.equals(eva.getStudentId().getStudentId()))
+                .map(eva -> Optional.ofNullable(eva.getGradeResult()).orElse("-"))
                 .findFirst()
-                .orElse("-"); // ถ้าไม่พบข้อมูล ให้คืนค่า "N/A"
+                .orElse("-");
     }
+
 
     private boolean checkStudentDefenseEvaStatus(String instructorUsername, String studentId, List<Criteria> allDefenseEvaCriteria, List<DefenseEvaluation> defenseEvaluationList) {
 
