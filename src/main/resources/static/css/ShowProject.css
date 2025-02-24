@@ -152,6 +152,11 @@ tbody ul li {
     cursor: pointer;
 }
 
+td:nth-child(1) {
+    max-width: 100px;
+    word-wrap: break-word; /* ป้องกันการล้นของข้อความ */
+    white-space: normal; /* อนุญาตให้แบ่งบรรทัดได้ */
+}
 
 td:nth-child(2) {
     max-width: 150px;
@@ -168,6 +173,12 @@ td:nth-child(4) , td:nth-child(5)  {
 td:nth-child(4) ul, td:nth-child(5) ul {
     list-style-type: none;
     padding: 0;
+}
+
+td:nth-child(5) {
+    max-width: 200px;
+    word-wrap: break-word; /* ป้องกันการล้นของข้อความ */
+    white-space: normal; /* อนุญาตให้แบ่งบรรทัดได้ */
 }
 
 .student-id, .student-name {
