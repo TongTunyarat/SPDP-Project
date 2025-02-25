@@ -121,6 +121,12 @@
                 </table>
             </div>
 
+            <!-- Comment -->
+            <div class="table-container">
+                <h1> Comment </h1>
+                <textarea id="comment" rows="4" cols="50"></textarea>
+            </div>
+
             <!-- Score Result -->
             <div class="table-container">
                 <h1> Score Result </h1>
@@ -146,6 +152,24 @@
     </div>
 </div>
 
+<style>
+    .zero-score-warning {
+        background-color: #ffebee;
+        padding: 10px 15px;
+        border-radius: 4px;
+        margin: 10px 0;
+        border-left: 4px solid #e74c3c;
+    }
+
+    .zero-score-warning ul {
+        margin: 5px 0;
+        padding-left: 20px;
+    }
+
+    .zero-score-warning li {
+        margin-bottom: 3px;
+    }
+</style>
 
 <script>
     window.onload = function () {
@@ -704,18 +728,116 @@
 
 <!-- -------------- Insert Score to Database -------------- -->
 <script>
+    // Function to check for students with zero scores
+    function checkForZeroScores() {
+        // Get all students' IDs from input fields
+        const inputs = document.querySelectorAll('.present-score-input, .document-score-input');
+        const studentMap = new Map();
+
+        // Initialize studentMap with all studentIds and set initial total to 0
+        inputs.forEach(input => {
+            const studentId = input.getAttribute('data-student-id');
+            if (!studentMap.has(studentId)) {
+                studentMap.set(studentId, { total: 0, count: 0 });
+            }
+
+            const scoreValue = parseFloat(input.value) || 0;
+            const currentData = studentMap.get(studentId);
+            currentData.total += scoreValue;
+            currentData.count++;
+            studentMap.set(studentId, currentData);
+        });
+
+        // Find students with zero total scores
+        const zeroScoreStudents = [];
+        for (const [studentId, data] of studentMap.entries()) {
+            if (data.total === 0) {
+                // Fetch student name if available
+                const studentElement = document.querySelector(`.card-score-result[data-student-id="${studentId}"]`);
+                let studentName = '';
+
+                if (studentElement) {
+                    const iconSpan = studentElement.querySelector('.icon');
+                    if (iconSpan) {
+                        studentName = iconSpan.textContent.trim();
+                    }
+                }
+
+                zeroScoreStudents.push({ id: studentId, name: studentName });
+            }
+        }
+
+        return zeroScoreStudents;
+    }
+
+    // Update the save button click event handler
     document.querySelector('.save-button').addEventListener('click', function(event) {
+        console.log("Save Process");
         event.preventDefault();
 
-        // แสดง Modal เพื่อให้ผู้ใช้ยืนยัน
-        document.getElementById("confirmationModal").style.display = "block";
+        // Check for zero scores before showing the modal
+        const zeroScoreStudents = checkForZeroScores();
 
-        // เมื่อผู้ใช้คลิก "Yes, Submit"
-        document.getElementById("confirmSave").addEventListener('click', function() {
-            // ปิด Modal
-            document.getElementById("confirmationModal").style.display = "none";
+        // แสดง Modal
+        const modal = document.getElementById('confirmationModal');
+        const closeButton = document.getElementById('closeModal');
+        const confirmSaveButton = document.getElementById('confirmSave');
+        const cancelSaveButton = document.getElementById('cancelSave');
 
-            console.log("Save Process");
+        // Update modal content based on zero score detection
+        const modalContent = document.querySelector('.modal-content');
+
+        // Clear previous content if any
+        const oldWarning = modalContent.querySelector('.zero-score-warning');
+        if (oldWarning) {
+            oldWarning.remove();
+        }
+
+        if (zeroScoreStudents.length > 0) {
+            // Create warning message
+            const warningDiv = document.createElement('div');
+            warningDiv.className = 'zero-score-warning';
+            warningDiv.style.color = '#e74c3c';
+            warningDiv.style.marginBottom = '15px';
+            warningDiv.style.fontWeight = 'bold';
+
+            let warningMessage = '<p>คำเตือน: นักศึกษาต่อไปนี้ได้ 0 คะแนนทุก criteria:</p><ul>';
+
+            zeroScoreStudents.forEach(student => {
+                warningMessage += `<li>${student.name || student.id}</li>`;
+            });
+
+            warningMessage += '</ul><p>ต้องการยืนยันการให้คะแนนใช่หรือไม่?</p>';
+            warningDiv.innerHTML = warningMessage;
+
+            // Insert warning before the buttons
+            const buttonDiv = modalContent.querySelector('div');
+            modalContent.insertBefore(warningDiv, buttonDiv);
+        }
+
+        // Show the modal
+        modal.style.display = "block";
+
+        // ถ้าผู้ใช้กดปิด modal
+        closeButton.addEventListener('click', function () {
+            modal.style.display = "none"; // ซ่อน modal
+        });
+
+        // ถ้าผู้ใช้กดยืนยันการบันทึกคะแนน
+        confirmSaveButton.addEventListener('click', function () {
+            modal.style.display = "none"; // ซ่อน modal
+    // document.querySelector('.save-button').addEventListener('click', function(event) {
+    //     event.preventDefault();
+    //
+    //     // แสดง Modal เพื่อให้ผู้ใช้ยืนยัน
+    //     document.getElementById("confirmationModal").style.display = "block";
+    //
+    //     // เมื่อผู้ใช้คลิก "Yes, Submit"
+    //     document.getElementById("confirmSave").addEventListener('click', function() {
+    //         // ปิด Modal
+    //         document.getElementById("confirmationModal").style.display = "none";
+    //
+    //         console.log("Save Process");
 
             // projectId
             var projectId = getProjectIdFromURL();
@@ -723,7 +845,6 @@
 
             // student score
             var studentScores = document.querySelectorAll('.present-score-input, .document-score-input'); // ดึงข้อมูลจาก input ในตาราง (scores)
-
             var studentData = {};
 
             studentScores.forEach((input) => {
@@ -738,6 +859,10 @@
             });
 
             console.log(studentData);
+
+            // ดึงค่าคอมเมนต์จาก textarea
+            var comment = document.getElementById("comment").value;
+            console.log("Comment: ", comment);
 
             // instructorId
             var instructorId = "";
@@ -773,7 +898,10 @@
                             'Content-Type': 'application/json',
                         },
                         credentials: 'include',
-                        body: JSON.stringify(scoreDTOList)
+                        body: JSON.stringify({
+                            scores: scoreDTOList,
+                            comment: comment // เพิ่ม comment ส่งไปด้วย
+                        })
                     })
                         .then(response => {
                             console.log(response.status)
@@ -793,11 +921,36 @@
                         });
                 }
 
+                function showNotification(message, callback) {
+                    const notification = document.createElement("div");
+                    notification.textContent = message;
+                    notification.style.position = "fixed";
+                    notification.style.top = "20px";
+                    notification.style.right = "20px";
+                    notification.style.padding = "10px 20px";
+                    notification.style.background = "green";
+                    notification.style.color = "white";
+                    notification.style.borderRadius = "5px";
+                    notification.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)";
+                    document.body.appendChild(notification);
+
+                    // ให้ข้อความหายไปอัตโนมัติหลังจาก 3 วินาที
+                    setTimeout(() => {
+                        notification.remove();
+                        if (callback) callback(); // เรียก callback หลังจากแจ้งเตือนเสร็จ
+                    }, 1000);
+                }
+
+                // แสดงแจ้งเตือนก่อน แล้วค่อยเปลี่ยนหน้า
+                showNotification("Evaluation saved successfully!", function() {
+                    window.location.href = "/show-defense-eva-projects";
+                });
+
                 // แสดงข้อความ alert ว่าการบันทึกสำเร็จ
-                alert('Evaluation saved successfully!');
+                // alert('Evaluation saved successfully!');
 
                 // เปลี่ยน path ไปที่ /show-defense-eva-projects
-                window.location.href = '/show-defense-eva-projects';
+                // window.location.href = '/show-defense-eva-projects';
             }
         });
 
@@ -906,6 +1059,15 @@
             // Try parsing the JSON
             try {
                 const data = JSON.parse(text);
+
+                // ดึงข้อมูลคอมเมนต์จาก API และแสดงใน textarea
+                if (data.comment) {
+                    document.getElementById("comment").value = data.comment;
+                    console.log(`✅ Loaded comment: ${data.comment}`);
+                } else {
+                    console.log('📝 No comment found');
+                }
+
                 const scores = data.defenseEvalScore || [];
                 console.log(`✅ Retrieved scores for student ${studentId}:`, scores);
                 return scores;
@@ -1032,13 +1194,16 @@
         try {
             data.students.forEach(student => {
                 const score = student.totalScore !== undefined ? Math.round(student.totalScore) : "N/A";
+                // const score = student.totalScore !== undefined ? parseFloat(student.totalScore.toFixed(2)) : "N/A";
+                // const score = student.totalScore !== undefined ? student.totalScore.toFixed(2) : "N/A";
+
 
                 const card = document.createElement('div');
                 card.className = 'card-score-result';
                 card.setAttribute("data-student-id", student.studentId);
                 card.innerHTML = `
                 <span class="icon"><i class="fa fa-user"></i> ${student.studentId} ${student.studentName || ""}</span>
-                <span class="score">${score} / ${totalMaxScore}</span>
+                <span class="score">${score.toFixed(2)} / ${totalMaxScore.toFixed(2)}</span>
             `;
 
                 console.log(`✅ Created card for student ${student.studentId} with maxScore ${totalMaxScore}`);
@@ -1087,7 +1252,7 @@
 
         if (scoreDisplay) {
             console.log(`✅ Updating Student ${studentId} score to: ${total} / ${totalMaxScore}`);
-            scoreDisplay.textContent = `${total} / ${totalMaxScore}`;
+            scoreDisplay.textContent = `${total.toFixed(2)} / ${totalMaxScore.toFixed(2)}`;
         } else {
             console.warn(`⚠️ Card result for student ${studentId} not found!`);
             console.log("🧐 Available cards in DOM:", document.querySelectorAll(".card-score-result"));

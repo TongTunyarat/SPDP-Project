@@ -84,27 +84,49 @@ public class CalculateController {
     }
 
 
+//    @PostMapping("/saveEvaluation")
+//    public ResponseEntity<String> saveEvaluation(
+//            @RequestParam String instructorId,
+//            @RequestParam String projectId,
+//            @RequestParam String studentId,
+//            @RequestBody List<ScoreDTO> scores) {
+//        try {
+//            System.out.println("Save Evaluation Controller");
+//
+//            ProjectInstructorRole instructor = findInstructor(instructorId);
+//            Project project = findProject(projectId);
+//            Student student = findStudent(studentId);
+//
+//            // ✅ เรียกใช้ Service
+//            calculateService.saveEvaluation(instructor, project, student, scores);
+//
+//            return ResponseEntity.ok("Evaluation saved successfully");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+//        }
+//    }
     @PostMapping("/saveEvaluation")
     public ResponseEntity<String> saveEvaluation(
             @RequestParam String instructorId,
             @RequestParam String projectId,
             @RequestParam String studentId,
-            @RequestBody List<ScoreDTO> scores) {
+            @RequestBody EvaluationRequest request) {
         try {
-            System.out.println("Save Evaluation Controller");
+            System.out.println("🐔 request.getScores(): " + request.getScores());
+            System.out.println("🐔 request.getComment(): " + request.getComment());
 
             ProjectInstructorRole instructor = findInstructor(instructorId);
             Project project = findProject(projectId);
             Student student = findStudent(studentId);
 
-            // ✅ เรียกใช้ Service
-            calculateService.saveEvaluation(instructor, project, student, scores);
+            calculateService.saveEvaluation(instructor, project, student, request.getScores(), request.getComment());
 
             return ResponseEntity.ok("Evaluation saved successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
+
 
     @GetMapping("/getEvaluation")
     public ResponseEntity<?> getEvaluation(
@@ -128,21 +150,44 @@ public class CalculateController {
         }
     }
 
+//    @PostMapping("/saveDefenseEvaluation")
+//    public ResponseEntity<String> saveDefenseEvaluation(
+//            @RequestParam String instructorId,
+//            @RequestParam String projectId,
+//            @RequestParam String studentId,
+//            @RequestBody List<ScoreDTO> scores) {
+//        try {
+//            System.out.println("Save Evaluation Controller");
+//
+//            ProjectInstructorRole instructor = findInstructor(instructorId);
+//            Project project = findProject(projectId);
+//            Student student = findStudent(studentId);
+//
+//            // ✅ เรียกใช้ Service
+//            calculateService.saveDefenseEvaluation(instructor, project, student, scores);
+//
+//            return ResponseEntity.ok("Evaluation saved successfully");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+//        }
+//    }
     @PostMapping("/saveDefenseEvaluation")
     public ResponseEntity<String> saveDefenseEvaluation(
             @RequestParam String instructorId,
             @RequestParam String projectId,
             @RequestParam String studentId,
-            @RequestBody List<ScoreDTO> scores) {
+            @RequestBody EvaluationRequest request) {
         try {
             System.out.println("Save Evaluation Controller");
+            System.out.println("🐔 request.getScores(): " + request.getScores());
+            System.out.println("🐔 request.getComment(): " + request.getComment());
 
             ProjectInstructorRole instructor = findInstructor(instructorId);
             Project project = findProject(projectId);
             Student student = findStudent(studentId);
 
             // ✅ เรียกใช้ Service
-            calculateService.saveDefenseEvaluation(instructor, project, student, scores);
+            calculateService.saveDefenseEvaluation(instructor, project, student, request.getScores(), request.getComment());
 
             return ResponseEntity.ok("Evaluation saved successfully");
         } catch (Exception e) {
@@ -172,25 +217,46 @@ public class CalculateController {
         }
     }
 
+//    @PostMapping("/savePosterEvaluation")
+//    public ResponseEntity<String> savePosterEvaluation(
+//            @RequestParam String instructorId,
+//            @RequestParam String projectId,
+//            @RequestBody List<ScoreDTO> scores) {
+//        try {
+//            System.out.println("Save Evaluation Controller");
+//
+//            ProjectInstructorRole instructor = findInstructor(instructorId);
+//            Project project = findProject(projectId);
+//
+//            // ✅ เรียกใช้ Service
+//            calculateService.savePosterEvaluation(instructor, project, scores);
+//
+//            return ResponseEntity.ok("Evaluation saved successfully");
+//        } catch (Exception e) {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
+//        }
+//    }
     @PostMapping("/savePosterEvaluation")
     public ResponseEntity<String> savePosterEvaluation(
             @RequestParam String instructorId,
             @RequestParam String projectId,
-            @RequestBody List<ScoreDTO> scores) {
+            @RequestBody EvaluationRequest request) {
         try {
             System.out.println("Save Evaluation Controller");
 
             ProjectInstructorRole instructor = findInstructor(instructorId);
             Project project = findProject(projectId);
 
-            // ✅ เรียกใช้ Service
-            calculateService.savePosterEvaluation(instructor, project, scores);
+            // ✅ เรียกใช้ Service พร้อมกับส่งคอมเมนต์ไปด้วย
+            calculateService.savePosterEvaluation(instructor, project, request.getScores(), request.getComment());
 
             return ResponseEntity.ok("Evaluation saved successfully");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error: " + e.getMessage());
         }
     }
+
+
 
     @GetMapping("/getPosterEvaluation")
     public ResponseEntity<?> getPosterEvaluation(
