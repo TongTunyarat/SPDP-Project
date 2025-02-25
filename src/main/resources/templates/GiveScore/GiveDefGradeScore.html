@@ -160,6 +160,25 @@
 </div>
 </body>
 
+<style>
+    .zero-score-warning {
+        background-color: #ffebee;
+        padding: 10px 15px;
+        border-radius: 4px;
+        margin: 10px 0;
+        border-left: 4px solid #e74c3c;
+    }
+
+    .zero-score-warning ul {
+        margin: 5px 0;
+        padding-left: 20px;
+    }
+
+    .zero-score-warning li {
+        margin-bottom: 3px;
+    }
+</style>
+
 
 <script>
     window.onload = function () {
@@ -1133,9 +1152,56 @@
     //     }
     //
     // });
+
+    // Function to check for students with zero scores
+    function checkForZeroScores() {
+        // Get all students' IDs from input fields
+        const inputs = document.querySelectorAll('.present-score-input');
+        const studentMap = new Map();
+
+        // Initialize studentMap with all studentIds and set initial total to 0
+        inputs.forEach(input => {
+            const studentId = input.getAttribute('data-student-id');
+            if (!studentMap.has(studentId)) {
+                studentMap.set(studentId, { total: 0, count: 0 });
+            }
+
+            const scoreValue = parseFloat(input.value) || 0;
+            const currentData = studentMap.get(studentId);
+            currentData.total += scoreValue;
+            currentData.count++;
+            studentMap.set(studentId, currentData);
+        });
+
+        // Find students with zero total scores
+        const zeroScoreStudents = [];
+        for (const [studentId, data] of studentMap.entries()) {
+            if (data.total === 0) {
+                // Fetch student name if available
+                const studentElement = document.querySelector(`.card-score-result[data-student-id="${studentId}"]`);
+                let studentName = '';
+
+                if (studentElement) {
+                    const iconSpan = studentElement.querySelector('.icon');
+                    if (iconSpan) {
+                        studentName = iconSpan.textContent.trim();
+                    }
+                }
+
+                zeroScoreStudents.push({ id: studentId, name: studentName });
+            }
+        }
+
+        return zeroScoreStudents;
+    }
+
+
     document.querySelector('.save-button').addEventListener('click', function (event) {
         console.log("Save Process");
         event.preventDefault();
+
+        // Check for zero scores before showing the modal
+        const zeroScoreStudents = checkForZeroScores();
 
         // แสดง Modal ก่อนทำการบันทึกข้อมูล
         const modal = document.getElementById('confirmationModal');
@@ -1143,19 +1209,63 @@
         const confirmSaveButton = document.getElementById('confirmSave');
         const cancelSaveButton = document.getElementById('cancelSave');
 
-        modal.style.display = "block"; // เปิด Modal
+        // Update modal content based on zero score detection
+        const modalContent = document.querySelector('.modal-content');
 
-        // เมื่อปิด modal หรือคลิก cancel ให้ปิด modal
-        function closeModal() {
-            modal.style.display = "none";
+        // Clear previous content if any
+        const oldWarning = modalContent.querySelector('.zero-score-warning');
+        if (oldWarning) {
+            oldWarning.remove();
         }
 
-        closeButton.addEventListener('click', closeModal, {once: true});
-        cancelSaveButton.addEventListener('click', closeModal, {once: true});
+        if (zeroScoreStudents.length > 0) {
+            // Create warning message
+            const warningDiv = document.createElement('div');
+            warningDiv.className = 'zero-score-warning';
+            warningDiv.style.color = '#e74c3c';
+            warningDiv.style.marginBottom = '15px';
+            warningDiv.style.fontWeight = 'bold';
+
+            let warningMessage = '<p>คำเตือน: นักศึกษาต่อไปนี้ได้ 0 คะแนน:</p><ul>';
+
+            zeroScoreStudents.forEach(student => {
+                warningMessage += `<li>${student.name || student.id}</li>`;
+            });
+
+            warningMessage += '</ul><p>ต้องการยืนยันการให้คะแนนใช่หรือไม่?</p>';
+            warningDiv.innerHTML = warningMessage;
+
+            // Insert warning before the buttons
+            const buttonDiv = modalContent.querySelector('div');
+            modalContent.insertBefore(warningDiv, buttonDiv);
+        }
+
+
+        modal.style.display = "block"; // เปิด Modal
+
+        // ถ้าผู้ใช้กดปิด modal
+        closeButton.addEventListener('click', function () {
+            modal.style.display = "none"; // ซ่อน modal
+        });
+
+        // ฟังก์ชันปิด modal
+        function closeModal() {
+            const modal = document.getElementById('confirmationModal');
+            modal.style.display = "none"; // ซ่อน modal
+        }
+
+        // เพิ่ม event listener ให้ปุ่ม close และ cancel
+        closeButton.addEventListener('click', closeModal);
+        cancelSaveButton.addEventListener('click', closeModal);
+
+        // closeButton.addEventListener('click', closeModal, {once: true});
+        // cancelSaveButton.addEventListener('click', closeModal, {once: true});
 
         // เมื่อกดปุ่ม Confirm (Save) ใน Modal จะทำการบันทึกข้อมูล
+        // confirmSaveButton.addEventListener('click', function () {
+        //     closeModal(); // ปิด Modal
         confirmSaveButton.addEventListener('click', function () {
-            closeModal(); // ปิด Modal
+            modal.style.display = "none"; // ซ่อน modal
 
             // projectId
             var projectId = getProjectIdFromURL();
@@ -1264,9 +1374,35 @@
                 // Wait for all fetch requests to complete
                 Promise.all(fetchPromises)
                     .then(() => {
-                        alert('✅ Evaluation saved successfully!');
-                        loadEvaluationData(projectId); // Reload evaluation data after saving
-                        window.location.href = '/show-defense-grade-projects'; // Redirect to the results page
+                        function showNotification(message, callback) {
+                            const notification = document.createElement("div");
+                            notification.textContent = message;
+                            notification.style.position = "fixed";
+                            notification.style.top = "20px";
+                            notification.style.right = "20px";
+                            notification.style.padding = "10px 20px";
+                            notification.style.background = "green";
+                            notification.style.color = "white";
+                            notification.style.borderRadius = "5px";
+                            notification.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)";
+                            document.body.appendChild(notification);
+
+                            // ให้ข้อความหายไปอัตโนมัติหลังจาก 3 วินาที
+                            setTimeout(() => {
+                                notification.remove();
+                                if (callback) callback(); // เรียก callback หลังจากแจ้งเตือนเสร็จ
+                            }, 1000);
+                        }
+
+                        // แสดงแจ้งเตือนก่อน แล้วค่อยเปลี่ยนหน้า
+                        showNotification("Evaluation saved successfully!", function() {
+                            loadEvaluationData(projectId);
+                            window.location.href = "/show-defense-grade-projects";
+                        });
+
+                        // alert('✅ Evaluation saved successfully!');
+                        // loadEvaluationData(projectId); // Reload evaluation data after saving
+                        // window.location.href = '/show-defense-grade-projects'; // Redirect to the results page
                     })
                     .catch(error => console.error('⚠️ Error saving evaluations:', error));
             }

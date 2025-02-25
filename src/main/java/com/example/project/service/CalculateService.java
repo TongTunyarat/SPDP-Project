@@ -44,58 +44,121 @@ public class CalculateService {
     private ProjectInstructorRoleRepository projectInstructorRoleRepository;
 
     // ---------------------- Proposal Eva -------------------------//
+//    @Transactional
+//    public void saveEvaluation(ProjectInstructorRole instructor, Project project, Student student, List<ScoreDTO> scores) {
+//        System.out.println("[Service] Inside saveEvaluation");
+//
+//        // ค้นหา ProposalEvaluation ที่มีอยู่แล้วในฐานข้อมูลตาม instructor, project และ student
+//        ProposalEvaluation evaluation = evaluationRepository.findByProjectInstructorRoleAndProjectAndStudent(instructor, project, student);
+//
+//        // ถ้าไม่มี ProposalEvaluation อยู่แล้ว ให้สร้างใหม่
+//        if (evaluation == null) {
+//            evaluation = new ProposalEvaluation()
+//                    .setProjectInstructorRole(instructor)
+//                    .setProject(project)
+//                    .setStudent(student);
+//
+//            // บันทึก ProposalEvaluation ใหม่
+//            evaluation = evaluationRepository.save(evaluation);
+//            if (evaluation.getProposalId() == null) {
+//                throw new IllegalArgumentException("Proposal ID cannot be null");
+//            }
+//            System.out.println("[Service] Saved ProposalEvaluation with ID: " + evaluation.getProposalId());
+//        } else {
+//            // ถ้ามีอยู่แล้ว ให้ทำการ update หรือเพิ่มการอัปเดตที่ต้องการ
+//            System.out.println("[Service] Found existing ProposalEvaluation with ID: " + evaluation.getProposalId());
+//        }
+//
+//        String proposalId = evaluation.getProposalId();
+//
+//        // บันทึกหรืออัปเดตคะแนนลง ProposalEvalScore
+//        for (ScoreDTO score : scores) {
+//            // ดึง Criteria จากฐานข้อมูลตาม scoreCriteriaId
+//            System.out.println("[Service] Score: " + score.getScore());
+//            System.out.println("[Service] Criteria: " + score.getScoreCriteriaId());
+//
+//            Criteria criteria = criteriaRepository.findById(score.getScoreCriteriaId())
+//                    .orElseThrow(() -> new IllegalArgumentException("Criteria not found for id: " + score.getScoreCriteriaId()));
+//
+//            // ค้นหาคะแนนที่มีอยู่แล้วในฐานข้อมูล (ใช้ evaId เป็น key)
+//            ProposalEvalScore evalScore = scoreRepository.findByEvaId(proposalId + "_" + score.getScoreCriteriaId());
+//
+//            if (evalScore == null) {
+//                // ถ้ายังไม่มีคะแนนในฐานข้อมูล ให้ทำการสร้างใหม่
+//                evalScore = new ProposalEvalScore()
+//                        .setEvaId(proposalId + "_" + score.getScoreCriteriaId())
+//                        .setScore(score.getScore())
+//                        .setCriteria(criteria)
+//                        .setProposalEvaluation(evaluation);
+//
+//                // บันทึกคะแนนใหม่
+//                scoreRepository.save(evalScore);
+//                System.out.println("[Service] Saved ProposalEvalScore for criteria: " + score.getScoreCriteriaId());
+//            } else {
+//                // ถ้ามีคะแนนอยู่แล้วในฐานข้อมูล ให้ทำการอัปเดต
+//                evalScore.setScore(score.getScore());
+//                scoreRepository.save(evalScore);
+//                System.out.println("[Service] Updated ProposalEvalScore for criteria: " + score.getScoreCriteriaId());
+//            }
+//        }
+//    }
     @Transactional
-    public void saveEvaluation(ProjectInstructorRole instructor, Project project, Student student, List<ScoreDTO> scores) {
+    public void saveEvaluation(ProjectInstructorRole instructor, Project project, Student student, List<ScoreDTO> scores, String comment) {
         System.out.println("[Service] Inside saveEvaluation");
 
-        // ค้นหา ProposalEvaluation ที่มีอยู่แล้วในฐานข้อมูลตาม instructor, project และ student
+        System.out.println("💬 Comment: " + comment);
+        System.out.println("💬 Score: " + scores);
+
+        // ค้นหา ProposalEvaluation ที่มีอยู่แล้วในฐานข้อมูล
         ProposalEvaluation evaluation = evaluationRepository.findByProjectInstructorRoleAndProjectAndStudent(instructor, project, student);
 
-        // ถ้าไม่มี ProposalEvaluation อยู่แล้ว ให้สร้างใหม่
+        // ถ้าไม่มีให้สร้างใหม่
         if (evaluation == null) {
             evaluation = new ProposalEvaluation()
                     .setProjectInstructorRole(instructor)
                     .setProject(project)
+                    .setComment(comment)
                     .setStudent(student);
-
-            // บันทึก ProposalEvaluation ใหม่
-            evaluation = evaluationRepository.save(evaluation);
-            if (evaluation.getProposalId() == null) {
-                throw new IllegalArgumentException("Proposal ID cannot be null");
-            }
-            System.out.println("[Service] Saved ProposalEvaluation with ID: " + evaluation.getProposalId());
         } else {
-            // ถ้ามีอยู่แล้ว ให้ทำการ update หรือเพิ่มการอัปเดตที่ต้องการ
+            // อัปเดตข้อมูลเดิม
             System.out.println("[Service] Found existing ProposalEvaluation with ID: " + evaluation.getProposalId());
+            evaluation.setComment(comment);
         }
 
-        String proposalId = evaluation.getProposalId();
+        // ✅ คำนวณคะแนนรวม
+        // ✅ ใช้ .intValue() เพื่อแปลง BigDecimal เป็น int
+        int totalScore = scores.stream()
+                .map(ScoreDTO::getScore)  // ดึงค่า BigDecimal
+                .mapToInt(BigDecimal::intValue)  // แปลงเป็น int
+                .sum();
 
-        // บันทึกหรืออัปเดตคะแนนลง ProposalEvalScore
+        evaluation.setTotalScore(BigDecimal.valueOf(totalScore));
+
+        // ✅ บันทึก ProposalEvaluation
+        evaluation = evaluationRepository.save(evaluation);
+        String proposalId = evaluation.getProposalId();
+        System.out.println("[Service] Saved/Updated ProposalEvaluation with ID: " + proposalId);
+
+        // ✅ บันทึกหรืออัปเดตคะแนนแต่ละ criteria
         for (ScoreDTO score : scores) {
-            // ดึง Criteria จากฐานข้อมูลตาม scoreCriteriaId
             System.out.println("[Service] Score: " + score.getScore());
             System.out.println("[Service] Criteria: " + score.getScoreCriteriaId());
 
             Criteria criteria = criteriaRepository.findById(score.getScoreCriteriaId())
                     .orElseThrow(() -> new IllegalArgumentException("Criteria not found for id: " + score.getScoreCriteriaId()));
 
-            // ค้นหาคะแนนที่มีอยู่แล้วในฐานข้อมูล (ใช้ evaId เป็น key)
             ProposalEvalScore evalScore = scoreRepository.findByEvaId(proposalId + "_" + score.getScoreCriteriaId());
 
             if (evalScore == null) {
-                // ถ้ายังไม่มีคะแนนในฐานข้อมูล ให้ทำการสร้างใหม่
                 evalScore = new ProposalEvalScore()
                         .setEvaId(proposalId + "_" + score.getScoreCriteriaId())
                         .setScore(score.getScore())
                         .setCriteria(criteria)
                         .setProposalEvaluation(evaluation);
 
-                // บันทึกคะแนนใหม่
                 scoreRepository.save(evalScore);
                 System.out.println("[Service] Saved ProposalEvalScore for criteria: " + score.getScoreCriteriaId());
             } else {
-                // ถ้ามีคะแนนอยู่แล้วในฐานข้อมูล ให้ทำการอัปเดต
                 evalScore.setScore(score.getScore());
                 scoreRepository.save(evalScore);
                 System.out.println("[Service] Updated ProposalEvalScore for criteria: " + score.getScoreCriteriaId());
@@ -155,64 +218,129 @@ public class CalculateService {
 
 
     // ---------------- Defense Eva ------------------------ //
+//    @Transactional
+//    public void saveDefenseEvaluation(ProjectInstructorRole instructor, Project project, Student student, List<ScoreDTO> scores) {
+//        System.out.println("[Service] Inside saveDefenseEvaluation");
+//
+//        // ค้นหา ProposalEvaluation ที่มีอยู่แล้วในฐานข้อมูลตาม instructor, project และ student
+//        DefenseEvaluation evaluation = defenseEvaluationRepository.findByDefenseInstructorIdAndProjectIdAndStudent(instructor, project, student);
+//
+//        // ถ้าไม่มี ProposalEvaluation อยู่แล้ว ให้สร้างใหม่
+//        if (evaluation == null) {
+//            evaluation = new DefenseEvaluation()
+//                    .setDefenseInstructorId(instructor)
+//                    .setProjectId (project)
+//                    .setStudent(student);
+//
+//            // บันทึก ProposalEvaluation ใหม่
+//            evaluation = defenseEvaluationRepository.save(evaluation);
+//            if (evaluation.getDefenseEvaId() == null) {
+//                throw new IllegalArgumentException("Defense ID cannot be null");
+//            }
+//            System.out.println("[Service] Saved DefenseEvaluation with ID: " + evaluation.getDefenseEvaId());
+//        } else {
+//            // ถ้ามีอยู่แล้ว ให้ทำการ update หรือเพิ่มการอัปเดตที่ต้องการ
+//            System.out.println("[Service] Found existing DefenseEvaluation with ID: " + evaluation.getDefenseEvaId());
+//        }
+//
+//        String defenseId = evaluation.getDefenseEvaId();
+//
+//        // บันทึกหรืออัปเดตคะแนนลง ProposalEvalScore
+//        for (ScoreDTO score : scores) {
+//            // ดึง Criteria จากฐานข้อมูลตาม scoreCriteriaId
+//            System.out.println("[Service] Score: " + score.getScore());
+//            System.out.println("[Service] Criteria: " + score.getScoreCriteriaId());
+//
+//            Criteria criteria = criteriaRepository.findById(score.getScoreCriteriaId())
+//                    .orElseThrow(() -> new IllegalArgumentException("Criteria not found for id: " + score.getScoreCriteriaId()));
+//
+//            // ค้นหาคะแนนที่มีอยู่แล้วในฐานข้อมูล (ใช้ evaId เป็น key)
+//            DefenseEvalScore evalScore = defenseEvalScoreRepository.findByEvalId(defenseId + "_" + score.getScoreCriteriaId());
+//
+//            if (evalScore == null) {
+//                // ถ้ายังไม่มีคะแนนในฐานข้อมูล ให้ทำการสร้างใหม่
+//                evalScore = new DefenseEvalScore()
+//                        .setEvalId(defenseId + "_" + score.getScoreCriteriaId())
+//                        .setScore(score.getScore().intValue())
+//                        .setCriteria(criteria)
+//                        .setDefenseEvaluation(evaluation);
+//
+//                // บันทึกคะแนนใหม่
+//                defenseEvalScoreRepository.save(evalScore);
+//                System.out.println("[Service] Saved ProposalEvalScore for criteria: " + score.getScoreCriteriaId());
+//            } else {
+//                // ถ้ามีคะแนนอยู่แล้วในฐานข้อมูล ให้ทำการอัปเดต
+//                evalScore.setScore(score.getScore().intValue());
+//                defenseEvalScoreRepository.save(evalScore);
+//                System.out.println("[Service] Updated ProposalEvalScore for criteria: " + score.getScoreCriteriaId());
+//            }
+//        }
+//    }
+
     @Transactional
-    public void saveDefenseEvaluation(ProjectInstructorRole instructor, Project project, Student student, List<ScoreDTO> scores) {
+    public void saveDefenseEvaluation(ProjectInstructorRole instructor, Project project, Student student, List<ScoreDTO> scores, String comment) {
         System.out.println("[Service] Inside saveDefenseEvaluation");
 
-        // ค้นหา ProposalEvaluation ที่มีอยู่แล้วในฐานข้อมูลตาม instructor, project และ student
+        System.out.println("💬 Comment: " + comment);
+        System.out.println("💬 Score: " + scores);
+
         DefenseEvaluation evaluation = defenseEvaluationRepository.findByDefenseInstructorIdAndProjectIdAndStudent(instructor, project, student);
 
-        // ถ้าไม่มี ProposalEvaluation อยู่แล้ว ให้สร้างใหม่
         if (evaluation == null) {
             evaluation = new DefenseEvaluation()
                     .setDefenseInstructorId(instructor)
-                    .setProjectId (project)
+                    .setProjectId(project)
+                    .setComment(comment)
                     .setStudent(student);
 
-            // บันทึก ProposalEvaluation ใหม่
             evaluation = defenseEvaluationRepository.save(evaluation);
             if (evaluation.getDefenseEvaId() == null) {
                 throw new IllegalArgumentException("Defense ID cannot be null");
             }
             System.out.println("[Service] Saved DefenseEvaluation with ID: " + evaluation.getDefenseEvaId());
         } else {
-            // ถ้ามีอยู่แล้ว ให้ทำการ update หรือเพิ่มการอัปเดตที่ต้องการ
             System.out.println("[Service] Found existing DefenseEvaluation with ID: " + evaluation.getDefenseEvaId());
+            evaluation.setComment(comment);
         }
 
+        // ✅ คำนวณคะแนนรวม (เก็บทศนิยมไว้)
+        BigDecimal totalScore = scores.stream()
+                .map(ScoreDTO::getScore) // ดึงค่า BigDecimal
+                .reduce(BigDecimal.ZERO, BigDecimal::add); // ใช้ BigDecimal.sum เพื่อรักษาค่าทศนิยม
+
+        evaluation.setTotalScore(totalScore);
+
+        // ✅ บันทึก DefenseEvaluation
+        evaluation = defenseEvaluationRepository.save(evaluation);
         String defenseId = evaluation.getDefenseEvaId();
 
-        // บันทึกหรืออัปเดตคะแนนลง ProposalEvalScore
+        // ✅ บันทึกหรืออัปเดตคะแนนลง DefenseEvalScore
         for (ScoreDTO score : scores) {
-            // ดึง Criteria จากฐานข้อมูลตาม scoreCriteriaId
             System.out.println("[Service] Score: " + score.getScore());
             System.out.println("[Service] Criteria: " + score.getScoreCriteriaId());
 
             Criteria criteria = criteriaRepository.findById(score.getScoreCriteriaId())
                     .orElseThrow(() -> new IllegalArgumentException("Criteria not found for id: " + score.getScoreCriteriaId()));
 
-            // ค้นหาคะแนนที่มีอยู่แล้วในฐานข้อมูล (ใช้ evaId เป็น key)
             DefenseEvalScore evalScore = defenseEvalScoreRepository.findByEvalId(defenseId + "_" + score.getScoreCriteriaId());
 
             if (evalScore == null) {
-                // ถ้ายังไม่มีคะแนนในฐานข้อมูล ให้ทำการสร้างใหม่
                 evalScore = new DefenseEvalScore()
                         .setEvalId(defenseId + "_" + score.getScoreCriteriaId())
-                        .setScore(score.getScore().intValue())
+                        .setScore(score.getScore().floatValue()) // ✅ ใช้ floatValue() เพื่อรักษาค่าทศนิยม
                         .setCriteria(criteria)
                         .setDefenseEvaluation(evaluation);
 
-                // บันทึกคะแนนใหม่
                 defenseEvalScoreRepository.save(evalScore);
-                System.out.println("[Service] Saved ProposalEvalScore for criteria: " + score.getScoreCriteriaId());
+                System.out.println("[Service] Saved DefenseEvalScore for criteria: " + score.getScoreCriteriaId());
             } else {
-                // ถ้ามีคะแนนอยู่แล้วในฐานข้อมูล ให้ทำการอัปเดต
-                evalScore.setScore(score.getScore().intValue());
+                evalScore.setScore(score.getScore().floatValue()); // ✅ ใช้ floatValue() แทน intValue()
                 defenseEvalScoreRepository.save(evalScore);
-                System.out.println("[Service] Updated ProposalEvalScore for criteria: " + score.getScoreCriteriaId());
+                System.out.println("[Service] Updated DefenseEvalScore for criteria: " + score.getScoreCriteriaId());
             }
         }
     }
+
 
     public StudentScoreDTO calculateTotalScoreDefense(ProjectInstructorRole instructor, Project project, Student student) {
         // 🔍 ค้นหา Evaluation ของนักศึกษา
@@ -266,63 +394,109 @@ public class CalculateService {
 
 
     // ---------------- Poster Eva ------------------------ //
+//    @Transactional
+//    public void savePosterEvaluation(ProjectInstructorRole instructor, Project project, List<ScoreDTO> scores) {
+//        System.out.println("[Service] Inside savePosterEvaluation");
+//
+//        // ค้นหา ProposalEvaluation ที่มีอยู่แล้วในฐานข้อมูลตาม instructor, project และ student
+//        PosterEvaluation evaluation = posterEvaRepository.findByInstructorIdPosterAndProjectIdPoster(instructor, project);
+//
+//        // ถ้าไม่มี ProposalEvaluation อยู่แล้ว ให้สร้างใหม่
+//        if (evaluation == null) {
+//            evaluation = new PosterEvaluation()
+//                    .setInstructorIdPoster(instructor)
+//                    .setProjectIdPoster(project);
+//
+//            // บันทึก PosterEvaluation ใหม่
+//            evaluation = posterEvaRepository.save(evaluation);
+//            if (evaluation.getPosterId() == null) {
+//                throw new IllegalArgumentException("PosterEvaluation ID cannot be null");
+//            }
+//            System.out.println("[Service] Saved PosterEvaluation with ID: " + evaluation.getPosterId());
+//        } else {
+//            // ถ้ามีอยู่แล้ว ให้ทำการ update หรือเพิ่มการอัปเดตที่ต้องการ
+//            System.out.println("[Service] Found existing PosterEvaluation with ID: " + evaluation.getPosterId());
+//        }
+//
+//        String posterId = evaluation.getPosterId();
+//
+//        // บันทึกหรืออัปเดตคะแนนลง ProposalEvalScore
+//        for (ScoreDTO score : scores) {
+//            // ดึง Criteria จากฐานข้อมูลตาม scoreCriteriaId
+//            System.out.println("[Service] Score: " + score.getScore());
+//            System.out.println("[Service] Criteria: " + score.getScoreCriteriaId());
+//
+//            Criteria criteria = criteriaRepository.findById(score.getScoreCriteriaId())
+//                    .orElseThrow(() -> new IllegalArgumentException("Criteria not found for id: " + score.getScoreCriteriaId()));
+//
+//            // ค้นหาคะแนนที่มีอยู่แล้วในฐานข้อมูล (ใช้ evaId เป็น key)
+//            PosterEvaluationScore evalScore = posterEvaScoreRepository.findByPosterEvaId(posterId + "_" + score.getScoreCriteriaId());
+//
+//            if (evalScore == null) {
+//                // ถ้ายังไม่มีคะแนนในฐานข้อมูล ให้ทำการสร้างใหม่
+//                evalScore = new PosterEvaluationScore()
+//                        .setPosterEvaId(posterId + "_" + score.getScoreCriteriaId())
+//                        .setScore(score.getScore().intValue())
+//                        .setCriteriaPoster(criteria)
+//                        .setPosterEvaluation(evaluation);
+//
+//                // บันทึกคะแนนใหม่
+//                posterEvaScoreRepository.save(evalScore);
+//                System.out.println("[Service] Saved PosterEvalScore for criteria: " + score.getScoreCriteriaId());
+//            } else {
+//                // ถ้ามีคะแนนอยู่แล้วในฐานข้อมูล ให้ทำการอัปเดต
+//                evalScore.setScore(score.getScore().intValue());
+//                posterEvaScoreRepository.save(evalScore);
+//                System.out.println("[Service] Updated PosterEvalScore for criteria: " + score.getScoreCriteriaId());
+//            }
+//        }
+//    }
     @Transactional
-    public void savePosterEvaluation(ProjectInstructorRole instructor, Project project, List<ScoreDTO> scores) {
+    public void savePosterEvaluation(ProjectInstructorRole instructor, Project project, List<ScoreDTO> scores, String comment) {
         System.out.println("[Service] Inside savePosterEvaluation");
 
-        // ค้นหา ProposalEvaluation ที่มีอยู่แล้วในฐานข้อมูลตาม instructor, project และ student
         PosterEvaluation evaluation = posterEvaRepository.findByInstructorIdPosterAndProjectIdPoster(instructor, project);
 
-        // ถ้าไม่มี ProposalEvaluation อยู่แล้ว ให้สร้างใหม่
         if (evaluation == null) {
             evaluation = new PosterEvaluation()
                     .setInstructorIdPoster(instructor)
                     .setProjectIdPoster(project);
-
-            // บันทึก PosterEvaluation ใหม่
-            evaluation = posterEvaRepository.save(evaluation);
-            if (evaluation.getPosterId() == null) {
-                throw new IllegalArgumentException("PosterEvaluation ID cannot be null");
-            }
-            System.out.println("[Service] Saved PosterEvaluation with ID: " + evaluation.getPosterId());
-        } else {
-            // ถ้ามีอยู่แล้ว ให้ทำการ update หรือเพิ่มการอัปเดตที่ต้องการ
-            System.out.println("[Service] Found existing PosterEvaluation with ID: " + evaluation.getPosterId());
         }
+
+        // บันทึกคอมเมนต์ลงฐานข้อมูล
+        evaluation.setComment(comment);
+
+        evaluation = posterEvaRepository.save(evaluation);
+        System.out.println("[Service] Saved PosterEvaluation with ID: " + evaluation.getPosterId());
 
         String posterId = evaluation.getPosterId();
 
-        // บันทึกหรืออัปเดตคะแนนลง ProposalEvalScore
         for (ScoreDTO score : scores) {
-            // ดึง Criteria จากฐานข้อมูลตาม scoreCriteriaId
             System.out.println("[Service] Score: " + score.getScore());
             System.out.println("[Service] Criteria: " + score.getScoreCriteriaId());
 
             Criteria criteria = criteriaRepository.findById(score.getScoreCriteriaId())
                     .orElseThrow(() -> new IllegalArgumentException("Criteria not found for id: " + score.getScoreCriteriaId()));
 
-            // ค้นหาคะแนนที่มีอยู่แล้วในฐานข้อมูล (ใช้ evaId เป็น key)
             PosterEvaluationScore evalScore = posterEvaScoreRepository.findByPosterEvaId(posterId + "_" + score.getScoreCriteriaId());
 
             if (evalScore == null) {
-                // ถ้ายังไม่มีคะแนนในฐานข้อมูล ให้ทำการสร้างใหม่
                 evalScore = new PosterEvaluationScore()
                         .setPosterEvaId(posterId + "_" + score.getScoreCriteriaId())
-                        .setScore(score.getScore().intValue())
+                        .setScore(score.getScore().floatValue())
                         .setCriteriaPoster(criteria)
                         .setPosterEvaluation(evaluation);
 
-                // บันทึกคะแนนใหม่
                 posterEvaScoreRepository.save(evalScore);
                 System.out.println("[Service] Saved PosterEvalScore for criteria: " + score.getScoreCriteriaId());
             } else {
-                // ถ้ามีคะแนนอยู่แล้วในฐานข้อมูล ให้ทำการอัปเดต
-                evalScore.setScore(score.getScore().intValue());
+                evalScore.setScore(score.getScore().floatValue());
                 posterEvaScoreRepository.save(evalScore);
                 System.out.println("[Service] Updated PosterEvalScore for criteria: " + score.getScoreCriteriaId());
             }
         }
     }
+
 
     public StudentScoreDTO calculateTotalScorePoster(ProjectInstructorRole instructor, Project project) {
         PosterEvaluation evaluation = posterEvaRepository.findByInstructorIdPosterAndProjectIdPoster(instructor, project);
