@@ -16,7 +16,7 @@ body {
     color: white;
     padding: 20px;
     text-align: left;
-    font-size: 24px;
+    font-size: 250%;
     font-weight: bold;
     height: 100px;
 }
@@ -29,32 +29,111 @@ body {
     padding: 20px;
 }
 
+/*.card-wrapper {*/
+/*    display: grid;*/
+/*    grid-template-columns: repeat(5, 1fr);*/
+/*    gap: 8px;*/
+/*    margin: 16px 0;*/
+/*}*/
+
+/*.container {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    align-items: center;*/
+/*    width: 100%;*/
+/*    margin: auto;*/
+/*}*/
+
+
 .card-wrapper {
+    width: 98%;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin: 16px 0;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* ปรับ layout */
+    gap: 18px; /* ระยะห่างระหว่าง Card */
+    margin: 18px 0; /* ระยะห่างจากขอบ Container */
 }
 
 .header-container {
-    flex: 0 1 calc(33.33% - 16px);
     background-color: #fff;
-    padding: 16px;
+    padding: 20px;
     border-radius: 8px;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     border: 1px solid #cdcdcd;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    /*min-height: 150px;*/
     position: relative;
-    width: 200px;
-    height: 150px;
-    margin-top: -80px;
+    top: -80px;
+}
+
+
+.header-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.icon-work {
+    display: inline-flex;
+    padding: 8px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 6px;
+    background: #E0DCFE;
+    margin-left: auto;
+    width: 32px;
+    height: 32px;
+}
+
+.icon-prop {
+    display: inline-flex;
+    padding: 8px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 6px;
+    background: #E7FAFE;
+    margin-left: auto;
+    /*margin-top: -15px;*/
+    width: 32px;
+    height: 32px;
+}
+
+.icon-post {
+    display: inline-flex;
+    padding: 8px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 6px;
+    background: #FBEBEC;
+    margin-left: auto;
+    width: 32px;
+    height: 32px;
+}
+
+.icon-defense {
+    display: inline-flex;
+    padding: 4px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 6px;
+    background: #EAF6EC;
+    margin-left: auto;
+    width: 32px;
+    height: 32px;
 }
 
 .text-header {
-    font-size: 20px;
+    font-size: 1.5rem;
     color: #212B36;
+}
+
+.text-centerProgram {
+    display: flex;
+    font-size: 1.5rem;
+    align-items: center;
+    margin-top: -2rem;
+    padding-left: 1.2rem;
 }
 
 label {
@@ -94,7 +173,7 @@ label {
 .btn-cancel {
     display: flex;
     background-color: #FFFF;
-    color: 909090;
+    color:  #909090;
     width: 100px;
     height: 50px;
     flex-shrink: 0;
@@ -139,6 +218,8 @@ label {
     border: 1px solid #cdcdcd;
     box-shadow: 0px 6px 25px 0px rgba(0, 0, 0, 0.07), 0px 0.751px 3.13px 0px rgba(0, 0, 0, 0.04);
     padding: 20px;
+    position: relative; /* ให้ Card เลื่อนขึ้นได้โดยไม่ชนกัน */
+    top: -80px; /* เลื่อนขึ้นแทน margin-top */
 }
 
 .reminder-title {
@@ -193,6 +274,8 @@ label {
     border: 1px solid #cdcdcd;
     box-shadow: 0px 6px 25px 0px rgba(0, 0, 0, 0.07), 0px 0.751px 3.13px 0px rgba(0, 0, 0, 0.04);
     padding: 20px;
+    position: relative; /* ให้ Card เลื่อนขึ้นได้โดยไม่ชนกัน */
+    top: -80px; /* เลื่อนขึ้นแทน margin-top */
 }
 
 .schedule-title {
@@ -310,3 +393,6 @@ label {
 .status-btn-in-progress {
     background-color: #a9a9a9;
 }
+
+
+
