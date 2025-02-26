@@ -17,6 +17,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
@@ -27,24 +28,23 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-//                .csrf( csrf ->  csrf
-//                        .ignoringRequestMatchers("/user/details")
-//                )
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/user/details", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade","/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense")
+                )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/css/**", "/js/**", "/instructor/GetProposalEvalScoreModal", "/instructor/GetDefenseEvalScoreModal").permitAll()
+                        .requestMatchers("/login", "/css/**", "/js/**", "/publicProjectDetail", "/instructor/criteriaDefenseGrade", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade", "/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense").permitAll() // อนุญาตให้ทุกคนเข้าถึง
+//                        "/publicProjectDetail", "/instructor/criteriaDefenseGrade", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade", "/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense"
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/instructor/**").hasRole("INSTRUCTOR")
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        // user ที่จะเข้าระบบได้จะต้องผ่าน
                         .loginPage("/login")
-                        .loginProcessingUrl("/login")
+                        .loginProcessingUrl("/login") // url ใน post method
                         .successHandler((request, response, authentication) -> {
-                            // request.getSession().removeAttribute("SPRING_SECURITY_LAST_EXCEPTION");
-                            // https://stackoverflow.com/questions/12612096/how-to-check-if-authority-exists-in-a-collection-of-grantedauthority
+                            //[SimpleGrantedAuthority("ROLE_ADMIN"), SimpleGrantedAuthority("ROLE_INSTRUCTOR")]
                             Set<String> roles = authentication.getAuthorities().stream()
-                                    // ดึงค่า getAuthority() ของ SimpleGrantedAuthority
+                                    // string
                                     .map(GrantedAuthority::getAuthority)
                                     .collect(Collectors.toSet());
                             if(roles.contains("ROLE_ADMIN")){
@@ -60,9 +60,7 @@ public class SecurityConfig {
                 )
                 .logout(logout -> logout
                         .logoutSuccessUrl("/login?logout")
-                        // delete current session
-                        .invalidateHttpSession(true)
-                        // when user login -> https://docs.spring.io/spring-security/reference/servlet/authentication/session-management.html
+                        .invalidateHttpSession(true) // delete
                         .deleteCookies("JSESSIONID")
                         .permitAll()
                 );

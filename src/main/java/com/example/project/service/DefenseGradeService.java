@@ -1,5 +1,6 @@
 package com.example.project.service;
 
+import com.example.project.DTO.DefenseEvaResponseDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,8 @@ public class DefenseGradeService {
     private DefenseEvaluationRepository defenseEvaluationRepository;
     @Autowired
     private ProjectInstructorRoleRepository projectInstructorRoleRepository;
+    @Autowired
+    private DefenseEvalScoreRepository defenseEvalScoreRepository;
 
     public DefenseGradeService(CriteriaRepository criteriaRepository, StudentProjectRepository studentProjectRepository, ProjectRepository projectRepository) {
         this.criteriaRepository = criteriaRepository;
@@ -69,5 +72,10 @@ public class DefenseGradeService {
                                 score.getDefenseEvaluation()
                                         .getDefenseInstructorId().getRole().equals(role)
                 ).collect(Collectors.toList());
+    }
+
+    // get student score
+    public List<DefenseEvaResponseDTO> getDefenseEvalScoresByProjectId(String projectId) {
+        return defenseEvalScoreRepository.findByDefenseEvaluation_ProjectId_ProjectId(projectId);
     }
 }

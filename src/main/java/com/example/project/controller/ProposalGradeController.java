@@ -3,17 +3,15 @@ package com.example.project.controller;
 import com.example.project.DTO.InstructorProjectListDTO;
 import com.example.project.DTO.ProposalEvaResponseDTO;
 import com.example.project.DTO.ProposalEvaResquestDTO;
-import com.example.project.DTO.ShowProposalCriteriaDTO;
+import com.example.project.DTO.Criteria.ShowProposalCriteriaDTO;
 import com.example.project.entity.Criteria;
 import com.example.project.entity.ProjectInstructorRole;
-import com.example.project.entity.ProposalEvalScore;
 import com.example.project.repository.ProposalEvalScoreRepository;
 import com.example.project.service.ProposalGradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
@@ -102,6 +100,29 @@ public class ProposalGradeController {
                                                 evaScore.getScore().doubleValue()
                                         )).collect(Collectors.toList());
     }
+
+    // request and response modal
+//    @GetMapping("/instructor/showScorePropGrade")
+//    @ResponseBody
+//    public List<ProposalEvaResponseDTO> getPropGradeScore(@RequestParam String projectId) {
+//
+//        List<ProposalEvalScore> proposalGradeScoreList = proposalGradeService.getProposalEvalScoresByProjectId(projectId);
+//
+//        return proposalGradeService.getFilterProposalEvaScore(projectId)
+//
+//
+//                .map(evaScore -> new ProposalEvaResponseDTO(
+//                        evaScore.getEvaId(),
+//                        evaScore.getProposalEvaluation().getStudent().getStudentId(),
+//                        evaScore.getProposalEvaluation().getStudent().getStudentName(),
+//                        evaScore.getCriteria().getCriteriaId(),
+//                        evaScore.getCriteria().getCriteriaName(),
+//                        evaScore.getCriteria().getType(),
+//                        evaScore.getScore().doubleValue()
+//                ))
+//                .collect(Collectors.toList());
+//    }
+
 
 
 

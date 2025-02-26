@@ -1,4 +1,4 @@
-package com.example.project.DTO;
+package com.example.project.DTO.Criteria;
 
 public class ShowProposalCriteriaDTO {
     private String criteriaId;

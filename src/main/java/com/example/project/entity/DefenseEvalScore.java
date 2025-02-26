@@ -35,31 +35,35 @@ public class DefenseEvalScore {
         return evalId;
     }
 
-    public void setEvalId(String evalId) {
+    public DefenseEvalScore setEvalId(String evalId) {
         this.evalId = evalId;
+        return this;
     }
 
     public BigDecimal getScore() {
         return score;
     }
 
-    public void setScore(BigDecimal score) {
-        this.score = score;
+    public DefenseEvalScore setScore(float score) {
+        this.score = BigDecimal.valueOf(score);
+        return this;
     }
 
     public Criteria getCriteria() {
         return criteria;
     }
 
-    public void setCriteria(Criteria criteria) {
+    public DefenseEvalScore setCriteria(Criteria criteria) {
         this.criteria = criteria;
+        return this;
     }
 
     public DefenseEvaluation getDefenseEvaluation() {
         return defenseEvaluation;
     }
 
-    public void setDefenseEvaluation(DefenseEvaluation defenseEvaluation) {
+    public DefenseEvalScore setDefenseEvaluation(DefenseEvaluation defenseEvaluation) {
         this.defenseEvaluation = defenseEvaluation;
+        return this;
     }
 }

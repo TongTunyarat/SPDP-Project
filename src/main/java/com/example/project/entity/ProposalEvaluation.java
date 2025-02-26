@@ -3,15 +3,24 @@ package com.example.project.entity;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
+@Data
+@Accessors(chain = true)
 @Entity
 @Table(name="proposalevaluation")
 public class ProposalEvaluation {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name="proposal_id")
     private String proposalId;
 
@@ -24,6 +33,9 @@ public class ProposalEvaluation {
     @Column(name="edited_on")
     private LocalDateTime editedOn;
 
+    @Column(name="total_score")
+    private BigDecimal totalScore;
+
     @ManyToOne
     @JoinColumn(name = "recorded_by")
     @JsonManagedReference
@@ -34,30 +46,15 @@ public class ProposalEvaluation {
     @JsonManagedReference
     private Account accountEdit;
 
-//    @Column(name="recorded_by")
-//    private String recordedBy;
-//
-//    @Column(name="edited_by")
-//    private String editedBy;
-
     @ManyToOne
     @JoinColumn(name = "instructor_id")
     @JsonManagedReference
     private ProjectInstructorRole projectInstructorRole;
 
-//    @Column(name="instructor_id")
-//    private String instructorId;
-
     @ManyToOne
     @JoinColumn(name = "project_id")
     @JsonManagedReference
     private Project project;
-
-//    @Column(name="project_id")
-//    private String projectId;
-
-//    @Column(name="student_id")
-//    private String studentId;
 
     @ManyToOne
     @JoinColumn(name="student_id")
@@ -65,92 +62,106 @@ public class ProposalEvaluation {
     private Student student;
 
     @OneToMany(mappedBy = "proposalEvaluation", cascade = CascadeType.ALL)
-    @JsonBackReference
+    @JsonManagedReference
     private List<ProposalEvalScore> proposalEvalScores;
 
-    public ProposalEvaluation() {
-
-    }
 
     public String getProposalId() {
         return proposalId;
     }
 
-    public void setProposalId(String proposalId) {
+    public ProposalEvaluation setProposalId(String proposalId) {
         this.proposalId = proposalId;
+        return this;
     }
 
     public String getComment() {
         return comment;
     }
 
-    public void setComment(String comment) {
+    public ProposalEvaluation setComment(String comment) {
         this.comment = comment;
+        return this;
     }
 
     public LocalDateTime getRecordedOn() {
         return recordedOn;
     }
 
-    public void setRecordedOn(LocalDateTime recordedOn) {
+    public ProposalEvaluation setRecordedOn(LocalDateTime recordedOn) {
         this.recordedOn = recordedOn;
+        return this;
     }
 
     public LocalDateTime getEditedOn() {
         return editedOn;
     }
 
-    public void setEditedOn(LocalDateTime editedOn) {
+    public ProposalEvaluation setEditedOn(LocalDateTime editedOn) {
         this.editedOn = editedOn;
+        return this;
     }
 
     public Account getAccount() {
         return account;
     }
 
-    public void setAccount(Account account) {
+    public ProposalEvaluation setAccount(Account account) {
         this.account = account;
+        return this;
     }
 
     public Account getAccountEdit() {
         return accountEdit;
     }
 
-    public void setAccountEdit(Account accountEdit) {
+    public ProposalEvaluation setAccountEdit(Account accountEdit) {
         this.accountEdit = accountEdit;
+        return this;
     }
 
     public ProjectInstructorRole getProjectInstructorRole() {
         return projectInstructorRole;
     }
 
-    public void setProjectInstructorRole(ProjectInstructorRole projectInstructorRole) {
+    public ProposalEvaluation setProjectInstructorRole(ProjectInstructorRole projectInstructorRole) {
         this.projectInstructorRole = projectInstructorRole;
+        return this;
     }
 
     public Project getProject() {
         return project;
     }
 
-    public void setProject(Project project) {
+    public ProposalEvaluation setProject(Project project) {
         this.project = project;
+        return this;
     }
 
     public Student getStudent() {
         return student;
     }
 
-    public void setStudent(Student student) {
+    public ProposalEvaluation setStudent(Student student) {
         this.student = student;
+        return this;
     }
 
     public List<ProposalEvalScore> getProposalEvalScores() {
         return proposalEvalScores;
     }
 
-    public void setProposalEvalScores(List<ProposalEvalScore> proposalEvalScores) {
+    public ProposalEvaluation setProposalEvalScores(List<ProposalEvalScore> proposalEvalScores) {
         this.proposalEvalScores = proposalEvalScores;
+        return this;
     }
 
+    public BigDecimal getTotalScore() {
+        return totalScore;
+    }
 
+    public ProposalEvaluation setTotalScore(BigDecimal totalScore) {
+        this.totalScore = totalScore;
+        return this;
+    }
 }

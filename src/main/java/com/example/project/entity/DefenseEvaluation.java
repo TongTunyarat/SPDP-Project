@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import java.util.List;
 public class DefenseEvaluation {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     @Column(name = "defense_eva_id")
     private String defenseEvaId;
 
@@ -25,6 +27,9 @@ public class DefenseEvaluation {
 
     @Column(name = "edited_on")
     private LocalDateTime editedOn;
+
+    @Column(name="total_score")
+    private BigDecimal totalScore;
 
     @OneToMany(mappedBy = "defenseEvaluation", cascade = CascadeType.ALL)
     @JsonManagedReference
@@ -59,89 +64,117 @@ public class DefenseEvaluation {
     @JsonManagedReference
     private Student student;
 
-//
 //    @ManyToOne
-//    @JoinColumn(name = "student_id", referencedColumnName = "student_id")
-//    private Student studentId;
-
+//    @JoinColumn(name="student_id")
+//    @JsonManagedReference
+//    private Student studentDefense;
 
     public String getDefenseEvaId() {
         return defenseEvaId;
     }
 
-    public void setDefenseEvaId(String defenseEvaId) {
+    public DefenseEvaluation setDefenseEvaId(String defenseEvaId) {
+
         this.defenseEvaId = defenseEvaId;
+        return this;
     }
 
     public LocalDateTime getRecordedOn() {
         return recordedOn;
     }
 
-    public void setRecordedOn(LocalDateTime recordedOn) {
+    public DefenseEvaluation setRecordedOn(LocalDateTime recordedOn) {
         this.recordedOn = recordedOn;
+        return this;
     }
 
     public String getComment() {
         return comment;
     }
 
-    public void setComment(String comment) {
+    public DefenseEvaluation setComment(String comment) {
         this.comment = comment;
+        return this;
     }
 
     public LocalDateTime getEditedOn() {
         return editedOn;
     }
 
-    public void setEditedOn(LocalDateTime editedOn) {
+    public DefenseEvaluation setEditedOn(LocalDateTime editedOn) {
         this.editedOn = editedOn;
+        return this;
     }
 
     public Account getRecordedBy() {
         return recordedBy;
     }
 
-    public void setRecordedBy(Account recordedBy) {
+    public DefenseEvaluation setRecordedBy(Account recordedBy) {
         this.recordedBy = recordedBy;
+        return this;
     }
 
     public Account getEditedBy() {
         return editedBy;
     }
 
-    public void setEditedBy(Account editedBy) {
+    public DefenseEvaluation setEditedBy(Account editedBy) {
         this.editedBy = editedBy;
+        return this;
     }
 
     public List<DefenseEvalScore> getDefenseEvalScore() {
         return defenseEvalScore;
     }
 
-    public void setDefenseEvalScore(List<DefenseEvalScore> defenseEvalScore) {
+    public DefenseEvaluation setDefenseEvalScore(List<DefenseEvalScore> defenseEvalScore) {
         this.defenseEvalScore = defenseEvalScore;
+        return this;
     }
 
     public Project getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(Project projectId) {
+    public DefenseEvaluation setProjectId(Project projectId) {
         this.projectId = projectId;
+        return this;
     }
 
     public ProjectInstructorRole getDefenseInstructorId() {
         return defenseInstructorId;
     }
 
-    public void setDefenseInstructorId(ProjectInstructorRole defenseInstructorId) {
+    public DefenseEvaluation setDefenseInstructorId(ProjectInstructorRole defenseInstructorId) {
         this.defenseInstructorId = defenseInstructorId;
+        return this;
+    }
+
+//    public Student getStudentDefense() {
+//        return studentDefense;
+//    }
+//
+//    public DefenseEvaluation setStudentDefense(Student studentDefense) {
+//        this.studentDefense = studentDefense;
+//        return this;
+//    }
+
+    public BigDecimal getTotalScore() {
+        return totalScore;
+    }
+
+    public DefenseEvaluation setTotalScore(BigDecimal totalScore) {
+        this.totalScore = totalScore;
+        return this;
     }
 
     public Student getStudent() {
         return student;
     }
 
-    public void setStudent(Student student) {
+    public DefenseEvaluation setStudent(Student student) {
         this.student = student;
+        return this;
     }
 }

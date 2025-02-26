@@ -64,4 +64,18 @@ body {
     color: #ffffff;
 }
 
+/* เปลี่ยนหน้าไม่ได้ */
+.disabled-link {
+    opacity: 0.6;
+    pointer-events: none;
+    cursor: not-allowed;
+    position: relative;
+}
+
+.tooltip {
+    font-size: 12px;
+    color: #999;
+    margin-left: 8px;
+}
+
 

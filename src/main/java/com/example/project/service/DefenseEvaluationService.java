@@ -1,11 +1,8 @@
 package com.example.project.service;
 
-import com.example.project.entity.Criteria;
-import com.example.project.entity.Project;
-import com.example.project.entity.StudentProject;
-import com.example.project.repository.CriteriaRepository;
-import com.example.project.repository.ProjectRepository;
-import com.example.project.repository.StudentProjectRepository;
+import com.example.project.DTO.DefenseEvaResponseDTO;
+import com.example.project.entity.*;
+import com.example.project.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,10 +19,16 @@ public class DefenseEvaluationService {
     @Autowired
     private ProjectRepository projectRepository;
 
-    public DefenseEvaluationService(CriteriaRepository criteriaRepository, StudentProjectRepository studentProjectRepository, ProjectRepository projectRepository) {
+    @Autowired
+    private DefenseEvaluationRepository defenseEvaluationRepository;
+    @Autowired
+    private DefenseEvalScoreRepository defenseEvalScoreRepository;
+
+    public DefenseEvaluationService(CriteriaRepository criteriaRepository, StudentProjectRepository studentProjectRepository, ProjectRepository projectRepository, DefenseEvaluationRepository defenseEvaluationRepository) {
         this.criteriaRepository = criteriaRepository;
         this.studentProjectRepository = studentProjectRepository;
         this.projectRepository = projectRepository;
+        this.defenseEvaluationRepository = defenseEvaluationRepository;
     }
 
     //=========================================== USE ===================================================
@@ -45,4 +48,12 @@ public class DefenseEvaluationService {
         List<StudentProject> studentProjectList = project.getStudentProjects();
         return studentProjectList;
     }
+
+    // get student score
+//    public List<DefenseEvalScore> getDefenseEvaScoresByProjectId(String projectId) {
+//        // สมมุติว่า ProposalEvalScore มีการเชื่อมโยงกับ ProposalEvaluation และ Project
+//        return defenseEvalScoreRepository.findByDefenseEvaluation_ProjectId_ProjectId(projectId);
+//    }
+
+
 }

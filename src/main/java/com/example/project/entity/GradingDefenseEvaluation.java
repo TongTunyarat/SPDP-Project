@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 @Entity
 @Table(name = "gradingdefenseevaluation")
@@ -14,7 +16,7 @@ public class GradingDefenseEvaluation {
     private String defenseGradeEvalId;
 
     @Column(name = "datetime")
-    private String datetime;
+    private LocalDateTime datetime;
 
     @Column(name = "avg_poster_score")
     private double avgPosterScore;
@@ -40,9 +42,10 @@ public class GradingDefenseEvaluation {
     @JsonManagedReference
     private Project projectId;
 
-/// /    @ManyToOne
-/// /    @JoinColumn(name = "student_id", referencedColumnName = "student_id")
-/// /    private Student studentId;
+    @OneToOne
+    @JoinColumn(name = "student_id")
+    @JsonManagedReference
+    private Student studentId;
 
     public String getDefenseGradeEvalId() {
         return defenseGradeEvalId;
@@ -52,11 +55,11 @@ public class GradingDefenseEvaluation {
         this.defenseGradeEvalId = defenseGradeEvalId;
     }
 
-    public String getDatetime() {
+    public LocalDateTime getDatetime() {
         return datetime;
     }
 
-    public void setDatetime(String datetime) {
+    public void setDatetime(LocalDateTime datetime) {
         this.datetime = datetime;
     }
 
@@ -114,5 +117,13 @@ public class GradingDefenseEvaluation {
 
     public void setProjectId(Project projectId) {
         this.projectId = projectId;
+    }
+
+    public Student getStudentId() {
+        return studentId;
+    }
+
+    public void setStudentId(Student studentId) {
+        this.studentId = studentId;
     }
 }

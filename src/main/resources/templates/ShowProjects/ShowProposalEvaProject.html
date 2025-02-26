@@ -130,7 +130,8 @@
                 return response.json();
             })
             .then(data => {
-                console.log("Data: " + data);
+                console.log("🐍 Data Length: " + data.length);
+                console.log("Show Data: " + JSON.stringify(data, null, 2));
                 // แสดงผลข้อมูลที่ได้รับ
                 displayResults(data);
             })
@@ -333,6 +334,11 @@
 
                 const row = document.createElement('tr');
 
+                // status
+                const evaluationStatus = project.allEvaluationsComplete
+                ? `<td class="evaluation completed" title="Complete Evaluation"><i class="fa-solid fa-check"></i></td>`
+                : `<td class="evaluation uncompleted" title="Incomplete Evaluation"><i class="fa-solid fa-spinner"></i></td>`;
+
                 row.innerHTML = `
                  <td><span class="tag ${project.projectProgram.toLowerCase()}">${project.projectProgram}</span> ${project.projectId}</td>
                 <td>${project.projectTitle}</td>
@@ -347,7 +353,8 @@
                         ${project.students.map(name => `<li>${name.studentName}</li>`).join('')}
                     </ul>
                 </td>
-                <td class="evaluation completed"><span class="material-icons">done</span></td>
+<!--                <td class="evaluation completed"><i class="fa-solid fa-check"></i></td>-->
+                ${evaluationStatus}
                 <td>
                     <form action="/instructor/editProposalEvaluation" method="get">
                         <input type="hidden" name="projectId" value="${project.projectId}">

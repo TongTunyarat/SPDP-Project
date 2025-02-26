@@ -1,26 +1,27 @@
 package com.example.project.controller;
 
 
-import com.example.project.DTO.ShowProposalCriteriaDTO;
-import com.example.project.DTO.StudentCriteriaDTO;
-import com.example.project.entity.Criteria;
-import com.example.project.entity.ProjectInstructorRole;
-import com.example.project.entity.StudentProject;
+import com.example.project.DTO.*;
+import com.example.project.DTO.Criteria.ShowProposalCriteriaDTO;
+import com.example.project.DTO.Criteria.StudentCriteriaDTO;
+import com.example.project.DTO.StudentProjectDTO;
+import com.example.project.entity.*;
 import com.example.project.repository.ProjectInstructorRoleRepository;
+import com.example.project.service.ProjectService;
 import com.example.project.service.ProposalEvaluationService;
+import com.example.project.service.ProposalGradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Controller
+@RequestMapping("/instructor")
 public class ProposalEvaluationController {
+
 
     //=========================================== USE ===================================================
 
@@ -37,15 +38,16 @@ public class ProposalEvaluationController {
     private ProposalEvaluationService proposalEvaluationService;
 
     @Autowired
+    private ProposalGradeService proposalGradeService;
+
+    @Autowired
     private ProjectInstructorRoleRepository projectInstructorRoleRepository;
 
-    public ProposalEvaluationController(ProposalEvaluationService proposalEvaluationService, ProjectInstructorRoleRepository projectInstructorRoleRepository) {
-        this.proposalEvaluationService = proposalEvaluationService;
-        this.projectInstructorRoleRepository = projectInstructorRoleRepository;
-    }
+    @Autowired
+    private ProjectService projectService;
 
     // get criteria DTO
-    @GetMapping("/instructor/criteriaProposal")
+    @GetMapping("/criteriaProposal")
     @ResponseBody
     public List<ShowProposalCriteriaDTO> getCriteriaDTO() {
 
@@ -63,13 +65,13 @@ public class ProposalEvaluationController {
     }
 
     // get student criteria
-    @GetMapping("/instructor/studentProposalCriteria")
+    @GetMapping("/studentProposalCriteria")
     @ResponseBody
     public List<StudentCriteriaDTO> getStudentCriteria(@RequestParam String projectId) {
 
         List<StudentProject> studentProject = proposalEvaluationService.getStudentCriteria(projectId);
 
-        System.out.println("ID from send editProposalEvaluation: "+ projectId);
+        System.out.println("ID from send editProposalEvaluation: " + projectId);
         return studentProject.stream()
                 .filter(student -> "Active".equals(student.getStatus()))
                 .map(student ->
@@ -88,6 +90,67 @@ public class ProposalEvaluationController {
                         )).collect(Collectors.toList());
     }
 
+    //======================================= GET ProposalEvalScore ========================================
+
+    public ProposalEvaluationController(ProposalEvaluationService proposalEvaluationService, ProposalGradeService proposalGradeService, ProjectInstructorRoleRepository projectInstructorRoleRepository, ProjectService projectService) {
+        this.proposalEvaluationService = proposalEvaluationService;
+        this.proposalGradeService = proposalGradeService;
+        this.projectInstructorRoleRepository = projectInstructorRoleRepository;
+        this.projectService = projectService;
+    }
+
+
+    //     get score DTO
+    @GetMapping("/showScoreProposal")
+    @ResponseBody
+    public List<ProposalEvalScoreDTO> getScoreProposal(@RequestParam String projectId) {
+        // ดึงข้อมูล ProposalEvalScore ตาม projectId
+        List<ProposalEvalScore> proposalEvalScoreList = proposalEvaluationService.getProposalEvalScoresByProjectId(projectId);
+
+        return proposalEvalScoreList.stream()
+                .map(score -> new ProposalEvalScoreDTO(
+                        score.getEvaId(),
+                        score.getProposalEvaluation().getStudent().getStudentId(),
+                        score.getProposalEvaluation().getStudent().getStudentName(),
+                        score.getProposalEvaluation().getProject().getProjectId(),
+                        score.getCriteria().getCriteriaId(),
+                        score.getCriteria().getCriteriaName(),
+                        score.getScore() != null ? score.getScore().doubleValue() : 0.0
+
+                )).collect(Collectors.toList());
+    }
+
+    @GetMapping("/showStudentDetails")
+    @ResponseBody
+    public List<StudentProjectDTO> getStudentDetails(@RequestParam String projectId) {
+        List<StudentProject> studentProjectList = projectService.getStudentDetails(projectId);
+                return studentProjectList.stream()
+                .map(studentProject -> new StudentProjectDTO(
+                        studentProject.getStudent().getStudentId(),
+                        studentProject.getStudent().getStudentName(),
+                        studentProject.getStatus()))
+                .toList();
+    }
+
+
+//
+//    @GetMapping("/GetProposalEvalScore")
+//    @ResponseBody
+//    public List<ProposalEvaResponseDTO> getProposalEvaScore(@RequestParam String projectId,
+//                                                            @RequestParam(required = false) String instructorName,
+//                                                            @RequestParam(required = false) String role) {
+//        return proposalGradeService.getFilterProposalEvaScore(projectId, instructorName, role).stream()
+//                .map(evaScore -> new ProposalEvaResponseDTO(
+//                        evaScore.getEvaId(),
+//                        evaScore.getProposalEvaluation().getStudent().getStudentId(),
+//                        evaScore.getProposalEvaluation().getStudent().getStudentName(),
+//                        evaScore.getCriteria().getCriteriaId(),
+//                        evaScore.getCriteria().getCriteriaName(),
+//                        evaScore.getCriteria().getType(),
+//                        evaScore.getScore().doubleValue()
+//                )).collect(Collectors.toList());
+//    }
+}
 
 
     //=========================================== NOT USE ===================================================
@@ -139,4 +202,3 @@ public class ProposalEvaluationController {
 //    public List<Criteria> getProposalCriteria(){
 //        return proposalEvaluationService.getProposalCriteria();
 //    }
-}

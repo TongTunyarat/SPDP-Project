@@ -30,29 +30,38 @@ public class GradingProposalEvaluation {
     @Column(name="grade_result")
     private String gradeResult;
 
-//    @Column(name="project_id")
-//    private String projectId;
-
    // map for project
     @ManyToOne
-       @JoinColumn(name="project_id")
-       @JsonManagedReference
-       private Project project;
+    @JoinColumn(name="project_id")
+    @JsonManagedReference
+    private Project project;
 
- // map for student
+    // map for student
     @OneToOne
     @JoinColumn(name = "student_id")
     @JsonManagedReference
     private Student student;
 
-//    @Column(name="student_id")
-//    private String studentId;
 
     public GradingProposalEvaluation() {
 
     }
 
-    public String getProposalGradeId() {
+ @Override
+ public String toString() {
+  return "GradingProposalEvaluation{" +
+          "proposalGradeId='" + proposalGradeId + '\'' +
+          ", dateTime=" + dateTime +
+          ", avgScoreProposal=" + avgScoreProposal +
+          ", evaluateScore=" + evaluateScore +
+          ", totalScore=" + totalScore +
+          ", gradeResult='" + gradeResult + '\'' +
+          ", project=" + project +
+          ", student=" + student +
+          '}';
+ }
+
+ public String getProposalGradeId() {
      return proposalGradeId;
     }
 
@@ -108,11 +117,11 @@ public class GradingProposalEvaluation {
      this.project = project;
     }
 
- public Student getStudent() {
+    public Student getStudent() {
   return student;
  }
 
- public void setStudent(Student student) {
+    public void setStudent(Student student) {
   this.student = student;
  }
 }

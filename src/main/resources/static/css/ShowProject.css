@@ -81,6 +81,17 @@ tbody td {
     border-bottom: 1px solid #ddd;
 }
 
+tbody ul {
+    width: 100%;
+}
+
+tbody ul li {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+}
+
 .tag {
     display: inline-block;
     padding: 4px 8px;
@@ -115,12 +126,21 @@ tbody td {
     color: white;
 }
 
+.role.poster-committee {
+    background-color: #9b59b6;
+    color: white;
+}
+
 .evaluation {
-    font-size: 18px;
+    font-size: 25px;
 }
 
 .evaluation.completed {
     color: green;
+}
+
+.evaluation.uncompleted {
+    color: #ec9c40;
 }
 
 .evaluation.pending {
@@ -132,6 +152,11 @@ tbody td {
     cursor: pointer;
 }
 
+td:nth-child(1) {
+    max-width: 100px;
+    word-wrap: break-word; /* ป้องกันการล้นของข้อความ */
+    white-space: normal; /* อนุญาตให้แบ่งบรรทัดได้ */
+}
 
 td:nth-child(2) {
     max-width: 150px;
@@ -148,6 +173,12 @@ td:nth-child(4) , td:nth-child(5)  {
 td:nth-child(4) ul, td:nth-child(5) ul {
     list-style-type: none;
     padding: 0;
+}
+
+td:nth-child(5) {
+    max-width: 200px;
+    word-wrap: break-word; /* ป้องกันการล้นของข้อความ */
+    white-space: normal; /* อนุญาตให้แบ่งบรรทัดได้ */
 }
 
 .student-id, .student-name {

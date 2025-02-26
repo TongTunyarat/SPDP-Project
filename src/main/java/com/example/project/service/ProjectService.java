@@ -3,7 +3,10 @@ package com.example.project.service;
 
 import com.example.project.entity.*;
 import com.example.project.repository.AccountRepository;
+import com.example.project.repository.ProjectInstructorRoleRepository;
 import com.example.project.repository.ProjectRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.SpringVersion;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -14,17 +17,22 @@ import java.util.List;
 @Service
 public class ProjectService {
 
-    private final AccountRepository accountRepository;
-    private final ProjectRepository projectRepository;
+    @Autowired
+    private AccountRepository accountRepository;
+    @Autowired
+    private ProjectRepository projectRepository;
+    @Autowired
+    private ProjectInstructorRoleRepository projectInstructorRoleRepository;
 
-    public ProjectService(AccountRepository accountRepository, ProjectRepository projectRepository) {
+    public ProjectService(AccountRepository accountRepository, ProjectRepository projectRepository, ProjectInstructorRoleRepository projectInstructorRoleRepository) {
         this.accountRepository = accountRepository;
         this.projectRepository = projectRepository;
+        this.projectInstructorRoleRepository = projectInstructorRoleRepository;
     }
 
     //=========================================== USE ===================================================
 
-    // find project by instructor user
+    // find project by instructor user - show project page
     public List<ProjectInstructorRole> getInstructorProject() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
@@ -44,20 +52,19 @@ public class ProjectService {
         throw new UsernameNotFoundException("User is not authenticated");
     }
 
-//     get project details
+
+    //    get project details after click edit
     public Project getProjectDetails(String projectId) {
+
         return projectRepository.findByProjectId(projectId);
+
     }
 
+    public List<StudentProject> getStudentDetails(String projectId) {
+        Project project = projectRepository.findById(projectId).orElseThrow(() -> new RuntimeException("Project not found"));
+        return project.getStudentProjects();
+    }
 
-//
-//    public Project getProjectDetails(String projectId) {
-//        Object[] result = projectRepository.findProfessorNameByProjectId(projectId);
-//        Project project = (Project) result[0];
-//        String professorName = (String) result[1];
-//        project.setProfessorName(professorName);  // ตั้งค่า professorName ให้กับ Project
-//        return project;
-//    }
 
 
 

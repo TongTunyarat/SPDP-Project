@@ -92,6 +92,7 @@
                         <option value="all" selected>ALL</option>
                         <option value="advisor">Advisor</option>
                         <option value="committee">Committee</option>
+                        <option value="poster_committee">Poster Committee</option>
                     </select>
                 </label>
                 <input id="search-keyword" type="text" placeholder="Search"/>
@@ -127,7 +128,7 @@
 
     function fetchData() {
         // JSON information fetch project list
-        let url = 'http://localhost:8080/committee/projectList';
+        let url = 'http://localhost:8080/instructor/projectPosterList';
 
         // ทำการส่งคำขอไปยัง API หรือ Backend
         fetch(url)
@@ -238,6 +239,11 @@
 
                 const row = document.createElement('tr');
 
+                // status
+                const evaluationStatus = project.allEvaluationsComplete
+                    ? `<td class="evaluation completed" title="Complete Evaluation"><i class="fa-solid fa-check"></i></td>`
+                    : `<td class="evaluation uncompleted" title="Incomplete Evaluation"><i class="fa-solid fa-spinner"></i></td>`;
+
                 row.innerHTML = `
                  <td><span class="tag ${project.projectProgram.toLowerCase()}">${project.projectProgram}</span> ${project.projectId}</td>
                 <td>${project.projectTitle}</td>
@@ -252,7 +258,7 @@
                         ${project.students.map(name => `<li>${name.studentName}</li>`).join('')}
                     </ul>
                 </td>
-                <td class="evaluation completed"><span class="material-icons">done</span></td>
+                ${evaluationStatus}
                 <td>
                     <form action="/instructor/editPosterEvaluation" method="get">
                         <input type="hidden" name="projectId" value="${project.projectId}">

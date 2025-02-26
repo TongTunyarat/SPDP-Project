@@ -1,13 +1,14 @@
 package com.example.project.controller;
 
-import com.example.project.DTO.ShowProposalCriteriaDTO;
-import com.example.project.DTO.StudentCriteriaDTO;
-import com.example.project.entity.Criteria;
-import com.example.project.entity.StudentProject;
+import com.example.project.DTO.Criteria.ShowProposalCriteriaDTO;
+import com.example.project.DTO.Criteria.StudentCriteriaDTO;
+import com.example.project.DTO.DefenseEvaResponseDTO;
+import com.example.project.DTO.DefenseEvaScoreDTO;
+import com.example.project.DTO.ProposalEvalScoreDTO;
+import com.example.project.entity.*;
 import com.example.project.service.DefenseEvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 @Controller
 public class DefenseEvaluationController {
+
 
     //=========================================== USE ===================================================
 
@@ -34,11 +36,14 @@ public class DefenseEvaluationController {
 //        model.addAttribute("projectId", projectId);
 //        return "/GiveScore/GiveDefEvaScore";
 //    }
+    @Autowired
+    private DefenseEvaluationService defenseEvalService;
 
     @Autowired
     private DefenseEvaluationService defenseEvaluationService;
 
-    public DefenseEvaluationController(DefenseEvaluationService defenseEvaluationService) {
+    public DefenseEvaluationController(DefenseEvaluationService defenseEvalService, DefenseEvaluationService defenseEvaluationService) {
+        this.defenseEvalService = defenseEvalService;
         this.defenseEvaluationService = defenseEvaluationService;
     }
 
@@ -84,4 +89,23 @@ public class DefenseEvaluationController {
                                 student.getStatus()
                         )).collect(Collectors.toList());
     }
+
+//    @GetMapping("/instructor/showScoreDefense")
+//    @ResponseBody
+//    public List<DefenseEvaScoreDTO> getScoreDefense(@RequestParam String projectId) {
+//        // ดึงข้อมูล ProposalEvalScore ตาม projectId
+//        List<DefenseEvalScore> defenseEvalScoreList = defenseEvalService.getDefenseEvaScoresByProjectId(projectId);
+//
+//        return defenseEvalScoreList.stream()
+//                .map(score -> new DefenseEvaScoreDTO(
+//                        score.getEvalId(),
+//                        score.getDefenseEvaluation().getStudent().getStudentId(),
+//                        score.getDefenseEvaluation().getStudent().getStudentName(),
+//                        score.getDefenseEvaluation().getProjectId().getProjectId(),
+//                        score.getCriteria().getCriteriaId(),
+//                        score.getCriteria().getCriteriaName(),
+//                        score.getScore() != null ? score.getScore().doubleValue() : 0.0
+//
+//                )).collect(Collectors.toList());
+//    }
 }

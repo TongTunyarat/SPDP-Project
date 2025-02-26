@@ -79,29 +79,10 @@
 
                 <h1>Project Details</h1>
 
-                <!--                <div id="details">-->
-
-                <!--                </div>-->
-                <!--                <div class="details">-->
-                <!--                    <div><strong> Project ID: </strong>-->
-                <!--                        <span> </span>-->
-                <!--                    </div>-->
-                <!--                    <div><strong> Project Name: </strong>-->
-                <!--                        <span></span>-->
-                <!--                    </div>-->
-                <!--                    <div><strong> Project Advisor: </strong>-->
-                <!--                        <span></span>-->
-                <!--                    </div>-->
-                <!--                    <div><strong> Project Title: </strong>-->
-                <!--                        <span></span>-->
-                <!--                    </div>-->
-                <!--                    <div><strong> Date: </strong>-->
-                <!--                        <span></span>-->
-                <!--                    </div>-->
-                <!--                </div>-->
-
-                <div class="details">
-                    <div><strong>Project ID:</strong> <span id="project-id"></span></div>
+                <div class="details" id="project-details">
+                    <div><strong>Project ID:</strong> <span id="project-id"></span>
+                        <input type="hidden" id="projectIdInput" th:value="${projectId}">
+                    </div>
                     <div><strong>Project Title:</strong> <span id="project-title"></span></div>
                     <div><strong>Project Advisor:</strong> <span id="project-advisor"></span></div>
                     <div><strong>Project Description:</strong> <span id="project-description"></span></div>
@@ -110,50 +91,13 @@
 
             </div>
 
-            <div class="table-container">
-                <h1>Student Score</h1>
-                <table>
-
-                    <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Quality of Work</th>
-                        <th>Level of Progress</th>
-                        <th>Presentation Language</th>
-                        <th>Question & Answer</th>
-                        <th>Result</th>
-                    </tr>
-                    </thead>
-
-                    <tbody id="student-score">
-                    <!-- Record Result -->
-
-                    </tbody>
-                </table>
-            </div>
-
             <!-- A -->
             <div class="table-container">
                 <h1> A. Poster Presentation [Apperance] </h1>
 
                 <table class="evaluation-table" id="appearance-table">
                     <thead>
-<!--                    <tr id="student-name-header">-->
-
-<!--                    </tr>-->
                     </thead>
-<!--                    <tbody>-->
-<!--                    <tr>-->
-<!--                        <td>-->
-<!--                            <strong> Poster is well organized, readable, easy to follow and has a logical, clear progression of ideas, methods </strong>-->
-<!--                            <div class="subtitle">  <span class="max-score">Max Score 5</span>-->
-<!--                            </div>-->
-<!--                        </td>-->
-<!--                        <td><input type="number" min="0" max="5" value="0"/></td>-->
-
-<!--                    </tr>-->
-
-<!--                    </tbody>-->
                 </table>
             </div>
 
@@ -163,53 +107,7 @@
 
                 <table class="evaluation-table" id="content-table">
                     <thead>
-<!--                    <tr id="student-name-header">-->
-
-<!--                    </tr>-->
                     </thead>
-<!--                    <tbody>-->
-<!--                    <tr>-->
-<!--                        <td>-->
-<!--                            <strong> English Usage </strong>-->
-<!--                            <div class="subtitle">  <span class="max-score">Max Score 5</span>-->
-<!--                            </div>-->
-<!--                        </td>-->
-<!--                        <td><input type="number" min="0" max="5" value="0"/></td>-->
-<!--                    </tr>-->
-<!--                    <tr>-->
-<!--                        <td>-->
-<!--                            <strong> Problem statements and objectives are started clearly </strong>-->
-<!--                            <div class="subtitle">  <span class="max-score">Max Score 5</span>-->
-<!--                            </div>-->
-<!--                        </td>-->
-<!--                        <td><input type="number" min="0" max="5" value="0"/></td>-->
-<!--                    </tr>-->
-<!--                    <tr>-->
-<!--                        <td>-->
-<!--                            <strong> Research methodology or development framework are stated clearly </strong>-->
-<!--                            <div class="subtitle">  <span class="max-score">Max Score 5</span>-->
-<!--                            </div>-->
-<!--                        </td>-->
-<!--                        <td><input type="number" min="0" max="5" value="0"/></td>-->
-<!--                    </tr>-->
-<!--                    <tr>-->
-<!--                        <td>-->
-<!--                            <strong> Level of difficulty (technical value)  </strong>-->
-<!--                            <div class="subtitle">  <span class="max-score">Max Score 5</span>-->
-<!--                            </div>-->
-<!--                        </td>-->
-<!--                        <td><input type="number" min="0" max="5" value="0"/></td>-->
-<!--                    </tr>-->
-<!--                    <tr>-->
-<!--                        <td>-->
-<!--                            <strong> Level of progress is suitable with the timeline given  </strong>-->
-<!--                            <div class="subtitle">  <span class="max-score">Max Score 5</span>-->
-<!--                            </div>-->
-<!--                        </td>-->
-<!--                        <td><input type="number" min="0" max="5" value="0"/></td>-->
-<!--                    </tr>-->
-
-<!--                    </tbody>-->
                 </table>
             </div>
 
@@ -219,250 +117,147 @@
 
                 <table class="evaluation-table" id="presentation-table">
                     <thead>
-                    <!--                    <tr id="student-name-header">-->
-
-                    <!--                    </tr>-->
                     </thead>
-<!--                    <tbody>-->
-<!--                    <tr>-->
-<!--                        <td>-->
-<!--                            <strong> Presenters speak clearly and effectively </strong>-->
-<!--                            <div class="subtitle">  <span class="max-score">Max Score 5</span>-->
-<!--                            </div>-->
-<!--                        </td>-->
-<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
-<!--                    </tr>-->
-<!--                    <tr>-->
-<!--                        <td>-->
-<!--                            <strong> Presenters respond to questions effectively </strong>-->
-<!--                            <div class="subtitle">  <span class="max-score">Max Score 5</span>-->
-<!--                            </div>-->
-<!--                        </td>-->
-<!--                        <td><input type="number" min="0" max="10" value="0"/></td>-->
-<!--                    </tr>-->
-
-<!--                    </tbody>-->
                 </table>
             </div>
 
+            <!-- Comment -->
             <div class="table-container">
                 <h1> Comment </h1>
-                <label class="comment-poster">
-                    <input type="text">
-                </label>
+                <textarea id="comment" rows="4" cols="50"></textarea>
             </div>
-
 
             <!-- Score Result -->
             <div class="table-container">
                 <h1> Score Result </h1>
-                <label class="score-subtitle">
-                    <i class="fa fa-exclamation-triangle"></i>
-                    Unable to calculate the grade because not all committee members have submitted their scores.
-                </label>
 
-                <div id="card-container">
-
-                </div>
-
-                <!--                <div class="card-container">-->
-                <!--                    <div class="card-score-result">-->
-                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
-                <!--                        <span class="score">100 / 100</span>-->
-                <!--                    </div>-->
-
-                <!--                    <div class="card-score-result">-->
-                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
-                <!--                        <span class="score">100 / 100</span>-->
-                <!--                    </div>-->
-
-                <!--                    <div class="card-score-result">-->
-                <!--                        <span class="icon"><i class="fa fa-user"></i> 6487002 Tunyarat </span>-->
-                <!--                        <span class="score">100 / 100</span>-->
-                <!--                    </div>-->
-                <!--                </div>-->
+                <div id="card-container"></div>
 
                 <button class="save-button"> Save</button>
             </div>
+
+            <!-- Modal -->
+            <div id="confirmationModal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <span class="close-button" id="closeModal">&times;</span>
+                    <h3>Are you sure you want to submit the scores?</h3>
+                    <div>
+                        <button id="confirmSave" class="confirm-button">Yes, Submit</button>
+                        <button id="cancelSave" class="cancel-button">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
 
         </div>
     </div>
 </div>
 
+<!-- ------------ Show Project detail ----------------- -->
 <script>
-
-    window.onload = fetchData;
-
-    function getProjectIdFromURL() {
-        const urlParams = new URLSearchParams(window.location.search);
-        return urlParams.get("projectId"); // ดึงค่าจาก ?projectId=xxxx
-    }
-
-    function fetchData() {
-        // รับค่า projectId จาก URL
-        const projectId = "DST SP2024-01"
-        // const projectId = getProjectIdFromURL();
+    window.onload = function () {
+        const projectId = getProjectIdFromURL();
 
         if (!projectId) {
-            document.getElementById('student-score').innerHTML = "ไม่พบข้อมูล projectId";
+            displayError("ไม่พบข้อมูล projectId");
             return;
         }
 
-        const url = `http://localhost:8080/instructor/giveScorePosterEvaluation?projectId=${encodeURIComponent(projectId)}`;
+        fetchProjectDetails(projectId)
+            .then(displayProjectDetails)
+            .catch(error => handleFetchError(error, 'ไม่พบข้อมูลโปรเจกต์'));
 
-        fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-            })
-            .then(data => {
-                console.log("Data received from API:", data);
-                displayStudentScore(data);
-                displayResultsCards(data);
-                displayStudentHeader(data);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                document.getElementById('student-score').innerHTML = "ไม่พบข้อมูล";
-            });
-    }
+        fetchAndDisplayInstructor(projectId)
+        // fetchAndDisplayScores(projectId);
+        // fetchAndDisplayCardResultScores(projectId);
 
+    };
 
-    // Show Project Details //
-    document.addEventListener('DOMContentLoaded', function () {
-        // ดึงค่า projectId จาก URL
+    // Utility Functions
+    function getProjectIdFromURL() {
         const urlParams = new URLSearchParams(window.location.search);
-        const projectId = urlParams.get('projectId');
+        return urlParams.get("projectId");
+    }
 
-        if (projectId) {
-            // ถ้ามี projectId ใน URL
-            fetch(`http://localhost:8080/instructor/getProjectDetails?projectId=${projectId}`)
-                .then(response => response.json())
-                .then(project => {
-                    // แสดงข้อมูลที่ได้จาก API ใน HTML
-                    document.getElementById('project-id').textContent = project.projectId;
-                    document.getElementById('project-id-title').textContent = project.projectId;
-                    document.getElementById('project-title').textContent = project.projectTitle;
-                    document.getElementById('project-advisor').textContent = project.projectTitle;
-                    document.getElementById('project-description').textContent = project.projectDescription;
+    function displayError(message) {
+        document.getElementById('student-score').innerHTML = message;
+    }
 
-                    const recordedOn = project.recordedOn;
-                    const formattedDate = recordedOn.split("T")[0];
-                    document.getElementById('project-date').textContent = formattedDate;
-                })
-                .catch(error => {
-                    console.error('Error fetching project details:', error);
-                    alert('ไม่พบข้อมูลโปรเจกต์');
-                });
-        } else {
-            // alert('ไม่พบ projectId ใน URL');
+    function handleFetchError(error, userMessage) {
+        console.error("Error fetching data:", error);
+        alert(userMessage);
+    }
+
+    // Fetch Functions
+    async function fetchProjectDetails(projectId) {
+        const url = `http://localhost:8080/instructor/getProjectDetails?projectId=${encodeURIComponent(projectId)}`;
+        const response = await fetch(url);
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
         }
-    });
+        return response.json();
+    }
 
-    // Show Student Score
-    function displayStudentScore(data) {
-        let tableBody = document.querySelector("tbody");
-        tableBody.innerHTML = "";
+    // Display Functions
+    function displayProjectDetails(project) {
+        document.getElementById('project-id').textContent = project.projectId;
+        document.getElementById('project-id-title').textContent = project.projectId;
+        document.getElementById('project-title').textContent = project.projectTitle;
+        document.getElementById('project-description').textContent = project.projectDescription;
+        document.getElementById('project-date').textContent = project.recordedOn.split("T")[0];
+    }
 
-        if (!Array.isArray(data)) {
-            data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
-        }
+    async function fetchAndDisplayInstructor(projectId) {
+        const url = `http://localhost:8080/project/instructor?projectId=${encodeURIComponent(projectId)}`;
 
         try {
-            data.forEach(project => {
-                project.students.forEach(student => {
-                    const row = document.createElement('tr');
+            const response = await fetch(url);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const instructorData = await response.json();
 
-                    row.innerHTML = `
-                <td style="text-align: left;">${student.studentName}</td>
-                <td>${project.score}</td>
-                <td>${project.score}</td>
-                <td>${project.score}</td>
-                <td>${project.score}</td>
-                <td>${project.score * 4}</td>
-            `;
-                    tableBody.appendChild(row);
-                });
-            });
+            if (Array.isArray(instructorData) && instructorData.length > 0) {
+                displayInstructorDetails(instructorData[0]); // Assume only one record is needed
+            } else {
+                console.warn("No instructor data found for this project.");
+                document.getElementById('project-advisor').textContent = "N/A";
+            }
         } catch (error) {
-            console.error("Error displaying data in HTML:", error);
-            document.getElementById('student-score').innerHTML = "No valid data to display.";
+            console.error('Error fetching instructor details:', error);
         }
     }
 
-    function displayResultsCards(data) {
-        const cardContainer = document.querySelector('#card-container');
-        cardContainer.innerHTML = "";
 
-        if (!Array.isArray(data)) {
-            data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
-        }
-
-        try {
-            data.forEach(project => {
-                project.students.forEach(student => {
-                    const card = document.createElement('div');
-                    card.className = 'card-score-result';
-                    card.innerHTML = `
-                        <span class="icon"><i class="fa fa-user"></i> ${student.studentId} ${student.studentName}</span>
-                        <span class="score"> / 100</span>
-                    `;
-                    cardContainer.appendChild(card);
-                });
-            });
-        } catch (error) {
-            console.error("Error displaying data in HTML:", error);
-            document.getElementById('student-score').innerHTML = "No valid data to display.";
-        }
+    function displayInstructorDetails(instructor) {
+        document.getElementById('project-advisor').textContent = instructor.professorName;
     }
 
-    function displayStudentHeader(data) {
-        if (!Array.isArray(data)) {
-            data = [data]; // แปลง Object เป็น Array หากข้อมูลมีแค่รายการเดียว
-        }
-
-        try {
-            data.forEach(project => {
-                const studentNameHeader = document.getElementById('student-name-header');
-
-                studentNameHeader.innerHTML = '';
-
-                // เพิ่ม <th> ช่องว่างแรก
-                const emptyTh = document.createElement('th');
-                emptyTh.innerHTML = '';  // ช่องว่าง
-                studentNameHeader.appendChild(emptyTh);
-
-                // เพิ่ม <th> สำหรับนักศึกษาทุกคน
-                project.students.forEach(student => {
-                    const studentTh = document.createElement('th');
-                    studentTh.innerHTML = `${student.studentId} ${student.studentName}`;
-                    studentNameHeader.appendChild(studentTh);
-                });
-
-                // ใช้ฟังก์ชันเดียวกัน สำหรับอีก Header นึง
-                const studentNameHeader2 = document.getElementById('student-name-header-2');
-                if (studentNameHeader2) {
-                    studentNameHeader2.innerHTML = '';
-                    studentNameHeader2.appendChild(emptyTh.cloneNode(true)); // เพิ่มช่องว่าง
-
-                    project.students.forEach(student => {
-                        const studentTh2 = document.createElement('th');
-                        studentTh2.innerHTML = `${student.studentId} ${student.studentName}`;
-                        studentNameHeader2.appendChild(studentTh2);  // เพิ่มข้อมูลที่เหมือนกัน
-                    });
-                }
-            });
-        } catch (error) {
-            console.error("Error displaying data: ", error);
-        }
-    }
 </script>
 
-    //================================  Fern  ==========================================
 
-    <script>
+<!-- ------------ Show Score Criteria ----------------- -->
+<script>
+    // ฟังก์ชันสำหรับตรวจสอบค่าคะแนนที่กรอก
+    function enforceMaxScore(inputElement) {
+        let maxScore = parseInt(inputElement.getAttribute("max"), 10);
+        let currentValue = parseInt(inputElement.value, 10);
+
+        if (currentValue > maxScore) {
+            inputElement.value = maxScore;
+        }
+    }
+
+    // ฟังก์ชันเพิ่ม Event Listener ให้กับ input
+    function addInputValidation() {
+        document.querySelectorAll(".present-score-input").forEach(input => {
+            input.addEventListener("input", function () {
+                enforceMaxScore(this);
+            });
+        });
+    }
+
     function fetchData() {
         let url = 'http://localhost:8080/instructor/criteriaPoster';
 
@@ -493,12 +288,8 @@
 
     //================================  displayAppearanceCriteria  ==========================================
     function displayAppearanceCriteria(data) {
-
-
         const table = document.getElementById("appearance-table");
         table.innerHTML = "";
-
-        // <thead></thead>
 
         const tbody = document.createElement("tbody");
 
@@ -512,23 +303,20 @@
                     <span class="subtitle">${criteria.criteriaNameTH}</span>
                     <span class="max-score">Max Score ${criteria.maxScore}</span>
                 </td>
-                <td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}" /></td>
+                <td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}" data-criteria-id="${criteria.criteriaId}" /></td>
             `;
             tbody.appendChild(row);
         });
         table.appendChild(tbody)
+
+        // เพิ่มการตรวจสอบ input
+        addInputValidation();
     }
 
     //================================  displayContentsCriteria  ==========================================
-
     function displayContentsCriteria(data) {
-
-
         const table = document.getElementById("content-table");
         table.innerHTML = "";
-
-        // <thead></thead>
-
         const tbody = document.createElement("tbody");
 
         const appearanceCriteria = data.filter(i => i.type === "Contents");
@@ -541,22 +329,20 @@
                     <span class="subtitle">${criteria.criteriaNameTH}</span>
                     <span class="max-score">Max Score ${criteria.maxScore}</span>
                 </td>
-                <td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}" /></td>
+                <td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}" data-criteria-id="${criteria.criteriaId}" /></td>
             `;
             tbody.appendChild(row);
         });
         table.appendChild(tbody)
+
+        // เพิ่มการตรวจสอบ input
+        addInputValidation();
     }
 
     //================================  displayPresentationCriteria  ==========================================
-
     function displayPresentationCriteria(data) {
-
-
         const table = document.getElementById("presentation-table");
         table.innerHTML = "";
-
-        // <thead></thead>
 
         const tbody = document.createElement("tbody");
 
@@ -570,15 +356,542 @@
                     <span class="subtitle">${criteria.criteriaNameTH}</span>
                     <span class="max-score">Max Score ${criteria.maxScore}</span>
                 </td>
-                <td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}" /></td>
+                <td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}" data-criteria-id="${criteria.criteriaId}" /></td>
             `;
             tbody.appendChild(row);
         });
         table.appendChild(tbody)
+
+        // เพิ่มการตรวจสอบ input
+        addInputValidation();
+    }
+</script>
+
+
+<!-- -------------- Insert Score to Database -------------- -->
+<script>
+    // document.querySelector('.save-button').addEventListener('click', function(event) {
+    //     event.preventDefault();
+    //
+    //     // แสดง Modal เพื่อให้ผู้ใช้ยืนยัน
+    //     document.getElementById("confirmationModal").style.display = "block";
+    //
+    //     // เมื่อผู้ใช้คลิก "Yes, Submit"
+    //     document.getElementById("confirmSave").addEventListener('click', function() {
+    //         // ปิด Modal
+    //         document.getElementById("confirmationModal").style.display = "none";
+    //
+    //         console.log("Save Process");
+    //
+    //         // projectId ===== //
+    //         var projectId = getProjectIdFromURL();
+    //         console.log("projectId: " + projectId);
+    //
+    //         // student score ===== //
+    //         var studentScores = document.querySelectorAll('.present-score-input'); // ดึงข้อมูลจาก input ในตาราง (scores)
+    //
+    //         var studentData = {};
+    //
+    //         studentScores.forEach((input) => {
+    //             let studentId = input.dataset.studentId; // ดึง studentId
+    //             let scoreCriteriaId = input.getAttribute('data-criteria-id'); // ดึง criteria ID จาก data-attribute
+    //             let score = parseFloat(input.value) || 0;
+    //
+    //             if (!studentData[studentId]) {
+    //                 studentData[studentId] = [];
+    //             }
+    //             studentData[studentId].push({scoreCriteriaId, score});
+    //         });
+    //
+    //         console.log(studentData);
+    //
+    //         // instructorId ===== //
+    //         var instructorId = "";
+    //         fetchInstructorId();
+    //
+    //         function fetchInstructorId() {
+    //             fetch(`http://localhost:8080/get-instructorId?projectId=${projectId}`)
+    //                 .then(response => response.text())
+    //                 .then(data => {
+    //                     instructorId = data;
+    //                     console.log("Instructor Id: " + instructorId);
+    //                     sendEvaluationData();  // Call the function to send data after instructorId is fetched
+    //                 })
+    //                 .catch(error => {
+    //                     console.error('Error fetching instructorId:', error);
+    //                 });
+    //         }
+    //
+    //         function sendEvaluationData() {
+    //             // ส่งข้อมูลไปที่ /saveEvaluation สำหรับแต่ละ student
+    //             for (let studentId in studentData) {
+    //                 let scoreDTOList = studentData[studentId];
+    //
+    //                 console.log(studentId);
+    //                 console.log(JSON.stringify(scoreDTOList));
+    //
+    //                 fetch('http://localhost:8080/savePosterEvaluation?' +
+    //                     new URLSearchParams({
+    //                         instructorId: instructorId,
+    //                         projectId: projectId,
+    //                     }), {
+    //                     method: 'POST',
+    //                     headers: {
+    //                         'Content-Type': 'application/json',
+    //                     },
+    //                     credentials: 'include',
+    //                     body: JSON.stringify(scoreDTOList)
+    //                 })
+    //                     .then(response => {
+    //                         console.log(response.status)
+    //                         if (!response.ok) {
+    //                             return response.text().then(text => {
+    //                                 console.error("Error response from server:", text);
+    //                                 throw new Error(text);
+    //                             });
+    //                         }
+    //                         return response;
+    //                     })
+    //                     .then(data => {
+    //                         console.log(`Evaluation saved successfully:`, data);
+    //                     })
+    //                     .catch(error => {
+    //                         console.error('Error saving evaluation:', error);
+    //                     });
+    //             }
+    //
+    //             // แสดงข้อความ alert ว่าการบันทึกสำเร็จ
+    //             alert('Evaluation saved successfully!');
+    //
+    //             // เปลี่ยน path ไปที่ /show-poster-projects
+    //             window.location.href = '/show-poster-projects';
+    //         }
+    //     });
+    //
+    //     // เมื่อผู้ใช้คลิก "Cancel"
+    //     document.getElementById("cancelSave").addEventListener('click', function() {
+    //         // ปิด Modal
+    //         document.getElementById("confirmationModal").style.display = "none";
+    //     });
+    //
+    //     // เมื่อผู้ใช้คลิกปิด Modal
+    //     document.getElementById("closeModal").addEventListener('click', function() {
+    //         document.getElementById("confirmationModal").style.display = "none";
+    //     });
+    // });
+
+    document.querySelector('.save-button').addEventListener('click', function(event) {
+        event.preventDefault();
+        document.getElementById("confirmationModal").style.display = "block";
+
+        document.getElementById("confirmSave").addEventListener('click', function() {
+            document.getElementById("confirmationModal").style.display = "none";
+
+            console.log("Save Process");
+            var projectId = getProjectIdFromURL();
+            console.log("projectId: " + projectId);
+
+            var studentScores = document.querySelectorAll('.present-score-input');
+            var studentData = {};
+
+            studentScores.forEach((input) => {
+                let studentId = input.dataset.studentId;
+                let scoreCriteriaId = input.getAttribute('data-criteria-id');
+                let score = parseFloat(input.value) || 0;
+
+                if (!studentData[studentId]) {
+                    studentData[studentId] = [];
+                }
+                studentData[studentId].push({scoreCriteriaId, score});
+            });
+
+            // ดึงค่าคอมเมนต์จาก textarea
+            var comment = document.getElementById("comment").value;
+            console.log("Comment: ", comment);
+
+            var instructorId = "";
+            fetchInstructorId();
+
+            function fetchInstructorId() {
+                fetch(`http://localhost:8080/get-instructorId?projectId=${projectId}`)
+                    .then(response => response.text())
+                    .then(data => {
+                        instructorId = data;
+                        console.log("Instructor Id: " + instructorId);
+                        sendEvaluationData();
+                    })
+                    .catch(error => {
+                        console.error('Error fetching instructorId:', error);
+                    });
+            }
+
+            function sendEvaluationData() {
+                for (let studentId in studentData) {
+                    let scoreDTOList = studentData[studentId];
+
+                    console.log(studentId);
+                    console.log(JSON.stringify(scoreDTOList));
+
+                    fetch('http://localhost:8080/savePosterEvaluation?' +
+                        new URLSearchParams({
+                            instructorId: instructorId,
+                            projectId: projectId,
+                        }), {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            scores: scoreDTOList,
+                            comment: comment // เพิ่ม comment ส่งไปด้วย
+                        })
+                    })
+                        .then(response => {
+                            console.log(response.status)
+                            if (!response.ok) {
+                                return response.text().then(text => {
+                                    console.error("Error response from server:", text);
+                                    throw new Error(text);
+                                });
+                            }
+                            return response;
+                        })
+                        .then(data => {
+                            console.log(`Evaluation saved successfully:`, data);
+                        })
+                        .catch(error => {
+                            console.error('Error saving evaluation:', error);
+                        });
+                }
+
+                function showNotification(message, callback) {
+                    const notification = document.createElement("div");
+                    notification.textContent = message;
+                    notification.style.position = "fixed";
+                    notification.style.top = "20px";
+                    notification.style.right = "20px";
+                    notification.style.padding = "10px 20px";
+                    notification.style.background = "green";
+                    notification.style.color = "white";
+                    notification.style.borderRadius = "5px";
+                    notification.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)";
+                    document.body.appendChild(notification);
+
+                    // ให้ข้อความหายไปอัตโนมัติหลังจาก 3 วินาที
+                    setTimeout(() => {
+                        notification.remove();
+                        if (callback) callback(); // เรียก callback หลังจากแจ้งเตือนเสร็จ
+                    }, 1000);
+                }
+
+                // แสดงแจ้งเตือนก่อน แล้วค่อยเปลี่ยนหน้า
+                showNotification("Evaluation saved successfully!", function() {
+                    window.location.href = "/show-poster-projects";
+                });
+
+                // alert('Evaluation saved successfully!');
+                // window.location.href = '/show-poster-projects';
+            }
+        });
+
+        document.getElementById("cancelSave").addEventListener('click', function() {
+            document.getElementById("confirmationModal").style.display = "none";
+        });
+
+        document.getElementById("closeModal").addEventListener('click', function() {
+            document.getElementById("confirmationModal").style.display = "none";
+        });
+    });
+
+</script>
+
+
+<!-- -------------- Show Evaluation Score -------------- -->
+<script>
+
+    document.addEventListener("DOMContentLoaded", async function () {
+        const projectId = getProjectIdFromURL();
+        if (!projectId) {
+            console.error('❌ No project ID found');
+            return;
+        }
+
+        try {
+            const instructorId = await fetchInstructorId(projectId);
+            if (!instructorId) {
+                console.error('❌ No instructor ID found');
+                return;
+            }
+
+            console.log('📌 Loading scores for Project:', projectId, 'Instructor:', instructorId);
+
+            // ✅ โหลดคะแนนให้เสร็จก่อน
+            await loadEvaluationData(instructorId, projectId);
+            console.log("✅ Scores Loaded");
+
+            // ✅ ผูก event listener หลังจากโหลดคะแนนเสร็จ
+            addScoreInputListeners();
+            addInputListeners();
+
+            // ✅ คำนวณคะแนนสูงสุด
+            calculateMaxScore();
+
+            // ✅ คำนวณคะแนนรวม และ สร้าง Card หลังจากคะแนนถูกโหลดครบ
+            updateTotalScore();
+            displayResultsCards();
+
+            console.log("✅ Script Fully Loaded");
+        } catch (error) {
+            console.error('❌ Error in initialization:', error);
+        }
+    });
+
+
+    // Add event listeners to score inputs
+    function addScoreInputListeners() {
+        const scoreInputs = document.querySelectorAll('.present-score-input');
+        scoreInputs.forEach(input => {
+            input.addEventListener('change', () => {
+                validateScore(input);
+                updateTotalScore();
+            });
+        });
+    }
+
+    // Validate score input
+    function validateScore(input) {
+        const maxScore = parseInt(input.getAttribute('max'));
+        let value = parseFloat(input.value) || 0;
+
+        if (value < 0) value = 0;
+        if (value > maxScore) value = maxScore;
+
+        input.value = value;
+    }
+
+    // Fetch instructor ID
+    async function fetchInstructorId(projectId) {
+        try {
+            const response = await fetch(`http://localhost:8080/get-instructorId?projectId=${projectId}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            const instructorId = await response.text();
+            console.log('📌 Retrieved instructor ID:', instructorId);
+            return instructorId;
+        } catch (error) {
+            console.error('❌ Error fetching instructor ID:', error);
+            throw error;
+        }
+    }
+
+    // Load all evaluation data
+    async function loadEvaluationData(instructorId, projectId) {
+        try {
+            const scores = await fetchScores(instructorId, projectId);
+            if (scores && scores.length > 0) {
+                populateScores(scores);
+            } else {
+                initializeEmptyScores();
+            }
+        } catch (error) {
+            console.warn('⚠️ Error loading evaluation data:', error);
+            initializeEmptyScores();
+        }
+    }
+
+    // Initialize empty scores
+    function initializeEmptyScores() {
+        const inputs = document.querySelectorAll('.present-score-input');
+        inputs.forEach(input => {
+            input.value = '0';
+        });
+        updateTotalScore();
+    }
+
+    // Fetch scores
+    async function fetchScores(instructorId, projectId) {
+        try {
+            const response = await fetch(`http://localhost:8080/getPosterEvaluation?` +
+                new URLSearchParams({
+                    instructorId: instructorId,
+                    projectId: projectId,
+                }));
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const text = await response.text();
+            if (!text || text.trim() === '') {
+                console.log('📝 No existing scores found');
+                return [];
+            }
+
+            try {
+                const data = JSON.parse(text);
+                // Log the raw data to inspect its structure
+                console.log('Raw API response:', data);
+
+                // ดึงข้อมูลคอมเมนต์จาก API และแสดงใน textarea
+                if (data.comment) {
+                    document.getElementById("comment").value = data.comment;
+                    console.log(`✅ Loaded comment: ${data.comment}`);
+                } else {
+                    console.log('📝 No comment found');
+                }
+
+                // Handle different possible data structures
+                let scores;
+                if (Array.isArray(data)) {
+                    scores = data;
+                } else if (data.posterEvaluationScores) {
+                    scores = data.posterEvaluationScores;
+                } else {
+                    scores = [];
+                }
+
+                console.log('✅ Processed scores:', scores);
+                return scores;
+            } catch (e) {
+                console.warn('⚠️ Invalid JSON response:', text);
+                return [];
+            }
+        } catch (error) {
+            console.error('❌ Error fetching scores:', error);
+            return [];
+        }
+    }
+
+    // Populate scores
+    function populateScores(scores) {
+        if (!Array.isArray(scores)) {
+            console.warn('⚠️ Invalid scores data');
+            initializeEmptyScores();
+            return;
+        }
+
+        scores.forEach(score => {
+            // Log the score object to inspect its structure
+            console.log('Processing score object:', score);
+
+            // Get criteriaId from criteriaPoster object
+            const criteriaId = score?.criteriaPoster?.criteriaId;
+            const scoreValue = score?.score || 0;
+
+            if (criteriaId) {
+                const inputField = document.querySelector(`.present-score-input[data-criteria-id="${criteriaId}"]`);
+                if (inputField) {
+                    inputField.value = scoreValue;
+                    console.log(`✅ Populated score ${scoreValue} for criteria ${criteriaId}`);
+                } else {
+                    console.warn(`⚠️ No input field found for criteria: ${criteriaId}`);
+                }
+            } else {
+                console.warn('⚠️ No criteriaId found in score object:', score);
+            }
+        });
+
+        updateTotalScore();
+    }
+
+    // Update total score
+    function updateTotalScore() {
+        const inputs = document.querySelectorAll('.present-score-input');
+        let total = 0;
+
+        inputs.forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+
+    }
+</script>
+
+
+<!-- --------------- Show Score Result ------------------ -->
+<script>
+    function displayResultsCards() {
+        console.log("📌 Creating card result...");
+        const cardContainer = document.querySelector('#card-container');
+        cardContainer.innerHTML = "";
+
+        const maxScore = calculateMaxScore();
+        let totalScore = calculateTotalScore();
+
+        // ป้องกัน totalScore ไม่ให้เกิน maxScore และให้ทศนิยมไม่เกิน 2 จุด
+        totalScore = Math.min(totalScore, maxScore).toFixed(2);
+
+        console.log(`📊 Adjusted Score: ${totalScore} / ${maxScore}`);
+
+        const card = document.createElement('div');
+        card.className = 'card-score-result';
+        card.dataset.type = "poster";
+        card.innerHTML = `
+        <h3>คะแนนรวม Poster</h3>
+        <span class="score">${totalScore} / ${maxScore}</span>
+    `;
+
+        cardContainer.appendChild(card);
     }
 
 
+    function addInputListeners() {
+        console.log("🎯 Adding event listeners...");
+        const inputs = document.querySelectorAll('.present-score-input');
+        inputs.forEach(input => {
+            console.log(`📌 Found input: ${input.name}, Value: ${input.value}, Max: ${input.dataset.maxScore}`);
+            input.addEventListener("input", updatePosterTotalScore);
+        });
+    }
+
+    function updatePosterTotalScore() {
+        console.log("✏️ Input changed! Updating...");
+        let totalScore = calculateTotalScore();
+        const maxScore = calculateMaxScore();
+
+        // ป้องกัน totalScore ไม่ให้เกิน maxScore
+        totalScore = Math.min(totalScore, maxScore);
+
+
+        let scoreDisplay = document.querySelector('.card-score-result[data-type="poster"] .score');
+
+        if (!scoreDisplay) {
+            console.warn("⚠️ Score display not found. Creating new card...");
+            displayResultsCards();
+            scoreDisplay = document.querySelector('.card-score-result[data-type="poster"] .score');
+        }
+
+        if (scoreDisplay) {
+            console.log(`🎯 Updating Score: ${totalScore} / ${maxScore}`);
+            scoreDisplay.textContent = `${totalScore.toFixed(2)} / ${maxScore.toFixed(2)}`;
+        }
+    }
+
+
+    function calculateTotalScore() {
+        let total = 0;
+        document.querySelectorAll('.present-score-input').forEach(input => {
+            let value = parseFloat(input.value);
+            // console.log(`➕ Adding: ${value || 0}`);
+            total += value || 0;
+        });
+        // return Math.round(total);
+        return total;
+    }
+
+    function calculateMaxScore() {
+        let maxScore = 0;
+        document.querySelectorAll('.present-score-input').forEach(input => {
+            let max = parseFloat(input.max);
+            // console.log(`🛠️ Max Score Found: ${max || 0}`);
+            maxScore += max || 0;
+        });
+        return maxScore;
+    }
+
 </script>
+
 
 
 </html>

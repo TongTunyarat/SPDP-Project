@@ -97,6 +97,8 @@
                     <th>Student ID</th>
                     <th>Student Names</th>
                     <th>Evaluation</th>
+                    <th>Grade Evaluation</th>
+                    <th>Grade</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -118,7 +120,7 @@
 
     function fetchData() {
         // JSON information fetch project list
-        let url = 'http://localhost:8080/advisor/projectList';
+        let url = 'http://localhost:8080/instructor/projectDefeseGradeList';
 
         // ทำการส่งคำขอไปยัง API หรือ Backend
         fetch(url)
@@ -333,6 +335,25 @@
 
                 const row = document.createElement('tr');
 
+                // status
+                const evaluationStatus = project.allEvaluationsComplete
+                    ? `<td class="evaluation completed" title="Complete Evaluation"><i class="fa-solid fa-check"></i></td>`
+                    : `<td class="evaluation uncompleted" title="Incomplete Evaluation"><i class="fa-solid fa-spinner"></i></td>`;
+
+                let maxInstructor = project.students[0].instructorEvaluation.totalInstructors;
+                let completeEva = Math.min(...project.students.map(student => student.instructorEvaluation.completedInstructors));
+                let waitEva = maxInstructor - completeEva;
+
+                let completeEvaIcons = "";
+                for (let i = 0; i < completeEva; i++) {
+                    completeEvaIcons += '<i class=\'fas fa-user-alt\' style=\'font-size:1.7rem;color:#78adc5\'></i>'
+                }
+
+                let waitEvaIcons = "";
+                for (let i = 0; i < waitEva; i++) {
+                    waitEvaIcons += '<i class=\'fas fa-user-alt\' style=\'font-size:1.7rem;color:#dbdbdb\'></i>'
+                }
+
                 row.innerHTML = `
                  <td><span class="tag ${project.projectProgram.toLowerCase()}">${project.projectProgram}</span> ${project.projectId}</td>
                 <td>${project.projectTitle}</td>
@@ -347,7 +368,16 @@
                         ${project.students.map(name => `<li>${name.studentName}</li>`).join('')}
                     </ul>
                 </td>
-                <td class="evaluation completed"><span class="material-icons">done</span></td>
+                <td>
+                 ${completeEvaIcons}${waitEvaIcons}
+
+                 ${evaluationStatus}
+                </td>
+                <td>
+                    <ul>
+                        ${project.students.map(student => `<li>${student.gradeResult}</li>`).join('')}
+                    </ul>
+                </td>
                 <td>
                     <form action="/instructor/editDefenseGrade" method="get">
                         <input type="hidden" name="projectId" value="${project.projectId}">

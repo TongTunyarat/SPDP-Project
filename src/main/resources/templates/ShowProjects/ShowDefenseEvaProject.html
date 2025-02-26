@@ -118,7 +118,7 @@
 
     function fetchData() {
         // JSON information fetch project list
-        let url = 'http://localhost:8080/advisor/projectList';
+        let url = 'http://localhost:8080/instructor/projectDefenseList';
 
         // ทำการส่งคำขอไปยัง API หรือ Backend
         fetch(url)
@@ -333,6 +333,11 @@
 
                 const row = document.createElement('tr');
 
+                // status
+                const evaluationStatus = project.allEvaluationsComplete
+                    ? `<td class="evaluation completed" title="Complete Evaluation"><i class="fa-solid fa-check"></i></td>`
+                    : `<td class="evaluation uncompleted" title="Incomplete Evaluation"><i class="fa-solid fa-spinner"></i></td>`;
+
                 row.innerHTML = `
                  <td><span class="tag ${project.projectProgram.toLowerCase()}">${project.projectProgram}</span> ${project.projectId}</td>
                 <td>${project.projectTitle}</td>
@@ -347,7 +352,7 @@
                         ${project.students.map(name => `<li>${name.studentName}</li>`).join('')}
                     </ul>
                 </td>
-                <td class="evaluation completed"><span class="material-icons">done</span></td>
+                 ${evaluationStatus}
                 <td>
                     <form action="/instructor/editDefenseEvaluation" method="get">
                         <input type="hidden" name="projectId" value="${project.projectId}">

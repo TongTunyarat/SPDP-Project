@@ -52,12 +52,12 @@ h1 {
     margin-top: -60px;
 }
 
-.details div {
+#project-details div {
     margin-bottom: 16px;
     /* กำหนดระยะห่างระหว่าง div เท่ากัน */
 }
 
-.details span {
+#project-details span {
     display: inline-block;
     padding: 4px 8px;
     border: 1px solid #D9D9D9;
@@ -107,6 +107,8 @@ h1 {
 table {
     width: 100%;
     border-collapse: collapse;
+    table-layout: fixed; /* ทำให้ตารางใช้ขนาดที่กำหนด */
+
 }
 
 thead th {
@@ -157,6 +159,13 @@ tbody td {
 
 .evaluation-table th {
     background-color: #f0f0f0;
+}
+
+thead th:first-child,
+tbody td:first-child {
+    width: 500px; /* ปรับค่าตามที่ต้องการ */
+    overflow: hidden;
+    text-align: left;
 }
 
 input[type="number"], input[type="text"] {
@@ -249,6 +258,14 @@ input[type="number"], input[type="text"] {
     margin-top: 32px;
 }
 
+#confirmationModal {
+    width: 100%; /* ทำให้ครอบคลุมทั้งหน้าจอ */
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* เพิ่มพื้นหลังโปร่งแสง */
+    justify-content: center; /* จัดให้อยู่กลางแนวนอน */
+    align-items: center; /* จัดให้อยู่กลางแนวตั้ง */
+}
+
 
 /* ปรับการตั้งค่าของ model
  #popup-modal > div {
@@ -305,4 +322,60 @@ hr {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+}
+
+/* modal save*/
+/* Style the Modal */
+.modal {
+    display: none; /* Hide modal by default */
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.4); /* Black with transparency */
+    padding-top: 60px;
+}
+
+.modal-content {
+    background-color: #fefefe;
+    margin: 5% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+}
+
+.close-button {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-button:hover,
+.close-button:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+button {
+    padding: 10px 20px;
+    margin: 5px;
+    cursor: pointer;
+}
+
+.confirm-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+}
+
+.cancel-button {
+    background-color: #f44336;
+    color: white;
+    border: none;
 }
