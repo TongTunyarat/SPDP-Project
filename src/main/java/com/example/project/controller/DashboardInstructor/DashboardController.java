@@ -3,11 +3,13 @@ package com.example.project.controller.DashboardInstructor;
 
 import com.example.project.service.DashboardInstructor.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -20,23 +22,23 @@ public class DashboardController {
 
     // Proposal
     @GetMapping("/instructor/proposalStatusDashboard")
-    @ResponseBody
-    public String checkGroupEvaStatus() {
-        return dashboardService.checkGroupEvaStatus();
+    public ResponseEntity<Map<String, Object>> checkGroupEvaStatus() {
+        Map<String, Object> response = dashboardService.checkGroupEvaStatus();
+        return ResponseEntity.ok(response);
     }
 
     // Poster
     @GetMapping("/instructor/posterStatusDashboard")
-    @ResponseBody
-    public String checkGroupPosterEvaStatus() {
-        return dashboardService.checkGroupPosterEvaStatus();
+    public ResponseEntity<Map<String, Object>> checkGroupPosterEvaStatus() {
+        Map<String, Object> response =dashboardService.checkGroupPosterEvaStatus();
+        return ResponseEntity.ok(response);
     }
 
     // Defense
     @GetMapping("/instructor/defenseStatusDashboard")
-    @ResponseBody
-    public String checkGroupDefenseEvaStatus() {
-        return dashboardService.checkGroupDefenseEvaStatus();
+    public  ResponseEntity<Map<String, Object>> checkGroupDefenseEvaStatus() {
+        Map<String, Object> response = dashboardService.checkGroupDefenseEvaStatus();
+        return ResponseEntity.ok(response);
     }
 
 

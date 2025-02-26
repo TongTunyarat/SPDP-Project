@@ -223,7 +223,7 @@ label {
 }
 
 .reminder-title {
-    font-size: 22px;
+    font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 10px;
 }
@@ -237,7 +237,8 @@ label {
 }
 
 .reminder-icon {
-    margin-right: 15px;
+    margin-right: 1rem;
+    margin-left: 2rem;
 }
 
 .reminder-content {
@@ -247,16 +248,16 @@ label {
 }
 
 .reminder-text {
-    font-size: 16px;
+    font-size: 1.2rem;
     color: #333;
     margin-bottom: 5px;
 }
 
 .reminder-subtitle {
-    font-size: 14px;
+    font-size: 0.9rem;
     color: #999;
     margin-top: 2px;
-    margin-left: 40px;
+    margin-left: 4.3rem;
 }
 
 .reminder-date {
@@ -264,7 +265,7 @@ label {
     color: #666;
     padding: 5px 10px;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 0.9rem;
 }
 
 .schedule-container {
@@ -279,7 +280,7 @@ label {
 }
 
 .schedule-title {
-    font-size: 22px;
+    font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 10px;
     display: flex;
@@ -292,7 +293,7 @@ label {
 
 .warning-text {
     color: #d9534f;
-    font-size: 14px;
+    font-size: 0.85rem;
     margin: 10px 0;
 }
 
@@ -317,7 +318,7 @@ label {
 
 .tag {
     padding: 3px 8px;
-    font-size: 12px;
+    font-size: 1rem;
     color: white;
     border-radius: 4px;
 }
@@ -349,29 +350,31 @@ label {
 
 .schedule-content {
     margin-top: 10px;
-    font-size: 14px;
+    /*font-size: 1rem;*/
+    margin-left: 0.5rem;
 }
 
 .schedule-content strong {
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
+    font-size: 1.2rem;
 }
 
 .schedule-project-subtitle {
-    font-size: 14px;
+    font-size: 1.1rem;
     color: #9C9A9A;
     font-weight: bold;
 }
 
 .schedule-datetime {
-    font-size: 14px;
+    font-size: 1rem;
     color: #000000;
     font-weight: bold;
 }
 
 .schedule-room {
-    font-size: 14px;
+    font-size: 1rem;
     color: #000000;
     font-weight: bold;
 }

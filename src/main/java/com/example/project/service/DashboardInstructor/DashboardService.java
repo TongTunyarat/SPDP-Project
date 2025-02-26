@@ -8,7 +8,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -51,7 +53,7 @@ public class DashboardService {
 
 
     // Proposal
-    public String checkGroupEvaStatus() {
+    public Map<String, Object> checkGroupEvaStatus() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -59,7 +61,7 @@ public class DashboardService {
 
         List<ProjectInstructorRole> projectInstructorRoles = projectService.getInstructorProject();
         List<Criteria> allPropEvaCriteria = proposalEvaluationService.getProposalCriteria();
-        List<Criteria> allPropGradeCriteria = proposalGradeService.getProposalCriteria();
+//        List<Criteria> allPropGradeCriteria = proposalGradeService.getProposalCriteria();
 
         long totalProjects = projectInstructorRoles.stream()
                 .filter(role -> ("Advisor".equalsIgnoreCase(role.getRole()) || "Committee".equalsIgnoreCase(role.getRole())) && role.getInstructor().getAccount().getUsername().equals(username))
@@ -67,7 +69,7 @@ public class DashboardService {
 
         long instructorPropoSuccessEva = projectInstructorRoles.stream()
                 .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
-                .mapToLong(i -> {
+                .filter(i -> {
 
                     List<StudentProject> studentProjectsList = i.getProjectIdRole().getStudentProjects();
                     System.out.println("👩🏻‍🎓 List of students: " + studentProjectsList);
@@ -76,6 +78,7 @@ public class DashboardService {
                     String projectId = i.getProjectIdRole().getProjectId();
                     System.out.println("📝 ProjectId: " + projectId);
 
+                    // get eva
                     List<ProposalEvaluation> proposalEvaluationList = proposalEvaluationRepository.findByProject_ProjectId(projectId);
                     List<GradingProposalEvaluation> gradingProposalEvaluationList = gradingProposalEvaluationRepository.findByProject_ProjectId(projectId);
 
@@ -83,6 +86,7 @@ public class DashboardService {
                     boolean allStudentsComplete = studentProjectsList.stream()
                             .filter(student -> "Active".equals(student.getStatus()))
                             .allMatch(student -> {
+
                                 Optional<ProposalEvaluation> evaluation = proposalEvaluationList.stream()
                                         .filter(e -> e.getProjectInstructorRole().getInstructor().getAccount().getUsername().equals(username) &&
                                                 e.getStudent().getStudentId().equals(student.getStudent().getStudentId()))
@@ -98,6 +102,7 @@ public class DashboardService {
 
                                 boolean hasAllGradeScores = false; // default
                                 if ("Advisor".equalsIgnoreCase(i.getRole())) {
+
                                     Optional<GradingProposalEvaluation> gradingEvaluation = gradingProposalEvaluationList.stream()
                                             .filter(g -> g.getStudent().getStudentId().equals(student.getStudent().getStudentId()))
                                             .findFirst();
@@ -107,21 +112,28 @@ public class DashboardService {
                                             .orElse(false);
                                 }
 
-                                return hasAllEvaScores && hasAllGradeScores;
+                                return "Advisor".equalsIgnoreCase(i.getRole())
+                                        ? (hasAllEvaScores && hasAllGradeScores)
+                                        : hasAllEvaScores;
                             });
 
-                    return allStudentsComplete ? 1L : 0L;
-                }).sum(); // all project success
+                    return allStudentsComplete;
+                }).count(); // all project success
 
         System.out.println("📊 Instructor Total Project: " + totalProjects);
         System.out.println("✅ Instructor Proposal Evaluations Success: " + instructorPropoSuccessEva);
 
-        return "✅ instructorPropoSuccessEva: " + instructorPropoSuccessEva + " From 📊 totalProjects: " + totalProjects;
+//        return "✅ instructorPropoSuccessEva: " + instructorPropoSuccessEva + " From 📊 totalProjects: " + totalProjects;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("totalProjects", (int) totalProjects);
+        result.put("instructorPropoSuccessEva", (int) instructorPropoSuccessEva);
+
+        return result;
     }
 
     // Poster
-
-    public String checkGroupPosterEvaStatus() {
+    public Map<String, Object> checkGroupPosterEvaStatus() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -136,12 +148,13 @@ public class DashboardService {
 
         long instructorPosterSuccessEva = projectInstructorRoles.stream()
                 .filter(i -> "Poster-Committee".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
-                .mapToLong(i -> {
+                .filter(i -> {
 
                     // get projectId
                     String projectId = i.getProjectIdRole().getProjectId();
                     System.out.println("📝 ProjectId: " + projectId);
 
+                    // get eva
                     List<PosterEvaluation> posterEvaluationList = posterEvaRepository.findByProjectIdPoster_ProjectId(projectId);
                     List<StudentProject> studentProjectsList = i.getProjectIdRole().getStudentProjects();
 
@@ -163,18 +176,22 @@ public class DashboardService {
                                 return hasAllEvaScores;
                             });
 
-                    return allStudentsComplete ? 1L : 0L;
+                    return allStudentsComplete;
 
-                }).sum(); // all project success
-
+                }).count();
         System.out.println("📊 Instructor Total Project: " + totalProjects);
         System.out.println("✅ Instructor Poster Evaluations Success: " + instructorPosterSuccessEva);
 
-        return "✅ instructorPosterSuccessEva: " + instructorPosterSuccessEva + " From 📊 totalProjects: " + totalProjects;
+//        return "✅ instructorPosterSuccessEva: " + instructorPosterSuccessEva + " From 📊 totalProjects: " + totalProjects;
+        Map<String, Object> result = new HashMap<>();
+        result.put("totalProjects", (int) totalProjects);
+        result.put("instructorPropoSuccessEva", (int) instructorPosterSuccessEva);
+
+        return result;
     }
 
     // Defense
-    public String checkGroupDefenseEvaStatus() {
+    public Map<String, Object> checkGroupDefenseEvaStatus() {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -182,7 +199,7 @@ public class DashboardService {
 
         List<ProjectInstructorRole> projectInstructorRoles = projectService.getInstructorProject();
         List<Criteria> allDefenseEvaCriteria = defenseEvaluationService.getDefenseCriteria();
-        List<Criteria> allDefenseGradeCriteria = defenseGradeService.getDefenseCriteria();
+//        List<Criteria> allDefenseGradeCriteria = defenseGradeService.getDefenseCriteria();
 
         long totalProjects = projectInstructorRoles.stream()
                 .filter(role -> ("Advisor".equalsIgnoreCase(role.getRole()) || "Committee".equalsIgnoreCase(role.getRole())) && role.getInstructor().getAccount().getUsername().equals(username))
@@ -190,7 +207,7 @@ public class DashboardService {
 
         long instructorDefenseSuccessEva = projectInstructorRoles.stream()
                 .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
-                .mapToLong(i -> {
+                .filter(i -> {
 
                     List<StudentProject> studentProjectsList = i.getProjectIdRole().getStudentProjects();
                     System.out.println("👩🏻‍🎓 List of students: " + studentProjectsList);
@@ -201,7 +218,7 @@ public class DashboardService {
 
                     List<DefenseEvaluation> defenseEvaluationList = defenseEvaluationRepository.findByProjectId_ProjectId(projectId);
                     List<GradingDefenseEvaluation> gradingDefenseEvaluationList = gradingDefenseEvaluationRepository.findByProjectId_ProjectId(projectId);
-                    List<PosterEvaluation> posterEvaluationList = posterEvaRepository.findByProjectIdPoster_ProjectId(projectId);
+//                    List<PosterEvaluation> posterEvaluationList = posterEvaRepository.findByProjectIdPoster_ProjectId(projectId);
 
                     // each student each criteria
                     boolean allStudentsComplete = studentProjectsList.stream()
@@ -229,16 +246,24 @@ public class DashboardService {
                                     hasAllGradeScores = gradingEvaluation.stream().anyMatch(eg -> eg.getStudentId().getStudentId().equals(student.getStudent().getStudentId()));
                                 }
 
-                                return hasAllEvaScores && hasAllGradeScores;
+                                return "Advisor".equalsIgnoreCase(i.getRole())
+                                        ? (hasAllEvaScores && hasAllGradeScores)
+                                        : hasAllEvaScores;
                             });
 
-                    return allStudentsComplete ? 1L : 0L;
-                }).sum(); // all project success
+                    return allStudentsComplete;
+                }).count();
 
         System.out.println("📊 Instructor Total Project: " + totalProjects);
         System.out.println("✅ Instructor Defense Evaluations Success: " + instructorDefenseSuccessEva);
 
-        return "✅ instructorDefenseSuccessEva: " + instructorDefenseSuccessEva + " From 📊 totalProjects: " + totalProjects;
+//        return "✅ instructorDefenseSuccessEva: " + instructorDefenseSuccessEva + " From 📊 totalProjects: " + totalProjects;
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("totalProjects", (int) totalProjects);
+        result.put("instructorPropoSuccessEva", (int) instructorDefenseSuccessEva);
+
+        return result;
     }
 
 }
