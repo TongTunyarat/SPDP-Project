@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -50,22 +51,22 @@ public class ProjectController {
     private DefenseEvaluationService defenseEvaluationService;
 
     @Autowired
-    DefenseEvaluationRepository defenseEvaluationRepository;
+    private DefenseEvaluationRepository defenseEvaluationRepository;
 
     @Autowired
-    DefenseGradeService defenseGradeService;
+    private DefenseGradeService defenseGradeService;
 
     @Autowired
-    GradingDefenseEvaluationRepository gradingDefenseEvaluationRepository;
+    private GradingDefenseEvaluationRepository gradingDefenseEvaluationRepository;
 
     @Autowired
-    PosterEvaluationService posterEvaluationService;
+    private PosterEvaluationService posterEvaluationService;
 
     @Autowired
-    PosterEvaRepository posterEvaRepository;
+    private PosterEvaRepository posterEvaRepository;
 
     @Autowired
-    ProjectInstructorRoleRepository projectInstructorRoleRepository;
+    private ProjectInstructorRoleRepository projectInstructorRoleRepository;
 
     public ProjectController(ProjectService projectService, ProposalEvaluationRepository proposalEvaluationRepository, ProposalEvaluationService proposalEvaluationService, GradingProposalEvaluationRepository gradingProposalEvaluationRepository, ProposalGradeService proposalGradeService, DefenseEvaluationService defenseEvaluationService, DefenseEvaluationRepository defenseEvaluationRepository, DefenseGradeService defenseGradeService, GradingDefenseEvaluationRepository gradingDefenseEvaluationRepository, PosterEvaluationService posterEvaluationService, PosterEvaRepository posterEvaRepository, ProjectInstructorRoleRepository projectInstructorRoleRepository) {
         this.projectService = projectService;
@@ -89,6 +90,7 @@ public class ProjectController {
     @GetMapping("/instructor/view")
     public String viewInstructorProjectPage() {
         System.out.println("📌 Show default instructor page");
+
         return "DashboardInstructor"; // html
     }
 
@@ -142,7 +144,7 @@ public class ProjectController {
                     }
 
                     boolean isAllComplete = studentProjectDTOS.stream()
-                                .allMatch(StudentProjectDTONew::isEvaluationComplete);
+                            .allMatch(StudentProjectDTONew::isEvaluationComplete);
 
                     return new InstructorProjectDTONew(
                             // i -> projectInstructorRoles
@@ -184,10 +186,10 @@ public class ProjectController {
                     return score.isPresent() && score.get().getScore() != null;
                 });
 
-            return hasAllScores;
+        return hasAllScores;
     }
 
-//------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+    //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
     // project list by user (Proposal Grade)
     @GetMapping("/instructor/projectPropGradeList")
     @ResponseBody
@@ -292,10 +294,17 @@ public class ProjectController {
     // proposal eva status instructor
     private InstructorEvaluationStatusDTO checkInstructorEva(String studentId, List<Criteria> allPropEvaCriteria, List<ProposalEvaluation> proposalEvaluationList, List<ProjectInstructorRole> projectInstructorRoleList) {
 
-        long allinstructor = projectInstructorRoleList.size();
+//        long allinstructor = projectInstructorRoleList.size();
+
+        long allinstructor = projectInstructorRoleList.stream()
+                .filter(role -> ("Advisor".equalsIgnoreCase(role.getRole()) || "Committee".equalsIgnoreCase(role.getRole())))
+                .count();
 
         // loop projectInstructorRole
         long instructorSuccessEva = projectInstructorRoleList.stream()
+                .filter(instructor ->
+                        "Advisor".equalsIgnoreCase(instructor.getRole()) || "Committee".equalsIgnoreCase(instructor.getRole())
+                )
                 .filter(instructor -> {
 
                     Optional<ProposalEvaluation> instructorEvaCheck = proposalEvaluationList.stream()
@@ -542,69 +551,68 @@ public class ProjectController {
 
     private boolean checkStudentDefenseGradeStatus(String studentId, List<GradingDefenseEvaluation> gradingDefenseEvaluationList) {
 
-            return gradingDefenseEvaluationList.stream()
-                    .anyMatch(e -> e.getStudentId() != null && studentId.equals(e.getStudentId().getStudentId()));
+        return gradingDefenseEvaluationList.stream()
+                .anyMatch(e -> e.getStudentId() != null && studentId.equals(e.getStudentId().getStudentId()));
 
     }
 
     // defense eva status instructor
     private InstructorEvaluationDefenseStatusDTO checkInstructorDefenseEva(String studentId, List<Criteria> allDefenseCriteria, List<Criteria> allPosterCriteria, List<DefenseEvaluation> defenseEvaluationList, List<PosterEvaluation> posterEvaluationList, List<ProjectInstructorRole> projectInstructorRoleList) {
 
-//        System.out.println("⭐️Check input: ");
-//        System.out.println("StudentID: " + studentId);
-//        System.out.println("All Criteria: " + allDefenseCriteria.size());
-//        System.out.println("Defense Evaluation List: " + defenseEvaluationList.size());
-//        System.out.println("Project Instructor Roles: " + projectInstructorRoleList.size());
+        // param base on projectId
+        System.out.println("⭐️Check input: ");
+        System.out.println("StudentID: " + studentId);
+        System.out.println("All Criteria: " + allDefenseCriteria.size());
+        System.out.println("Defense Evaluation List: " + defenseEvaluationList.size());
+        System.out.println("Project Instructor Roles: " + projectInstructorRoleList.size());
 
         long allInstructor = projectInstructorRoleList.size();
 
+
         // loop projectInstructorRole
         long instructorDefenseSuccessEva = projectInstructorRoleList.stream()
+                // each instructor
                 .filter(instructor -> {
 
-                    Optional<DefenseEvaluation> instructorDefenseEvaCheck = defenseEvaluationList.stream()
-                            .filter(e -> e.getStudent().getStudentId().equals(studentId) &&
-                                    // eva == projectInstructorRole
-                                    e.getDefenseInstructorId().getInstructorId().equals(instructor.getInstructorId()))
-                            .findFirst();
+                    boolean hasDefenseEvaluation = false; // default
+                    boolean hasPosterEvaluation = false;  // default
 
-                    // not create
-                    if (instructorDefenseEvaCheck.isEmpty()) {
-                        return false;
+                    if ("Advisor".equalsIgnoreCase(instructor.getRole()) || "Committee".equalsIgnoreCase(instructor.getRole())) {
+
+                        // each eva
+                        Optional<DefenseEvaluation> instructorDefenseEvaCheck = defenseEvaluationList.stream()
+                                .filter(e -> e.getStudent().getStudentId().equals(studentId) &&
+                                        // eva == projectInstructorRole
+                                        e.getDefenseInstructorId().getInstructorId().equals(instructor.getInstructorId()))
+                                .findFirst();
+
+                        // ให้คะแนนครบทุก criteria & score != null ?
+                        hasDefenseEvaluation = instructorDefenseEvaCheck.map(defenseEvaluation ->
+                                allDefenseCriteria.stream().allMatch(criteria ->
+                                        defenseEvaluation.getDefenseEvalScore().stream()
+                                                .anyMatch(s -> s.getCriteria().getCriteriaId().equals(criteria.getCriteriaId()) && s.getScore() != null))
+                        ).orElse(false);
+
                     }
 
-                    Optional<PosterEvaluation> instructorPosterCheck = posterEvaluationList.stream()
-                            .filter(pe -> pe.getInstructorIdPoster().getInstructorId().equals(instructor.getInstructorId()))
-                            .findFirst();
+                    if ("Poster-Committee".equalsIgnoreCase(instructor.getRole()) || "Committee".equalsIgnoreCase(instructor.getRole())) {
 
-                    if (instructorPosterCheck.isEmpty()) {
-                        return false;
+                        Optional<PosterEvaluation> instructorPosterCheck = posterEvaluationList.stream()
+                                .filter(pe -> pe.getInstructorIdPoster().getInstructorId().equals(instructor.getInstructorId()))
+                                .findFirst();
+
+                        // float
+                        hasPosterEvaluation = instructorPosterCheck.map(posterEvaluation ->
+                                allPosterCriteria.stream()
+                                        .allMatch(criteria -> posterEvaluation.getPosterEvaluationScores().stream()
+                                                .anyMatch(ps -> ps.getCriteriaPoster().getCriteriaId().equals(criteria.getCriteriaId())))
+                        ).orElse(false);
+
                     }
 
-                    // pull instructor have eva
-                    DefenseEvaluation defenseEvaluation = instructorDefenseEvaCheck.get();
-                    PosterEvaluation posterEvaluation = instructorPosterCheck.get();
-
-                    // ให้คะแนนครบทุก criteria & score != null ?
-                    boolean hasAllDefenseScores = allDefenseCriteria.stream()
-                            .allMatch(criteria -> {
-                                Optional<DefenseEvalScore> score = defenseEvaluation.getDefenseEvalScore().stream()
-                                        .filter(s -> s.getCriteria().getCriteriaId().equals(criteria.getCriteriaId()))
-                                        .findFirst();
-
-                                return score.isPresent() && score.get().getScore() != null;
-                            });
-
-                    // float
-                    boolean hasAllPosterScores = allPosterCriteria.stream()
-                            .allMatch(criteria -> {
-                                Optional<PosterEvaluationScore> score = posterEvaluation.getPosterEvaluationScores().stream()
-                                        .filter(ps -> ps.getCriteriaPoster().getCriteriaId().equals(criteria.getCriteriaId()))
-                                        .findFirst();
-                                return score.isPresent();
-                            });
-
-                    return hasAllDefenseScores && hasAllPosterScores;
+                    return ("Committee".equalsIgnoreCase(instructor.getRole()))
+                            ? (hasDefenseEvaluation && hasPosterEvaluation)
+                            : (hasDefenseEvaluation || hasPosterEvaluation);
 
                 }).count();
 
