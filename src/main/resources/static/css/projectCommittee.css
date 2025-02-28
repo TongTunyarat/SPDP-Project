@@ -1,0 +1,302 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+body {
+    font-family: Inter;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+.header-section {
+    background-color: #00796b;
+    color: white;
+    padding: 20px;
+    text-align: left;
+    font-size: 24px;
+    font-weight: bold;
+    height: 100px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-header {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-header button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    height: 30px;
+    cursor: pointer;
+    color: #624BFF;
+    font-weight: 500;
+    box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08),
+    0px 1px 2px 0px rgba(21, 30, 40, 0.08);
+}
+
+.btn-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-footer button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    height: 30px;
+    cursor: pointer;
+    color: #624BFF;
+    font-weight: 500;
+    box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08),
+    0px 1px 2px 0px rgba(21, 30, 40, 0.08);
+    margin: 20px;
+}
+
+
+/* Table */
+.table-container {
+    max-width: 1500px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: -60px;
+    margin-left: 32px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+}
+
+/* แถบหัวข้อหลัก Committee */
+.header-row {
+    background-color: #f4f4f4;
+    border-bottom: none; /* เอาเส้นระหว่างหัวข้อหลักกับ Sub-column ออก */
+}
+
+/* Sub-column ของ Committee */
+.sub-header-row th {
+    border-top: none; /* เอาเส้นบนของ Sub-column ออก */
+}
+
+.advisor-header {
+    background-color: #FCB6B7;
+    color: black;
+}
+
+.committee1-header {
+    background-color: #F9FFA1;
+    color: black;
+}
+
+.committee2-header {
+    background-color: #B0E4FF;
+    color: black;
+}
+
+.committee3-header {
+    background-color: #B4D2FF;
+    color: black;
+}
+
+.committee4-header {
+    background-color: #CCF4DD;
+    color: black;
+}
+
+.committee5-header {
+    background-color: #FCB6CE;
+    color: black;
+}
+
+
+
+/* ป้ายสี (Tags) */
+.tag {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.ict {
+    background-color: #77B1B1;
+    color: white;
+}
+
+.dst {
+    background-color: #f5d76e;
+    color: black;
+}
+
+/* ปุ่มไอคอน */
+.action-buttons {
+    gap: 10px;
+}
+
+.icon-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-size: 18px;
+}
+
+.icon-btn i {
+    color: black;
+}
+
+.filter-controls {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 10px 30px;
+    padding-left: 0px;
+    gap: 5px;
+}
+
+.filter-controls button {
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.filter.active {
+    background-color: #005A5A;
+    color: white;
+}
+
+.filter-controls input {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.filter-controls input {
+    margin-left: auto;
+}
+
+
+/* View Button */
+.view-btn,
+.edit-btn,
+.delete-btn {
+    background-color: #005A5A;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+}
+
+.page-btn {
+    border: none;
+    background-color: #E0E4EA;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.page-btn.active {
+    background-color: #005A5A;
+    color: white;
+}
+
+.card-popup {
+    background-color: white;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 600px;
+    padding: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.card-description {
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.project-info {
+    margin-bottom: 20px;
+}
+
+.project-info p {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.students-section {
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 1rem;
+}
+
+.student-card {
+    background-color: #f5f5f5;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.student-name {
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.student-details {
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.committee-section {
+    margin-bottom: 20px;
+}
+
+.committee-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.committee-item {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
