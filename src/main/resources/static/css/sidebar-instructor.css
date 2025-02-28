@@ -45,23 +45,28 @@ body {
 }
 
 .sidebar ul li a {
-    color: #919EAB;
+    color: #808891;
     text-decoration: none;
     font-size: 14px;
     font-style: normal;
     font-weight: 500;
     line-height: normal;
-
+    display: block;
+    padding: 10px 5px;
+    border-radius: 5px;
+    transition: background 0.3s, padding-left 0.3s;
 }
 
-.sidebar ul li:hover {
+.sidebar ul li a:hover {
     color: #ffffff;
     background-color: #E0E4EA80;
     padding-left: 15px;
 }
 
-.sidebar ul li a:hover {
-    color: #ffffff;
+.sidebar ul li a.active {
+    background: rgba(255, 255, 255, 0.3); /* สีเทาโปร่งแสง */
+    color: #ffffff; /* สีอักษรเทาอ่อน */
+    padding-left: 10px; /* Active ขยับเข้ามา 10px */
 }
 
 /* เปลี่ยนหน้าไม่ได้ */
