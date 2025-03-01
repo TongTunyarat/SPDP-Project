@@ -10,5 +10,8 @@ public interface InstructorRepository extends JpaRepository<Instructor, String> 
 
     Instructor findByAccount(Account account);
 
+    // Query to find Instructor by their ID
+    Instructor findByProfessorId(String instructorId);
+
 }
 

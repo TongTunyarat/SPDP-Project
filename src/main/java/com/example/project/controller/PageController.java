@@ -71,5 +71,29 @@ public class PageController {
     }
 
 
+    // ---------- Project Management ---------- //
+    @GetMapping("/project-overview")
+    public String projectOverview() {return "projectManagement/projectOverview";}
+
+    @GetMapping("/project-committee")
+    public String projectCommittee() {return "projectManagement/projectCommittee";}
+
+    @GetMapping("/project-details")
+    public String projectDetails() {return "projectManagement/projectDetails";}
+
+    @GetMapping("/project-poster-committee")
+    public String projectPosterCommittee() {return "projectManagement/projectPosterCommittee";}
+
+    @GetMapping("/project-add-new-project")
+    public String projectAddNewProject() {return "projectManagement/addNewProject";}
+
+    @GetMapping("/project-edit-committee")
+    public String projectEditCommittee() {return "projectManagement/editCommittee";}
+
+    @GetMapping("/project-edit-poster-committee")
+    public String projectEditPosterCommittee() {return "projectManagement/editPosterCommittee";}
+
+    @GetMapping("/project-edit-project")
+    public String projectEditProject() {return "projectManagement/editProject";}
 }
 

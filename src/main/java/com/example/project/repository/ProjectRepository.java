@@ -2,6 +2,8 @@ package com.example.project.repository;
 
 
 import com.example.project.DTO.FilterResponseDTO;
+import com.example.project.DTO.projectManagement.ProjectDTO;
+import com.example.project.DTO.projectManagement.StudentProjectDTO;
 import com.example.project.entity.Project;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -26,6 +28,14 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
     Object[] findProfessorNameByProjectId(@Param("projectId") String projectId);
 
     Project findByProjectId(String projectId);
+
+    @Query("SELECT new com.example.project.DTO.projectManagement.ProjectDTO( " +
+            "p.projectId, p.program, p.semester, p.projectTitle, " +
+            "p.projectCategory, p.projectDescription, pir.role, i.professorName) " +
+            "FROM Project p " +
+            "LEFT JOIN ProjectInstructorRole pir ON p.projectId = pir.projectIdRole.projectId " +
+            "LEFT JOIN pir.instructor i")
+    List<ProjectDTO> findAllProjectsWithRolesAndInstructor();
 
 
 

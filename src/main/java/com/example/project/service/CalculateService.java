@@ -109,7 +109,7 @@ public class CalculateService {
         System.out.println("💬 Comment: " + comment);
         System.out.println("💬 Score: " + scores);
 
-        // ค้นหา ProposalEvaluation ที่มีอยู่แล้วในฐานข้อมูล
+        // ค้ นหา ProposalEvaluation ที่มีอยู่แล้วในฐานข้อมูล
         ProposalEvaluation evaluation = evaluationRepository.findByProjectInstructorRoleAndProjectAndStudent(instructor, project, student);
 
         // ถ้าไม่มีให้สร้างใหม่
