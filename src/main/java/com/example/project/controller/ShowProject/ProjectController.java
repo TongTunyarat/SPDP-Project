@@ -88,11 +88,22 @@ public class ProjectController {
 
     // show project list page
     @GetMapping("/instructor/view")
-    public String viewInstructorProjectPage() {
+    public String viewInstructorProjectPage(Model model) {
         System.out.println("📌 Show default instructor page");
+
+        List<ProjectInstructorRole> projectInstructorRoleList = projectService.getInstructorProject();
+        Long programDST = projectInstructorRoleList.stream()
+                .filter(i -> "DST".equalsIgnoreCase(i.getProjectIdRole().getProgram())).count();
+        Long programICT = projectInstructorRoleList.stream()
+                .filter(i -> "ICT".equalsIgnoreCase(i.getProjectIdRole().getProgram())).count();
+        System.out.println("📚 Check Program Group");
+
+        model.addAttribute("programDST", programDST);
+        model.addAttribute("programICT", programICT);
 
         return "DashboardInstructor"; // html
     }
+
 
     // project list by user (Proposal)
     @GetMapping("/instructor/projectList")
