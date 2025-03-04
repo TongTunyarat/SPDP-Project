@@ -5,6 +5,7 @@ import com.example.project.entity.Instructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface InstructorRepository extends JpaRepository<Instructor, String> {
 
@@ -13,5 +14,6 @@ public interface InstructorRepository extends JpaRepository<Instructor, String> 
     // Query to find Instructor by their ID
     Instructor findByProfessorId(String instructorId);
 
+    Optional<Instructor> findByProfessorName(String professorName);
 }
 

@@ -63,6 +63,9 @@ public class Student {
         this.studentProjects = studentProjects;
     }
 
+    public Student(String studentId, String studentName, String program, String section, String track, Project project) {
+    }
+
     public String getStudentId() {
         return studentId;
     }

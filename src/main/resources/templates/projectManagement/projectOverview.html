@@ -88,7 +88,7 @@
         <div class="header-section">
             Project Overview
             <div class="btn-header">
-                <button class="export-btn">Export</button>
+                <button class="export-btn" id="export-btn" onclick="exportToCSV()">Export</button>
             </div>
         </div>
 
@@ -263,7 +263,6 @@
             })
             .catch(error => console.error("Error fetching project data:", error));
     }
-
     // ฟังก์ชันแสดงข้อมูลในตาราง
     function displayResults(page) {
         let tableBody = document.querySelector("tbody");
@@ -299,6 +298,7 @@
         });
     }
 
+    // -------------------- Pagination -------------------- //
     // ฟังก์ชันสำหรับการเปลี่ยนหน้า
     function changePage(page) {
         if (page === 'prev' && currentPage > 1) {
@@ -344,9 +344,6 @@
         nextButton.onclick = () => changePage('next');
         paginationContainer.appendChild(nextButton);
     }
-
-    // เรียกฟังก์ชันเพื่อดึงข้อมูลเมื่อโหลดหน้า
-    fetchProjects();
 
     // -------------------- Pop Up -------------------- //
     // ฟังก์ชันในการเปิด Modal และแสดงข้อมูลจาก API
@@ -442,6 +439,92 @@
             document.getElementById("card-popup").style.display = "none";
         }
     });
+
+
+// -------------------- Export to CSV -------------------- //
+    // ฟังก์ชันสร้างและดาวน์โหลดไฟล์ CSV
+    function exportToCSV() {
+        console.log("Export button clicked");
+        fetch("http://localhost:8080/admin/projectOverview")
+            .then(response => response.json())
+            .then(data => {
+                if (!data || data.length === 0) {
+                    console.warn("No data available to export.");
+                    return;
+                }
+
+                // เพิ่ม BOM (Byte Order Mark) เพื่อรองรับภาษาไทย
+                let csvContent = "\uFEFF";
+
+                // คำนวณจำนวนสูงสุดของ Committee และ PosterCommittee
+                let maxCommittees = 0;
+                let maxPosterCommittees = 0;
+
+                data.forEach(project => {
+                    const committeeCount = project.professorList.filter(p => p.role === "Committee").length;
+                    const posterCommitteeCount = project.professorList.filter(p => p.role === "Poster-Committee").length;
+                    maxCommittees = Math.max(maxCommittees, committeeCount);
+                    maxPosterCommittees = Math.max(maxPosterCommittees, posterCommitteeCount);
+                });
+
+                // สร้าง Header
+                csvContent += "Project ID,Project Title,Project Description,Advisor,";
+                for (let i = 1; i <= maxCommittees; i++) csvContent += `Committee ${i},`;
+                for (let i = 1; i <= maxPosterCommittees; i++) csvContent += `Poster Committee ${i},`;
+                csvContent += "Student ID,Student Name,Program,Section,Track\r\n";
+
+                // สร้างข้อมูล CSV
+                data.forEach(project => {
+                    const projectId = `"${project.projectId || "N/A"}"`;
+                    const projectTitle = `"${project.projectTitle || "N/A"}"`;
+                    const projectDescription = `"${project.projectDescription || "N/A"}"`;
+                    const advisor = `"${project.professorList.find(p => p.role === "Advisor")?.professorName || "N/A"}"`;
+
+                    // Committee & Poster Committee
+                    const committeeList = project.professorList.filter(p => p.role === "Committee").map(p => `"${p.professorName}"`);
+                    while (committeeList.length < maxCommittees) committeeList.push('""'); // เติมช่องว่าง
+                    const posterCommitteeList = project.professorList.filter(p => p.role === "Poster-Committee").map(p => `"${p.professorName}"`);
+                    while (posterCommitteeList.length < maxPosterCommittees) posterCommitteeList.push('""'); // เติมช่องว่าง
+
+                    // แถวแรกของแต่ละโปรเจคต้องมีค่าครบ
+                    let firstRow = true;
+
+                    project.studentList.forEach(student => {
+                        const studentId = `"${student.studentId || "N/A"}"`;
+                        const studentName = `"${student.studentName || "N/A"}"`;
+                        const program = `"${project.program || "N/A"}"`;
+                        const section = `"${student.section || "N/A"}"`;
+                        const track = `"${student.track || "-"}"`;
+
+                        if (firstRow) {
+                            csvContent += `${projectId},${projectTitle},${projectDescription},${advisor},${committeeList.join(",")},${posterCommitteeList.join(",")},${studentId},${studentName},${program},${section},${track}\r\n`;
+                            firstRow = false; // แถวต่อไปจะไม่ใส่ค่าซ้ำ
+                        } else {
+                            csvContent += `,,,,${committeeList.join(",")},${posterCommitteeList.join(",")},${studentId},${studentName},${program},${section},${track}\r\n`;
+                        }
+                    });
+
+                    // กรณีไม่มีนักศึกษา
+                    if (project.studentList.length === 0) {
+                        csvContent += `${projectId},${projectTitle},${projectDescription},${advisor},${committeeList.join(",")},${posterCommitteeList.join(",")},,,,,\r\n`;
+                    }
+                });
+
+                // สร้างไฟล์ CSV และดาวน์โหลด
+                const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.setAttribute("download", "project_data.csv");
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            })
+            .catch(error => console.error("Error exporting CSV:", error));
+    }
+
+    // ให้ปุ่ม Export เรียกใช้งานฟังก์ชัน exportToCSV
+    document.getElementById("export-btn").addEventListener("click", exportToCSV);
+
 
 
 </script>

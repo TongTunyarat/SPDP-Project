@@ -91,6 +91,11 @@ public class Project {
     private List<ProposalEvaluation> proposalEvaluations;
 
 
+    public Project() {
+
+    }
+
+
     public String getProjectId() {
         return projectId;
     }
