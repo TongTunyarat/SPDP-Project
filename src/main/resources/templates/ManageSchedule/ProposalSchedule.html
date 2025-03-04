@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> Dashboard </title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/sidebar-instructor.css">
+    <link rel="stylesheet" href="/css/ScheduleStyle.css">
+
+    <!-- Library -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+</head>
+
+<body>
+
+<!-- Slide bar-->
+<div class="sidebar">
+    <h2>ICT MAHIDOL</h2>
+    <ul>
+        <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                 style="fill:#FFFFFF;">
+            <path
+                    d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+            </path>
+        </svg> Homepage </h4>
+        <li><a href="#">Dashboard</a></li>
+    </ul>
+
+    <ul>
+        <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+            <g fill="#ffffff" fill-rule="nonzero">
+                <g transform="scale(5.33333,5.33333)">
+                    <path
+                            d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                    </path>
+                </g>
+            </g>
+        </svg> Evaluation (40%) </h4>
+        <li><a href="/show-proposal-eva-projects" data-period="proposalEvaluation">Proposal Evaluation</a></li>
+        <li><a href="/show-poster-projects" data-period="posterEvaluation">Poster Evaluation</a></li>
+        <li><a href="/show-defense-eva-projects" data-period="defenseEvaluation">Defense Evaluation</a></li>
+    </ul>
+
+    <ul>
+        <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+            <g fill="#ffffff" fill-rule="nonzero">
+                <g transform="scale(5.33333,5.33333)">
+                    <path
+                            d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                    </path>
+                </g>
+            </g>
+        </svg> Grades (60%) </h4>
+        <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Proposal Grade</a></li>
+        <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Defense Grade</a></li>
+    </ul>
+</div>
+
+<div class="content">
+    <div class="header-section">
+        <div class="title-group">
+            Manage Proposal Schedule
+            <button class="btn-program" id="toggle-program">
+                <i class="far fa-calendar"></i>&nbsp;<span id="program-text">DST</span>
+            </button>
+        </div>
+        <button class="set-btn" id="openModal">Setting</button>
+    </div>
+
+    <!-- ===================================================================  Modal =================================================================== -->
+    <div class="modal" id="settingModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Setting</h4>
+            </div>
+
+            <div class="modal-body">
+                <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <!--            <p>CSRF Token: <span th:text="${_csrf.token}">ไม่มีค่า</span></p>-->
+                <label>Start Date:</label>
+                <input type="date" class="custom-input" id="start-date"/><br>
+
+                <label>End Date:</label>
+                <input type="date" class="custom-input" id="end-date"/><br>
+
+                <label>Time Start :</label>
+                <input type="time" class="custom-input"><br>
+
+                <label>End Start :</label>
+                <input type="time" class="custom-input"><br>
+
+                <label>Room: </label>
+                <div class="dropdown">
+
+                    <button id="selected-label" onclick="toggleDropdown()">
+                        <span id="selected-text">Select Room</span>
+                    </button>
+
+                    <div class="dropdown-content upward" id="dropdown-content">
+                        <input type="text" id="search" placeholder="Search" onkeyup="filterRooms()">
+                        <label><input type="checkbox" id="select-all" onclick="selectAll()"> Select All</label><br>
+                        <div id="room-list"></div>
+                    </div>
+                </div><br>
+
+                <div class="modal-footer">
+                    <button id="saveBtn">Save</button>
+                    <button id="cancelBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>
+
+<!-- ===================================================================  Modal =================================================================== -->
+
+<script>
+
+    function fetchData() {
+        let url = 'http://localhost:8080/admin/roomSetting';
+
+        fetch(url)
+            .then(response => {
+                // console.log(response.json());
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                // console.log("🐍 Data Length: " + data.length);
+                // console.log("Show Data: " + JSON.stringify(data, null, 2));
+
+                rooms.length = 0;
+
+                data.forEach(function(room) {
+                    rooms.push(room);
+                });
+
+                createRooms();
+
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                document.getElementById('filter-results').innerHTML = "ไม่พบข้อมูล";
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        console.log("🚀 Load Page");
+        fetchData();
+    });
+
+
+    // open modal
+    document.getElementById("openModal").addEventListener("click", function() {
+        console.log("📌 Open modal");
+        document.getElementById("settingModal").style.display = "block";
+    });
+
+    // close modal
+    function closeModal() {
+        console.log("❌ Close Modal");
+        document.getElementById("settingModal").style.display = "none";
+
+        document.querySelector("input[type='date']").value = "";
+        document.querySelectorAll("input[type='date']")[1].value = "";
+        document.querySelector("input[type='time']").value = "";
+        document.querySelectorAll("input[type='time']")[1].value = "";
+
+        document.getElementById("selected-text").textContent = "Select Room";
+    }
+
+    document.getElementById("cancelBtn").addEventListener("click", closeModal);
+
+    // click out modal
+    // https://stackoverflow.com/questions/45393553/window-onclick-functionevent-only-works-for-first-item
+    window.onclick = function(event) {
+        let modal = document.getElementById("settingModal");
+
+        if (event.target === modal) {
+            // console.log("👀 Event: " + event.target);
+            // console.dir(event.target);
+            // console.log("🙂 Modal: " + modal);
+            // console.dir(modal);
+            console.log("⛔ คลิกนอก Modal -> ปิด Modal");
+            closeModal();
+        }
+
+    };
+
+    // date (https://stackoverflow.com/questions/20491326/start-and-end-date-validation-in-html5)
+    const startDate = document.querySelector("#start-date");
+    const endDate = document.querySelector("#end-date");
+
+    startDate.addEventListener('change', function () {
+
+        if (startDate.value) {
+            endDate.min = startDate.value
+        }
+
+    }, false);
+
+    endDate.addEventListener('change', function () {
+
+        if (endDate.value) {
+            startDate.max = endDate.value
+        }
+
+    }, false);
+
+    // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_onblur (blur)
+    endDate.addEventListener('blur', function () {
+
+        if (endDate.value && startDate.value && endDate.value < startDate.value) {
+            Swal.fire({
+                icon: "error",
+                title: "Sorry!",
+                text: "End date cannot be earlier than the Start date.",
+                draggable: true,
+                confirmButtonColor: "#dc3360"
+            });
+
+            endDate.value = "";
+            endDate.min = "";
+        }
+
+    });
+
+    startDate.addEventListener('blur', function () {
+
+        if (startDate.value && endDate.value && startDate.value > endDate.value) {
+            Swal.fire({
+                icon: "error",
+                title: "Sorry!",
+                text: "Start date cannot be more than End date",
+                draggable: true,
+                confirmButtonColor: "#dc3360"
+            });
+
+            startDate.value = "";
+            startDate.max = "";
+        }
+
+    });
+
+
+
+    // room
+    const rooms = [];
+    let selectedRooms = new Set();
+
+    function toggleDropdown() {
+        let dropdown = document.getElementById("dropdown-content");
+        let isVisible = dropdown.style.display === "block";
+        console.log(`${isVisible}`);
+
+        dropdown.style.display = isVisible ? "none" : "block";
+        console.log(`📂 Dropdown ${isVisible ? "close" : "open"}`);
+    }
+
+    function filterRooms() {
+        // change
+        let searchValue = document.getElementById("search").value.toLowerCase();
+        console.log(`🔎 Find: ${searchValue}`);
+
+        let filteredRooms = rooms.filter(room => room.toLowerCase().includes(searchValue));
+        console.log("📋 Result:", filteredRooms);
+
+        createRooms(filteredRooms); // หลังค้นหา
+    }
+
+    function createRooms(filteredRooms = rooms) {
+        let roomList = document.getElementById("room-list");
+        roomList.innerHTML = ""; // clear
+
+        console.log("🔄 Load new room");
+        console.log("🔍 Room:", filteredRooms);
+
+        filteredRooms.forEach(room => {
+            let label = document.createElement("label");
+            label.classList.add("room-label");
+            let checkbox = document.createElement("input");
+
+            checkbox.type = "checkbox";
+            checkbox.value = room;
+            checkbox.checked = selectedRooms.has(room);
+
+            checkbox.onchange = function () {
+                if (checkbox.checked) {
+                    selectedRooms.add(room);
+                    console.log(`✅ Select room: ${room}`);
+                } else {
+                    selectedRooms.delete(room);
+                    console.log(`❌ Delete room: ${room}`);
+                }
+                updateSelectedCount();
+            };
+
+            label.appendChild(checkbox);
+            label.appendChild(document.createTextNode(` ${room}`));
+            roomList.appendChild(label);
+            roomList.appendChild(document.createElement("br"));
+        });
+
+        updateSelectedCount();
+    }
+
+    function selectAll() {
+        let selectAllCheckbox = document.getElementById("select-all");
+        let checkboxes = document.querySelectorAll("#room-list input[type=checkbox]");
+        let isChecked = selectAllCheckbox.checked;
+
+        console.log(isChecked ? "🔘 Select all" : "⭕ Cancle all");
+
+        checkboxes.forEach(cb => {
+            cb.checked = isChecked;
+
+            if (isChecked) {
+                selectedRooms.add(cb.value);
+            } else {
+                selectedRooms.delete(cb.value);
+            }
+
+        });
+
+        updateSelectedCount();
+    }
+
+    function updateSelectedCount() {
+        let count = selectedRooms.size;
+
+        if (count > 0) {
+            document.getElementById("selected-text").textContent = `${count} Selected`;
+        } else {
+            document.getElementById("selected-text").textContent = "Select Room";
+        }
+
+        console.log(`📊 Count room: ${count}`);
+        console.log("📋 List room:", [...selectedRooms]);
+    }
+
+    // close dropdown room
+    document.addEventListener("click", function(event) {
+
+        if (!event.target.closest(".dropdown")) {
+            document.getElementById("dropdown-content").style.display = "none";
+            console.log("📌 คลิกข้างนอก -> ปิด Dropdown");
+        }
+
+    });
+
+
+    function getCsrfToken() {
+
+        let tokenInput = document.getElementById("csrfToken");
+
+        if (tokenInput && tokenInput.value) {
+            return tokenInput.value;
+        }
+
+        console.error("⛔ CSRF token not found.");
+        return "dummy-token";
+    }
+
+
+
+    // send value to controlller
+    document.getElementById("saveBtn").addEventListener("click", function (){
+        let startDateInput = document.querySelector("input[type='date']");
+        let endDateInput = document.querySelectorAll("input[type='date']")[1];
+        let startTimeInput = document.querySelector("input[type='time']");
+        let endTimeInput = document.querySelectorAll("input[type='time']")[1];
+        let program = document.getElementById("program-text").textContent;
+
+        // console.log("startDateInput:", startDateInput);
+        // console.log("endDateInput:", endDateInput);
+        // console.log("startTimeInput:", startTimeInput);
+        // console.log("endTimeInput:", endTimeInput);
+        // console.log("program:", program);
+
+
+        let startDate = startDateInput.value;
+        let endDate = endDateInput.value;
+        let startTime = startTimeInput.value;
+        let endTime = endTimeInput.value;
+        let selectedRoom = [...selectedRooms];
+        let programData = program;
+
+        if (!startDate || !endDate || !startTime || !endTime || selectedRoom.length === 0) {
+            Swal.fire({
+                icon: "warning",
+                title: "Oops...",
+                text: "Please fill in all information.",
+                draggable: true,
+                confirmButtonColor: "#dc7633"
+            });
+            return;
+        }
+
+        let settingData = {
+            startDate: startDate,
+            endDate: endDate,
+            startTime: startTime,
+            endTime: endTime,
+            rooms: selectedRoom,
+            program: programData
+        };
+
+        console.log("📤 settingData: ", settingData);
+
+        let csrfToken = getCsrfToken();
+        console.log("👀 CSRF Token: ", csrfToken);
+
+        if (!csrfToken || csrfToken === "dummy-token") {
+            alert("CSRF Token Invalid❗️");
+            return;
+        }
+
+
+        fetch('http://localhost:8080/admin/bookingSave', {
+
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify(settingData)
+
+        })
+            .then(response => {
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json()
+            })
+
+            .then(data => {
+
+                console.log('Data:', data);
+                // alert('✅ Data saved successfully.');
+
+                // ref image: https://www.pinterest.com/pin/654640495854851006/visual-search/?x=59&y=72&w=113&h=100&cropSource=6&surfaceType=flashlight&rs=pin
+                // ref swal: https://preview.keenthemes.com/metronic/demo6/rtl/features/miscellaneous/sweetalert2.html
+                // Swal.fire({
+                //   title: "Success!",
+                //   text: "Data saved successfully.",
+                //   imageUrl: "https://i.ibb.co/V0xkrmQD/Fireworks.jpg",
+                //   imageWidth: 200,
+                //   imageHeight: 200,
+                //   showConfirmButton: false,
+                //   timer: 1500
+                // });
+
+                Swal.fire({
+                    icon: "success",
+                    title: "Data saved successfully.",
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+
+                document.getElementById("settingModal").style.display = "none";
+
+                document.querySelector("input[type='date']").value = "";
+                document.querySelectorAll("input[type='date']")[1].value = "";
+                document.querySelector("input[type='time']").value = "";
+                document.querySelectorAll("input[type='time']")[1].value = "";
+
+                document.getElementById("selected-text").textContent = "Select Room";
+
+            })
+
+            .catch(error => {
+                console.error('Error:', error);
+                // alert('An error occurred while saving the data ❗️');
+                Swal.fire({
+                    icon: "error",
+                    title: "Oops...",
+                    text: "Something went wrong!",
+                });
+            });
+    });
+
+
+    // toggle program
+
+    document.getElementById("toggle-program").addEventListener("click", function() {
+        let textElement = document.getElementById("program-text");
+
+        if (textElement.textContent === "DST") {
+
+            textElement.textContent = "ICT";
+            // textElement.style.backgroundColor = "#77B1B1";
+            // textElement.style.color = "white";
+
+        } else {
+
+            textElement.textContent = "DST";
+            // textElement.style.backgroundColor = "#f5d76e";
+            // textElement.style.color = "white";
+
+        }
+    });
+
+
+
+
+</script>

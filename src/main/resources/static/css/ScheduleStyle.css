@@ -1,0 +1,240 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+body {
+    font-family: Inter;
+    margin: 0;
+    background-color: #F4F6F8;
+}
+
+.content {
+    flex: 1;
+    margin-left: 280px;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #006C6C;
+    color: white;
+    /*padding: 2rem;*/
+    font-size: 2rem;
+    font-weight: 700;
+    height: 100px;
+    padding-top: 1rem;
+    padding-bottom: 5.5rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    letter-spacing: 0.05rem;
+}
+
+:root {
+    --Theme-Colors-White: #624BFF;
+}
+
+.set-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 20px;
+    gap: 10px;
+    border-radius: 0.7rem;
+    color: #624BFF;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.05rem;
+}
+
+.btn-program {
+    width: 5.2rem;
+    height: 3rem;
+    flex-shrink: 0;
+    border-radius: 0.5rem;
+    background: #FFF;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    font-size: 1.2rem;
+    font-style: normal;
+    font-weight: 570;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.05rem;
+}
+
+.title-group {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    flex-grow: 1; /* ให้ขยายพื้นที่ไปทางขวา */
+}
+
+
+/*===================================================================  Modal =================================================================== */
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 40%;
+    border-radius: 10px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -2rem;
+    border-bottom: 0.5rem solid #DFE3E8;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.04rem;
+    margin-bottom: 1rem;
+}
+
+.close {
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.modal-body {
+    padding: 1rem;
+}
+
+label {
+    margin-bottom: 1rem;
+    display: block;
+    font-weight: 600;
+    letter-spacing: 0.03rem;
+}
+
+.room-label {
+    font-weight: 450;
+}
+
+.custom-input {
+    width: 100%;
+    padding: 0.6rem;
+    margin-bottom: 2rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+}
+
+#saveBtn {
+    background-color: #5f9de0;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    align-items: end;
+    padding: 1rem;
+    margin-top: 2rem;
+    margin-right: 1rem;
+}
+
+#cancelBtn {
+    background-color: #f44336;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    padding: 1rem;
+    margin-top: 2rem;
+}
+
+/*===================================================================  Modal =================================================================== */
+
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 75%;
+}
+
+.dropdown button {
+    width: 100%;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dropdown-content {
+    position: absolute;
+    background: #fff;
+    box-shadow: 0px 4px 6px rgba(0,0,0,0.2);
+    border-radius: 6px;
+    padding: 10px;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    z-index: 1000;
+
+    /* ป้องกันการตกขอบ */
+    left: 0;
+    min-width: 100%;
+}
+
+.dropdown-content.upward {
+    bottom: 100%;
+    top: auto;
+}
+
+
+.dropdown-content label {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.7rem;  /* ลด padding ให้เล็กลง */
+    margin: 2px 0;     /* ลดระยะห่างระหว่าง label */
+    cursor: pointer;
+}
+
+.dropdown-content label:hover {
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.dropdown-content input[type="text"] {
+    width: 100%;
+    padding: 1rem;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+/*.body-section {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    justify-content: flex-start;*/
+/*    background: #ffffff;*/
+/*    padding: 20px;*/
+/*}*/
