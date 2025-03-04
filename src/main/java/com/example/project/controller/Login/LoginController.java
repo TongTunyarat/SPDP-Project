@@ -32,22 +32,23 @@ public class LoginController {
         if (logout != null) {
             model.addAttribute("message", "You have been logged out successfully.");
         }
-        return "login";
+        return "Login";
     }
+
 
 
 
     // Prepare Admin login
     //https://medium.com/@CodeWithTech/understanding-securitycontext-and-securitycontextholder-in-spring-security-e8ec9c030819
     //https://stackoverflow.com/questions/3542026/retrieving-session-id-with-spring-security
-    @GetMapping("/admin/home")
-    public String defautlAdmin() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        System.out.println("Account username: " + authentication.getName());
-        System.out.println("Session ID: " + RequestContextHolder.currentRequestAttributes().getSessionId());
-
-        return "AdminHome";
-    }
+//    @GetMapping("/admin/home")
+//    public String defautlAdmin() {
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        System.out.println("Account username: " + authentication.getName());
+//        System.out.println("Session ID: " + RequestContextHolder.currentRequestAttributes().getSessionId());
+//
+//        return "AdminHome";
+//    }
 
 
 
@@ -60,17 +61,17 @@ public class LoginController {
 
     //=========================================== See Result (Not Use) ===================================================
 
-    // เก็บไว้ดู session
-    @GetMapping("/session")
-    @ResponseBody
-    public String checkSession() {
-        try {
-            String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
-            return "Session ID: " + sessionId;
-        } catch (IllegalStateException e) {
-            return "Session ID has been invalidated";
-        }
-    }
+//    // เก็บไว้ดู session
+//    @GetMapping("/session")
+//    @ResponseBody
+//    public String checkSession() {
+//        try {
+//            String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
+//            return "Session ID: " + sessionId;
+//        } catch (IllegalStateException e) {
+//            return "Session ID has been invalidated";
+//        }
+//    }
 
 }
 

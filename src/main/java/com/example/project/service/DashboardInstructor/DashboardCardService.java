@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Service
-public class DashboardService {
+public class DashboardCardService {
 
     @Autowired
     private ProjectService projectService;

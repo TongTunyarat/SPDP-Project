@@ -136,6 +136,21 @@ body {
     padding-left: 1.2rem;
 }
 
+.text-center {
+    display: flex;
+    font-size: 1.5rem;
+    align-items: center;
+    margin-top: -1.5rem;
+    padding-left: 2.5rem;
+}
+
+.text-footer {
+    display: flex;
+    font-size: 1.2rem;
+    padding-left: 1rem;
+    margin-top: -1.5rem;
+}
+
 label {
     font-size: 14px;
     margin-bottom: 10px;
