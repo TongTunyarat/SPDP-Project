@@ -1,41 +1,64 @@
 package com.example.project.DTO.projectManagement;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import lombok.Data;
 
 @Data
 public class ExcelDataDTO {
-    private String projectID;
+
+    @ExcelProperty("Project ID")
+    private String projectId;
+
+    @ExcelProperty("Project Title")
     private String projectTitle;
+
+    @ExcelProperty("Project Description")
     private String projectDescription;
+
+    @ExcelProperty("Advisor")
     private String advisor;
+
+    @ExcelProperty("Committee")
     private String committee;
+
+    @ExcelProperty("Poster Committee")
     private String posterCommittee;
-    private String studentID;
+
+    @ExcelProperty("Student ID")
+    private String studentId;
+
+    @ExcelProperty("Student Name")
     private String studentName;
+
+    @ExcelProperty("Program")
     private String program;
+
+    @ExcelProperty("Section")
     private String section;
+
+    @ExcelProperty("Track")
     private String track;
 
-    public ExcelDataDTO(String projectID, String projectTitle, String projectDescription, String advisor, String committee, String posterCommittee, String studentID, String studentName, String program, String section, String track) {
-        this.projectID = projectID;
+    public ExcelDataDTO(String projectId, String projectTitle, String projectDescription, String advisor, String committee, String posterCommittee, String studentId, String studentName, String program, String section, String track) {
+        this.projectId = projectId;
         this.projectTitle = projectTitle;
         this.projectDescription = projectDescription;
         this.advisor = advisor;
         this.committee = committee;
         this.posterCommittee = posterCommittee;
-        this.studentID = studentID;
+        this.studentId = studentId;
         this.studentName = studentName;
         this.program = program;
         this.section = section;
         this.track = track;
     }
 
-    public String getProjectID() {
-        return projectID;
+    public String getProjectId() {
+        return projectId;
     }
 
-    public void setProjectID(String projectID) {
-        this.projectID = projectID;
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
     }
 
     public String getProjectTitle() {
@@ -78,12 +101,12 @@ public class ExcelDataDTO {
         this.posterCommittee = posterCommittee;
     }
 
-    public String getStudentID() {
-        return studentID;
+    public String getStudentId() {
+        return studentId;
     }
 
-    public void setStudentID(String studentID) {
-        this.studentID = studentID;
+    public void setStudentId(String studentId) {
+        this.studentId = studentId;
     }
 
     public String getStudentName() {
@@ -118,5 +141,3 @@ public class ExcelDataDTO {
         this.track = track;
     }
 }
-
-

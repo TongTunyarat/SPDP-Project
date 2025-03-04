@@ -3,6 +3,8 @@ package com.example.project.service;
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
+import com.example.project.entity.StudentProject;
+import com.example.project.repository.StudentProjectRepository;
 import com.opencsv.CSVReader;
 import com.example.project.entity.Project;
 import com.example.project.entity.Student;
@@ -27,28 +29,32 @@ public class UploadFilesService {
     @Autowired
     private StudentRepository studentRepository;
 
+    @Autowired
+    private StudentProjectRepository studentProjectRepository;
+
     public Map<String, Object> uploadFile(MultipartFile file) {
         Map<String, Object> response = new HashMap<>();
         List<String> errorLogs = new ArrayList<>();
         List<Student> students = new ArrayList<>();
         List<Project> projects = new ArrayList<>();
+        List<StudentProject> studentProjects = new ArrayList<>();
 
         try {
             if (file.getOriginalFilename().endsWith(".csv")) {
-                processCSV(file, students, projects, errorLogs);
+                processCSV(file, students, projects, studentProjects, errorLogs);
             } else if (file.getOriginalFilename().endsWith(".xlsx")) {
-                processExcel(file, students, projects, errorLogs);
+                processExcel(file, students, projects, studentProjects, errorLogs);
             } else {
                 throw new IllegalArgumentException("Unsupported file format");
             }
 
-            validateAndSaveData(students, projects, errorLogs);
+            validateAndSaveData(students, projects, studentProjects, errorLogs); // ✅ ส่ง studentProjects เข้าไป
 
             response.put("message", "File processed successfully");
             response.put("errors", errorLogs);
         } catch (Exception e) {
-            // ใช้ System.out.println() แสดงผลแทนการใช้ log
             System.out.println("Error processing file: " + e.getMessage());
+            e.printStackTrace();
             response.put("message", "File processing failed");
             response.put("errors", List.of(e.getMessage()));
         }
@@ -56,13 +62,13 @@ public class UploadFilesService {
         return response;
     }
 
-    private void processCSV(MultipartFile file, List<Student> students, List<Project> projects, List<String> errorLogs) {
+    private void processCSV(MultipartFile file, List<Student> students, List<Project> projects, List<StudentProject> studentProjects, List<String> errorLogs) {
         try (CSVReader reader = new CSVReader(new InputStreamReader(file.getInputStream()))) {
             List<String[]> lines = reader.readAll();
             boolean isFirstLine = true;
 
             for (String[] data : lines) {
-                if (isFirstLine) { // ข้าม Header
+                if (isFirstLine) {
                     isFirstLine = false;
                     continue;
                 }
@@ -70,65 +76,89 @@ public class UploadFilesService {
                     errorLogs.add("Invalid CSV format: " + Arrays.toString(data));
                     continue;
                 }
-                mapToEntities(data, students, projects, errorLogs);
+                mapToEntities(data, students, projects, studentProjects, errorLogs); // ✅ ส่ง studentProjects เข้าไป
             }
         } catch (Exception e) {
-            // ใช้ System.out.println() แสดงผลแทนการใช้ log
             System.out.println("Error processing CSV: " + e.getMessage());
             errorLogs.add("Error processing CSV: " + e.getMessage());
         }
     }
 
-    private void processExcel(MultipartFile file, List<Student> students, List<Project> projects, List<String> errorLogs) {
+    private void processExcel(MultipartFile file, List<Student> students, List<Project> projects, List<StudentProject> studentProjects, List<String> errorLogs) {
         try {
             EasyExcel.read(file.getInputStream(), ExcelDataDTO.class, new ReadListener<ExcelDataDTO>() {
                 @Override
                 public void invoke(ExcelDataDTO data, AnalysisContext context) {
+                    System.out.println("Excel Data Read: " + data);
+
+                    if (data == null || data.getStudentId() == null || data.getStudentId().isEmpty()) {
+                        errorLogs.add("Missing Student ID: " + data);
+                        return;
+                    }
+
                     String[] rowData = {
-                            data.getProjectID(), data.getProjectTitle(), data.getProjectDescription(),
+                            data.getProjectId(), data.getProjectTitle(), data.getProjectDescription(),
                             data.getAdvisor(), data.getCommittee(), data.getPosterCommittee(),
-                            data.getStudentID(), data.getStudentName(), data.getProgram(),
+                            data.getStudentId(), data.getStudentName(), data.getProgram(),
                             data.getSection(), data.getTrack()
                     };
-                    mapToEntities(rowData, students, projects, errorLogs);
+
+                    System.out.println("Row Data: " + Arrays.toString(rowData));
+                    mapToEntities(rowData, students, projects, studentProjects, errorLogs);
                 }
 
                 @Override
                 public void doAfterAllAnalysed(AnalysisContext context) {}
             }).sheet().doRead();
         } catch (Exception e) {
-            // ใช้ System.out.println() แสดงผลแทนการใช้ log
             System.out.println("Error processing Excel: " + e.getMessage());
             errorLogs.add("Error processing Excel: " + e.getMessage());
         }
     }
 
-    private void mapToEntities(String[] data, List<Student> students, List<Project> projects, List<String> errorLogs) {
+    private void mapToEntities(String[] data, List<Student> students, List<Project> projects, List<StudentProject> studentProjects, List<String> errorLogs) {
         try {
+            System.out.println("📌 Raw data from file: " + Arrays.toString(data));
+
+            if (data.length < 11) {
+                errorLogs.add("Invalid data format: " + Arrays.toString(data));
+                return;
+            }
+
+            if (data[6].isEmpty() || data[7].isEmpty()) {
+                errorLogs.add("Missing required Student fields: " + Arrays.toString(data));
+                return;
+            }
+
             Project project = new Project();
-            project.setProjectId(data[0]);
-            project.setProjectTitle(data[1]);
-            project.setProjectDescription(data[2]);
-            project.setProgram(data[8]);
+            project.setProjectId(data[0].trim());
+            project.setProjectTitle(data[1].trim());
+            project.setProjectDescription(data[2].trim());
+            project.setProgram(data[8].trim());
             projects.add(project);
 
             Student student = new Student();
-            student.setStudentId(data[6]);
-            student.setStudentName(data[7]);
-            student.setProgram(data[8]);
-            student.setSection(Byte.parseByte(data[9]));
-            student.setTrack(data[10]);
-
+            student.setStudentId(data[6].trim());
+            student.setStudentName(data[7].trim());
+            student.setProgram(data[8].trim());
+            student.setSection(data[9].isEmpty() ? 0 : Byte.parseByte(data[9].trim()));
+            student.setTrack(data[10].trim());
             students.add(student);
+
+            StudentProject studentProject = new StudentProject(student, project);
+            studentProject.setStudentPjId(UUID.randomUUID().toString());
+            studentProjects.add(studentProject);
+
+            System.out.println("✅ Mapped Student: " + student.getStudentId() + " - " + student.getStudentName());
+
         } catch (Exception e) {
-            errorLogs.add("Data mapping error: " + Arrays.toString(data));
-            // ใช้ System.out.println() แสดงผลแทนการใช้ log
-            System.out.println("Data mapping error: " + Arrays.toString(data));
+            errorLogs.add("Data mapping error: " + Arrays.toString(data) + " -> " + e.getMessage());
+            System.out.println("Data mapping error: " + Arrays.toString(data) + " -> " + e.getMessage());
         }
     }
 
-    private void validateAndSaveData(List<Student> students, List<Project> projects, List<String> errorLogs) {
-        // เปลี่ยนจากการใช้ findAllByStudentId เป็นการดึงข้อมูลทั้งหมด
+
+    private void validateAndSaveData(List<Student> students, List<Project> projects, List<StudentProject> studentProjects, List<String> errorLogs) {
         List<Student> existingStudents = studentRepository.findAll();
         Set<String> existingStudentIds = new HashSet<>();
         Set<String> existingStudentNames = new HashSet<>();
@@ -147,8 +177,10 @@ public class UploadFilesService {
             }
         }
 
-        // บันทึกข้อมูลที่ไม่ซ้ำ
         studentRepository.saveAll(validStudents);
         projectRepository.saveAll(projects);
+        studentProjectRepository.saveAll(studentProjects); // ✅ บันทึกข้อมูล StudentProject
+
     }
+
 }

@@ -153,4 +153,6 @@ public class Student {
     public void setDefenseEvaluations(List<DefenseEvaluation> defenseEvaluations) {
         this.defenseEvaluations = defenseEvaluations;
     }
+
+
 }

@@ -430,20 +430,11 @@
 
             reader.onload = function (e) {
                 let fileContent = e.target.result;
+                fileContent = removeBOM(fileContent); // ลบ BOM (ถ้ามี)
 
-                // ลบ BOM (ถ้ามี) จากไฟล์ CSV
-                fileContent = removeBOM(fileContent);
-
-                // ถ้าเป็นไฟล์ CSV
                 if (file.type === "text/csv") {
                     const jsonData = csvToJson(fileContent);
-                    showFilePreview(jsonData);
-                }
-
-                // ถ้าเป็นไฟล์ Excel
-                else if (file.type === "application/vnd.ms-excel" || file.type === "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet") {
-                    const jsonData = excelToJson(fileContent);
-                    showFilePreview(jsonData);
+                    validateAndShowPreview(jsonData);
                 }
             };
 
@@ -451,7 +442,7 @@
         }
     });
 
-    // ฟังก์ชันแปลง CSV เป็น JSON
+    // แปลง CSV เป็น JSON
     function csvToJson(csv) {
         const lines = csv.split("\n");
         const result = [];
@@ -462,7 +453,7 @@
             const currentLine = lines[i].split(",");
 
             for (let j = 0; j < headers.length; j++) {
-                obj[headers[j]] = currentLine[j];
+                obj[headers[j].trim()] = currentLine[j] ? currentLine[j].trim() : "";
             }
             result.push(obj);
         }
@@ -470,55 +461,92 @@
         return result;
     }
 
-    // ฟังก์ชันแปลง Excel เป็น JSON
-    function excelToJson(fileContent) {
-        const workbook = XLSX.read(fileContent, {type: "binary"});
+    // ตรวจสอบข้อมูลก่อนอัปโหลด
+    function validateAndShowPreview(jsonData) {
+        console.log("📌 JSON Data for Preview:", jsonData); // ✅ Debug JSON
 
-        const jsonData = workbook.SheetNames.reduce((acc, sheetName) => {
-            const sheet = workbook.Sheets[sheetName];
-            const jsonSheet = XLSX.utils.sheet_to_json(sheet);
-            acc[sheetName] = jsonSheet;
-            return acc;
-        }, {});
-
-        return jsonData;
-    }
-
-    // แสดงตัวอย่างข้อมูลในไฟล์
-    function showFilePreview(jsonData) {
         const previewContent = document.getElementById('preview-content');
-        previewContent.innerHTML = '';  // เคลียร์ข้อมูลเก่า
+        previewContent.innerHTML = ''; // เคลียร์ข้อมูลเก่า
 
-        // แสดงข้อมูลจาก JSON ตัวอย่าง
+        const table = document.createElement('table');
+        table.classList.add('preview-table');
+
+        const headerRow = document.createElement('tr');
+        headerRow.innerHTML = `
+        <th>Student ID</th>
+        <th>Student Name</th>
+        <th>Project Title</th>
+        <th>Status</th>
+    `;
+        table.appendChild(headerRow);
+
         jsonData.forEach(item => {
-            const div = document.createElement('div');
-            div.classList.add('file-preview-item');
-            div.textContent = JSON.stringify(item, null, 2);
-            previewContent.appendChild(div);
+            if (Array.isArray(item.studentsList) && item.studentsList.length > 0) {
+                item.studentsList.forEach(student => {
+                    const row = document.createElement('tr');
+                    const studentId = student["Student ID"];
+                    const studentName = student["Student Name"];
+                    const status = studentId ? "✅ Valid" : "❌ Missing Student ID";
+
+                    row.innerHTML = `
+                    <td>${studentId || "-"}</td>
+                    <td>${studentName || "-"}</td>
+                    <td>${item["Project Title"] || "-"}</td>
+                    <td>${status}</td>
+                `;
+
+                    table.appendChild(row);
+                });
+            } else {
+                console.warn("⚠️ No students found for project:", item["Project ID"]);
+            }
         });
 
-        // แสดงปุ่ม Upload หลังจากมีการแสดงตัวอย่าง
-        document.getElementById('confirm-upload-btn').style.display = 'inline-block';
+        previewContent.appendChild(table);
+
+        // แสดงปุ่ม Upload ถ้ามีข้อมูล
+        document.getElementById('confirm-upload-btn').style.display = jsonData.length > 0 ? 'inline-block' : 'none';
     }
 
-    // ฟังก์ชัน Upload ข้อมูล
+
+    // ฟังก์ชัน Upload ข้อมูลไปยังเซิร์ฟเวอร์
     document.getElementById('confirm-upload-btn').addEventListener('click', function () {
         const file = document.getElementById('fileInput').files[0];
-        if (file) {
-            // ทำการอัปโหลดไฟล์ตามที่ต้องการ (ส่งข้อมูล JSON ไปที่ server)
-            alert('File Uploaded!');
-            document.getElementById('uploadModal').style.display = 'none';  // ปิด Modal
-            window.location.reload();
+        if (!file) {
+            alert("Please select a file first!");
+            return;
         }
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        console.log("📌 Sending file to server:", file.name); // ✅ Debug ก่อนส่งไฟล์
+
+        fetch("http://localhost:8080/admin/uploadFiles", {
+            method: "POST",
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log("📌 Server Response:", data);
+
+                if (data.message === "File processed successfully") {
+                    alert("Upload successful!");
+                } else {
+                    alert("Upload failed: " + (data.errors ? data.errors.join(", ") : "Unknown error"));
+                }
+            })
+            .catch(error => console.error("Error uploading file:", error));
     });
 
-    // ฟังก์ชันสำหรับลบ BOM (ตัวไม่รองรับภาษาไทย)
+    // ฟังก์ชันสำหรับลบ BOM (รองรับภาษาไทย)
     function removeBOM(csv) {
         if (csv.charCodeAt(0) === 0xFEFF) {
             csv = csv.substring(1);
         }
         return csv;
     }
+
 
 
 </script>

@@ -21,14 +21,13 @@ public class UploadFilesController {
 
     @PostMapping("/uploadFiles")
     public ResponseEntity<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file) {
+        System.out.println("✅ File upload started: " + file.getOriginalFilename()); // ✅ Debug
+
         Map<String, Object> response = uploadFilesService.uploadFile(file);
 
-        // ตรวจสอบว่าไฟล์ประมวลผลสำเร็จหรือไม่
-        if (response.containsKey("message") && response.get("message").equals("File processed successfully")) {
-            return new ResponseEntity<>(response, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
-        }
+        return response.containsKey("message") && response.get("message").equals("File processed successfully")
+                ? new ResponseEntity<>(response, HttpStatus.OK)
+                : new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
     }
 
 }

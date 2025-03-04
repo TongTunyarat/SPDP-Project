@@ -31,6 +31,10 @@ public class StudentProject {
 
     }
 
+    public StudentProject(Student student, Project project) {
+        this.student = student;
+        this.project = project;
+    }
 
     public String getStudentPjId() {
         return studentPjId;
