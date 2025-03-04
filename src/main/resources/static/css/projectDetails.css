@@ -1,4 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
 body {
     font-family: Inter;
@@ -157,14 +158,18 @@ td:nth-child(6) ul, td:nth-child(7) ul {
 }
 
 
-/* View Button */
+/* Actions Button */
+td form {
+    display: inline-flex;
+    margin-right: 1px;
+}
+
 .view-btn,
 .edit-btn,
 .delete-btn {
     background-color: #005A5A;
     color: white;
     border: none;
-    padding: 6px 12px;
     border-radius: 5px;
     cursor: pointer;
 }
@@ -381,4 +386,58 @@ td:nth-child(6) ul, td:nth-child(7) ul {
 .close-btn:hover {
     background-color: #d32f2f; /* สีแดงเข้มขึ้น */
     transform: scale(1.05);
+}
+
+.dropdown {
+    margin-top: -3px;
+}
+
+/* Hide the dropdown content by default */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+/* Style for the dropdown button */
+.dropdown-btn {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+/* When you hover over the dropdown button */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Style for each link inside the dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    font-size: 14px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color when hovering over the links */
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+.show {
+    display: block;
+}
+
+.template-btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
 }
