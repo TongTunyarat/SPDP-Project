@@ -75,49 +75,13 @@
 
     <div class="content">
         <!--    HEADER    -->
-<!--        <div class="header-section">-->
-<!--            <span id="date-time"></span>-->
-
-<!--            <div class="semester-container">-->
-<!--                <select id="semester-selector">-->
-<!--                    <option value="Semester 1/2024"> [icon calendar]Semester 1/2024</option>-->
-<!--                    <option value="Semester 2/2024"> [icon calendar]Semester 2/2024</option>-->
-<!--                </select>-->
-<!--            </div>-->
-<!--        </div>-->
         <div class="header-section">
             <span id="date-time"></span>
+
             <div class="semester-container">
-                <select id="semester-selector">
-                    <option value="">Loading...</option>
-                </select>
+                <select id="semester-selector" onchange="fetchGradingStatistics(); fetchProposalData(); fetchDefenseData(); fetchPosterData(); fetchGradeDistribution();"></select>
             </div>
         </div>
-
-        <script>
-            async function fetchAcademicYears() {
-                try {
-                    // เรียก API เพื่อดึงข้อมูลปีการศึกษาและภาคการศึกษา
-                    const response = await fetch('/api/academic-years'); // แก้ไข URL ตาม API ของคุณ
-                    const data = await response.json();
-
-                    const semesterSelector = document.getElementById('semester-selector');
-                    semesterSelector.innerHTML = ""; // ล้างค่าก่อนเติมใหม่
-
-                    data.forEach(item => {
-                        const option = document.createElement("option");
-                        option.value = item.academic_year;
-                        option.textContent = item.academic_year;
-                        semesterSelector.appendChild(option);
-                    });
-                } catch (error) {
-                    console.error("Error fetching academic years:", error);
-                }
-            }
-
-            fetchAcademicYears();
-        </script>
-
 
         <!--    TAB: ICT & DST    -->
         <div class="tabs">
@@ -132,7 +96,7 @@
                 <label class="text-header"> Proposal Grading </label>
 
                 <label class="text-center">
-                    <h1> 0/10 <span style="color: #919EAB;"></span></h1>
+                    <h1> 0/0 <span style="color: #919EAB;"></span></h1>
                 </label>
 
                 <label class="text-footer"> 0 <span style="color: #919EAB;"> completed </span> </label>
@@ -141,7 +105,7 @@
             <div class="header-container">
                 <label class="text-header"> Defense Grading </label>
                 <label class="text-center">
-                    <h1> 0/10 <span style="color: #919EAB;"></span></h1>
+                    <h1> 0/0 <span style="color: #919EAB;"></span></h1>
                 </label>
                 <label class="text-footer"> 0 <span style="color: #919EAB;"> completed </span> </label>
             </div>
@@ -149,7 +113,7 @@
             <div class="header-container">
                 <label class="text-header"> Proposal Evaluation </label>
                 <label class="text-center">
-                    <h1> 0/10 <span style="color: #919EAB;">Groups</span></h1>
+                    <h1> 0/0 <span style="color: #919EAB;">Groups</span></h1>
                 </label>
 
                 <label class="text-footer"> 0 <span style="color: #919EAB;"> completed </span> </label>
@@ -158,7 +122,7 @@
             <div class="header-container">
                 <label class="text-header"> Poster Evaluation </label>
                 <label class="text-center">
-                    <h1> 0/20 <span style="color: #919EAB;">Groups</span></h1>
+                    <h1> 0/0 <span style="color: #919EAB;">Groups</span></h1>
                 </label>
 
                 <label class="text-footer"> 0 <span style="color: #919EAB;"> completed </span> </label>
@@ -167,7 +131,7 @@
             <div class="header-container">
                 <label class="text-header"> Defense Evaluation </label>
                 <label class="text-center">
-                    <h1> 0/10 <span style="color: #919EAB;">Groups</span></h1>
+                    <h1> 0/0 <span style="color: #919EAB;">Groups</span></h1>
                 </label>
 
                 <label class="text-footer"> 0 <span style="color: #919EAB;"> completed </span> </label>
@@ -186,23 +150,22 @@
             <div class="panel">
                 <div class="panel-title">สัดส่วนเกรดของนักเรียนทั้งหมด</div>
                 <div class="chart-container">
-                    <div class="bar-chart">
-                        <div class="bar" style="height: 80%;"></div>
-                        <div class="bar" style="height: 60%;"></div>
-                        <div class="bar" style="height: 60%;"></div>
-                        <div class="bar" style="height: 20%;"></div>
-                        <div class="bar" style="height: 10%;"></div>
-                        <div class="bar tallest" style="height: 90%;"></div>
+                    <div class="bar-chart" id="barChart">
+                        <!-- แสดงกราฟ -->
                     </div>
                     <div class="x-axis">
                         <div class="x-label">A</div>
+                        <div class="x-label">B+</div>
                         <div class="x-label">B</div>
+                        <div class="x-label">C+</div>
                         <div class="x-label">C</div>
+                        <div class="x-label">D+</div>
                         <div class="x-label">D</div>
                         <div class="x-label">F</div>
                         <div class="x-label">I</div>
                     </div>
                 </div>
+                <div class="tooltip" id="tooltip"></div> <!-- เพิ่ม tooltip -->
                 <div style="font-size: 13px; text-align: center; margin-top: 10px; color: #666;">
                     แสดงการกระจายของเกรดในแต่ละระดับ คิดเป็นเปอร์เซ็นต์ของนักเรียนทั้งหมด
                 </div>
@@ -312,7 +275,7 @@
 
 </div>
 
-<!-- Set Header Value-->
+<!-- ----------- Set Header Value -------------- -->
 <script>
     // ฟังก์ชันแสดงวันที่ในรูปแบบที่ต้องการ
     function formatDate() {
@@ -323,7 +286,7 @@
         // แยกค่าวันที่
         const [weekday, month, day, year] = formattedDate.replace(',', '').split(' ');
 
-        // เรียงใหม่เป็น "Monday 03, March 2025"
+        // เรียงใหม่ "Monday 03, March 2025"
         return `${weekday} ${day} ${month} ${year}`;
     }
 
@@ -335,28 +298,84 @@
         console.log("Selected Semester:", semesterSelect.value);
     });
 
+    // ตั้งค่า event listeners
     document.addEventListener("DOMContentLoaded", function () {
-        const tabs = document.querySelectorAll(".tab");
-        const filters = document.querySelectorAll(".filter");
+        // เริ่มต้นโหลดข้อมูลครั้งแรก
+        // fetchGradeDistribution();
 
+        // อัปเดต event listener สำหรับ semester selector
+        const semesterSelect = document.getElementById("semester-selector");
+        semesterSelect.addEventListener("change", function () {
+            console.log("Selected Semester:", semesterSelect.value);
+            fetchGradeDistribution();
+        });
+
+        // อัปเดต event listener สำหรับ tabs (All, ICT, DST)
+        const tabs = document.querySelectorAll(".tab");
         tabs.forEach(tab => {
             tab.addEventListener("click", function () {
                 // เอา active ออกจากทุก tab
                 tabs.forEach(t => t.classList.remove("active"));
                 // เพิ่ม active ให้ tab ที่ถูกคลิก
                 this.classList.add("active");
+                // เรียก API เมื่อเปลี่ยน tab
+                fetchGradeDistribution();
             });
         });
 
-        filters.forEach(tab => {
-            tab.addEventListener("click", function () {
-                // เอา active ออกจากทุก tab
-                filters.forEach(t => t.classList.remove("active"));
-                // เพิ่ม active ให้ tab ที่ถูกคลิก
+        // อัปเดต event listener สำหรับ filters (Proposal, Poster, Defense)
+        const filters = document.querySelectorAll(".filter");
+        filters.forEach(filter => {
+            filter.addEventListener("click", function () {
+                // เอา active ออกจากทุก filter
+                filters.forEach(f => f.classList.remove("active"));
+                // เพิ่ม active ให้ filter ที่ถูกคลิก
                 this.classList.add("active");
+                // เรียก API เมื่อเปลี่ยน filter
+                fetchGradeDistribution();
             });
         });
     });
+</script>
+
+<!-- --------- Semester Change ------------- -->
+<script>
+    async function fetchAcademicYears() {
+        try {
+            const response = await fetch('/api/academic-years'); // เรียก API
+            const data = await response.json();
+
+            console.log("Year: ", data);
+
+            const semesterSelector = document.getElementById('semester-selector');
+            semesterSelector.innerHTML = ""; // เคลียร์ค่าก่อนเติมใหม่
+
+            data.forEach(year => {
+                const option = document.createElement("option");
+                option.value = year;
+                option.textContent = "📆 "+year;
+                semesterSelector.appendChild(option);
+            });
+
+            // ตั้งค่าปีปัจจุบันเป็น default (เช่น 2025)
+            const currentYear = new Date().getFullYear();  // หาปีปัจจุบัน
+            if (!semesterSelector.value) {
+                semesterSelector.value = currentYear.toString();  // กำหนดค่า default เป็นปีปัจจุบัน
+            }
+
+            // เรียก fetchGradingStatistics เพื่อส่งค่า initial ปีไป
+            await fetchGradingStatistics();
+            await fetchProposalData();
+            await fetchDefenseData();
+            await fetchPosterData();
+            await fetchGradeDistribution();
+
+        } catch (error) {
+            console.error("Error fetching academic years:", error);
+        }
+    }
+
+    fetchAcademicYears();
 </script>
 
 <!-- ------------- For Grading Card --------------- -->
@@ -365,7 +384,7 @@
     let gradingSummary = {}; // เก็บข้อมูลสรุป (completedProposals, completedDefenses, totalGroups, defenseEva, proposalEva)
 
     document.addEventListener('DOMContentLoaded', function() {
-        fetchGradingStatistics();
+        // fetchGradingStatistics();
 
         const tabs = document.querySelectorAll(".tab");
         tabs.forEach(tab => {
@@ -379,54 +398,63 @@
         });
     });
 
-    function fetchGradingStatistics() {
-        fetch('/api/grading-statistics')
-            .then(response => response.json())
-            .then(data => {
-                console.log("📌 Data from API:", data);
+    async function fetchGradingStatistics() {
+        const selectedYear = document.getElementById("semester-selector").value;  // ดึงปีที่เลือกจาก dropdown
+        console.log("selectedYear: ", selectedYear);  // ตรวจสอบว่าได้ค่าไหมใน console
+        if (!selectedYear) {
+            console.log("No year selected");
+            return;
+        }
 
-                if (!Array.isArray(data.student)) {
-                    console.error("❌ API response 'student' is not an array!", data);
-                    return;
-                }
+        try {
+            const response = await fetch(`/api/grading-statistics?year=${selectedYear}`);  // ส่งปีที่เลือกไปใน query parameter
+            const data = await response.json();
 
-                gradingData = data.student;  // Use only the student array
-                gradingSummary = {
-                    totalGroups: data.totalGroups,
-                    completedProposals: data.completedProposals,
-                    completedDefenses: data.completedDefenses,
-                    proposalEvaluation: data.proposalEvaluation,  // Store proposal evaluations
-                    defenseEvaluation: data.defenseEvaluation   // Store defense evaluations
-                };
+            console.log("📌 Data from API:", data);
 
-                // Filter out students with valid grades (not "I")
-                const validStudentGrades = gradingData.filter(student => {
-                    const validProposal = gradingSummary.proposalEvaluation.some(evaluation => {
-                        if (evaluation.student && evaluation.student.studentId === student.studentId) {
-                            console.log(`Proposal Grade for ${student.studentId}: ${evaluation.gradeResult}`);
-                            return evaluation.gradeResult !== "I";
-                        }
-                        return false;
-                    });
+            if (!Array.isArray(data.student)) {
+                console.error("❌ API response 'student' is not an array!", data);
+                return;
+            }
 
-                    const validDefense = gradingSummary.defenseEvaluation.some(evaluation => {
-                        if (evaluation.student && evaluation.student.studentId === student.studentId) {
-                            console.log(`Defense Grade for ${student.studentId}: ${evaluation.gradeResult}`);
-                            return evaluation.gradeResult !== "I";
-                        }
-                        return false;
-                    });
+            gradingData = data.student;  // ใช้ข้อมูล student เท่านั้น
+            gradingSummary = {
+                totalGroups: data.totalGroups,
+                completedProposals: data.completedProposals,
+                completedDefenses: data.completedDefenses,
+                proposalEvaluation: data.proposalEvaluation,  // เก็บค่าการประเมินข้อเสนอ
+                defenseEvaluation: data.defenseEvaluation   // เก็บค่าการประเมินการป้องกัน
+            };
 
-                    return validProposal || validDefense; // If either evaluation has a grade that's not "I"
+            // กรองนักศึกษาที่มีคะแนนที่ไม่ใช่ "I"
+            const validStudentGrades = gradingData.filter(student => {
+                const validProposal = gradingSummary.proposalEvaluation.some(evaluation => {
+                    if (evaluation.student && evaluation.student.studentId === student.studentId) {
+                        console.log(`Proposal Grade for ${student.studentId}: ${evaluation.gradeResult}`);
+                        return evaluation.gradeResult !== "I";
+                    }
+                    return false;
                 });
 
-                console.log("📊 Valid Students Count:", validStudentGrades.length);
+                const validDefense = gradingSummary.defenseEvaluation.some(evaluation => {
+                    if (evaluation.student && evaluation.student.studentId === student.studentId) {
+                        console.log(`Defense Grade for ${student.studentId}: ${evaluation.gradeResult}`);
+                        return evaluation.gradeResult !== "I";
+                    }
+                    return false;
+                });
 
-                gradingSummary.validStudents = validStudentGrades.length;  // Store the valid student count
+                return validProposal || validDefense; // ถ้ามีการประเมินที่มีคะแนนไม่ใช่ "I"
+            });
 
-                updateGradingByProgram("All");
-            })
-            .catch(error => console.error('❌ Fetch error:', error));
+            console.log("📊 Valid Students Count:", validStudentGrades.length);
+
+            gradingSummary.validStudents = validStudentGrades.length;  // เก็บจำนวน student ที่มีคะแนนถูกต้อง
+
+            updateGradingByProgram("All");
+        } catch (error) {
+            console.error('❌ Fetch error:', error);
+        }
     }
 
 
@@ -498,23 +526,26 @@
 
 <!-- ------------- For Proposal Evaluation Card --------------- -->
 <script>
-    async function fetchProposalData(program) {
+    async function fetchProposalData() {
+        const program = document.querySelector(".tab.active");
+        console.log("Program: "+ program.textContent)
+
+        const selectedYear = document.getElementById("semester-selector").value;  // ดึงปีที่เลือกจาก dropdown
+
+        if (!selectedYear) {
+            console.error("Year is not selected!");
+            return;
+        }
+
         try {
-            const url = "http://localhost:8080/api/proposal-evaluation";
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: new URLSearchParams({ program }) // ส่งค่า program ใน body
-            });
+            const response = await fetch(`http://localhost:8080/api/proposal-evaluation?program=${program.textContent}&year=${selectedYear}`);
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
-            console.log("Proposal Data:", data);
+            console.log("Fetch Proposal Data:", data);
 
             // ตรวจสอบข้อมูลที่ได้รับ
             if (!data || typeof data.totalProjects === "undefined" || typeof data.completedProjects === "undefined") {
@@ -544,12 +575,6 @@
         }
     }
 
-    // โหลดข้อมูลเมื่อหน้าเว็บเปิด
-    document.addEventListener("DOMContentLoaded", function () {
-        fetchProposalData("All"); // โหลดข้อมูลเริ่มต้นเมื่อหน้าเว็บเปิด
-        fetchDefenseData("All");
-    });
-
     // Event listener สำหรับการคลิกที่ tab
     document.querySelectorAll('.tab').forEach(tab => {
         tab.addEventListener('click', function () {
@@ -560,31 +585,28 @@
             tab.classList.add('active');
 
             // เรียกใช้ฟังก์ชัน fetchProposalData โดยส่งค่า program ที่เลือกไป
-            fetchProposalData(program);
-            fetchDefenseData("All");
+            fetchProposalData();
+            fetchDefenseData();
+            fetchPosterData();
         });
     });
 </script>
 
 <!-- ------------- For Defense Evaluation Card --------------- -->
 <script>
-    async function fetchDefenseData(program) {
+    async function fetchDefenseData() {
+        const program = document.querySelector(".tab.active");
+        const selectedYear = document.getElementById("semester-selector").value;
+
         try {
-            const url = "http://localhost:8080/api/defense-evaluation";
-            const response = await fetch(url, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/x-www-form-urlencoded"
-                },
-                body: new URLSearchParams({ program }) // ส่งค่า program ใน body
-            });
+            const response = await fetch(`http://localhost:8080/api/defense-evaluation?program=${program.textContent}&year=${selectedYear}`);
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
-            console.log("Defense Data:", data);
+            console.log("Fetch Defense Data:", data);
 
             // ตรวจสอบข้อมูลที่ได้รับ
             if (!data || typeof data.totalProjects === "undefined" || typeof data.completedProjects === "undefined") {
@@ -613,6 +635,251 @@
             console.error("Error fetching proposal data:", error);
         }
     }
+</script>
+
+<!-- ------------- For Poster Evaluation Card --------------- -->
+<script>
+    async function fetchPosterData() {
+        const program = document.querySelector(".tab.active");
+        const selectedYear = document.getElementById("semester-selector").value;
+
+        try {
+            const response = await fetch(`http://localhost:8080/api/poster-evaluation?program=${program.textContent}&year=${selectedYear}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("Fetch Defense Data:", data);
+
+            // ตรวจสอบข้อมูลที่ได้รับ
+            if (!data || typeof data.totalProjects === "undefined" || typeof data.completedProjects === "undefined") {
+                throw new Error("Invalid data format");
+            }
+
+            // ค้นหา .header-container ที่มี .text-header ที่มีข้อความ 'Proposal Evaluation'
+            const headerContainers = document.querySelectorAll(".header-container");
+            headerContainers.forEach(container => {
+                const headerText = container.querySelector(".text-header");
+                console.log("headerText: "+headerText.textContent)
+                if (headerText && headerText.textContent.includes("Poster Evaluation")) {
+                    console.log("update poster card")
+                    const posterHeader = container.querySelector(".text-center h1");
+                    const posterFooter = container.querySelector(".text-footer");
+
+                    if (posterHeader) {
+                        posterHeader.innerHTML = `${data.completedProjects}/${data.totalProjects} <span style="color: #919EAB;">Groups</span>`;
+                    }
+
+                    if (posterFooter) {
+                        posterFooter.innerHTML = `${data.completedProjects} <span style="color: #919EAB;">completed</span>`;
+                    }
+                }
+            });
+
+        } catch (error) {
+            console.error("Error fetching proposal data:", error);
+        }
+    }
+</script>
+
+<!-- ---------- For Grade Bar Chart -------------- -->
+<script>
+    // อัปเดตฟังก์ชัน fetchGradeDistribution ให้รับพารามิเตอร์จากตัวเลือกต่างๆ
+    function fetchGradeDistribution() {
+        // อ่านค่าจาก UI elements ทั้งหมด
+        const semesterYear = document.getElementById("semester-selector").value;
+
+        // หา tab ที่กำลัง active อยู่ (All, ICT, DST)
+        const activeTab = document.querySelector(".tab.active").textContent;
+
+        // หา filter ที่กำลัง active อยู่ (Proposal, Poster, Defense)
+        const activeFilter = document.querySelector(".filter.active").textContent;
+
+        // Map filter text เป็นค่า evaType ที่ต้องการส่งไป API
+        let evaType;
+        switch (activeFilter) {
+            case "Proposal":
+                evaType = "Proposal Evaluation";
+                break;
+            case "Poster":
+                evaType = "Poster Exhibition";
+                break;
+            case "Defense":
+                evaType = "Defense Evaluation";
+                break;
+            default:
+                evaType = "Proposal Evaluation";
+        }
+
+        console.log(`Fetching data for: ${activeTab} program, ${semesterYear} year, ${evaType}`);
+
+        // เรียก API พร้อมพารามิเตอร์
+        fetch(`http://localhost:8080/api/grading-graph?program=${activeTab}&year=${semesterYear}&evaType=${evaType}`)
+            .then(response => response.json())
+            .then(data => {
+                updateChart(data);
+            })
+            .catch(error => {
+                console.error("Error fetching grade distribution:", error);
+            });
+    }
+
+    function updateChart(gradeData) {
+        const barChart = document.getElementById("barChart");
+        const tooltip = document.getElementById("tooltip");
+        barChart.innerHTML = ""; // เคลียร์กราฟเก่า
+
+        console.log("grade data: ", gradeData)
+
+        const gradeOrder = ["A", "B+", "B", "C+", "C", "D+", "D", "F", "I"];
+        const maxCount = Math.max(...Object.values(gradeData), 1);
+
+        let xAxis = document.querySelector(".x-axis");
+        if (!xAxis) {
+            xAxis = document.createElement("div");
+            xAxis.classList.add("x-axis");
+            barChart.parentNode.insertBefore(xAxis, barChart.nextSibling);
+        }
+        xAxis.innerHTML = "";
+
+        gradeOrder.forEach(grade => {
+            const count = gradeData[grade] || 0;
+            const heightPercent = (count / maxCount) * 100;
+
+            const bar = document.createElement("div");
+            bar.classList.add("bar");
+            bar.style.height = heightPercent + "%";
+            bar.setAttribute("data-grade", grade);
+            bar.setAttribute("data-count", count);
+
+            // Mouse Hover Tooltip
+            bar.addEventListener("mouseenter", (event) => {
+                tooltip.innerText = `เกรด ${grade}: ${count} คน`;
+                tooltip.style.display = "block";
+                tooltip.style.left = event.pageX + "px";
+                tooltip.style.top = (event.pageY - 30) + "px";
+            });
+
+            bar.addEventListener("mousemove", (event) => {
+                tooltip.style.left = event.pageX + "px";
+                tooltip.style.top = (event.pageY - 30) + "px";
+            });
+
+            bar.addEventListener("mouseleave", () => {
+                tooltip.style.display = "none";
+            });
+
+            barChart.appendChild(bar);
+
+            // เพิ่มป้ายชื่อเกรด x-axis
+            const xLabel = document.createElement("div");
+            xLabel.classList.add("x-label");
+            xLabel.textContent = grade;
+            xAxis.appendChild(xLabel);
+        });
+    }
+</script>
+
+<!-- ---------- For Reminder Card ----------- -->
+<script>
+    // ฟังก์ชันสำหรับดึงข้อมูลและอัปเดต timeline
+    function fetchImportantDates() {
+        fetch("http://localhost:8080/api/important-dates")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                updateTimeline(data);
+            })
+            .catch(error => {
+                console.error("Error fetching important dates:", error);
+            });
+    }
+
+    // ฟังก์ชันสำหรับอัปเดต UI ของ timeline
+    function updateTimeline(scoringPeriods) {
+        const timelineContainer = document.querySelector(".timeline");
+        timelineContainer.innerHTML = ""; // ล้างข้อมูลเก่า
+
+        // Map evaluation types กับชื่อที่แสดงผล
+        const displayNames = {
+            "Proposal Evaluation": "Proposal Presentation",
+            "Poster Evaluation": "Poster Exhibition",
+            "Defense Evaluation": "Senior Project Defense",
+            "Proposal Grade": "Proposal Grading Period"
+        };
+
+        const today = new Date();
+
+        // กรองเฉพาะรายการที่หมดอายุไม่เกิน 7 วัน
+        const filteredPeriods = scoringPeriods.filter(period => {
+            const endDate = new Date(period.endDate);
+            const daysPast = Math.ceil((today - endDate) / (1000 * 60 * 60 * 24));
+            return daysPast <= 7; // แสดงเฉพาะที่หมดอายุไม่เกิน 7 วัน
+        });
+
+        // สร้าง timeline items
+        filteredPeriods.forEach(period => {
+            const endDate = new Date(period.endDate);
+            const daysRemaining = Math.max(0, Math.ceil((endDate - today) / (1000 * 60 * 60 * 24)));
+
+            // Format dates
+            const startDateFormatted = formatDate(period.startDate);
+            const endDateFormatted = formatDate(period.endDate);
+
+            // สร้าง timeline item
+            const timelineItem = document.createElement("div");
+            timelineItem.classList.add("timeline-item");
+
+            // กำหนดสีหรือสถานะตามจำนวนวันที่เหลือ
+            let statusClass = "";
+            if (daysRemaining === 0) {
+                statusClass = "timeline-expired";
+            } else if (daysRemaining <= 7) {
+                statusClass = "timeline-urgent";
+            } else if (daysRemaining >= 30) {
+                statusClass = "timeline-chill";
+            }
+
+            if (statusClass) {
+                timelineItem.classList.add(statusClass);
+            }
+
+            timelineItem.innerHTML = `
+            <div class="timeline-icon">🕒</div>
+            <div class="timeline-content">
+                <div class="timeline-title">${displayNames[period.evaluationType] || period.evaluationType}</div>
+                <div class="timeline-date">ระยะเวลา : ${startDateFormatted} - ${endDateFormatted}</div>
+                <div class="timeline-status">เหลือเวลา : ${daysRemaining} วัน</div>
+            </div>
+        `;
+
+            timelineContainer.appendChild(timelineItem);
+        });
+    }
+
+
+    // ฟังก์ชันช่วยในการจัดรูปแบบวันที่
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}/${month}/${day}`;
+    }
+
+    // ดึงข้อมูลเมื่อโหลดหน้า
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchImportantDates();
+
+        // อัปเดตข้อมูลทุก 24 ชั่วโมง
+        setInterval(fetchImportantDates, 24 * 60 * 60 * 1000);
+    });
 </script>
 
 </body>

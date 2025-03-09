@@ -6,7 +6,9 @@ import com.example.project.entity.Project;
 import com.example.project.entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface GradingDefenseEvaluationRepository extends JpaRepository<GradingDefenseEvaluation, String> {
@@ -14,6 +16,10 @@ public interface GradingDefenseEvaluationRepository extends JpaRepository<Gradin
 
     List<GradingDefenseEvaluation> findByProjectId_ProjectId(String projectId);
 
-    @Query("SELECT COUNT(DISTINCT g.studentId) FROM GradingDefenseEvaluation g WHERE g.gradeResult IS NOT NULL AND g.gradeResult != 'I' AND g.gradeResult != ''")
-    long countDistinctProjectIds();
+    List<GradingDefenseEvaluation> findByProjectIdIn(Collection<Project> projectId);
+
+    @Query("SELECT COUNT(DISTINCT g.studentId) FROM GradingDefenseEvaluation g WHERE g.gradeResult IS NOT NULL AND g.gradeResult != 'I' AND g.gradeResult != '' AND g.projectId IN :projects")
+    long countDistinctProjectIdByProjectIdIn(@Param("projects") Collection<Project> projectId);
+
+    GradingDefenseEvaluation findGradeResultByProjectIdAndStudentId_StudentId(Project projectId, String studentId);
 }
