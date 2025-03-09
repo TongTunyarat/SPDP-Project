@@ -1,9 +1,6 @@
 package com.example.project.repository;
 
-import com.example.project.entity.Project;
-import com.example.project.entity.ProjectInstructorRole;
-import com.example.project.entity.ProposalEvaluation;
-import com.example.project.entity.Student;
+import com.example.project.entity.*;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -16,4 +13,5 @@ public interface ProposalEvaluationRepository extends JpaRepository<ProposalEval
 
     List<ProposalEvaluation> findByProject_ProjectId(String projectId);
 
+    int countByProjectInstructorRoleAndProject(ProjectInstructorRole projectInstructorRole, Project project);
 }

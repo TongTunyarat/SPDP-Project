@@ -1,0 +1,156 @@
+body {
+    font-family: Inter;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+.header-section {
+    background-color: #00796b;
+    color: white;
+    padding: 20px;
+    text-align: left;
+    font-size: 250%;
+    font-weight: bold;
+    height: 100px;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.export-btn {
+    display: flex;
+    gap: 5px;
+}
+
+.export-btn button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    height: 30px;
+    cursor: pointer;
+    color: #624BFF;
+    font-weight: 500;
+    box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08),
+    0px 1px 2px 0px rgba(21, 30, 40, 0.08);
+}
+
+/* Table styles */
+.table-container {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 50px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
+
+th,
+td {
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+th {
+    background-color: #f4f4f4;
+}
+
+th:nth-child(1), td:nth-child(1) { width: 10%; } /* Project ID */
+th:nth-child(2), td:nth-child(2) { width: 30%; } /* Project Name */
+th:nth-child(3), td:nth-child(3) { width: 15%; } /* Advisor */
+th:nth-child(4), td:nth-child(4) { width: 10%; } /* Student ID */
+th:nth-child(5), td:nth-child(5) { width: 20%; } /* Student Name */
+th:nth-child(6), td:nth-child(6) { width: 5%; }  /* Section */
+th:nth-child(7), td:nth-child(7) { width: 5%; }  /* Track */
+th:nth-child(8), td:nth-child(8) { width: 5%; }  /* Grade */
+
+/*td:nth-child(6),*/
+/*td:nth-child(7),*/
+/*td:nth-child(8) {*/
+/*    text-align: center; */
+/*}*/
+
+.dst-badge {
+    background-color: #f5d76e;
+    color: black;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+.ict-badge {
+    background-color: #77B1B1;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    display: inline-block;
+    margin-top: 5px;
+}
+
+/* TAB: ICT,DST */
+.tabs {
+    display: flex;
+    background-color: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: -25px 20px 20px;
+}
+
+.tab {
+    /*flex: 1;*/
+    display: flex;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #555;
+    transition: background-color 0.3s, color 0.3s;
+    align-items: center;
+    justify-content: center;
+}
+
+.tab:not(:last-child) {
+    border-right: 1px solid #ddd;
+}
+
+.tab.active {
+    font-weight: bold;
+    background-color: #fff;
+    color: #026e6e;
+    border-bottom: 3px solid #026e6e;
+}
+
+.tab:hover:not(.active) {
+    background-color: #f1f1f1;
+}
+
+
+/* Search */
+.tabs input {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 10px 20px 10px auto;
+}
+
+.tabs input {
+    margin-left: auto;
+}
+

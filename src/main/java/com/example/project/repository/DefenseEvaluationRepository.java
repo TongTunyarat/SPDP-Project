@@ -17,4 +17,5 @@ public interface DefenseEvaluationRepository extends JpaRepository<DefenseEvalua
 
     List<DefenseEvaluation> findByProjectId_ProjectId(String projectId);
 
+    int countByDefenseInstructorIdAndProjectId(ProjectInstructorRole instructorRole, Project project);
 }

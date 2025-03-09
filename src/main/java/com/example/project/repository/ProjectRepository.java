@@ -28,7 +28,7 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
     Project findByProjectId(String projectId);
 
 
-
+    List<Project> findByProgram(String param);
 }
 
 

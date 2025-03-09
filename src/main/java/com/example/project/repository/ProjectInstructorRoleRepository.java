@@ -14,5 +14,7 @@ public interface ProjectInstructorRoleRepository extends JpaRepository<ProjectIn
     ProjectInstructorRole findByInstructorAndProjectIdRole(Instructor instructor, Project projectIdRole);
 
     List<ProjectInstructorRole> findByProjectIdRoleAndRole(Project projectIdRole, String role);
+
+    List<ProjectInstructorRole> findByProjectIdRole(Project currentProject);
 }
 
