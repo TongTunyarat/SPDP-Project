@@ -35,6 +35,14 @@ body {
     font-weight: 500;
     box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08),
     0px 1px 2px 0px rgba(21, 30, 40, 0.08);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-header button:hover {
+    background-color: #624BFF; /* เปลี่ยนสีพื้นหลังเมื่อ hover */
+    color: white; /* เปลี่ยนสีตัวอักษรเมื่อ hover */
+    transform: scale(1.05); /* ขยายขนาดปุ่มเล็กน้อย */
+    box-shadow: 0px 4px 6px rgba(13, 23, 33, 0.1), 0px 2px 4px rgba(21, 30, 40, 0.12); /* เพิ่มความเข้มของเงา */
 }
 
 .btn-footer {
@@ -172,6 +180,14 @@ td form {
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.view-btn:hover,
+.edit-btn:hover,
+.delete-btn:hover {
+    background-color: #007777; /* สีเมื่อ hover */
+    transform: scale(1.05); /* ขยายขนาดเล็กน้อยเมื่อ hover */
 }
 
 /* Pagination */
@@ -440,4 +456,78 @@ td form {
     color: white;
     border: none;
     cursor: pointer;
+}
+
+/* ปรับการแสดงผลของ overlay */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* พื้นหลังโปร่งใส */
+    display: flex;
+    justify-content: center;  /* จัดให้ popup อยู่กลางในแนวนอน */
+    align-items: center;      /* จัดให้ popup อยู่กลางในแนวตั้ง */
+    z-index: 9999; /* ทำให้ overlay อยู่ด้านหน้าของเนื้อหาทั้งหมด */
+}
+
+/* ปรับการแสดงผลของ popup content */
+.popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 300px; /* ขนาดของ popup */
+    max-width: 90%; /* ทำให้มีความยืดหยุ่นขนาดในอุปกรณ์ที่มีหน้าจอเล็ก */
+    box-sizing: border-box; /* ทำให้ padding ไม่กระทบกับขนาดที่ตั้งไว้ */
+}
+
+/* ปรับปุ่ม */
+.popup-content button {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #005A5A;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.popup-content button:hover {
+    background-color: #007777;
+}
+
+.popup-content button:focus {
+    outline: none;
+}
+
+/* ปรับรูปแบบของปุ่ม Delete All */
+.deleteAll-btn {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    height: 30px;
+    cursor: pointer;
+    color: #624BFF;
+    font-weight: 500;
+    box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08),
+    0px 1px 2px 0px rgba(21, 30, 40, 0.08);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* การเปลี่ยนสีเมื่อเมาส์ hover */
+.deleteAll-btn:hover {
+    background-color: #624BFF; /* เปลี่ยนสีพื้นหลังเมื่อ hover */
+    color: white; /* เปลี่ยนสีตัวอักษรเมื่อ hover */
+    transform: scale(1.05); /* ขยายขนาดปุ่มเล็กน้อย */
+    box-shadow: 0px 4px 6px rgba(13, 23, 33, 0.1), 0px 2px 4px rgba(21, 30, 40, 0.12); /* เพิ่มความเข้มของเงา */
+}
+
+/* การตั้งค่าเมื่อปุ่มถูกคลิก */
+.deleteAll-btn:active {
+    background-color: #003f7f;  /* สีเมื่อคลิก */
+    transform: scale(1);  /* ทำให้ปุ่มกลับมาเป็นขนาดเดิมเมื่อคลิก */
 }

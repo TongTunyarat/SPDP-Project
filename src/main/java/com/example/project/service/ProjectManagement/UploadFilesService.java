@@ -1,9 +1,12 @@
-package com.example.project.service;
+package com.example.project.service.ProjectManagement;
 
 import com.alibaba.excel.EasyExcel;
 import com.alibaba.excel.context.AnalysisContext;
 import com.alibaba.excel.read.listener.ReadListener;
+import com.example.project.DTO.projectManagement.ProfessorRoleDTO;
+import com.example.project.entity.ProjectInstructorRole;
 import com.example.project.entity.StudentProject;
+import com.example.project.repository.ProjectInstructorRoleRepository;
 import com.example.project.repository.StudentProjectRepository;
 import com.opencsv.CSVReader;
 import com.example.project.entity.Project;
@@ -13,11 +16,13 @@ import com.example.project.repository.StudentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import com.example.project.DTO.projectManagement.ExcelDataDTO;
 
 import java.io.InputStreamReader;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -31,6 +36,9 @@ public class UploadFilesService {
 
     @Autowired
     private StudentProjectRepository studentProjectRepository;
+
+    @Autowired
+    private ProjectInstructorRoleRepository projectInstructorRoleRepository;
 
     public Map<String, Object> uploadFile(MultipartFile file) {
         Map<String, Object> response = new HashMap<>();
@@ -108,7 +116,8 @@ public class UploadFilesService {
                 }
 
                 @Override
-                public void doAfterAllAnalysed(AnalysisContext context) {}
+                public void doAfterAllAnalysed(AnalysisContext context) {
+                }
             }).sheet().doRead();
         } catch (Exception e) {
             System.out.println("Error processing Excel: " + e.getMessage());
@@ -181,6 +190,33 @@ public class UploadFilesService {
         projectRepository.saveAll(projects);
         studentProjectRepository.saveAll(studentProjects); // ✅ บันทึกข้อมูล StudentProject
 
+    }
+
+    @Transactional
+    public void deleteProjectDetails(String projectId) {
+        // ตรวจสอบว่าโปรเจกต์มีอยู่หรือไม่
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Project not found for ID: " + projectId));
+
+        // ลบข้อมูลอาจารย์ที่ปรึกษาที่เกี่ยวข้องกับโปรเจกต์นี้
+        List<ProjectInstructorRole> existingRoles = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(projectId);
+        if (existingRoles != null && !existingRoles.isEmpty()) {
+            projectInstructorRoleRepository.deleteAll(existingRoles);  // ลบอาจารย์ที่ปรึกษาทั้งหมดที่เกี่ยวข้องกับโปรเจกต์นี้
+        }
+
+        // ลบข้อมูลนักศึกษาที่เกี่ยวข้องกับโปรเจกต์นี้
+        List<StudentProject> studentProjects = studentProjectRepository.findByProject_ProjectId(projectId);
+        if (studentProjects != null && !studentProjects.isEmpty()) {
+            studentProjectRepository.deleteAll(studentProjects);  // ลบข้อมูลนักศึกษาทั้งหมดที่เกี่ยวข้องกับโปรเจกต์นี้
+        }
+
+        // ลบโปรเจกต์จากฐานข้อมูล
+        projectRepository.delete(project);
+    }
+
+    public void deleteAllProjects() {
+        // ลบทุกโปรเจกต์ในฐานข้อมูล
+        projectRepository.deleteAll();
     }
 
 }

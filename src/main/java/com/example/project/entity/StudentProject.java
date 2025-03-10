@@ -36,6 +36,9 @@ public class StudentProject {
         this.project = project;
     }
 
+    public StudentProject(Project project, String studentId) {
+    }
+
     public String getStudentPjId() {
         return studentPjId;
     }

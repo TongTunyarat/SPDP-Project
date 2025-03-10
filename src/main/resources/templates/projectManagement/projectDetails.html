@@ -12,6 +12,7 @@
 
     <!-- Library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 </head>
 
 <body>
@@ -89,7 +90,15 @@
             Project Details
 
             <div class="btn-header">
-                <button class="template-btn" id="download-template-btn">Template</button>
+                <button id="export-project-excel">Export Project Template (Excel)</button>
+<!--                <div class="dropdown" id="template-dropdown">-->
+<!--                    <button class="template-btn" id="download-template-btn">Download Template</button>-->
+<!--                    <div class="dropdown-content">-->
+<!--                        <a href="#" id="export-student">Template Student</a>-->
+<!--                        <a href="#" id="export-professor">Template Professor</a>-->
+<!--                        <a href="#" id="export-project">Template Project</a>-->
+<!--                    </div>-->
+<!--                </div>-->
                 <input type="file" id="upload-file" accept=".csv, .xlsx, .xls" style="display: none;"/>
                 <button id="upload-btn">Upload Files</button>
                 <button class="addProject-btn">+ Add Projects</button>
@@ -205,6 +214,9 @@
             </div>
         </div>
 
+        <div class="btn-footer">
+            <button class="deleteAll-btn">Delete ALL</button>
+        </div>
 
         <div class="pagination">
             <button class="page-btn" onclick="changePage('prev')">&lt;</button>
@@ -212,9 +224,27 @@
             <button class="page-btn" onclick="changePage('next')">&gt;</button>
         </div>
 
+        <!-- Popup สำหรับแจ้งเตือนเมื่อกด Delete ของแต่ละ Project -->
+        <div id="confirmDeletePopup" style="display: none;">
+            <div class="popup-overlay">
+                <div class="popup-content">
+                    <p id="delete-confirm-msg"> </p>
+                    <button id="confirmDeleteBtn">Delete</button>
+                    <button id="cancelDeleteBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
 
-        <div class="btn-footer">
-            <button class="deleteAll-btn">Delete ALL</button>
+        <!-- Popup สำหรับยืนยันการลบ Project ทั้งหมด -->
+        <div id="deleteAllPopup" style="display: none;">
+            <div class="popup-overlay">
+                <div class="popup-content">
+                    <p>Type "DELETE ALL PROJECT" to confirm deletion.</p>
+                    <input type="text" id="deleteAllInput" placeholder="Type DELETE ALL PROJECT" />
+                    <button id="confirmDeleteAllBtn">Delete All</button>
+                    <button id="cancelDeleteAllBtn">Cancel</button>
+                </div>
+            </div>
         </div>
 
 
@@ -300,12 +330,10 @@
             // กรอง professorList เพื่อให้แสดงเฉพาะ "Advisor"
             const advisor = project.professorList.find(professor => professor.role === "Advisor");
             const professorName = advisor ? advisor.professorName : "N/A"; // ถ้าไม่มี "Advisor" ให้แสดง "N/A"
-            console.log(professorName); // แสดง professorName ที่กรองแล้ว
 
             // กรอง professorList เพื่อให้แสดงเฉพาะ "Co-Advisor"
             const coadvisor = project.professorList.find(professor => professor.role === "Co-Advisor");
-            const coAdvisorName = coadvisor ? coadvisor.professorName : "N/A"; // ถ้าไม่มี "Advisor" ให้แสดง "N/A"
-            console.log(professorName); // แสดง professorName ที่กรองแล้ว
+            const coAdvisorName = coadvisor ? coadvisor.professorName : " ";
 
             row.innerHTML = `
             <td><span class="tag ${projectProgram}">${project.program || "N/A"}</span> ${project.projectId}</td>
@@ -324,14 +352,17 @@
                 </ul>
             </td>
             <td>
-           <form action="" method="get">
-                        <input type="hidden" name="projectId" value="${project.projectId}">
-                        <button type="submit"><span class="material-icons">Edit</span></button>
-                    </form>
-            <form action="" method="get">
-                        <input type="hidden" name="projectId" value="${project.projectId}">
-                        <button type="submit"><span class="material-icons">Delete</span></button>
-                    </form>
+                <form action="/admin/editProjectDetails" method="get">
+                    <input type="hidden" name="projectId" value="${project.projectId}">
+                    <button type="submit" class="edit-btn"><span class="material-icons">edit</span></button>
+                </form>
+
+                <form id="deleteForm-${project.projectId}" action="" method="get" onsubmit="return confirmDelete(event, '${project.projectId}')">
+                    <input type="hidden" name="projectId" value="${project.projectId}">
+                    <button type="submit" class="delete-btn">
+                        <span class="material-icons">delete</span>
+                    </button>
+                </form>
             </td>
             `;
             tableBody.appendChild(row);
@@ -384,31 +415,6 @@
         nextButton.onclick = () => changePage('next');
         paginationContainer.appendChild(nextButton);
     }
-
-
-    // -------------------- Export Template -------------------- //
-    // ฟังก์ชันดาวน์โหลด Template
-    function downloadTemplate() {
-        console.log("Download Template button clicked");
-
-        // สร้างเนื้อหาของไฟล์ CSV เปล่า
-        let csvContent = "\uFEFF"; // เพิ่ม BOM สำหรับรองรับภาษาไทย
-        csvContent += "Project ID,Advisor,Co-Advisor,Program,Project Name,Project Description,Student Id,Student Name\n";
-
-        // สร้างไฟล์ CSV และดาวน์โหลด
-        const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.setAttribute("download", "template.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    // เพิ่ม Event Listener ให้กับปุ่ม Download Template
-    document.getElementById("download-template-btn").addEventListener("click", downloadTemplate);
-
-
 
     // -------------------- Upload Files -------------------- //
     // เปิด Modal เมื่อกดปุ่ม Upload Files
@@ -532,6 +538,7 @@
 
                 if (data.message === "File processed successfully") {
                     alert("Upload successful!");
+                    location.reload();
                 } else {
                     alert("Upload failed: " + (data.errors ? data.errors.join(", ") : "Unknown error"));
                 }
@@ -548,5 +555,330 @@
     }
 
 
+    // -------------------- Delete Project -------------------- //
+    // ฟังก์ชันยืนยันการลบ
+    function confirmDelete(event, projectId) {
+        event.preventDefault(); // หยุดการส่งฟอร์ม
+
+        // แสดงข้อความใน popup ด้วย projectId
+        const popup = document.getElementById('confirmDeletePopup');
+        const deleteConfirmMsg = document.getElementById('delete-confirm-msg');
+        deleteConfirmMsg.innerHTML = `Do you want to delete project\n Project ID: ${projectId}?`;
+
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        const cancelBtn = document.getElementById('cancelDeleteBtn');
+
+        // ทำให้ Popup แสดง
+        popup.style.display = 'block';
+
+        // เมื่อกดยืนยันให้ลบโปรเจกต์
+        confirmBtn.onclick = function () {
+            deleteProject(projectId);  // ส่งคำขอลบโปรเจกต์ไปที่ backend
+            popup.style.display = 'none'; // ซ่อน Popup
+        };
+
+        // เมื่อกดยกเลิก
+        cancelBtn.onclick = function () {
+            popup.style.display = 'none'; // ซ่อน Popup
+        };
+
+        return false;  // หยุดการส่งฟอร์ม
+    }
+
+    // ฟังก์ชันลบโปรเจกต์
+    function deleteProject(projectId) {
+        fetch(`http://localhost:8080/admin/deleteProject/${encodeURIComponent(projectId)}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Delete Success!');  // แจ้งเตือนเมื่อการลบโปรเจกต์สำเร็จ
+                    location.reload();  // รีเฟรชหน้าใหม่เพื่ออัปเดตข้อมูล
+                } else {
+                    alert('เกิดข้อผิดพลาดในการลบโปรเจกต์');
+                }
+            })
+            .catch(error => {
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+            });
+    }
+
+
+    // -------------------- Delete ALL Project -------------------- //
+    // เมื่อกดปุ่ม "Delete All"
+    document.querySelector('.deleteAll-btn').addEventListener('click', function () {
+        // แสดง pop-up ยืนยันการลบ
+        const popup = document.getElementById('deleteAllPopup');
+        popup.style.display = 'block';
+    });
+
+    // เมื่อกดยืนยันการลบทั้งหมด
+    document.getElementById('confirmDeleteAllBtn').addEventListener('click', function () {
+        const userInput = document.getElementById('deleteAllInput').value;
+
+        // ตรวจสอบว่าผู้ใช้พิมพ์ "DELETE ALL PROJECT"
+        if (userInput === "DELETE ALL PROJECT") {
+            // เรียกฟังก์ชันลบโปรเจกต์ทั้งหมด
+            deleteAllProjects();
+            document.getElementById('deleteAllPopup').style.display = 'none'; // ซ่อน pop-up
+        } else {
+            alert('Please type "DELETE ALL PROJECT" to confirm');
+        }
+    });
+
+    // เมื่อกดปุ่ม Cancel
+    document.getElementById('cancelDeleteAllBtn').addEventListener('click', function () {
+        document.getElementById('deleteAllPopup').style.display = 'none'; // ซ่อน pop-up
+    });
+
+    // ฟังก์ชันลบโปรเจกต์ทั้งหมด
+    function deleteAllProjects() {
+        fetch('http://localhost:8080/admin/deleteAllProjects', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('All projects deleted successfully.');
+                    location.reload();  // รีเฟรชหน้าใหม่
+                } else {
+                    alert('Error deleting all projects.');
+                }
+            })
+            .catch(error => {
+                alert('Connection error while deleting projects.');
+            });
+    }
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
+
+<script>
+
+    // -------------------- Export Template -------------------- //
+    // ฟังก์ชันสำหรับ Export Project Template แบบ Excel (รองรับการ merge cells)
+    function exportExcel() {
+        // สร้างข้อมูลตามรูปแบบไฟล์ที่ต้องการ
+        const data = [
+            ["Senior Project 2024: Advisor and Member Sign up sheet", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["Please find an advisor before June 30, 2024", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["Link to view advisor profile ", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["https://docs.google.com/presentation/d/1ZSTVEGbVxQWv4Iwm_YjGeuSOXbBbUnf21tdpeUr0Ivk/edit?fbclid=IwAR10E-OcoQ6euV1cwN3YLiD0mUSDnR87uyy6CPPNjnf2pKfotQn78kdaSiQ#slide=id.g111612b1a81_0_844", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["No.", "Student ID", "Student Fullname", "", "", "Section", "Track", "Email", "Tel", "Prospective\nAdvisor", "Co-advisor\n(If applicable)", "Topic", "", "", "Each advisor can have up to 2 groups", ""],
+            ["X", "6487XXX", "MR.", "XXX", "XXXXXX", "XX", "XX", "XXXXX", "XXXX", "Aj. XXXX", "Aj. XXXX", "", "", "1", "Aj.Akara", "0"],
+            ["", "6487XXX", "MR.", "XXX", "XXXXXX", "XX", "XX", "XXXXX", "XXXX", "", "", "", "", "2", "Aj.Ananta", "0"],
+            ["", "6487XXX", "MR.", "XXX", "XXXXXX", "XX", "XX", "XXXXX", "XXXX", "", "", "", "", "3", "Aj.Assadarat", "0"],
+            ["1", "", "", "", "", "", "", "", "", "", "", "", "", "4", "Aj.Boonsit", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "5", "Aj.Chaiyong", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "6", "Aj.Charnyote", "0"],
+            ["2", "", "", "", "", "", "", "", "", "", "", "", "", "7", "Aj.Dolvara", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "8", "Aj.Ittipon", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "9", "Aj.Jidapa", "0"],
+            ["3", "", "", "", "", "", "", "", "", "", "", "", "", "10", "Aj.Morakot", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "11", "Aj.Mores", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "12", "Aj.Pagaporn", "0"],
+            ["4", "", "", "", "", "", "", "", "", "", "", "", "", "13", "Aj.Pattanasak", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "14", "Aj.Pawitra", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "15", "Aj.Petch", "0"],
+            ["5", "", "", "", "", "", "", "", "", "", "", "", "", "16", "Aj.Peter", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "17", "Aj.Pilailuck", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "18", "Aj.Pisit", "0"],
+            ["6", "", "", "", "", "", "", "", "", "", "", "", "", "19", "Aj.Piyanuch", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "20", "Aj.Preecha", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "21", "Aj.Rawesak", "0"],
+            ["7", "", "", "", "", "", "", "", "", "", "", "", "", "22", "Aj.Sirawich", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "23", "Aj.Siripen", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "24", "Aj.Snit", "0"],
+            ["8", "", "", "", "", "", "", "", "", "", "", "", "", "25", "Aj.Songpon", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "26", "Aj.Songsri", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "27", "Aj.Srisupa", "0"],
+            ["9", "", "", "", "", "", "", "", "", "", "", "", "", "28", "Aj.Sukanya", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "29", "Aj.Suppawong", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "30", "Aj.Thanapon", "0"],
+            ["10", "", "", "", "", "", "", "", "", "", "", "", "", "31", "Aj.Thanwadee", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "32", "Aj.Thitinan", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "33", "Aj.Thitivatr", "0"],
+            ["11", "", "", "", "", "", "", "", "", "", "", "", "", "34", "Aj.Tipajin", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "35", "Aj.Vasaka", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "36", "Aj.Woraluck", "0"],
+            ["12", "", "", "", "", "", "", "", "", "", "", "", "", "37", "Aj.Worapan", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "38", "Aj.Wudhichart", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "39", "", "0"],
+            ["13", "", "", "", "", "", "", "", "", "", "", "", "", "40", "", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "41", "", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["14", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "Total Project", "0"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["15", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+        ];
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(data);
+
+        // กำหนดความกว้างของคอลัมน์
+        ws['!cols'] = [
+            { wch: 5 },    // A - No.
+            { wch: 10 },   // B - Student ID
+            { wch: 8 },    // C - MR./MS.
+            { wch: 10 },   // D - First name
+            { wch: 10 },   // E - Last name
+            { wch: 8 },    // F - Section
+            { wch: 8 },    // G - Track
+            { wch: 25 },   // H - Email
+            { wch: 12 },   // I - Tel
+            { wch: 20 },   // J - Prospective Advisor
+            { wch: 20 },   // K - Co-advisor
+            { wch: 30 },   // L - Topic
+            { wch: 5 },    // M - (empty)
+            { wch: 5 },    // N - Number
+            { wch: 20 },   // O - Advisor name
+            { wch: 5 },    // P - Count
+        ];
+
+        // กำหนด merge cells
+        const merges = [
+            // Header merges
+            { s: { r: 0, c: 0 }, e: { r: 0, c: 15 } }, // Senior Project 2024 header
+            { s: { r: 1, c: 0 }, e: { r: 1, c: 15 } }, // Please find an advisor...
+            { s: { r: 2, c: 0 }, e: { r: 2, c: 15 } }, // Link to view...
+            { s: { r: 3, c: 0 }, e: { r: 3, c: 15 } }, // URL
+
+            // Column headers merges
+            { s: { r: 4, c: 2 }, e: { r: 4, c: 4 } }, // Student Fullname
+            { s: { r: 4, c: 11 }, e: { r: 4, c: 13 } }, // Topic
+            { s: { r: 4, c: 14 }, e: { r: 4, c: 15 } }, // Each advisor...
+
+            // Student name sample merges for rows 5-7
+            { s: { r: 5, c: 2 }, e: { r: 5, c: 4 } }, // First student full name
+            { s: { r: 6, c: 2 }, e: { r: 6, c: 4 } }, // Second student full name
+            { s: { r: 7, c: 2 }, e: { r: 7, c: 4 } }, // Third student full name
+
+            // Merge column A every 3 rows
+            { s: { r: 5, c: 0 }, e: { r: 7, c: 0 } }, // X
+            { s: { r: 8, c: 0 }, e: { r: 10, c: 0 } }, // 1
+            { s: { r: 11, c: 0 }, e: { r: 13, c: 0 } }, // 2
+            { s: { r: 14, c: 0 }, e: { r: 16, c: 0 } }, // 3
+            { s: { r: 17, c: 0 }, e: { r: 19, c: 0 } }, // 4
+            { s: { r: 20, c: 0 }, e: { r: 22, c: 0 } }, // 5
+            { s: { r: 23, c: 0 }, e: { r: 25, c: 0 } }, // 6
+            { s: { r: 26, c: 0 }, e: { r: 28, c: 0 } }, // 7
+            { s: { r: 29, c: 0 }, e: { r: 31, c: 0 } }, // 8
+            { s: { r: 32, c: 0 }, e: { r: 34, c: 0 } }, // 9
+            { s: { r: 35, c: 0 }, e: { r: 37, c: 0 } }, // 10
+            { s: { r: 38, c: 0 }, e: { r: 40, c: 0 } }, // 11
+            { s: { r: 41, c: 0 }, e: { r: 43, c: 0 } }, // 12
+            { s: { r: 44, c: 0 }, e: { r: 46, c: 0 } }, // 13
+            { s: { r: 47, c: 0 }, e: { r: 49, c: 0 } }, // 14
+            { s: { r: 50, c: 0 }, e: { r: 52, c: 0 } }, // 15
+
+            // Merge columns J, K, L (Prospective Advisor, Co-advisor, Topic) every 3 rows
+            { s: { r: 5, c: 9 }, e: { r: 7, c: 9 } }, // Prospective Advisor for X
+            { s: { r: 5, c: 10 }, e: { r: 7, c: 10 } }, // Co-advisor for X
+            { s: { r: 5, c: 11 }, e: { r: 7, c: 11 } }, // Topic for X
+
+            { s: { r: 8, c: 9 }, e: { r: 10, c: 9 } }, // Prospective Advisor for 1
+            { s: { r: 8, c: 10 }, e: { r: 10, c: 10 } }, // Co-advisor for 1
+            { s: { r: 8, c: 11 }, e: { r: 10, c: 11 } }, // Topic for 1
+
+            { s: { r: 11, c: 9 }, e: { r: 13, c: 9 } }, // Prospective Advisor for 2
+            { s: { r: 11, c: 10 }, e: { r: 13, c: 10 } }, // Co-advisor for 2
+            { s: { r: 11, c: 11 }, e: { r: 13, c: 11 } }, // Topic for 2
+
+            { s: { r: 14, c: 9 }, e: { r: 16, c: 9 } }, // Prospective Advisor for 3
+            { s: { r: 14, c: 10 }, e: { r: 16, c: 10 } }, // Co-advisor for 3
+            { s: { r: 14, c: 11 }, e: { r: 16, c: 11 } }, // Topic for 3
+
+            { s: { r: 17, c: 9 }, e: { r: 19, c: 9 } }, // Prospective Advisor for 4
+            { s: { r: 17, c: 10 }, e: { r: 19, c: 10 } }, // Co-advisor for 4
+            { s: { r: 17, c: 11 }, e: { r: 19, c: 11 } }, // Topic for 4
+
+            { s: { r: 20, c: 9 }, e: { r: 22, c: 9 } }, // Prospective Advisor for 5
+            { s: { r: 20, c: 10 }, e: { r: 22, c: 10 } }, // Co-advisor for 5
+            { s: { r: 20, c: 11 }, e: { r: 22, c: 11 } }, // Topic for 5
+
+            { s: { r: 23, c: 9 }, e: { r: 25, c: 9 } }, // Prospective Advisor for 6
+            { s: { r: 23, c: 10 }, e: { r: 25, c: 10 } }, // Co-advisor for 6
+            { s: { r: 23, c: 11 }, e: { r: 25, c: 11 } }, // Topic for 6
+
+            { s: { r: 26, c: 9 }, e: { r: 28, c: 9 } }, // Prospective Advisor for 7
+            { s: { r: 26, c: 10 }, e: { r: 28, c: 10 } }, // Co-advisor for 7
+            { s: { r: 26, c: 11 }, e: { r: 28, c: 11 } }, // Topic for 7
+
+            { s: { r: 29, c: 9 }, e: { r: 31, c: 9 } }, // Prospective Advisor for 8
+            { s: { r: 29, c: 10 }, e: { r: 31, c: 10 } }, // Co-advisor for 8
+            { s: { r: 29, c: 11 }, e: { r: 31, c: 11 } }, // Topic for 8
+
+            { s: { r: 32, c: 9 }, e: { r: 34, c: 9 } }, // Prospective Advisor for 9
+            { s: { r: 32, c: 10 }, e: { r: 34, c: 10 } }, // Co-advisor for 9
+            { s: { r: 32, c: 11 }, e: { r: 34, c: 11 } }, // Topic for 9
+
+            { s: { r: 35, c: 9 }, e: { r: 37, c: 9 } }, // Prospective Advisor for 10
+            { s: { r: 35, c: 10 }, e: { r: 37, c: 10 } }, // Co-advisor for 10
+            { s: { r: 35, c: 11 }, e: { r: 37, c: 11 } }, // Topic for 10
+
+            { s: { r: 38, c: 9 }, e: { r: 40, c: 9 } }, // Prospective Advisor for 11
+            { s: { r: 38, c: 10 }, e: { r: 40, c: 10 } }, // Co-advisor for 11
+            { s: { r: 38, c: 11 }, e: { r: 40, c: 11 } }, // Topic for 11
+
+            { s: { r: 41, c: 9 }, e: { r: 43, c: 9 } }, // Prospective Advisor for 12
+            { s: { r: 41, c: 10 }, e: { r: 43, c: 10 } }, // Co-advisor for 12
+            { s: { r: 41, c: 11 }, e: { r: 43, c: 11 } }, // Topic for 12
+
+            { s: { r: 44, c: 9 }, e: { r: 46, c: 9 } }, // Prospective Advisor for 13
+            { s: { r: 44, c: 10 }, e: { r: 46, c: 10 } }, // Co-advisor for 13
+            { s: { r: 44, c: 11 }, e: { r: 46, c: 11 } }, // Topic for 13
+
+            { s: { r: 47, c: 9 }, e: { r: 49, c: 9 } }, // Prospective Advisor for 14
+            { s: { r: 47, c: 10 }, e: { r: 49, c: 10 } }, // Co-advisor for 14
+            { s: { r: 47, c: 11 }, e: { r: 49, c: 11 } }, // Topic for 14
+
+            { s: { r: 50, c: 9 }, e: { r: 52, c: 9 } }, // Prospective Advisor for 15
+            { s: { r: 50, c: 10 }, e: { r: 52, c: 10 } }, // Co-advisor for 15
+            { s: { r: 50, c: 11 }, e: { r: 52, c: 11 } }, // Topic for 15
+        ];
+
+        ws["!merges"] = merges;
+
+        // สร้าง style ให้กับ header
+        const headerStyle = {
+            font: { bold: true, color: { rgb: "000000" } },
+            alignment: { horizontal: "center", vertical: "center" }
+        };
+
+        // ใส่ style ให้กับ cells ที่ต้องการ
+        if (!ws.A1.s) ws.A1.s = {};
+        Object.assign(ws.A1.s, headerStyle);
+
+        // ใส่ style ให้กับ header ของตาราง (row 5)
+        const headerRow = 5;
+        for (let col = 0; col < 16; col++) {
+            const cellRef = XLSX.utils.encode_cell({r: 4, c: col});
+            if (!ws[cellRef].s) ws[cellRef].s = {};
+            Object.assign(ws[cellRef].s, {
+                font: { bold: true },
+                alignment: { horizontal: "center", vertical: "center", wrapText: true }
+            });
+        }
+
+        // เพิ่ม Sheet ที่สร้างใน Workbook
+        XLSX.utils.book_append_sheet(wb, ws, "Project List");
+
+        // บันทึกไฟล์ Excel
+        XLSX.writeFile(wb, "2024_ICT_SP_Project_List.xlsx");
+
+        console.log("Excel file exported successfully.");
+    }
+
+    // เพิ่ม Event Listener สำหรับ Export Project Template (Excel)
+    document.getElementById("export-project-excel").addEventListener("click", () => {
+        exportExcel();
+    });
 
 </script>

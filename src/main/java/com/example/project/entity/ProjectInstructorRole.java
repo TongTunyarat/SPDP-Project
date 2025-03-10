@@ -48,6 +48,13 @@ public class ProjectInstructorRole {
     @JsonBackReference
     private List<ProposalEvaluation> proposalEvaluations;
 
+    public ProjectInstructorRole(Project project) {
+    }
+
+    public ProjectInstructorRole() {
+
+    }
+
 
     public String getInstructorId() {
         return instructorId;

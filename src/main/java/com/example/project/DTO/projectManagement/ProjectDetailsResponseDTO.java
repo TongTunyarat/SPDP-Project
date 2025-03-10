@@ -1,26 +1,32 @@
 package com.example.project.DTO.projectManagement;
 
-import com.example.project.DTO.projectManagement.ProfessorRoleDTO;
-import com.example.project.DTO.projectManagement.StudentProjectDTO;
 import java.util.List;
 
-public class ProjectDetailsDTO {
+public class ProjectDetailsResponseDTO {
     private String projectId;
     private String projectTitle;
-    private List<ProfessorRoleDTO> professorList;  // เพิ่ม professorList เพื่อเก็บข้อมูลอาจารย์ทั้งหมด
+    private List<ProfessorRoleDTO> professorList;  // สำหรับเก็บข้อมูลอาจารย์ทั้งหมด
     private String projectDescription;
     private String program;
     private List<StudentProjectDTO> studentList;
+    private List<ProfessorRoleDTO> advisors;  // สำหรับเก็บข้อมูล Advisor
+    private List<ProfessorRoleDTO> coAdvisors;  // สำหรับเก็บข้อมูล Co-Advisor
+    private List<ProfessorRoleDTO> committees;  // สำหรับเก็บข้อมูล Committee
 
     // Constructor
-    public ProjectDetailsDTO(String projectId, String projectTitle, List<ProfessorRoleDTO> professorList,
-                             String projectDescription, String program, List<StudentProjectDTO> studentList) {
+    public ProjectDetailsResponseDTO(String projectId, String projectTitle, List<ProfessorRoleDTO> professorList,
+                             String projectDescription, String program, List<StudentProjectDTO> studentList,
+                             List<ProfessorRoleDTO> advisors, List<ProfessorRoleDTO> coAdvisors,
+                             List<ProfessorRoleDTO> committees) {
         this.projectId = projectId;
         this.projectTitle = projectTitle;
-        this.professorList = professorList;  // กำหนดค่าให้กับ professorList
+        this.professorList = professorList;
         this.projectDescription = projectDescription;
         this.program = program;
         this.studentList = studentList;
+        this.advisors = advisors;
+        this.coAdvisors = coAdvisors;
+        this.committees = committees;
     }
 
     // Getter และ Setter
@@ -71,4 +77,30 @@ public class ProjectDetailsDTO {
     public void setStudentList(List<StudentProjectDTO> studentList) {
         this.studentList = studentList;
     }
+
+    public List<ProfessorRoleDTO> getAdvisors() {
+        return advisors;
+    }
+
+    public void setAdvisors(List<ProfessorRoleDTO> advisors) {
+        this.advisors = advisors;
+    }
+
+    public List<ProfessorRoleDTO> getCoAdvisors() {
+        return coAdvisors;
+    }
+
+    public void setCoAdvisors(List<ProfessorRoleDTO> coAdvisors) {
+        this.coAdvisors = coAdvisors;
+    }
+
+    public List<ProfessorRoleDTO> getCommittees() {
+        return committees;
+    }
+
+    public void setCommittees(List<ProfessorRoleDTO> committees) {
+        this.committees = committees;
+    }
 }
+
+
