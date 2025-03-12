@@ -16,4 +16,9 @@ public class ProjectInstructorRoleService {
     public List<ProjectInstructorRole> findByProjectId(String projectId) {
         return projectInstructorRoleRepository.findByProjectIdRole_ProjectId(projectId);
     }
+
+    // บันทึกบทบาทของอาจารย์ในโปรเจกต์
+    public void saveProfessorRole(ProjectInstructorRole role) {
+        projectInstructorRoleRepository.save(role);
+    }
 }

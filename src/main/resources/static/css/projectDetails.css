@@ -531,3 +531,12 @@ td form {
     background-color: #003f7f;  /* สีเมื่อคลิก */
     transform: scale(1);  /* ทำให้ปุ่มกลับมาเป็นขนาดเดิมเมื่อคลิก */
 }
+
+.addProject-btn a {
+    text-decoration: none;
+}
+
+.addProject-btn a:active {
+    background-color: #624BFF;  /* สีเมื่อคลิก */
+    transform: scale(1);  /* ทำให้ปุ่มกลับมาเป็นขนาดเดิมเมื่อคลิก */
+}

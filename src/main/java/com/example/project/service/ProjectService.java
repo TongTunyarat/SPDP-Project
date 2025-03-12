@@ -123,9 +123,13 @@ public class ProjectService {
         return projectDetailsDTOList;
     }
 
-
     public Optional<Project> findById(String projectId) {
         return projectRepository.findById(projectId);
+    }
+
+    // บันทึกโปรเจกต์ใหม่
+    public void saveProject(Project project) {
+        projectRepository.save(project);
     }
 
 

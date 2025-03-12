@@ -3,10 +3,8 @@ package com.example.project.controller.ProjectManagement;
 import com.example.project.DTO.projectManagement.ProfessorRoleDTO;
 import com.example.project.DTO.projectManagement.StudentProjectDTO;
 import com.example.project.DTO.projectManagement.ProjectDetailsDTO;
-import com.example.project.entity.Project;
-import com.example.project.entity.ProjectInstructorRole;
-import com.example.project.repository.ProjectInstructorRoleRepository;
-import com.example.project.repository.ProposalEvaluationRepository;
+import com.example.project.entity.*;
+import com.example.project.repository.*;
 import com.example.project.service.ProjectManagement.EditProjectService;
 import com.example.project.service.ProjectManagement.UploadFilesService;
 import com.example.project.service.ProjectService;
@@ -18,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +42,12 @@ public class projectAdminController {
     private EditProjectService editProjectService;
     @Autowired
     private UploadFilesService uploadFilesService;
+    @Autowired
+    private InstructorRepository instructorRepository;
+    @Autowired
+    private StudentRepository studentRepository;
+    @Autowired
+    private StudentProjectRepository studentProjectRepository;
 
     @Autowired
     public projectAdminController(ProjectService projectService) {
@@ -218,7 +223,76 @@ public class projectAdminController {
         }
     }
 
+    @PostMapping("/addNewProject")
+    @ResponseBody
+    public ResponseEntity<ProjectDetailsDTO> addProject(@RequestBody ProjectDetailsDTO projectDetailsDTO) {
+        // ตรวจสอบว่า projectId มีอยู่ในฐานข้อมูลแล้วหรือไม่
+        Project existingProject = projectService.getProjectDetails(projectDetailsDTO.getProjectId());
 
+        if (existingProject != null) {
+            // ถ้ามีโปรเจกต์ที่มี projectId ซ้ำ
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Project ID already exists");
+        }
+
+        // สร้างโปรเจกต์ใหม่จากข้อมูลที่ส่งมา
+        Project newProject = new Project();
+        newProject.setProjectId(projectDetailsDTO.getProjectId());
+        newProject.setProjectTitle(projectDetailsDTO.getProjectTitle());
+        newProject.setProjectDescription(projectDetailsDTO.getProjectDescription());
+        newProject.setProgram(projectDetailsDTO.getProgram());
+
+        // บันทึกข้อมูลโปรเจกต์ใหม่
+        projectService.saveProject(newProject);
+
+        // ดึงข้อมูลอาจารย์ที่ปรึกษาและบันทึกบทบาทอาจารย์
+        List<ProfessorRoleDTO> professorList = projectDetailsDTO.getProfessorList();
+        for (ProfessorRoleDTO professorDTO : professorList) {
+            ProjectInstructorRole role = new ProjectInstructorRole();
+
+            // ค้นหาข้อมูลอาจารย์ในฐานข้อมูล (ใช้ชื่ออาจารย์)
+            Optional<Instructor> instructorOptional = instructorRepository.findByProfessorName(professorDTO.getProfessorName());
+            Instructor instructor = instructorOptional.orElseThrow(() ->
+                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Instructor not found: " + professorDTO.getProfessorName())
+            );
+
+            // ตั้งค่าอาจารย์ใน ProjectInstructorRole
+            role.setProjectIdRole(newProject);  // ตั้งค่าโปรเจกต์
+            role.setInstructor(instructor);     // ตั้งค่าอาจารย์
+            role.setRole(professorDTO.getRole());  // ตั้งค่าบทบาท
+            role.setAssignDate(LocalDateTime.now());  // ตั้งค่าวันที่ที่มอบหมาย
+            projectInstructorRoleRepository.save(role);
+        }
+
+        // ดึงข้อมูลนักศึกษาและบันทึกข้อมูลนักศึกษา
+        List<StudentProjectDTO> studentList = projectDetailsDTO.getStudentList();
+        for (StudentProjectDTO studentDTO : studentList) {
+            StudentProject studentProject = new StudentProject();
+
+            // ค้นหาข้อมูลนักศึกษาในฐานข้อมูล
+            Student student = studentRepository.findByStudentId(studentDTO.getStudentId());
+            if (student != null) {
+                studentProject.setProject(newProject); // ตั้งค่าโปรเจกต์
+                studentProject.setStudent(student);   // ตั้งค่านักศึกษา
+                studentProject.setStatus(studentDTO.getStatus()); // ตั้งค่าสถานะ
+                studentProject.setStatus("Active");   // ตั้งค่าสถานะเริ่มต้น
+                studentProjectRepository.save(studentProject);
+            } else {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found: " + studentDTO.getStudentId());
+            }
+        }
+
+        // ส่งกลับข้อมูลโปรเจกต์ใหม่ในรูปแบบ DTO
+        ProjectDetailsDTO response = new ProjectDetailsDTO(
+                newProject.getProjectId(),
+                newProject.getProjectTitle(),
+                professorList,
+                newProject.getProjectDescription(),
+                newProject.getProgram(),
+                studentList
+        );
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);  // ส่งกลับ status CREATED
+    }
 
 }
 

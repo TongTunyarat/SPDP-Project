@@ -17,5 +17,6 @@ public interface InstructorRepository extends JpaRepository<Instructor, String> 
     Optional<Instructor> findByProfessorName(String professorName);
 
     List<Instructor> findAll();
+
 }
 
