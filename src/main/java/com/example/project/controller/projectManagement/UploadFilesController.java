@@ -1,4 +1,4 @@
-package com.example.project.controller.projectManagement;
+package com.example.project.controller.ProjectManagement;
 
 import com.example.project.service.ProjectManagement.UploadFilesService;
 import org.springframework.beans.factory.annotation.Autowired;
