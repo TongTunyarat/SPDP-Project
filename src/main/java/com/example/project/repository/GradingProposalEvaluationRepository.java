@@ -22,4 +22,6 @@ public interface GradingProposalEvaluationRepository extends JpaRepository<Gradi
     long countDistinctProjectByProjectIn(@Param("projects") Collection<Project> projects);
 
     GradingProposalEvaluation findGradeResultByProjectAndStudent_StudentId(Project project, String student);
+
+    List<GradingProposalEvaluation> findByProject_Semester(String year);
 }

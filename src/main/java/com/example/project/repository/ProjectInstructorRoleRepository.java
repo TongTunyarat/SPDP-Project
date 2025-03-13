@@ -4,6 +4,8 @@ import com.example.project.entity.Instructor;
 import com.example.project.entity.Project;
 import com.example.project.entity.ProjectInstructorRole;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
@@ -16,5 +18,10 @@ public interface ProjectInstructorRoleRepository extends JpaRepository<ProjectIn
     List<ProjectInstructorRole> findByProjectIdRoleAndRole(Project projectIdRole, String role);
 
     List<ProjectInstructorRole> findByProjectIdRole(Project currentProject);
+
+    List<ProjectInstructorRole> findByProjectIdRole_Semester(String year);
+
+    List<ProjectInstructorRole> findByProjectIdRole_SemesterAndProjectIdRole_Program(String year, String program);
+
 }
 

@@ -2,8 +2,14 @@ package com.example.project.service;
 
 import com.example.project.DTO.Dashboard.GradingStatisticsDTO;
 import com.example.project.DTO.Dashboard.EvaluationStatusResponse;
+import com.example.project.DTO.Dashboard.TeacherScoringDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import jakarta.persistence.Column;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,6 +39,8 @@ public class StatisticsService {
     private ProjectInstructorRoleRepository projectInstructorRoleRepository;
     @Autowired
     private ScoringPeriodsRepository scoringPeriodsRepository;
+    @Autowired
+    private PosterEvaRepository posterEvaRepository;
 
     @Autowired
     public StatisticsService(
@@ -325,28 +333,323 @@ public class StatisticsService {
         return scoringPeriodsRepository.findAll();
     }
 
+    public Map<String, Long> getStudentProposalEvaluationStatus(String evaType, String year, String program) {
+        // Filter projects by year and program
+        List<StudentProject> studentProjects;
+
+        if ("All".equalsIgnoreCase(program)) {
+            studentProjects = studentProjectRepository.findByProject_Semester(year);
+        } else {
+            studentProjects = studentProjectRepository.findByProject_SemesterAndProject_Program(year, program);
+        }
+
+        long totalStudents = studentProjects.size();
+        long completed = 0;
+        long partial = 0;
+        long notEvaluated = 0;
+
+        System.out.println("Total students: " + totalStudents);
+
+        for (StudentProject studentProject : studentProjects) {
+            Project project = studentProject.getProject();
+            System.out.println("Evaluating student: " + studentProject.getStudent().getStudentName() + ", Project ID: " + project.getProjectId());
+
+            // Get instructors with roles based on evaType
+            List<ProjectInstructorRole> instructors;
+            switch (evaType) {
+                case "Proposal":
+                case "Defense":
+                    // For "Proposal" and "Defense" evaluations, check "Advisor" or "Committee" roles
+                    instructors = projectInstructorRoleRepository.findByProjectIdRole(project)
+                            .stream()
+                            .filter(i -> "Advisor".equals(i.getRole()) || "Committee".equals(i.getRole()))
+                            .toList();
+                    break;
+                case "Poster":
+                    // For "Poster" evaluations, check "Committee" or "Poster-Committee" roles
+                    instructors = projectInstructorRoleRepository.findByProjectIdRole(project)
+                            .stream()
+                            .filter(i -> "Committee".equals(i.getRole()) || "Poster-Committee".equals(i.getRole()))
+                            .toList();
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid evaluation type: " + evaType);
+            }
+
+            System.out.println("Total instructors for project " + project.getProjectId() + ": " + instructors.size());
+
+            // Check if there are no instructors or evaluations
+            if (instructors.isEmpty()) {
+                notEvaluated++;
+                System.out.println("No instructors for project " + project.getProjectId() + ", marked as Not Evaluated.");
+                continue;
+            }
+
+            long totalInstructors = instructors.size();
+            long evaluationsCount = 0;
+
+            // Retrieve evaluations based on evaType
+            switch (evaType) {
+                case "Proposal":
+                    evaluationsCount = instructors.stream()
+                            .flatMap(i -> i.getProposalEvaluations().stream())
+                            .filter(e -> e.getStudent().equals(studentProject.getStudent()))
+                            .count();
+                    System.out.println("Proposal evaluations count for student " + studentProject.getStudent().getStudentName() + ": " + evaluationsCount);
+                    break;
+                case "Poster":
+                    evaluationsCount = instructors.stream()
+                            .flatMap(i -> i.getPosterEvaluations().stream())
+                            .peek(evaluation -> System.out.println("Instructor " + evaluation.getInstructorIdPoster().getInstructorId() + " evaluated poster for project " + project.getProjectId()))
+                            .count();  // No need to filter by student
+                    System.out.println("Poster evaluations count for project " + project.getProjectId() + ": " + evaluationsCount);
+                    break;
+                case "Defense":
+                    evaluationsCount = instructors.stream()
+                            .flatMap(i -> i.getDefenseEvaluations().stream())
+                            .filter(e -> e.getStudent().equals(studentProject.getStudent()))
+                            .count();
+                    System.out.println("Defense evaluations count for student " + studentProject.getStudent().getStudentName() + ": " + evaluationsCount);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Invalid evaluation type: " + evaType);
+            }
+
+            // If there are no evaluations, mark as not evaluated
+            if (evaluationsCount == 0) {
+                notEvaluated++;
+                System.out.println("No evaluations for student " + studentProject.getStudent().getStudentName() + ", marked as Not Evaluated.");
+            } else {
+                // Categorize evaluation statuses
+                if (evaluationsCount == totalInstructors) {
+                    completed++;
+                    System.out.println("Completed for student " + studentProject.getStudent().getStudentName());
+                } else {
+                    partial++;
+                    System.out.println("Partial for student " + studentProject.getStudent().getStudentName());
+                }
+            }
+        }
+
+        System.out.println("Completed: " + completed);
+        System.out.println("Partial: " + partial);
+        System.out.println("Not Evaluated: " + notEvaluated);
+
+        return Map.of(
+                "completed", completed,
+                "partial", partial,
+                "notEvaluated", notEvaluated,
+                "totalStudents", totalStudents
+        );
+    }
+
+//    public List<TeacherScoringDTO> getTeachersWithRemainingScores(String evaType, String year, String program) {
+//        // Get all instructor roles for the given year and program
+//        List<ProjectInstructorRole> instructorRoles;
+//
+//        if ("All".equalsIgnoreCase(program)) {
+//            instructorRoles = projectInstructorRoleRepository.findByProjectIdRole_Semester(year);
+//        } else {
+//            instructorRoles = projectInstructorRoleRepository.findByProjectIdRole_SemesterAndProjectIdRole_Program(year, program);
+//        }
+//        System.out.println("Total instructors: " + instructorRoles.size());
+//
+//        // List to hold all TeacherScoringDTO objects
+//        List<TeacherScoringDTO> instructorScoreList = new ArrayList<>();
+//
+//        for (ProjectInstructorRole role : instructorRoles) {
+//            String professorId = role.getInstructor().getProfessorId();
+//            String professorName = role.getInstructor().getProfessorName();
+//
+//            System.out.println("Professor ID: " + professorId);
+//            System.out.println("Professor Name: " + professorName);
+//
+//            // Check if the professor already exists in the list
+//            TeacherScoringDTO professorData = null;
+//            for (TeacherScoringDTO dto : instructorScoreList) {
+//                if (dto.getInstructorId().equals(professorId)) {
+//                    professorData = dto;
+//                    break;
+//                }
+//            }
+//
+//            // If professor not found, create a new entry
+//            if (professorData == null) {
+//                professorData = new TeacherScoringDTO(professorName, professorId, 0, 0, 0, 0);
+//                instructorScoreList.add(professorData);
+//            }
+//
+//            // Check if this role is relevant for the evaluation type
+//            boolean isRelevantRole = false;
+//
+//            if ("Proposal".equalsIgnoreCase(evaType)) {
+//                isRelevantRole = role.getRole().equalsIgnoreCase("Advisor") || role.getRole().equalsIgnoreCase("Committee");
+//            } else if ("Poster".equalsIgnoreCase(evaType)) {
+//                isRelevantRole = role.getRole().equalsIgnoreCase("Committee") || role.getRole().equalsIgnoreCase("Poster-Committee");
+//            } else if ("Defense".equalsIgnoreCase(evaType)) {
+//                isRelevantRole = role.getRole().equalsIgnoreCase("Advisor") || role.getRole().equalsIgnoreCase("Committee");
+//            }
+//
+//            if (!isRelevantRole) {
+//                continue;
+//            }
+//
+//            // Count students in this project
+//            Project project = role.getProjectIdRole();
+//            int studentsInProject = studentProjectRepository.countByProject(project);
+//            professorData.setTotalAssigned(professorData.getTotalAssigned() + studentsInProject);
+//
+//            System.out.println("🎞️" + professorData.toString());
+//
+//            // Count completed evaluations for this project
+//            int completedForProject = 0;
+//
+//            if ("Proposal".equalsIgnoreCase(evaType)) {
+//                completedForProject = proposalEvaluationRepository.countByProjectInstructorRole_Instructor_ProfessorIdAndProjectInstructorRole_ProjectIdRole(
+//                        professorId, project);
+//            } else if ("Poster".equalsIgnoreCase(evaType)) {
+//                completedForProject = posterEvaRepository.countByInstructorIdPoster_Instructor_ProfessorIdAndProjectIdPoster(
+//                        professorId, project);
+//            } else if ("Defense".equalsIgnoreCase(evaType)) {
+//                completedForProject = defenseEvaluationRepository.countByDefenseInstructorId_Instructor_ProfessorIdAndProjectId(
+//                        professorId, project);
+//            }
+//
+//            professorData.setCompletedCount(professorData.getCompletedCount() + completedForProject);
+//
+//            System.out.println("Total: " + instructorScoreList.size());
+//            System.out.println("Completed: " + completedForProject);
+//        }
+//
+//        // Log the instructorScoreList before filtering
+//        System.out.println("Before filtering: " + instructorScoreList.size());
+//        instructorScoreList.forEach(dto -> {
+//            System.out.println("Professor ID: " + dto.getInstructorId() + ", Remaining: " + (dto.getTotalAssigned() - dto.getCompletedCount()));
+//        });
+//
+//        // Process final results
+//        List<TeacherScoringDTO> result = instructorScoreList.stream()
+//                .map(score -> {
+//                    // Calculate remainingCount
+//                    int remainingCount = score.getTotalAssigned() - score.getCompletedCount();
+//                    score.setRemainingCount(remainingCount);
+//                    return score;
+//                })
+//                .filter(score -> score.getTotalAssigned() > 0)  // Only include those with assignments
+//                .sorted(Comparator.comparing(TeacherScoringDTO::getRemainingCount).reversed())
+//                .limit(5)  // Limiting the results to top 5
+//                .collect(Collectors.toList());
+//
+//        // Log final result after filtering
+//        System.out.println("After filtering: " + result.size());
+//        result.forEach(dto -> {
+//            System.out.println("Professor ID: " + dto.getInstructorId() + ", Remaining: " + dto.getRemainingCount());
+//        });
+//
+//        return result;
+//    }
+
+    public List<TeacherScoringDTO> getTeachersWithRemainingScores(String evaType, String year, String program) {
+        // Get all instructor roles for the given year and program
+        List<ProjectInstructorRole> instructorRoles;
+
+        if ("All".equalsIgnoreCase(program)) {
+            instructorRoles = projectInstructorRoleRepository.findByProjectIdRole_Semester(year);
+        } else {
+            instructorRoles = projectInstructorRoleRepository.findByProjectIdRole_SemesterAndProjectIdRole_Program(year, program);
+        }
+        System.out.println("Total instructors: " + instructorRoles.size());
+
+        // List to hold all TeacherScoringDTO objects
+        List<TeacherScoringDTO> instructorScoreList = new ArrayList<>();
+
+        for (ProjectInstructorRole role : instructorRoles) {
+            String professorId = role.getInstructor().getProfessorId();
+            String professorName = role.getInstructor().getProfessorName();
+
+            System.out.println("Professor ID: " + professorId);
+            System.out.println("Professor Name: " + professorName);
+
+            // ค้นหาข้อมูลอาจารย์ใน instructorScoreList ที่มี professorId ตรงกัน
+            TeacherScoringDTO professorData = instructorScoreList.stream()
+                    .filter(dto -> dto.getInstructorId().equals(professorId))
+                    .findFirst()
+                    .orElse(null);  // ถ้าไม่พบ ให้ professorData เป็น null
+
+            // ถ้าไม่พบข้อมูลของอาจารย์ใน list ให้สร้างข้อมูลใหม่
+            if (professorData == null) {
+                professorData = new TeacherScoringDTO(professorName, professorId, 0, 0, 0, 0);
+                instructorScoreList.add(professorData);
+            }
+
+            // ตรวจสอบว่า role นี้เป็น role ที่เกี่ยวข้องกับการประเมินประเภทนี้หรือไม่
+            boolean isRelevantRole = false;
+            if ("Proposal".equalsIgnoreCase(evaType)) {
+                isRelevantRole = role.getRole().equalsIgnoreCase("Advisor") || role.getRole().equalsIgnoreCase("Committee");
+            } else if ("Poster".equalsIgnoreCase(evaType)) {
+                isRelevantRole = role.getRole().equalsIgnoreCase("Committee") || role.getRole().equalsIgnoreCase("Poster-Committee");
+            } else if ("Defense".equalsIgnoreCase(evaType)) {
+                isRelevantRole = role.getRole().equalsIgnoreCase("Advisor") || role.getRole().equalsIgnoreCase("Committee");
+            }
+
+            if (!isRelevantRole) {
+                continue;
+            }
+
+            // นับจำนวน students ในโปรเจกต์นี้
+            Project project = role.getProjectIdRole();
+            int studentsInProject = studentProjectRepository.countByProject(project);
+            professorData.setTotalAssigned(professorData.getTotalAssigned() + studentsInProject);
+
+            System.out.println("🎞️" + professorData.toString());
+
+            // นับจำนวนการประเมินที่เสร็จสมบูรณ์สำหรับโปรเจกต์นี้
+            int completedForProject = 0;
+            if ("Proposal".equalsIgnoreCase(evaType)) {
+                completedForProject = proposalEvaluationRepository.countByProjectInstructorRole_Instructor_ProfessorIdAndProjectInstructorRole_ProjectIdRole(
+                        professorId, project);
+            } else if ("Poster".equalsIgnoreCase(evaType)) {
+                completedForProject = posterEvaRepository.countByInstructorIdPoster_Instructor_ProfessorIdAndProjectIdPoster(
+                        professorId, project);
+            } else if ("Defense".equalsIgnoreCase(evaType)) {
+                completedForProject = defenseEvaluationRepository.countByDefenseInstructorId_Instructor_ProfessorIdAndProjectId(
+                        professorId, project);
+            }
+
+            professorData.setCompletedCount(professorData.getCompletedCount() + completedForProject);
+
+            System.out.println("Total: " + instructorScoreList.size());
+            System.out.println("Completed: " + completedForProject);
+        }
+
+        // Log the instructorScoreList before filtering
+        System.out.println("Before filtering: " + instructorScoreList.size());
+        instructorScoreList.forEach(dto -> {
+            System.out.println("Professor ID: " + dto.getInstructorId() + ", Remaining: " + (dto.getTotalAssigned() - dto.getCompletedCount()));
+        });
+
+        // Process final results
+        List<TeacherScoringDTO> result = instructorScoreList.stream()
+                .map(score -> {
+                    // คำนวณ remainingCount
+                    int remainingCount = score.getTotalAssigned() - score.getCompletedCount();
+                    score.setRemainingCount(remainingCount);
+                    return score;
+                })
+                .filter(score -> score.getTotalAssigned() > 0)  // เฉพาะอาจารย์ที่มีการมอบหมาย
+                .sorted(Comparator.comparing(TeacherScoringDTO::getRemainingCount).reversed())
+                .limit(5)  // จำกัดผลลัพธ์เป็น 5 คน
+                .collect(Collectors.toList());
+
+        // Log final result after filtering
+        System.out.println("After filtering: " + result.size());
+        result.forEach(dto -> {
+            System.out.println("Professor ID: " + dto.getInstructorId() + ", Remaining: " + dto.getRemainingCount());
+        });
+
+        return result;
+    }
+
+
 }
 
-
-// if param == All
-// List<Project> allProject = projectRepository.findAll()
-// Long totalProject = allProject.size()
-// หาจำนวน instructor ในแต่ละ Project จาก projectInstructorRole *เอาแค่ role [Advisor, Committee]
-//                public class ProjectInstructorRole {
-//                    private String instructorId;
-//                    private LocalDateTime assignDate;
-//                    private String role;
-//                    private Project projectIdRole;
-//                    private Instructor instructor;
-//                    private List<DefenseEvaluation> defenseEvaluations;
-//                    private List<PosterEvaluation> posterEvaluations;
-//                    private List<ProposalEvaluation> proposalEvaluations;
-//                }
-// ตรวจสอบว่า instructor คนนั้นให้คะแนนครบทุกนักศึกษารึยังในแต่ละ Project จาก ProposalEvaluation
-// สมมตินะว่า Project001 มีนักศึกษา 3 คน มี Advisor 1 คน Committee 2 คน จะนับว่า project ประเมินครบแล้วโดย advisor และ committee ต้องประเมินครบทุกนักศึกษา
-// อยาก return (จำนวน project ทั้งหมด, จำนวน project ที่ประเมินครบแล้ว)
-
-// else if param == ICT
-// ทำเหมือนของ All แต่ Project ต้องเช็คว่ามี program == ICT
-// else if param == DST
-// ทำเหมือนของ All แต่ Project ต้องเช็คว่ามี program == DST

@@ -10,12 +10,10 @@ import java.util.List;
 public interface DefenseEvaluationRepository extends JpaRepository<DefenseEvaluation, String> {
 
     DefenseEvaluation findByDefenseInstructorIdAndProjectIdAndStudent(ProjectInstructorRole defenseInstructorId, Project projectId, Student studentDefense);
-//
-//    List<DefenseEvaluation> findByProjectId(Project project);
-//
-//    List<DefenseEvaluation> findByProjectIdAndStudent(Project projectId, Student studentDefense);
 
     List<DefenseEvaluation> findByProjectId_ProjectId(String projectId);
 
     int countByDefenseInstructorIdAndProjectId(ProjectInstructorRole instructorRole, Project project);
+
+    int countByDefenseInstructorId_Instructor_ProfessorIdAndProjectId(String professorId, Project project);
 }

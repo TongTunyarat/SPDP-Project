@@ -29,20 +29,32 @@ public class ReportController {
 
 
     @GetMapping("/api/proposal-grade")
-    public ResponseEntity<?> getGradingPropStatistics() {
-        ProposalGradeDTO proposalGradeDTO = new ProposalGradeDTO(studentProjectRepository.findAll(), gradingProposalEvaluationRepository.findAll(), projectInstructorRoleRepository.findAll());
+    public ResponseEntity<?> getGradingPropStatistics(
+            @RequestParam String year
+    ) {
+        ProposalGradeDTO proposalGradeDTO = new ProposalGradeDTO(
+                studentProjectRepository.findByProject_Semester(year),
+                gradingProposalEvaluationRepository.findByProject_Semester(year),
+                projectInstructorRoleRepository.findByProjectIdRole_Semester(year));
         return ResponseEntity.ok(proposalGradeDTO);
     }
 
     @GetMapping("/api/defense-grade")
-    public ResponseEntity<?> getGradingDefStatistics() {
-        DefenseGradeDTO defenseGradeDTO = new DefenseGradeDTO(studentProjectRepository.findAll(), gradingDefenseEvaluationRepository.findAll(), projectInstructorRoleRepository.findAll());
+    public ResponseEntity<?> getGradingDefStatistics(
+            @RequestParam String year
+    ) {
+        DefenseGradeDTO defenseGradeDTO = new DefenseGradeDTO(
+                studentProjectRepository.findByProject_Semester(year),
+                gradingDefenseEvaluationRepository.findByProjectId_Semester(year),
+                projectInstructorRoleRepository.findByProjectIdRole_Semester(year)
+        );
         return ResponseEntity.ok(defenseGradeDTO);
     }
 
     @GetMapping("/api/evaluation-tracking")
     public ResponseEntity<?> getGradingStatistics(
-            @RequestParam String evaType
+            @RequestParam String evaType,
+            @RequestParam String year
     ) {
     try {
             if (evaType == null || evaType.isBlank()) {
@@ -50,7 +62,7 @@ public class ReportController {
             }
 
             System.out.println("Fetching evaluation for type: " + evaType);
-            EvaluationTrackingDTO evaStatus = reportService.getEvaluationTracking(evaType);
+            EvaluationTrackingDTO evaStatus = reportService.getEvaluationTracking(evaType, year);
 
             if (evaStatus == null) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND)

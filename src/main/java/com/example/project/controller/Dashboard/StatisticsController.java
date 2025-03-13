@@ -2,6 +2,7 @@ package com.example.project.controller.Dashboard;
 
 import com.example.project.DTO.Dashboard.GradingStatisticsDTO;
 import com.example.project.DTO.Dashboard.EvaluationStatusResponse;
+import com.example.project.DTO.Dashboard.TeacherScoringDTO;
 import com.example.project.entity.ScoringPeriods;
 import com.example.project.service.ScoringPeriodsService;
 import com.example.project.service.StatisticsService;
@@ -158,5 +159,60 @@ public class StatisticsController {
     public ResponseEntity<List<ScoringPeriods>> getImportantDates() {
         List<ScoringPeriods> importantDates = statisticsService.getAllScoringPeriods();
         return ResponseEntity.ok(importantDates);
+    }
+
+    @GetMapping("/api/pie-chart")
+    public ResponseEntity<Map<String, Double>> getEvaluationStatus(
+            @RequestParam String evaType,
+            @RequestParam String year,
+            @RequestParam String program
+    ) {
+        Map<String, Long> statusCounts = statisticsService.getStudentProposalEvaluationStatus(evaType, year, program);
+        long totalStudents = statusCounts.get("totalStudents");
+
+        if (totalStudents == 0) {
+            return ResponseEntity.ok(Map.of("completed", 0.0, "partial", 0.0, "notEvaluated", 0.0));
+        }
+
+        Map<String, Double> response = Map.of(
+                "completed", (statusCounts.get("completed") * 100.0) / totalStudents,
+                "partial", (statusCounts.get("partial") * 100.0) / totalStudents,
+                "notEvaluated", (statusCounts.get("notEvaluated") * 100.0) / totalStudents
+        );
+
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/api/student-counts")
+    public ResponseEntity<Map<String, Double>> getStudentStatus(
+            @RequestParam String evaType,
+            @RequestParam String year,
+            @RequestParam String program
+    ) {
+        Map<String, Long> statusCounts = statisticsService.getStudentProposalEvaluationStatus(evaType, year, program);
+        long totalStudents = statusCounts.get("totalStudents");
+
+        if (totalStudents == 0) {
+            return ResponseEntity.ok(Map.of("completed", 0.0, "partial", 0.0, "notEvaluated", 0.0));
+        }
+
+        Map<String, Double> response = Map.of(
+                "completed", (statusCounts.get("completed").doubleValue()),
+                "partial", (statusCounts.get("partial").doubleValue()),
+                "notEvaluated", (statusCounts.get("notEvaluated").doubleValue())
+        );
+        return ResponseEntity.ok(response);
+    }
+
+
+    @GetMapping("/api/teacher-scoring/remaining")
+    public ResponseEntity<List<TeacherScoringDTO>> getTeachersWithRemainingScoring(
+            @RequestParam String evaType,
+            @RequestParam String year,
+            @RequestParam String program
+    ) {
+        List<TeacherScoringDTO> remainingScores = statisticsService.getTeachersWithRemainingScores(evaType, year, program);
+        return ResponseEntity.ok(remainingScores);
+
     }
 }

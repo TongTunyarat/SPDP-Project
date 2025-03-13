@@ -83,8 +83,15 @@
         <!--    HEADER    -->
         <div class="header-section">
             Proposal Grade Report
-            <div class="export-btn">
-                <button>Export</button>
+
+            <div class="header-button">
+                <div class="semester-container">
+                    <select id="semester-selector" onchange="fetchProposalGrades();"></select>
+                </div>
+
+                <div class="export-btn">
+                    <button>Export</button>
+                </div>
             </div>
         </div>
 
@@ -123,10 +130,46 @@
 </div>
 </body>
 
+<!-- --------- Semester Change ------------- -->
+<script>
+    async function fetchAcademicYears() {
+        try {
+            const response = await fetch('/api/academic-years'); // เรียก API
+            const data = await response.json();
+
+            console.log("Year: ", data);
+
+            const semesterSelector = document.getElementById('semester-selector');
+            semesterSelector.innerHTML = ""; // เคลียร์ค่าก่อนเติมใหม่
+
+            data.forEach(year => {
+                const option = document.createElement("option");
+                option.value = year;
+                option.textContent = "📆 "+year;
+                semesterSelector.appendChild(option);
+            });
+
+            // ตั้งค่าปีปัจจุบันเป็น default (เช่น 2025)
+            const currentYear = new Date().getFullYear();  // หาปีปัจจุบัน
+            if (!semesterSelector.value) {
+                semesterSelector.value = currentYear.toString();  // กำหนดค่า default เป็นปีปัจจุบัน
+            }
+
+            // เรียก fetchGradingStatistics เพื่อส่งค่า initial ปีไป
+            await fetchProposalGrades();
+
+
+        } catch (error) {
+            console.error("Error fetching academic years:", error);
+        }
+    }
+</script>
+
 <script>
     // สร้างฟังก์ชันสำหรับดึงข้อมูลและแสดงผล
     document.addEventListener('DOMContentLoaded', function() {
-        fetchProposalGrades();
+        // fetchProposalGrades();
+        fetchAcademicYears();
 
         // เพิ่ม event listener สำหรับปุ่ม tab
         const tabs = document.querySelectorAll('.tab');
@@ -163,7 +206,14 @@
 
     // ฟังก์ชันดึงข้อมูลจาก API
     function fetchProposalGrades() {
-        fetch('http://localhost:8080/api/proposal-grade')
+        const selectedYear = document.getElementById("semester-selector").value;  // ดึงปีที่เลือกจาก dropdown
+        console.log("selectedYear: ", selectedYear);  // ตรวจสอบว่าได้ค่าไหมใน console
+        if (!selectedYear) {
+            console.log("No year selected");
+            return;
+        }
+        console.log("😈selectedYear: ", selectedYear);
+        fetch(`http://localhost:8080/api/proposal-grade?year=${selectedYear}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
@@ -171,6 +221,8 @@
                 return response.json();
             })
             .then(data => {
+                console.log(data)
+
                 allProposalData = data;
                 processAndGroupData(data);
                 renderGroupedTable(groupedProjects);
@@ -246,62 +298,6 @@
         }
     }
 
-    // ฟังก์ชันแสดงข้อมูลในตารางแบบจัดกลุ่ม
-    // function renderGroupedTable(projects) {
-    //     const tableBody = document.getElementById('projectTable');
-    //     tableBody.innerHTML = '';
-    //
-    //     if (projects.length === 0) {
-    //         tableBody.innerHTML = '<tr><td colspan="8">No active projects found</td></tr>';
-    //         return;
-    //     }
-    //
-    //     projects.forEach(project => {
-    //         let isFirstStudent = true;
-    //
-    //         // สำหรับแต่ละนักศึกษาในโครงการ
-    //         project.students.forEach((student, index) => {
-    //             const row = document.createElement('tr');
-    //
-    //             // เปลี่ยนสีพื้นหลังของแถวตามลำดับของโครงการ
-    //             if (index % 2 === 0) {
-    //                 row.style.backgroundColor = '#ffffff'; // สีขาว สำหรับโครงการคี่
-    //             } else {
-    //                 row.style.backgroundColor = '#f2f2f2'; // สีเทา สำหรับโครงการคู่
-    //             }
-    //
-    //             if (isFirstStudent) {
-    //                 // แถวแรกของโครงการ - แสดงรายละเอียดโครงการและนักศึกษาคนแรก
-    //                 row.innerHTML = `
-    //                 <td rowspan="${project.students.length}">${project.projectId}
-    //                     <div class="${project.program.toLowerCase()}-badge">${project.program}</div>
-    //                 </td>
-    //                 <td rowspan="${project.students.length}">
-    //                     ${project.projectTitle}
-    //                 </td>
-    //                 <td rowspan="${project.students.length}">${project.advisor}</td>
-    //                 <td>${student.studentId}</td>
-    //                 <td>${student.studentName}</td>
-    //                 <td>${student.section}</td>
-    //                 <td>${student.track}</td>
-    //                 <td>${student.grade}</td>
-    //             `;
-    //             } else {
-    //                 // แถวถัดไปของโครงการ - แสดงเฉพาะข้อมูลนักศึกษา
-    //                 row.innerHTML = `
-    //                 <td>${student.studentId}</td>
-    //                 <td>${student.studentName}</td>
-    //                 <td>${student.section}</td>
-    //                 <td>${student.track}</td>
-    //                 <td>${student.grade}</td>
-    //             `;
-    //             }
-    //
-    //             tableBody.appendChild(row);
-    //             isFirstStudent = false;
-    //         });
-    //     });
-    // }
     // ฟังก์ชันแสดงข้อมูลในตารางแบบจัดกลุ่ม
     function renderGroupedTable(projects) {
         const tableBody = document.getElementById('projectTable');

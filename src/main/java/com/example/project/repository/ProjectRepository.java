@@ -27,12 +27,10 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 
     Project findByProjectId(String projectId);
 
-
-    List<Project> findByProgram(String param);
-
     List<Project> findBySemester(String param);
 
     List<Project> findBySemesterAndProgram(String param, String year);
+
 }
 
 

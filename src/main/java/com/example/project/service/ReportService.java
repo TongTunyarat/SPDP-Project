@@ -106,8 +106,8 @@ public class ReportService {
 //
 //        return new EvaluationTrackingDTO(instructorRoles, instructorEvaStatusList);
 //    }
-    public EvaluationTrackingDTO getEvaluationTracking(String evaType) {
-        List<ProjectInstructorRole> instructorRoles = projectInstructorRoleRepository.findAll();
+    public EvaluationTrackingDTO getEvaluationTracking(String evaType, String year) {
+        List<ProjectInstructorRole> instructorRoles = projectInstructorRoleRepository.findByProjectIdRole_Semester(year);
         List<EvaluationTrackingDTO.InstructorEvaStatus> instructorEvaStatusList = new ArrayList<>();
 
         if ("Proposal".equalsIgnoreCase(evaType)) {
@@ -122,6 +122,11 @@ public class ReportService {
     }
 
     private EvaluationTrackingDTO getProposalEvaluationTracking(List<ProjectInstructorRole> instructorRoles) {
+        // กรองเฉพาะ Instructor ที่มี role เป็น "Advisor" หรือ "Committee"
+        List<ProjectInstructorRole> filteredRoles = instructorRoles.stream()
+                .filter(role -> "Advisor".equalsIgnoreCase(role.getRole()) || "Committee".equalsIgnoreCase(role.getRole()))
+                .collect(Collectors.toList());
+
         List<StudentProject> studentProjects = studentProjectRepository.findAll();
         List<ProposalEvaluation> proposalEvaluations = proposalEvaluationRepository.findAll();
 
@@ -138,7 +143,7 @@ public class ReportService {
 
         List<EvaluationTrackingDTO.InstructorEvaStatus> instructorEvaStatusList = new ArrayList<>();
 
-        for (ProjectInstructorRole role : instructorRoles) {
+        for (ProjectInstructorRole role : filteredRoles) {
             String instructorId = role.getInstructor().getProfessorId();
             String projectId = role.getProjectIdRole().getProjectId();
             long studentCount = studentCountByProject.getOrDefault(projectId, 0L);
@@ -148,10 +153,16 @@ public class ReportService {
             instructorEvaStatusList.add(new EvaluationTrackingDTO.InstructorEvaStatus(instructorId, projectId, projectEvaStatus));
         }
 
-        return new EvaluationTrackingDTO(instructorRoles, instructorEvaStatusList);
+        return new EvaluationTrackingDTO(filteredRoles, instructorEvaStatusList);
     }
 
+
     private EvaluationTrackingDTO getDefenseEvaluationTracking(List<ProjectInstructorRole> instructorRoles) {
+        // กรองเฉพาะ Instructor ที่มี role เป็น "Advisor" หรือ "Committee"
+        List<ProjectInstructorRole> filteredRoles = instructorRoles.stream()
+                .filter(role -> "Advisor".equalsIgnoreCase(role.getRole()) || "Committee".equalsIgnoreCase(role.getRole()))
+                .collect(Collectors.toList());
+
         List<StudentProject> studentProjects = studentProjectRepository.findAll();
         List<DefenseEvaluation> defenseEvaluations = defenseEvaluationRepository.findAll();
 
@@ -168,7 +179,7 @@ public class ReportService {
 
         List<EvaluationTrackingDTO.InstructorEvaStatus> instructorEvaStatusList = new ArrayList<>();
 
-        for (ProjectInstructorRole role : instructorRoles) {
+        for (ProjectInstructorRole role : filteredRoles) {
             String instructorId = role.getInstructor().getProfessorId();
             String projectId = role.getProjectIdRole().getProjectId();
             long studentCount = studentCountByProject.getOrDefault(projectId, 0L);
@@ -178,10 +189,16 @@ public class ReportService {
             instructorEvaStatusList.add(new EvaluationTrackingDTO.InstructorEvaStatus(instructorId, projectId, projectEvaStatus));
         }
 
-        return new EvaluationTrackingDTO(instructorRoles, instructorEvaStatusList);
+        return new EvaluationTrackingDTO(filteredRoles, instructorEvaStatusList);
     }
 
+
     private EvaluationTrackingDTO getPosterEvaluationTracking(List<ProjectInstructorRole> instructorRoles) {
+        // กรองเฉพาะ Instructor ที่มี role เป็น "Committee" หรือ "Poster-Committee"
+        List<ProjectInstructorRole> filteredRoles = instructorRoles.stream()
+                .filter(role -> "Committee".equalsIgnoreCase(role.getRole()) || "Poster-Committee".equalsIgnoreCase(role.getRole()))
+                .collect(Collectors.toList());
+
         List<PosterEvaluation> posterEvaluations = posterEvaRepository.findAll();
 
         // นับจำนวน Poster Evaluation ของ Instructor ต่อ Project
@@ -192,7 +209,7 @@ public class ReportService {
 
         List<EvaluationTrackingDTO.InstructorEvaStatus> instructorEvaStatusList = new ArrayList<>();
 
-        for (ProjectInstructorRole role : instructorRoles) {
+        for (ProjectInstructorRole role : filteredRoles) {
             String instructorId = role.getInstructor().getProfessorId();
             String projectId = role.getProjectIdRole().getProjectId();
             long posterEvaCount = posterCountByInstructor.getOrDefault(instructorId + "_" + projectId, 0L);
@@ -202,8 +219,9 @@ public class ReportService {
             instructorEvaStatusList.add(new EvaluationTrackingDTO.InstructorEvaStatus(instructorId, projectId, projectEvaStatus));
         }
 
-        return new EvaluationTrackingDTO(instructorRoles, instructorEvaStatusList);
+        return new EvaluationTrackingDTO(filteredRoles, instructorEvaStatusList);
     }
+
 
 
 }

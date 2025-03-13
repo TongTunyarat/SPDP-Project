@@ -79,7 +79,7 @@
             <span id="date-time"></span>
 
             <div class="semester-container">
-                <select id="semester-selector" onchange="fetchGradingStatistics(); fetchProposalData(); fetchDefenseData(); fetchPosterData(); fetchGradeDistribution();"></select>
+                <select id="semester-selector" onchange="fetchGradingStatistics(); fetchProposalData(); fetchDefenseData(); fetchPosterData(); fetchGradeDistribution(); fetchEvaluationStatus(); fetchTeacherScoringData();"></select>
             </div>
         </div>
 
@@ -207,11 +207,11 @@
         <div class="main-content">
             <div class="panel">
                 <div class="panel-title">สถานะการประเมินนักเรียน</div>
-                <div style="display: flex;">
+                <div class="panel-chart-legend" style="display: flex;">
                     <div class="pie-chart">
-                        <div class="percentage green">25%</div>
-                        <div class="percentage red">37.5%</div>
-                        <div class="percentage yellow">37.5%</div>
+                        <div class="percentage green" id="completed"></div>
+                        <div class="percentage yellow" id="partial"></div>
+                        <div class="percentage red" id="notEvaluated"></div>
                     </div>
                     <div class="legend" style="margin-left: 20px;">
                         <div class="legend-item">
@@ -232,44 +232,51 @@
 
             <div class="panel">
                 <div class="panel-title">อาจารย์ที่ยังไม่ลงคะแนน</div>
-                <div class="horizontal-bar-chart">
-                    <div class="h-bar-item">
-                        <div class="h-bar-label">Aj.Siripen</div>
-                        <div class="h-bar-container">
-                            <div class="h-bar-fill" style="width: 85%;"></div>
-                        </div>
-                        <div class="h-bar-percentage">15 คนที่เหลือ</div>
-                    </div>
-                    <div class="h-bar-item">
-                        <div class="h-bar-label">Aj.Jidapa</div>
-                        <div class="h-bar-container">
-                            <div class="h-bar-fill" style="width: 70%;"></div>
-                        </div>
-                        <div class="h-bar-percentage">10 คนที่เหลือ</div>
-                    </div>
-                    <div class="h-bar-item">
-                        <div class="h-bar-label">Aj.Siripen</div>
-                        <div class="h-bar-container">
-                            <div class="h-bar-fill" style="width: 65%;"></div>
-                        </div>
-                        <div class="h-bar-percentage">8 คนที่เหลือ</div>
-                    </div>
-                    <div class="h-bar-item">
-                        <div class="h-bar-label">Aj.Siripen</div>
-                        <div class="h-bar-container">
-                            <div class="h-bar-fill" style="width: 60%;"></div>
-                        </div>
-                        <div class="h-bar-percentage">7 คนที่เหลือ</div>
-                    </div>
-                    <div class="h-bar-item">
-                        <div class="h-bar-label">Aj.Siripen</div>
-                        <div class="h-bar-container">
-                            <div class="h-bar-fill" style="width: 40%;"></div>
-                        </div>
-                        <div class="h-bar-percentage">5 คนที่เหลือ</div>
-                    </div>
+                <div class="horizontal-bar-chart" id="teacher-scoring-container">
+                    <!-- ข้อมูลจะถูกเพิ่มที่นี่โดย JavaScript -->
                 </div>
             </div>
+
+<!--            <div class="panel">-->
+<!--                <div class="panel-title">อาจารย์ที่ยังไม่ลงคะแนน</div>-->
+<!--                <div class="horizontal-bar-chart">-->
+<!--                    <div class="h-bar-item">-->
+<!--                        <div class="h-bar-label">Aj.Siripen</div>-->
+<!--                        <div class="h-bar-container">-->
+<!--                            <div class="h-bar-fill" style="width: 85%;"></div>-->
+<!--                        </div>-->
+<!--                        <div class="h-bar-percentage">15 คนที่เหลือ</div>-->
+<!--                    </div>-->
+<!--                    <div class="h-bar-item">-->
+<!--                        <div class="h-bar-label">Aj.Jidapa</div>-->
+<!--                        <div class="h-bar-container">-->
+<!--                            <div class="h-bar-fill" style="width: 70%;"></div>-->
+<!--                        </div>-->
+<!--                        <div class="h-bar-percentage">10 คนที่เหลือ</div>-->
+<!--                    </div>-->
+<!--                    <div class="h-bar-item">-->
+<!--                        <div class="h-bar-label">Aj.Siripen</div>-->
+<!--                        <div class="h-bar-container">-->
+<!--                            <div class="h-bar-fill" style="width: 65%;"></div>-->
+<!--                        </div>-->
+<!--                        <div class="h-bar-percentage">8 คนที่เหลือ</div>-->
+<!--                    </div>-->
+<!--                    <div class="h-bar-item">-->
+<!--                        <div class="h-bar-label">Aj.Siripen</div>-->
+<!--                        <div class="h-bar-container">-->
+<!--                            <div class="h-bar-fill" style="width: 60%;"></div>-->
+<!--                        </div>-->
+<!--                        <div class="h-bar-percentage">7 คนที่เหลือ</div>-->
+<!--                    </div>-->
+<!--                    <div class="h-bar-item">-->
+<!--                        <div class="h-bar-label">Aj.Siripen</div>-->
+<!--                        <div class="h-bar-container">-->
+<!--                            <div class="h-bar-fill" style="width: 40%;"></div>-->
+<!--                        </div>-->
+<!--                        <div class="h-bar-percentage">5 คนที่เหลือ</div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
         </div>
     </div>
 
@@ -308,6 +315,8 @@
         semesterSelect.addEventListener("change", function () {
             console.log("Selected Semester:", semesterSelect.value);
             fetchGradeDistribution();
+            fetchEvaluationStatus();
+            fetchTeacherScoringData();
         });
 
         // อัปเดต event listener สำหรับ tabs (All, ICT, DST)
@@ -320,6 +329,8 @@
                 this.classList.add("active");
                 // เรียก API เมื่อเปลี่ยน tab
                 fetchGradeDistribution();
+                fetchEvaluationStatus();
+                fetchTeacherScoringData();
             });
         });
 
@@ -333,6 +344,8 @@
                 this.classList.add("active");
                 // เรียก API เมื่อเปลี่ยน filter
                 fetchGradeDistribution();
+                fetchEvaluationStatus();
+                fetchTeacherScoringData();
             });
         });
     });
@@ -369,6 +382,8 @@
             await fetchDefenseData();
             await fetchPosterData();
             await fetchGradeDistribution();
+            await fetchEvaluationStatus();
+            await fetchTeacherScoringData();
 
         } catch (error) {
             console.error("Error fetching academic years:", error);
@@ -719,17 +734,24 @@
         fetch(`http://localhost:8080/api/grading-graph?program=${activeTab}&year=${semesterYear}&evaType=${evaType}`)
             .then(response => response.json())
             .then(data => {
-                updateChart(data);
+                updateChart(data, evaType);
             })
             .catch(error => {
                 console.error("Error fetching grade distribution:", error);
             });
     }
 
-    function updateChart(gradeData) {
+    function updateChart(gradeData, evaType) {
         const barChart = document.getElementById("barChart");
         const tooltip = document.getElementById("tooltip");
         barChart.innerHTML = ""; // เคลียร์กราฟเก่า
+
+        if (evaType === "Poster Exhibition") {
+            barChart.innerHTML = `<div style=" position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 16px; color: #ff0000; text-align: center;">
+            Poster Exhibition ไม่มีการประเมินเกรด
+        </div>`;
+            return; // ไม่ต้องแสดงกราฟ
+        }
 
         console.log("grade data: ", gradeData)
 
@@ -881,5 +903,232 @@
         setInterval(fetchImportantDates, 24 * 60 * 60 * 1000);
     });
 </script>
+
+<!-- ----------- For Pie Chart ------------- -->
+<script>
+    async function fetchEvaluationStatus() {
+        try {
+            const activeFilter = document.querySelector('.filter.active').textContent.trim();
+            const activeProgram = document.querySelector('.tab.active').textContent.trim();
+            const selectedYear = document.getElementById('semester-selector').value;
+
+            let evaType = activeFilter === 'Proposal' ? 'Proposal' :
+                activeFilter === 'Poster' ? 'Poster' :
+                    'Defense';
+
+            const response = await fetch(`/api/student-counts?evaType=${evaType}&year=${selectedYear}&program=${activeProgram}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+            console.log("📊 Student Count Data:", data);
+
+            updatePieChart(data);
+
+        } catch (error) {
+            console.error("❌ Error fetching evaluation status:", error);
+        }
+    }
+
+    function updatePieChart(data) {
+        // คำนวณผลรวมของนักเรียนทั้งหมด
+        const total = data.completed + data.partial + data.notEvaluated;
+
+        // คำนวณเปอร์เซ็นต์ของแต่ละสถานะ
+        const completedPercentage = total > 0 ? (data.completed / total) * 100 : 0;
+        const partialPercentage = total > 0 ? (data.partial / total) * 100 : 0;
+        const notEvaluatedPercentage = total > 0 ? (data.notEvaluated / total) * 100 : 0;
+
+        // หาองศาที่แต่ละส่วนต้องแสดง
+        const completedAngle = completedPercentage * 3.6; // 360 / 100 = 3.6
+        const partialAngle = partialPercentage * 3.6;
+        const notEvaluatedAngle = notEvaluatedPercentage * 3.6;
+
+        // อัปเดต pie chart ด้วย conic-gradient (วิธีที่ถูกต้องสำหรับ pie chart)
+        const pieChart = document.querySelector('.pie-chart');
+
+        // สร้าง conic-gradient ตามสัดส่วนที่คำนวณได้
+        let gradientStr = "";
+
+        if (completedPercentage > 0) {
+            gradientStr += `#26a69a 0deg ${completedAngle}deg`;
+        }
+
+        if (partialPercentage > 0) {
+            gradientStr += `${gradientStr ? ", " : ""}#feca57 ${completedAngle}deg ${completedAngle + partialAngle}deg`;
+        }
+
+        if (notEvaluatedPercentage > 0) {
+            gradientStr += `${gradientStr ? ", " : ""}#ff6b6b ${completedAngle + partialAngle}deg ${completedAngle + partialAngle + notEvaluatedAngle}deg`;
+        }
+
+        if (gradientStr === "") {
+            gradientStr = "#f5f5f5 0deg 360deg"; // กรณีไม่มีข้อมูล
+        }
+
+        pieChart.style.background = `conic-gradient(${gradientStr})`;
+
+        // ลบ elements ที่ไม่จำเป็นออก
+        const percentageElements = pieChart.querySelectorAll('.percentage');
+        percentageElements.forEach(el => el.remove());
+
+        // อัปเดตข้อความในคำอธิบายเพื่อแสดงจำนวนนักเรียน
+        const legendItems = document.querySelectorAll('.legend-item');
+        legendItems[0].querySelector('div:last-child').textContent =
+            `ได้รับการประเมินครบแล้ว (${data.completed} คน, ${completedPercentage.toFixed(1)}%)`;
+        legendItems[1].querySelector('div:last-child').textContent =
+            `ได้รับการประเมินบางส่วน (${data.partial} คน, ${partialPercentage.toFixed(1)}%)`;
+        legendItems[2].querySelector('div:last-child').textContent =
+            `ยังไม่ได้รับการประเมิน (${data.notEvaluated} คน, ${notEvaluatedPercentage.toFixed(1)}%)`;
+    }
+</script>
+
+<!-- Instructor scoring-->
+<script>
+    // async function fetchTeacherScoringData() {
+    //     try {
+    //         const activeFilter = document.querySelector('.filter.active').textContent.trim();
+    //         const activeProgram = document.querySelector('.tab.active').textContent.trim();
+    //         const selectedYear = document.getElementById('semester-selector').value;
+    //
+    //         let evaType = activeFilter === 'Proposal' ? 'Proposal' :
+    //             activeFilter === 'Poster' ? 'Poster' :
+    //                 'Defense';
+    //
+    //         console.log("😈 Scoring");
+    //         console.log("😈", evaType, selectedYear, activeProgram);
+    //
+    //         const response = await fetch(`http://localhost:8080/api/teacher-scoring/remaining?evaType=${evaType}&year=${selectedYear}&program=${activeProgram}`);
+    //         if (!response.ok) {
+    //             throw new Error(`HTTP error! Status: ${response.status}`);
+    //         }
+    //
+    //         const data = await response.json();
+    //
+    //         // ตรวจสอบข้อมูลที่ได้จาก API
+    //         console.log("😈", data);
+    //
+    //         // แสดงข้อมูลในกราฟ
+    //         const container = document.getElementById('teacher-scoring-container');
+    //         container.innerHTML = ''; // เคลียร์กราฟเดิมก่อน
+    //
+    //         // เพิ่มรายการข้อมูลใหม่จาก API
+    //         data.forEach(item => {
+    //             const barItem = document.createElement('div');
+    //             barItem.classList.add('h-bar-item');
+    //
+    //             const label = document.createElement('div');
+    //             label.classList.add('h-bar-label');
+    //             label.textContent = item.instructorName;
+    //
+    //             const barContainer = document.createElement('div');
+    //             barContainer.classList.add('h-bar-container');
+    //
+    //             const barFill = document.createElement('div');
+    //             barFill.classList.add('h-bar-fill');
+    //
+    //             // คำนวณเปอร์เซ็นต์ที่เหลือจากจำนวนที่มอบหมายและจำนวนที่ทำเสร็จ
+    //             const percentage = ((item.remainingCount / item.totalAssigned) * 100);
+    //
+    //             barFill.style.width = `${percentage}%`;  // ตั้งความยาวตามเปอร์เซ็นต์ที่เหลือ
+    //             // barFill.style.backgroundColor = getColorForPercentage(item.remainingCount);
+    //
+    //             const percentageText = document.createElement('div');
+    //             percentageText.classList.add('h-bar-percentage');
+    //             percentageText.textContent = `${item.remainingCount} คนที่เหลือ`;
+    //
+    //             // รวมทุกส่วนเข้าด้วยกัน
+    //             barContainer.appendChild(barFill);
+    //             barItem.appendChild(label);
+    //             barItem.appendChild(barContainer);
+    //             barItem.appendChild(percentageText);
+    //
+    //             container.appendChild(barItem);
+    //         });
+    //     } catch (error) {
+    //         console.error("Error fetching teacher scoring data:", error);
+    //     }
+    // }
+
+    async function fetchTeacherScoringData() {
+        try {
+            const activeFilter = document.querySelector('.filter.active').textContent.trim();
+            const activeProgram = document.querySelector('.tab.active').textContent.trim();
+            const selectedYear = document.getElementById('semester-selector').value;
+
+            let evaType = activeFilter === 'Proposal' ? 'Proposal' :
+                activeFilter === 'Poster' ? 'Poster' :
+                    'Defense';
+
+            console.log("😈 Scoring");
+            console.log("😈", evaType, selectedYear, activeProgram);
+
+            const response = await fetch(`http://localhost:8080/api/teacher-scoring/remaining?evaType=${evaType}&year=${selectedYear}&program=${activeProgram}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            // ตรวจสอบข้อมูลที่ได้จาก API
+            console.log("😈", data);
+
+            // แสดงข้อมูลในกราฟ
+            const container = document.getElementById('teacher-scoring-container');
+            container.innerHTML = ''; // เคลียร์กราฟเดิมก่อน
+
+            // เพิ่มรายการข้อมูลใหม่จาก API
+            data.forEach(item => {
+                const barItem = document.createElement('div');
+                barItem.classList.add('h-bar-item');
+
+                const label = document.createElement('div');
+                label.classList.add('h-bar-label');
+                label.textContent = item.instructorName;
+
+                const barContainer = document.createElement('div');
+                barContainer.classList.add('h-bar-container');
+
+                const barFill = document.createElement('div');
+                barFill.classList.add('h-bar-fill');
+
+                // คำนวณเปอร์เซ็นต์ที่เหลือจากจำนวนที่มอบหมายและจำนวนที่ทำเสร็จ
+                const percentage = ((item.remainingCount / item.totalAssigned) * 100);
+                barFill.style.width = `${100 - percentage}%`;  // ถ้าหาก percentage คือ 100% จะเป็นเทา ถ้า 0% คือเขียว
+
+                // ตั้งสีของแท่งตามเปอร์เซ็นต์
+                barFill.style.backgroundColor = getColorForPercentage(percentage);
+
+                const percentageText = document.createElement('div');
+                percentageText.classList.add('h-bar-percentage');
+                percentageText.textContent = `${item.remainingCount} คนที่เหลือ`;
+
+                // รวมทุกส่วนเข้าด้วยกัน
+                barContainer.appendChild(barFill);
+                barItem.appendChild(label);
+                barItem.appendChild(barContainer);
+                barItem.appendChild(percentageText);
+
+                container.appendChild(barItem);
+            });
+        } catch (error) {
+            console.error("Error fetching teacher scoring data:", error);
+        }
+    }
+
+    function getColorForPercentage(percentage) {
+        // ถ้าคะแนนที่เหลือคือ 100% (ยังไม่ได้ประเมินเลย) ให้ใช้สีแดง
+        if (percentage === 100) {
+            return '#ff8080'; // สีแดง
+        }
+        // ถ้าคะแนนที่เหลือคือ 0% (ประเมินเสร็จแล้ว) ให้ใช้สีเขียว
+        return '#20c8ba'; // สีเขียว
+    }
+
+
+</script>
+
 
 </body>

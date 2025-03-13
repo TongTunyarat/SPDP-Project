@@ -274,35 +274,108 @@ body {
     width: 40px;
 }
 
+/*!* pie chart *!*/
+/*.pie-chart {*/
+/*    width: 300px;*/
+/*    height: 300px;*/
+/*    border-radius: 50%;*/
+/*    background: conic-gradient(*/
+/*                #26a69a 0% 25%,*/
+/*                #ff6b6b 25% 62.5%,*/
+/*                #feca57 62.5% 100%*/
+/*    );*/
+/*    margin-right: 20px;*/
+/*    margin-top: 20px;*/
+/*}*/
+
+/*.panel-chart-legend {*/
+/*    height: 80%;*/
+/*    justify-content: center;*/
+/*}*/
+
+/*.legend {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    justify-content: center;*/
+/*}*/
+
+/*.legend-item {*/
+/*    display: flex;*/
+/*    align-items: center;*/
+/*    margin-bottom: 5px;*/
+/*}*/
+
+/*.legend-color {*/
+/*    width: 15px;*/
+/*    height: 15px;*/
+/*    margin-right: 8px;*/
+/*    border-radius: 3px;*/
+/*}*/
+
+/*.legend-color.green {*/
+/*    background-color: #26a69a;*/
+/*}*/
+
+/*.legend-color.yellow {*/
+/*    background-color: #feca57;*/
+/*}*/
+
+/*.legend-color.red {*/
+/*    background-color: #ff6b6b;*/
+/*}*/
+
+/*.total-students {*/
+/*    margin-top: 15px;*/
+/*    text-align: center;*/
+/*    font-weight: bold;*/
+/*}*/
+
 .pie-chart {
-    width: 180px;
-    height: 180px;
-    border-radius: 50%;
-    background: conic-gradient(
-            #26a69a 0% 25%,
-            #ff6b6b 25% 62.5%,
-            #feca57 62.5% 100%
-    );
-    margin: 0 auto;
-    position: relative;
+     width: 300px;
+     height: 300px;
+     border-radius: 50%;
+     position: relative;
+     background: conic-gradient(
+             #26a69a 0deg 0deg,    /* สีเขียว */
+             #feca57 0deg 0deg,    /* สีเหลือง */
+             #ff6b6b 0deg 0deg     /* สีแดง */
+     );
+     margin-right: 20px;
+     margin-top: 20px;
+ }
+
+.pie-chart .percentage-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+}
+
+.panel-chart-legend {
+    height: 80%;
+    justify-content: center;
 }
 
 .legend {
-    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .legend-item {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
-    font-size: 14px;
+    margin-bottom: 5px;
 }
 
 .legend-color {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    margin-right: 10px;
+    width: 15px;
+    height: 15px;
+    margin-right: 8px;
+    border-radius: 3px;
 }
 
 .legend-color.green {
@@ -317,29 +390,14 @@ body {
     background-color: #ff6b6b;
 }
 
-.percentage {
-    position: absolute;
-    font-size: 14px;
+.total-students {
+    margin-top: 15px;
+    text-align: center;
     font-weight: bold;
 }
 
-.percentage.green {
-    top: 20%;
-    right: 25%;
-    color: #fff;
-}
 
-.percentage.red {
-    top: 50%;
-    left: 45%;
-    color: #fff;
-}
 
-.percentage.yellow {
-    bottom: 30%;
-    left: 38%;
-    color: #333;
-}
 
 .timeline {
     margin-top: 20px;
@@ -405,25 +463,45 @@ body {
     font-size: 14px;
 }
 
+/*.h-bar-container {*/
+/*    height: 15px;*/
+/*    background-color: #e0e0e0;*/
+/*    border-radius: 10px;*/
+/*    overflow: hidden;*/
+/*}*/
+
+/*.h-bar-fill {*/
+/*    height: 100%;*/
+/*    background: linear-gradient(to right, #026e6e, #26a69a);*/
+/*    border-radius: 10px;*/
+/*}*/
+
+/*.h-bar-percentage {*/
+/*    font-size: 12px;*/
+/*    color: #777;*/
+/*    text-align: right;*/
+/*    margin-top: 2px;*/
+/*}*/
 .h-bar-container {
     height: 15px;
-    background-color: #e0e0e0;
+    background-color: #ff8080; /* สีพื้นหลังเทา */
     border-radius: 10px;
     overflow: hidden;
 }
 
 .h-bar-fill {
     height: 100%;
-    background: linear-gradient(to right, #026e6e, #26a69a);
     border-radius: 10px;
+    transition: background 0.3s ease; /* ให้การเปลี่ยนแปลงสีเนียนขึ้น */
 }
 
 .h-bar-percentage {
     font-size: 12px;
-    color: #777;
+    color: #ff8080;
     text-align: right;
     margin-top: 2px;
 }
+
 
 #semester-selector {
     min-width: 70px;
