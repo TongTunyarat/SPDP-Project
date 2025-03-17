@@ -8,10 +8,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class DashboardCardService {
@@ -67,6 +64,8 @@ public class DashboardCardService {
                 .filter(role -> ("Advisor".equalsIgnoreCase(role.getRole()) || "Committee".equalsIgnoreCase(role.getRole())) && role.getInstructor().getAccount().getUsername().equals(username))
                 .count();
 
+        List<String> successfulProjects = new ArrayList<>();
+
         long instructorPropoSuccessEva = projectInstructorRoles.stream()
                 .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
                 .filter(i -> {
@@ -100,26 +99,20 @@ public class DashboardCardService {
                                                                 s.getScore() != null))
                                 ).orElse(false);
 
-//                                boolean hasAllGradeScores = false; // default
-//                                if ("Advisor".equalsIgnoreCase(i.getRole())) {
-//
-//                                    Optional<GradingProposalEvaluation> gradingEvaluation = gradingProposalEvaluationList.stream()
-//                                            .filter(g -> g.getStudent().getStudentId().equals(student.getStudent().getStudentId()))
-//                                            .findFirst();
-//
-//                                    hasAllGradeScores = gradingEvaluation.map(gradingProposalEvaluation ->
-//                                                    gradingProposalEvaluation.getEvaluateScore() != null)
-//                                            .orElse(false);
-//                                }
-//
-//                                return "Advisor".equalsIgnoreCase(i.getRole())
-//                                        ? (hasAllEvaScores && hasAllGradeScores)
-//                                        : hasAllEvaScores;
-                                return  hasAllEvaScores;
+                                return hasAllEvaScores;
                             });
+
+                    if (allStudentsComplete) {
+                        successfulProjects.add(projectId); // ใช้ List แทน Map
+                        System.out.println("🙊 ProjectId success: " + projectId);
+                    }
 
                     return allStudentsComplete;
                 }).count(); // all project success
+
+        System.out.println(successfulProjects);
+        successfulProjects.forEach(projectId -> System.out.println("🎀 ProjectId: " + projectId));
+
 
         System.out.println("📊 Instructor Total Project: " + totalProjects);
         System.out.println("✅ Instructor Proposal Evaluations Success: " + instructorPropoSuccessEva);

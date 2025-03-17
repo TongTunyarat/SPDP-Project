@@ -206,7 +206,7 @@
 
         <div class="body-section">
 
-            <!-- Card Header -->
+            <!-- =============================================== Card Header =============================================== -->
             <div class="card-wrapper">
                 <div class="header-container">
                     <div class="header-title">
@@ -216,18 +216,9 @@
                         </svg>
                     </div>
                     <label class="text-centerProgram">
-                        <h1 th:text="${programDST}">0</h1><span style="color: #919EAB; font-size: 2.5rem; padding-left: 1rem;">Groups</span>
+                        <h1 th:text="${programDST}"></h1><span style="color: #919EAB; font-size: 2.5rem; padding-left: 1rem;">Groups</span>
                     </label>
-
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function() {
-                            const label = document.querySelector(".text-centerProgram");
-                            const programDST = label.getAttribute("data-program-dst");
-                            console.log("programDST:", programDST);
-                        });
-                    </script>
-
-                    <!--                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>-->
+                    <label class="text-footer"><span th:text="${coProgramDST}">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span></label>
                 </div>
 
                 <div class="header-container">
@@ -240,8 +231,10 @@
                     <label class="text-centerProgram">
                         <h1 th:text="${programICT}">0</h1><span style="color: #919EAB; font-size: 2.5rem; padding-left: 1rem;">Groups</span>
                     </label>
-                    <!--                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>-->
+                    <label class="text-footer"><span th:text="${coProgramICT}">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span></label>
                 </div>
+
+
 
                 <div class="header-container">
                     <div class="header-title">
@@ -306,45 +299,102 @@
 
 
             <!-- Reminder -->
-            <div class="reminder-container">
-                <div class="reminder-title">
-                    <i class="fa-solid fa-bell"></i>
-                    Reminder
-                </div>
+<!--            <div class="reminder-container">-->
+<!--                <div class="reminder-title">-->
+<!--                    <i class="fa-solid fa-bell"></i>-->
+<!--                    Reminder-->
+<!--                </div>-->
 
-                <div class="reminder-item">
-                    <div class="reminder-content">
-                        <div>
-                            <i class="fa-solid fa-circle-notch reminder-icon"></i>
-                            <span class="reminder-text">การประเมิน Proposal Presentation</span>
+<!--                <div class="reminder-item">-->
+<!--                    <div class="reminder-content">-->
+<!--                        <div>-->
+<!--                            <i class="fa-solid fa-circle-notch reminder-icon"></i>-->
+<!--                            <span class="reminder-text">การประเมิน Proposal Presentation</span>-->
+<!--                        </div>-->
+<!--                        <span class="reminder-subtitle">กรอกคะแนน Proposal Evaluation</span>-->
+<!--                    </div>-->
+<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+<!--                </div>-->
+
+<!--                <div class="reminder-item">-->
+<!--                    <div class="reminder-content">-->
+<!--                        <div>-->
+<!--                            <i class="fa-solid fa-circle-notch reminder-icon "></i>-->
+<!--                            <span class="reminder-text">การประเมิน Poster Presentation</span>-->
+<!--                        </div>-->
+<!--                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>-->
+<!--                    </div>-->
+<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+<!--                </div>-->
+
+<!--                <div class="reminder-item">-->
+<!--                    <div class="reminder-content">-->
+<!--                        <div>-->
+<!--                            <i class="fa-solid fa-circle-notch reminder-icon "></i>-->
+<!--                            <span class="reminder-text">การประเมิน Proposal Presentation</span>-->
+<!--                        </div>-->
+<!--                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>-->
+<!--                    </div>-->
+<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+<!--                </div>-->
+
+<!--            </div>-->
+            <div class="main-content">
+                <div class="panel">
+                    <div class="panel-title">สัดส่วนเกรดของนักเรียนทั้งหมด</div>
+                    <div class="chart-container">
+                        <div class="bar-chart" id="barChart">
+                            <!-- แสดงกราฟ -->
                         </div>
-                        <span class="reminder-subtitle">กรอกคะแนน Proposal Evaluation</span>
-                    </div>
-                    <div class="reminder-date">กำหนด: 15/01/2025</div>
-                </div>
-
-                <div class="reminder-item">
-                    <div class="reminder-content">
-                        <div>
-                            <i class="fa-solid fa-circle-notch reminder-icon "></i>
-                            <span class="reminder-text">การประเมิน Poster Presentation</span>
+                        <div class="x-axis">
+                            <div class="x-label">A</div>
+                            <div class="x-label">B+</div>
+                            <div class="x-label">B</div>
+                            <div class="x-label">C+</div>
+                            <div class="x-label">C</div>
+                            <div class="x-label">D+</div>
+                            <div class="x-label">D</div>
+                            <div class="x-label">F</div>
+                            <div class="x-label">I</div>
                         </div>
-                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>
                     </div>
-                    <div class="reminder-date">กำหนด: 15/01/2025</div>
+                    <div class="tooltip" id="tooltip"></div> <!-- เพิ่ม tooltip -->
+                    <div style="font-size: 13px; text-align: center; margin-top: 10px; color: #666;">
+                        แสดงการกระจายของเกรดในแต่ละระดับ คิดเป็นเปอร์เซ็นต์ของนักเรียนทั้งหมด
+                    </div>
                 </div>
 
-                <div class="reminder-item">
-                    <div class="reminder-content">
-                        <div>
-                            <i class="fa-solid fa-circle-notch reminder-icon "></i>
-                            <span class="reminder-text">การประเมิน Proposal Presentation</span>
+                <div class="panel">
+                    <div class="panel-title">กำหนดการสำคัญ</div>
+                    <div class="timeline">
+                        <div class="timeline-item">
+                            <div class="timeline-icon">🕒</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Proposal Presentation</div>
+                                <div class="timeline-date">ระยะเวลา : 2025/01/15 - 2025/01/15</div>
+                                <div class="timeline-status">เหลือเวลา : 0 วัน</div>
+                            </div>
                         </div>
-                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>
-                    </div>
-                    <div class="reminder-date">กำหนด: 15/01/2025</div>
-                </div>
 
+                        <div class="timeline-item">
+                            <div class="timeline-icon">🕒</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Poster Exhibition</div>
+                                <div class="timeline-date">ระยะเวลา : 2025/01/15 - 2025/01/15</div>
+                                <div class="timeline-status">เหลือเวลา : 1 วัน</div>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item">
+                            <div class="timeline-icon">🕒</div>
+                            <div class="timeline-content">
+                                <div class="timeline-title">Senior Project Defense</div>
+                                <div class="timeline-date">ระยะเวลา : 2025/01/15 - 2025/01/15</div>
+                                <div class="timeline-status">เหลือเวลา : 60 วัน</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
 
@@ -511,4 +561,106 @@
     }
 
 </script>
+
+<!-- ---------- For Reminder Card ----------- -->
+<script>
+    // ฟังก์ชันสำหรับดึงข้อมูลและอัปเดต timeline
+    function fetchImportantDates() {
+        fetch("http://localhost:8080/api/important-dates")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                updateTimeline(data);
+            })
+            .catch(error => {
+                console.error("Error fetching important dates:", error);
+            });
+    }
+
+    // ฟังก์ชันสำหรับอัปเดต UI ของ timeline
+    function updateTimeline(scoringPeriods) {
+        const timelineContainer = document.querySelector(".timeline");
+        timelineContainer.innerHTML = ""; // ล้างข้อมูลเก่า
+
+        // Map evaluation types กับชื่อที่แสดงผล
+        const displayNames = {
+            "Proposal Evaluation": "Proposal Presentation",
+            "Poster Evaluation": "Poster Exhibition",
+            "Defense Evaluation": "Senior Project Defense",
+            "Proposal Grade": "Proposal Grading Period"
+        };
+
+        const today = new Date();
+
+        // กรองเฉพาะรายการที่หมดอายุไม่เกิน 7 วัน
+        const filteredPeriods = scoringPeriods.filter(period => {
+            const endDate = new Date(period.endDate);
+            const daysPast = Math.ceil((today - endDate) / (1000 * 60 * 60 * 24));
+            return daysPast <= 7; // แสดงเฉพาะที่หมดอายุไม่เกิน 7 วัน
+        });
+
+        // สร้าง timeline items
+        filteredPeriods.forEach(period => {
+            const endDate = new Date(period.endDate);
+            const daysRemaining = Math.max(0, Math.ceil((endDate - today) / (1000 * 60 * 60 * 24)));
+
+            // Format dates
+            const startDateFormatted = formatDate(period.startDate);
+            const endDateFormatted = formatDate(period.endDate);
+
+            // สร้าง timeline item
+            const timelineItem = document.createElement("div");
+            timelineItem.classList.add("timeline-item");
+
+            // กำหนดสีหรือสถานะตามจำนวนวันที่เหลือ
+            let statusClass = "";
+            if (daysRemaining === 0) {
+                statusClass = "timeline-expired";
+            } else if (daysRemaining <= 7) {
+                statusClass = "timeline-urgent";
+            } else if (daysRemaining >= 30) {
+                statusClass = "timeline-chill";
+            }
+
+            if (statusClass) {
+                timelineItem.classList.add(statusClass);
+            }
+
+            timelineItem.innerHTML = `
+            <div class="timeline-icon">🕒</div>
+            <div class="timeline-content">
+                <div class="timeline-title">${displayNames[period.evaluationType] || period.evaluationType}</div>
+                <div class="timeline-date">ระยะเวลา : ${startDateFormatted} - ${endDateFormatted}</div>
+                <div class="timeline-status">เหลือเวลา : ${daysRemaining} วัน</div>
+            </div>
+        `;
+
+            timelineContainer.appendChild(timelineItem);
+        });
+    }
+
+
+    // ฟังก์ชันช่วยในการจัดรูปแบบวันที่
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}/${month}/${day}`;
+    }
+
+    // ดึงข้อมูลเมื่อโหลดหน้า
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchImportantDates();
+
+        // อัปเดตข้อมูลทุก 24 ชั่วโมง
+        setInterval(fetchImportantDates, 24 * 60 * 60 * 1000);
+    });
+</script>
+
+
 
