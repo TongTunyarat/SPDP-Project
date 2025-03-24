@@ -31,6 +31,9 @@ public class ProposalSchedule {
     @Column(name = "remark")
     private String remark;
 
+    @Column(name = "record_on")
+    private LocalDateTime recordOn;
+
     @Column(name = "edited_on")
     private LocalDateTime editedOn;
 
@@ -42,15 +45,21 @@ public class ProposalSchedule {
 
     // project_id
     @ManyToOne
-    @JoinColumn(name = "project_id")
+    @JoinColumn(name = "project_id", insertable = false, updatable = false)
     @JsonManagedReference
-    private Project projectId;
+    private Project project;
+
+    @Column(name = "project_id")
+    private String projectId;
 
     // room_number
     @ManyToOne
-    @JoinColumn(name = "room_number")
+    @JoinColumn(name = "room_number", insertable = false, updatable = false)
     @JsonManagedReference
     private Room roomNumber;
+
+    @Column(name = "room_number")
+    private String room;
 
     public String getProposalScheduleId() {
         return proposalScheduleId;
@@ -124,11 +133,35 @@ public class ProposalSchedule {
         this.roomNumber = roomNumber;
     }
 
-    public Project getProjectId() {
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public String getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(Project projectId) {
+    public void setProjectId(String projectId) {
         this.projectId = projectId;
+    }
+
+    public LocalDateTime getRecordOn() {
+        return recordOn;
+    }
+
+    public void setRecordOn(LocalDateTime recordOn) {
+        this.recordOn = recordOn;
+    }
+
+    public String getRoom() {
+        return room;
+    }
+
+    public void setRoom(String room) {
+        this.room = room;
     }
 }

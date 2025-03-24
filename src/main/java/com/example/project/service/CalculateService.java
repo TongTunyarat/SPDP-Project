@@ -630,6 +630,7 @@ public class CalculateService {
             gradingDefense.setEvaluateScore(advisorScore.doubleValue());
             gradingDefense.setExtraScore(extraScore.doubleValue());
             gradingDefense.setTotalScore(totalScore.doubleValue());
+            gradingDefense.setGradeResult(gradeResult);
         }
 
         // ✅ อัปเดตค่าต่างๆ และบันทึกลง Database
@@ -638,6 +639,7 @@ public class CalculateService {
         gradingDefense.setEvaluateScore(advisorScore.doubleValue());
         gradingDefense.setExtraScore(extraScore.doubleValue());
         gradingDefense.setTotalScore(totalScore.doubleValue());
+        gradingDefense.setGradeResult(gradeResult);
 
         gradingDefenseEvaluationRepository.save(gradingDefense);
 

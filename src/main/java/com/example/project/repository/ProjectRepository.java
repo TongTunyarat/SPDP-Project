@@ -31,6 +31,9 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 
     List<Project> findBySemesterAndProgram(String param, String year);
 
+    @Query("SELECT p.projectId FROM Project p WHERE p.program = :program")
+    List<String> findByProjectIdAndProgram(@Param("program") String program);
+
 }
 
 

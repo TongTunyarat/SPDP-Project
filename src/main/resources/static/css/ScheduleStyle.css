@@ -1,0 +1,590 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+body {
+    font-family: Inter;
+    margin: 0;
+    background-color: #F4F6F8;
+}
+
+.content {
+    flex: 1;
+    margin-left: 280px;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #006C6C;
+    color: white;
+    /*padding: 2rem;*/
+    font-size: 2rem;
+    font-weight: 700;
+    height: 100px;
+    padding-top: 1rem;
+    padding-bottom: 5.5rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    letter-spacing: 0.05rem;
+}
+
+:root {
+    --Theme-Colors-White: #624BFF;
+}
+
+.set-btn {
+    display: inline-flex;
+    align-items: center;
+    padding: 14px 20px;
+    gap: 10px;
+    border-radius: 0.7rem;
+    color: #624BFF;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.05rem;
+}
+
+.btn-program {
+    width: 5.2rem;
+    height: 3rem;
+    flex-shrink: 0;
+    border-radius: 0.5rem;
+    background: #FFF;
+    box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+    font-size: 1.2rem;
+    font-style: normal;
+    font-weight: 570;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.05rem;
+}
+
+.title-group {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    flex-grow: 1; /* ให้ขยายพื้นที่ไปทางขวา */
+}
+
+.program-selector {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 0.7rem;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 100px;
+    font-size: 1.6rem;
+}
+
+.program-selector:hover {
+    border-color: #aaa;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.program-selector i {
+    margin-right: 0.9rem;
+    color: #555;
+}
+
+.program-selector .selected-program {
+    flex-grow: 1;
+    font-weight: bold;
+    color: #333;
+}
+
+.program-selector .dropdown-arrow {
+    margin-left: 0.9rem;
+    color: #555;
+    transition: transform 0.2s ease;
+}
+
+.program-selector.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #3d5779;
+    border: 1px solid #ccc;
+    border-radius: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    display: none;
+    margin-top: 2px;
+}
+
+/*.dropdown-options.visible {*/
+/*    display: block;*/
+/*}*/
+
+.dropdown-option {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.dropdown-option:hover {
+    background-color: #f5f5f5;
+    color: #3d5779;
+    border-radius: 1rem;
+}
+
+.dropdown-option:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+
+ /*===================================================================  Modal =================================================================== */
+
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: white;
+    margin: 10% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 40%;
+    border-radius: 10px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: -2rem;
+    border-bottom: 0.5rem solid #DFE3E8;
+}
+
+.modal-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.04rem;
+    margin-bottom: 1rem;
+}
+
+.close {
+    cursor: pointer;
+    font-size: 20px;
+}
+
+.modal-body {
+    padding: 1rem;
+}
+
+label {
+    margin-bottom: 1rem;
+    display: block;
+    font-weight: 600;
+    letter-spacing: 0.03rem;
+}
+
+.room-label {
+    font-weight: 450;
+}
+
+.custom-input {
+    width: 100%;
+    padding: 0.6rem;
+    margin-bottom: 2rem;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.modal-footer {
+    display: flex;
+    justify-content: center;
+}
+
+#saveBtn {
+    background-color: #5f9de0;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    align-items: end;
+    padding: 1rem;
+    margin-top: 2rem;
+    margin-right: 1rem;
+}
+
+#cancelBtn {
+    background-color: #f44336;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    color: white;
+    padding: 1rem;
+    margin-top: 2rem;
+}
+
+/*===================================================================  Modal =================================================================== */
+
+
+.dropdown {
+    position: relative;
+    display: inline-block;
+    width: 75%;
+}
+
+.dropdown button {
+    width: 100%;
+    padding: 10px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.dropdown-content {
+    position: absolute;
+    background: #fff;
+    box-shadow: 0px 4px 6px rgba(0,0,0,0.2);
+    border-radius: 6px;
+    padding: 10px;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    z-index: 1000;
+
+    /* ป้องกันการตกขอบ */
+    left: 0;
+    min-width: 100%;
+}
+
+.dropdown-content.upward {
+    bottom: 100%;
+    top: auto;
+}
+
+
+.dropdown-content label {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 0.7rem;  /* ลด padding ให้เล็กลง */
+    margin: 2px 0;     /* ลดระยะห่างระหว่าง label */
+    cursor: pointer;
+}
+
+.dropdown-content label:hover {
+    background: #f0f0f0;
+    border-radius: 4px;
+}
+
+.dropdown-content input[type="text"] {
+    width: 100%;
+    padding: 1rem;
+    margin-bottom: 5px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 1rem;
+}
+
+/*.body-section {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    justify-content: flex-start;*/
+/*    background: #ffffff;*/
+/*    padding: 20px;*/
+/*}*/
+
+
+/*===================================================================  Schedule =================================================================== */
+
+.background-schedule {
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 0.7rem;
+    margin-top: -4rem;
+    margin-left: 2rem;
+    margin-right: 2rem;
+
+}
+
+.schedule-contanier {
+    font-family: Arial, sans-serif;
+    /*margin: 1.rem;*/
+    margin-top: -3rem;
+    padding: 3rem;
+}
+
+.shedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 1.8rem;
+    padding-right: 1.8rem;
+    background-color: #f9f9f9;
+    /*border-radius: 0.5rem;*/
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.date-title {
+    font-size: 1.5rem;
+    color: #333;
+}
+
+.nav-button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    color: #3D3D3D;
+}
+
+.schedule-table{
+    width: 100%;
+    height: 50%;
+    overflow-x: auto;
+    overflow-y: auto;
+
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background-color: #f5f5f5;
+    padding: 0.5rem;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    color: #333;
+    font-size: 1.2rem;
+}
+
+.time-column {
+    width: 150px;
+}
+
+td {
+    padding: 1.5rem;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.time-slot{
+    font-weight: bold;
+    font-size: 1rem;
+    background-color: #f9f9f9;
+}
+
+.slot-box {
+    background-color: #EFF6FF;
+    border: 2px solid #b8d8f8;
+    border-radius: 4px;
+    padding: 1rem;
+    color: #555;
+    min-height: 3.1rem;
+}
+
+.break-row{
+    background-color: #2f6f74;
+    text-align: center;
+    font-weight: bold;
+    color: white;
+}
+
+.break-row td{
+    padding: 1.2rem;
+    color: white;
+    font-size: 1.2rem;
+}
+
+
+.slot-box svg {
+    margin-left: 5px;
+    margin-top: 0.5rem;
+    cursor: pointer;
+}
+
+.project-id {
+    font-weight: bold;
+    font-size: 0.9rem;
+    color: #3d5779;
+}
+
+.instructors {
+    font-size: 0.65rem;
+    color: #7b7b7b;
+    margin-top: 0.2rem;
+    white-space: nowrap;
+    overflow-x: auto;
+}
+
+#icon-delete {
+    padding: 0;
+    margin-left: 0.5rem;
+    margin-right: -5.5rem;
+}
+
+/*.slot-box svg {*/
+/*    display: none;*/
+/*}*/
+
+.slot-box:hover svg {
+    display: inline-block;
+}
+
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 3rem;
+}
+
+.export-block {
+    margin-left: 3rem;
+}
+
+.preview-block, .export-block{
+    display: inline-flex;
+    padding: 14px 20px;
+    gap: 10px;
+    border-radius: 0.7rem;
+    color: #624BFF;
+    font-size: 1rem;
+    font-style: normal;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.05rem;
+    background-color: white;
+    box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08), 0px 1px 2px 0px rgba(21, 30, 40, 0.08);
+}
+
+
+.empty-state-image {
+    width: 70%;
+    height: auto;
+    display: block; /* จัดให้ภาพแสดงในบล็อก */
+    margin: 0 auto; /* จัดกลาง */
+}
+
+/*===================================================================  Load =================================================================== */
+
+.modal-loader-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(4px); /* ทำให้ blur modal ด้านหลัง */
+    background-color: rgba(255, 255, 255, 0.4); /* เพิ่มความขาวบางๆ ซ้อน */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    border-radius: 10px;
+}
+
+.loader-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loader {
+    text-align: center;
+    vertical-align: middle;
+    position: relative;
+    display: flex;
+    background: white;
+    padding: 150px;
+    box-shadow: 0px 40px 60px -20px rgba(0, 0, 0, 0.2);
+}
+
+.loader span {
+    display: block;
+    width: 20px;
+    height: 20px;
+    background: #eee;
+    border-radius: 50%;
+    margin: 0 5px;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+.loader span:nth-child(2) {
+    background: #f07e6e;
+}
+
+.loader span:nth-child(3) {
+    background: #84cdfa;
+}
+
+.loader span:nth-child(4) {
+    background: #5ad1cd;
+}
+
+.loader span:not(:last-child) {
+    animation: animate 1.5s linear infinite;
+}
+
+@keyframes animate {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(30px);
+    }
+}
+
+.loader span:last-child {
+    animation: jump 1.5s ease-in-out infinite;
+}
+
+@keyframes jump {
+    0% {
+        transform: translate(0, 0);
+    }
+    10% {
+        transform: translate(10px, -10px);
+    }
+    20% {
+        transform: translate(20px, 10px);
+    }
+    30% {
+        transform: translate(30px, -50px);
+    }
+    70% {
+        transform: translate(-150px, -50px);
+    }
+    80% {
+        transform: translate(-140px, 10px);
+    }
+    90% {
+        transform: translate(-130px, -10px);
+    }
+    100% {
+        transform: translate(-120px, 0);
+    }
+}
+
