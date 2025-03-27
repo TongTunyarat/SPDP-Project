@@ -125,6 +125,16 @@ public class ProposalScheduleController {
         return manageProposalScheduleService.getProposalSchedule(program);
     }
 
+    @GetMapping("/admin/deleteProjectById")
+    @ResponseBody
+    public Map<String, Boolean> deleteScheduleProject(@RequestParam String projectId) {
+        System.out.println("💌 Delete projectId: " + projectId);
+
+        Map<String, Boolean> response = new HashMap<>();
+        response.put("deleteProjectByIdStatus", manageProposalScheduleService.deleteProjectAutoGen(projectId));
+        return response;
+    }
+
 
 //================================================================= NOT USE =======================================================
 

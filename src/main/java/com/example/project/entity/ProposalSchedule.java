@@ -39,9 +39,12 @@ public class ProposalSchedule {
 
     // edited_by
     @ManyToOne
-    @JoinColumn(name = "edited_by")
+    @JoinColumn(name = "edited_by", insertable = false, updatable = false)
     @JsonManagedReference
     private Account editedBy;
+
+    @Column(name = "edited_by")
+    private String editedByUser;
 
     // project_id
     @ManyToOne
@@ -163,5 +166,13 @@ public class ProposalSchedule {
 
     public void setRoom(String room) {
         this.room = room;
+    }
+
+    public String getEditedByUser() {
+        return editedByUser;
+    }
+
+    public void setEditedByUser(String editedByUser) {
+        this.editedByUser = editedByUser;
     }
 }

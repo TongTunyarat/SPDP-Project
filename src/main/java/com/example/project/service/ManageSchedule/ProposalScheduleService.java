@@ -70,6 +70,7 @@ public class ProposalScheduleService {
         return ProjectList.stream()
                 .filter(i -> program.equalsIgnoreCase(i.getProgram()))
                 // อย่าลืมกลับมา filter อาจารย์ เเล้วก็ปีการศึกษา
+                //❗️❗️❗️❗️❗️ ห้ามลบ
 //                .filter(i -> {
 //                    List<StudentProject> studentProjects = i.getStudentProjects();
 //                    if (studentProjects == null || studentProjects.isEmpty()) return false;
@@ -217,11 +218,12 @@ public class ProposalScheduleService {
             timeSlotDTOList.add(new TimeSlotDTO(startTime, endTime, isBreak, breakLabel));
         }
 
-//        try {
-//            saveProposalSchedule(scheduledAssignments);
-//        } catch (Exception e) {
-//            return new ScheduleProposalResponseDTO("error", "Failed to generate schedule");
-//        }
+        //❗️❗️❗️❗️❗️ ห้ามลบ
+        try {
+            saveProposalSchedule(scheduledAssignments);
+        } catch (Exception e) {
+            return new ScheduleProposalResponseDTO("error", "Failed to generate schedule");
+        }
 
         return new ScheduleProposalResponseDTO("success", "finished generate schedule", scheduledAssignments, timeSlotDTOList);
     }
@@ -470,6 +472,7 @@ public class ProposalScheduleService {
         return sortedProjects;
     }
 
+
     public Map<LocalDateTime, List<ScheduleSlotDTO>> groupSlots(List<ScheduleSlotDTO> availableSlots) {
 
         Map<LocalDateTime, List<ScheduleSlotDTO>> timeGrouping = new LinkedHashMap<>();
@@ -499,6 +502,7 @@ public class ProposalScheduleService {
         return  timeGrouping;
     }
 
+    // 🤯🤯🤯🤯
     private void scheduleProjects(List<ProjectWithInstructorsDTO> projects, Map<LocalDateTime, List<ScheduleSlotDTO>> timeGroupedSlots, List<ScheduleAssignmentDTO> scheduledAssignments,  List<ProjectWithInstructorsDTO> unscheduledProjects, List<String> roomNumbers, List<Pair<LocalDateTime, LocalDateTime>> allTimeSlots) {
 
         List<ProjectWithInstructorsDTO> remainderProject = new ArrayList<>(projects);

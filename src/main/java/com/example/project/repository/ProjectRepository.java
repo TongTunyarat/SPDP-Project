@@ -3,6 +3,7 @@ package com.example.project.repository;
 
 import com.example.project.DTO.FilterResponseDTO;
 import com.example.project.entity.Project;
+import com.example.project.entity.ProposalSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -34,6 +35,8 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
     @Query("SELECT p.projectId FROM Project p WHERE p.program = :program")
     List<String> findByProjectIdAndProgram(@Param("program") String program);
 
+    @Query("SELECT p FROM Project p WHERE p.projectId IN :projectIds")
+    List<Project> findByProjectIds(@Param("projectIds") List<String> projectIds);
 }
 
 

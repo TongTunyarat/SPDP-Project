@@ -9,6 +9,8 @@ import com.example.project.repository.ProjectRepository;
 import com.example.project.repository.ProposalSchedRepository;
 import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -45,7 +47,49 @@ public class ManageProposalScheduleService {
 
     }
 
+    // ====================================== click delete =====================================
+
+    public boolean deleteProjectAutoGen(String projectId) {
+
+        ProposalSchedule project = proposalSchedRepository.findByProjectId(projectId);
+
+        if(project != null) {
+
+            duplicateProject(project);
+
+            project.setStatus("Non-Active");
+
+            proposalSchedRepository.save(project);
+
+            return true;
+        }
+
+        return false;
+
+    }
+
+    public void duplicateProject(ProposalSchedule project) {
+
+        ProposalSchedule newProject = new ProposalSchedule();
+
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        newProject.setProposalScheduleId(UUID.randomUUID().toString());
+        newProject.setProjectId(project.getProjectId());
+        newProject.setRemark("User-Add");
+        newProject.setEditedOn(LocalDateTime.now());
+        newProject.setEditedByUser(username);
+        newProject.setRecordOn(LocalDateTime.now());
+
+        proposalSchedRepository.save(newProject);
+    }
+
+
+
+    // ====================================== get project =====================================
+
     // อย่าลืม filter เฉพาะ auto-gen รอดูตอน add ก่อน
+    // อย่าลืม filter student
     public Map<String, Map<Pair<LocalTime, LocalTime>, List<GetProposalScheduleDTO>>> getProposalSchedule(String program){
 
         List<String> projectIds = projectRepository.findByProjectIdAndProgram(program);
@@ -67,7 +111,8 @@ public class ManageProposalScheduleService {
                         List<ProjectInstructorRole> instructors = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(schedule.getProjectId());
 
                         List<String> instructorNames = instructors.stream()
-                                .map(instructor -> instructor.getInstructor().getProfessorName())
+                            .filter(instructorRole -> "Advisor".equalsIgnoreCase(instructorRole.getRole()) || "Committee".equalsIgnoreCase(instructorRole.getRole()))
+                            .map(instructor -> instructor.getInstructor().getProfessorName())
                                 .collect(Collectors.toList());
 
                 return new GetProposalScheduleDTO(
@@ -84,17 +129,6 @@ public class ManageProposalScheduleService {
                                     schedule.getRoom()
                         ); })
                 .collect(Collectors.toList());
-
-//        dtoList.sort((dto1, dto2) -> {
-//            int dateCompare = dto1.getDate().compareTo(dto2.getDate());
-//
-//            // https://www.w3schools.com/java/tryjava.asp?filename=demo_ref_string_compareto
-//            if(dateCompare != 0) {
-//                return  dateCompare;
-//            }
-//
-//            return dto1.getStartTime().compareTo(dto2.getStartTime());
-//        });
 
         dtoList.sort(Comparator.comparing(GetProposalScheduleDTO::getDate).thenComparing(GetProposalScheduleDTO::getStartTime));
 

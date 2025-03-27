@@ -20,7 +20,14 @@ public interface ProposalSchedRepository extends JpaRepository<ProposalSchedule,
     @Query("DELETE FROM ProposalSchedule p WHERE p.projectId IN :projectIds")
     int deleteAllByProgram(@Param("projectIds") List<String> projectIds);
 
-    @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectIds")
+    @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectIds AND p.remark = 'Auto-generated schedule'")
     List<ProposalSchedule> findByProjectIds(@Param("projectIds") List<String> projectIds);
+
+
+    @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectId AND p.remark = 'Auto-generated schedule' ")
+    ProposalSchedule findByProjectId(String projectId);
+
+    @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectIds AND p.remark = 'User-Add' ")
+    List<ProposalSchedule> findEditProject(@Param("projectIds") List<String> projectIds);
 
 }

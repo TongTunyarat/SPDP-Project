@@ -32,12 +32,13 @@ public class SecurityConfig {
                         .ignoringRequestMatchers("/user/details", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade","/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense", "/get-instructorId", "/api/proposal-evaluation", "/api/defense-evaluation", "/admin/bookingSave")
                 )
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/css/**", "/js/**", "/static/**","/publicProjectDetail","/student", "/instructor/criteriaDefenseGrade", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade", "/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense", "/get-instructorId", "/api/proposal-evaluation", "/api/defense-evaluation", "https://i.ibb.co/gLLWFBZk/warning-schedule.png", "/admin/bookingSave", "/admin/getAllProposalSchedule").permitAll() // อนุญาตให้ทุกคนเข้าถึง
+                        .requestMatchers("/login", "/css/**", "/js/**", "/static/**","/publicProjectDetail","/student", "/instructor/criteriaDefenseGrade", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade", "/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense", "/get-instructorId", "/api/proposal-evaluation", "/api/defense-evaluation", "/admin/getProjectEditProposal", "/prepareProject").permitAll() // อนุญาตให้ทุกคนเข้าถึง
 //                        "/publicProjectDetail", "/instructor/criteriaDefenseGrade", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade", "/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense"
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/instructor/**").hasRole("INSTRUCTOR")
                         .anyRequest().authenticated()
                 )
+                // "/admin/bookingSave", "/admin/getAllProposalSchedule"
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login") // url ใน post method
@@ -48,7 +49,8 @@ public class SecurityConfig {
                                     .map(GrantedAuthority::getAuthority)
                                     .collect(Collectors.toSet());
                             if(roles.contains("ROLE_ADMIN")){
-                                response.sendRedirect("/admin/proposalSchedule");
+//                                response.sendRedirect("/admin-dashboard");
+                                  response.sendRedirect("/admin/editProposalSchedulePage");
                             } else if (roles.contains("ROLE_INSTRUCTOR")) {
                                 response.sendRedirect("/instructor/view");
                             }
