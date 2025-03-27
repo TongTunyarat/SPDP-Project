@@ -12,6 +12,8 @@
 
   <!-- Library -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 
 <body>
@@ -162,45 +164,71 @@
 
 
     <div class="card-popup">
-            <div class="card-header">
-                <h1 class="card-title">DST SP2024-04</h1>
-                <div class="tag ict">ICT</div>
-            </div>
+<!--        <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />-->
+<!--        <p>CSRF Token: <span th:text="${_csrf.token}">ไม่มีค่า</span></p>-->
+<!--            <div class="card-header">-->
+<!--                <h1 class="card-title">DST SP2024-04</h1>-->
+<!--                <div class="tag ict">ICT</div>-->
+<!--            </div>-->
 
-            <div class="project-info">
-                <p><strong>Project Title : </strong> Project Management Tools (ProjectESS)</p>
-            </div>
+<!--            <div class="project-info">-->
+<!--                <p><strong>Project Title : </strong> Project Management Tools (ProjectESS)</p>-->
+<!--            </div>-->
 
-            <div class="students-section">
-                <h2 class="section-title">Instructor</h2>
+<!--            <div class="students-section">-->
+<!--                <h2 class="section-title">Instructor</h2>-->
 
-                <div class="student-card">
-                    <div class="student-name">Tunyarat Nithirunpattana</div>
-                    <div class="student-details">Advisor</div>
-                </div>
+<!--                <div class="student-card">-->
+<!--                    <div class="student-name">Tunyarat Nithirunpattana</div>-->
+<!--                    <div class="student-details">Advisor</div>-->
+<!--                </div>-->
 
-                <div class="student-card">
-                    <div class="student-name">Chanyanuch Nuangjumnong</div>
-                    <div class="student-details">Committee</div>
-                </div>
+<!--                <div class="student-card">-->
+<!--                    <div class="student-name">Chanyanuch Nuangjumnong</div>-->
+<!--                    <div class="student-details">Committee</div>-->
+<!--                </div>-->
 
-                <div class="student-card">
-                    <div class="student-name">Neadnapa Thawontaweekul</div>
-                    <div class="student-details">Committee</div>
-                </div>
-            </div>
+<!--                <div class="student-card">-->
+<!--                    <div class="student-name">Neadnapa Thawontaweekul</div>-->
+<!--                    <div class="student-details">Committee</div>-->
+<!--                </div>-->
+<!--            </div>-->
 
+<!--        <div class="modal-body">-->
+<!--            <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />-->
+<!--                        <p>CSRF Token: <span th:text="${_csrf.token}">ไม่มีค่า</span></p>-->
+<!--            <label>Start Date:</label>-->
+<!--            <input type="date" class="custom-input" id="start-date"/><br>-->
 
-            <div class="modal-footer">
-                <button id="saveBtn">Save</button>
-                <button id="cancelBtn">Cancel</button>
-            </div>
+<!--            <label>End Date:</label>-->
+<!--            <input type="date" class="custom-input" id="end-date"/><br>-->
 
-        </div>
+<!--            <label>Time Start :</label>-->
+<!--            <input type="time" class="custom-input"><br>-->
 
-    <div class="btn-footer">
-      <button class="deleteAll-btn">Delete ALL</button>
-    </div>
+<!--            <label>End Start :</label>-->
+<!--            <input type="time" class="custom-input"><br>-->
+
+<!--            <label>Room: </label>-->
+<!--            <div class="dropdown">-->
+
+<!--                <button id="selected-label" onclick="toggleDropdown()">-->
+<!--                    <span id="selected-text">Select Room</span>-->
+<!--                </button>-->
+
+<!--                <div class="dropdown-content upward" id="dropdown-content">-->
+<!--                    <input type="text" id="search" placeholder="Search" onkeyup="filterRooms()">-->
+<!--                    <div id="room-list"></div>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+
+<!--            <div class="modal-footer">-->
+<!--                <button id="saveBtn">Save</button>-->
+<!--                <button id="cancelBtn">Cancel</button>-->
+<!--            </div>-->
+
+     </div>
 
 
   </div>
@@ -253,11 +281,6 @@
   document.getElementById("searchInput").addEventListener("input", searchProjects);
 
   // ============================================================= Get all project edit =====================================================================
-
-  document.addEventListener('DOMContentLoaded', function () {
-    console.log("🚀 Load Page");
-    getProjectEditProposal();
-  });
 
   function getProjectEditProposal() {
 
@@ -377,7 +400,6 @@
             });
   }
 
-  // ============================================================= Modal =====================================================================
 
   document.addEventListener('DOMContentLoaded', function () {
 
@@ -387,6 +409,8 @@
 
               const projectId = e.target.getAttribute("data-id");
               console.log("📌 Open modal");
+
+              getProjectEditProposalByProjectId(projectId)
 
               document.querySelector(".card-popup").style.display = "block";
           }
@@ -399,7 +423,9 @@
   });
 
 
-  window.onclick = function(event) {
+  document.addEventListener("DOMContentLoaded", function() {
+
+      window.onclick = function(event) {
       const modal = document.querySelector(".card-popup");
 
       if (modal && !modal.contains(event.target) && !event.target.classList.contains("edit-btn")) {
@@ -407,9 +433,258 @@
           document.querySelector(".card-popup").style.display = "none";
       }
 
-  };
+      };
+  });
+
+  // ============================================================= Modal =====================================================================
+  document.addEventListener('DOMContentLoaded', function () {
+      console.log("🚀 Load Page");
+      getProjectEditProposal();
+  });
+  function fetchData() {
+      let url = 'http://localhost:8080/admin/roomSetting';
+
+      fetch(url)
+          .then(response => {
+              // console.log(response.json());
+              if (!response.ok) {
+                  throw new Error('Network response was not ok ' + response.statusText);
+              }
+              return response.json();
+          })
+          .then(data => {
+              console.log("🐍 Data Length: " + data.length);
+              console.log("Show Data: " + JSON.stringify(data, null, 2));
+
+              rooms.length = 0;
+
+              data.forEach(function(room) {
+                  rooms.push(room);
+              });
+
+              createRooms();
+
+          })
+          .catch(error => {
+              console.error('Error fetching data:', error);
+              document.getElementById('filter-results').innerHTML = "ไม่พบข้อมูลห้อง";
+          });
+  }
+
+  // room
+  const rooms = [];
+  let selectedRoom = ""
+
+  function filterRooms() {
+      // change
+      let searchValue = document.getElementById("search").value.toLowerCase();
+      console.log(`🔎 Find: ${searchValue}`);
+
+      let filteredRooms = rooms.filter(room => room.toLowerCase().includes(searchValue));
+      console.log("📋 Result:", filteredRooms);
+
+      createRooms(filteredRooms); // หลังค้นหา
+  }
+
+  function createRooms(filteredRooms = rooms) {
+      let roomList = document.getElementById("room-list");
+      let selectedText = document.getElementById("selected-text");
+      roomList.innerHTML = ""; // clear
+
+      console.log("🔄 Load new room");
+      console.log("🔍 Room:", filteredRooms);
+
+      filteredRooms.forEach(room => {
+          let label = document.createElement("label");
+          label.classList.add("room-label");
+          let radio = document.createElement("input");
+
+          radio.type = "radio";
+          radio.value = room;
+          radio.checked = room === selectedRoom;
+
+          radio.onchange = function () {
+              if (radio.checked) {
+                  selectedRoom = room;
+                  selectedText.textContent = room;
+                  console.log(`✅ Select room: ${room}`);
+              }
+          };
+
+          label.appendChild(radio);
+          label.appendChild(document.createTextNode(` ${room}`));
+          roomList.appendChild(label);
+          roomList.appendChild(document.createElement("br"));
+      });
+
+  }
 
 
+
+
+
+  // ============================================================= Modal Dropdorn=====================================================================
+
+  function toggleDropdown() {
+      let dropdown = document.getElementById("dropdown-content");
+      let isVisible = dropdown.style.display === "block";
+      console.log(`${isVisible}`);
+
+      dropdown.style.display = isVisible ? "none" : "block";
+      console.log(`📂 Dropdown ${isVisible ? "close" : "open"}`);
+  }
+
+
+  // close dropdown room
+  document.addEventListener("click", function(event) {
+
+      const dropdown =  document.getElementById("dropdown-content");
+
+      if (dropdown && !event.target.closest(".dropdown")) {
+          dropdown.style.display = "none";
+          // console.log("📌 คลิกข้างนอก -> ปิด Dropdown");
+      }
+
+  });
+
+  // ============================================================= Get modal data =====================================================================
+
+
+  function getProjectEditProposalByProjectId(projectId) {
+
+      fetch(`http://localhost:8080/admin/getProjectEditProposalByProjectId?projectId=${encodeURIComponent(projectId)}`, {
+
+          method: 'GET',
+          headers: {
+              'Content-Type': 'application/json',
+          },
+      })
+          .then(response => {
+              if (!response.ok) {
+                  throw new Error('Network response was not ok ' + response.statusText);
+                  alert('Network response was not ok ' + response.statusText);
+              }
+              return response.json();
+          })
+          .then(data => {
+              console.log("🐍data: ", data);
+
+              if(data.length === 0) {
+                  console.log("No data available");
+
+              } else {
+
+                  const cardPop = document.querySelector(".card-popup");
+                  const modalBody = document.querySelector(".modal-body");
+
+                  data.forEach(project => {
+
+                      let advisor = "";
+                      let committee = "";
+
+                      if (typeof project.instructorNames === "object") {
+
+                          advisor = project.instructorNames.Advisor ? {name: project.instructorNames.Advisor[0]} : null;
+                          committee = project.instructorNames.Committee || [];
+                      }
+
+                      const committeeList = committee.map(instructor =>`
+
+                            <div class="student-card">
+                                <div class="student-name">${instructor}</div>
+                                <div class="student-details">Committee</div>
+                            </div>
+                      `).join("");
+
+                      let projectId = project.projectId;
+                      let cleanId = projectId.replace(/DST|ICT/g, '').trim();
+
+                      let timeSlot = "";
+                      let FormattedDate = "";
+                      if (project.startTime && project.endTime != null) {
+                          // JavaScript Date object
+                          const startTime = new Date(project.startTime);
+                          const endTime = new Date(project.endTime);
+                          timeSlot = `${startTime.getHours()}:${String(startTime.getMinutes()).padStart(2, '0')} - ${endTime.getHours()}:${String(endTime.getMinutes()).padStart(2, '0')}`;
+                          console.log("🕰️ timeSlot: ", timeSlot);
+                          console.log("startTime: ", startTime);
+                          console.log("endTime: ", endTime);
+
+                          newStartTime = `${startTime.getHours()}:${String(startTime.getMinutes()).padStart(2, '0')}`;
+                          newEndTime = `${endTime.getHours()}:${String(endTime.getMinutes()).padStart(2, '0')}`;
+
+                      }
+
+                      selectedRoom = project.room || "";
+
+                      cardPop.innerHTML = `
+                          <div class="card-header">
+                              <h1 class="card-title">${cleanId}</h1>
+                              <div class="tag ${project.program.toLowerCase()}">${project.program}</div>
+                          </div>
+
+                          <div class="project-info">
+                            <p><strong>Project Title : </strong>${project.projectTitle}</p>
+                          </div>
+
+                         <div class="students-section">
+                            <h2 class="section-title">Instructor</h2>
+
+                           ${advisor
+                          ?`
+                            <div class="student-card">
+                                <div class="student-name">${advisor.name}</div>
+                                <div class="student-details">Advisor</div>
+                            </div>
+                            `
+                          : ''}
+                            ${committeeList}
+                        </div>
+
+                        <div class="modal-body">
+                            <label>Start Date:</label>
+                            <input type="date" class="custom-input" id="start-date" value="${project.date ? project.date : '' }"/><br>
+
+                            <label>Time Start :</label>
+                            <input type="time" class="custom-input" value="${newStartTime ? newStartTime : ''}"><br>
+
+                            <label>End Start :</label>
+                            <input type="time" class="custom-input" value="${newEndTime ? newEndTime : ''}"><br>
+
+                            <label>Room: </label>
+                            <div class="dropdown">
+
+                                <button id="selected-label" onclick="toggleDropdown()">
+                                    <span id="selected-text">${selectedRoom || "Select Room"}</span>
+                                </button>
+
+                                <div class="dropdown-content upward" id="dropdown-content">
+                                    <input type="text" id="search" placeholder="Search" onkeyup="filterRooms()">
+                                    <div id="room-list"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                            <div class="modal-footer">
+                                <button id="saveBtn">Save</button>
+                                <button id="cancelBtn">Cancel</button>
+                            </div>
+                      `;
+
+                      fetchData();
+                  })
+                  }
+          })
+          .catch(error => {
+              console.error('Error fetching data:', error);
+
+              Swal.fire({
+                  icon: "error",
+                  title: "Oops...",
+                  text: "Something went wrong!",
+              });
+          });
+  }
 
 
 

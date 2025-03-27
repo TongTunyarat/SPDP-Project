@@ -64,5 +64,13 @@ public class StudentProject {
         this.status = status;
     }
 
-
+    @Override
+    public String toString() {
+        return "StudentProject{" +
+                "studentPjId='" + studentPjId + '\'' +
+                ", student=" + student +
+                ", project=" + project +
+                ", status='" + status + '\'' +
+                '}';
+    }
 }

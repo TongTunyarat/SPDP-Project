@@ -189,4 +189,24 @@ public class Account {
     public void setProposalEvaluationsRecord(List<ProposalEvaluation> proposalEvaluationsRecord) {
         this.proposalEvaluationsRecord = proposalEvaluationsRecord;
     }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "username='" + username + '\'' +
+                ", password='" + password + '\'' +
+                ", instructors=" + instructors +
+                ", admins=" + admins +
+                ", recordProjects=" + recordProjects +
+                ", editProject=" + editProject +
+                ", defenseRecordedBy=" + defenseRecordedBy +
+                ", defenseEditedBy=" + defenseEditedBy +
+                ", scoringPeriods=" + scoringPeriods +
+                ", proposaleditedBy=" + proposaleditedBy +
+                ", posterEvaluations=" + posterEvaluations +
+                ", posterEvaluationsEdit=" + posterEvaluationsEdit +
+                ", proposalEvaluationsEdit=" + proposalEvaluationsEdit +
+                ", proposalEvaluationsRecord=" + proposalEvaluationsRecord +
+                '}';
+    }
 }

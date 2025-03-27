@@ -227,5 +227,27 @@ public class Project {
         this.gradingProposalEvaluations = gradingProposalEvaluations;
     }
 
+    @Override
+    public String toString() {
+        return "Project{" +
+                "projectId='" + projectId + '\'' +
+                ", program='" + program + '\'' +
+                ", semester='" + semester + '\'' +
+                ", projectTitle='" + projectTitle + '\'' +
+                ", projectCategory='" + projectCategory + '\'' +
+                ", projectDescription='" + projectDescription + '\'' +
+                ", recordedOn=" + recordedOn +
+                ", editedOn=" + editedOn +
+                ", recordedProject=" + recordedProject +
+                ", editedProject=" + editedProject +
+                ", defenseEvaluations=" + defenseEvaluations +
+                ", gradingDefenseEvaluations=" + gradingDefenseEvaluations +
+                ", projectInstructorRoles=" + projectInstructorRoles +
+                ", posterEvaluations=" + posterEvaluations +
+                ", studentProjects=" + studentProjects +
+                ", gradingProposalEvaluations=" + gradingProposalEvaluations +
+                ", proposalEvaluations=" + proposalEvaluations +
+                '}';
+    }
 }
 

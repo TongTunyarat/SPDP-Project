@@ -1,11 +1,13 @@
 package com.example.project.controller.ManageSchedule;
 
 import com.example.project.DTO.ManageSchedule.EditSchedule.GetAllEditProposalScheduleDTO;
+import com.example.project.DTO.ManageSchedule.EditSchedule.GetEditProposalScheduleByIdDTO;
 import com.example.project.service.ManageSchedule.EditProposalService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.swing.text.html.parser.Entity;
 import java.util.List;
@@ -27,6 +29,12 @@ public class EditProposalScheduleController {
     @GetMapping("/admin/getProjectEditProposal")
     public ResponseEntity<List<GetAllEditProposalScheduleDTO> > getProjectEditProposal() {
         List<GetAllEditProposalScheduleDTO> response = editProposalService.getProjectEditProposal();
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/admin/getProjectEditProposalByProjectId")
+    public ResponseEntity<List<GetEditProposalScheduleByIdDTO> > getProjectEditProposalById(@RequestParam String projectId) {
+        List<GetEditProposalScheduleByIdDTO> response = editProposalService.getProjectEditProposalByProjectId(projectId);
         return ResponseEntity.ok(response);
     }
 

@@ -1,6 +1,7 @@
 package com.example.project.service.ManageSchedule;
 
 import com.example.project.DTO.ManageSchedule.EditSchedule.GetAllEditProposalScheduleDTO;
+import com.example.project.DTO.ManageSchedule.EditSchedule.GetEditProposalScheduleByIdDTO;
 import com.example.project.entity.Project;
 import com.example.project.entity.ProjectInstructorRole;
 import com.example.project.entity.ProposalSchedule;
@@ -23,7 +24,7 @@ public class EditProposalService {
     @Autowired
     ProjectInstructorRoleRepository projectInstructorRoleRepository;
 
-    public List<GetAllEditProposalScheduleDTO>  getProjectEditProposal() {
+    public List<GetAllEditProposalScheduleDTO> getProjectEditProposal() {
 
         List<Project> ProjectList = projectRepository.findAll();
 
@@ -45,15 +46,15 @@ public class EditProposalService {
                 .map(p -> {
 
                     String projectId = p.getProjectId();
-                    System.out.println("projectId: " + projectId);
+//                    System.out.println("projectId: " + projectId);
 
                     Project project = projectRepository.findByProjectId(projectId);
-                    System.out.println("--- project: " + project);
+//                    System.out.println("--- project: " + project);
 
-                    project.getStudentProjects().stream()
-                            .forEach(studentProject -> {
-                                System.out.println("🍭Student Name: " + studentProject.getStudent());
-                            });
+//                    project.getStudentProjects().stream()
+//                            .forEach(studentProject -> {
+//                                System.out.println("🍭Student Name: " + studentProject.getStudent());
+//                            });
 
 
                     if (project == null) {
@@ -63,11 +64,11 @@ public class EditProposalService {
                     List<ProjectInstructorRole> instructors = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(projectId);
 
                     List<ProjectInstructorRole> filteredInstructors = instructors.stream()
-                            .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) ||"Committee".equalsIgnoreCase(i.getRole()))
+                            .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
                             .collect(Collectors.toList());
 
-                    if(filteredInstructors.isEmpty()) {
-                        System.out.println("filteredInstructors.isEmpty");
+                    if (filteredInstructors.isEmpty()) {
+//                        System.out.println("filteredInstructors.isEmpty");
                         return null;
                     }
 //❗️❗️❗️❗️❗️ ห้ามลบ
@@ -100,7 +101,7 @@ public class EditProposalService {
                         String role = instructor.getRole();
                         String name = instructor.getInstructor().getProfessorName();
 
-                        if(!mapRoleNameInstruct.containsKey(role)) {
+                        if (!mapRoleNameInstruct.containsKey(role)) {
                             mapRoleNameInstruct.put(role, new ArrayList<>());
                         }
 
@@ -109,7 +110,7 @@ public class EditProposalService {
                     }
 
 
-                    return new GetAllEditProposalScheduleDTO (
+                    return new GetAllEditProposalScheduleDTO(
                             project.getProjectId(),
                             project.getProjectTitle(),
                             project.getProgram(),
@@ -128,4 +129,62 @@ public class EditProposalService {
 
     }
 
+    public List<GetEditProposalScheduleByIdDTO> getProjectEditProposalByProjectId(String projectId) {
+
+        List<ProposalSchedule> proposalScheduleList = proposalSchedRepository.findEditProjectByProjectId(projectId);
+
+        List<GetEditProposalScheduleByIdDTO> projectDTO = proposalScheduleList.stream()
+                .map(p -> {
+//                    System.out.println("projectId: " + projectId);
+
+                    Project project = projectRepository.findByProjectId(projectId);
+//                    System.out.println("--- project: " + project);
+
+                    if (project == null) {
+                        return null;
+                    }
+
+                    List<ProjectInstructorRole> instructors = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(projectId);
+
+                    List<ProjectInstructorRole> filteredInstructors = instructors.stream()
+                            .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
+                            .collect(Collectors.toList());
+
+                    if (filteredInstructors.isEmpty()) {
+//                        System.out.println("filteredInstructors.isEmpty");
+                        return null;
+                    }
+
+
+                    Map<String, List<String>> mapRoleNameInstruct = new HashMap<>();
+                    for (ProjectInstructorRole instructor : filteredInstructors) {
+
+                        String role = instructor.getRole();
+                        String name = instructor.getInstructor().getProfessorName();
+
+                        if (!mapRoleNameInstruct.containsKey(role)) {
+                            mapRoleNameInstruct.put(role, new ArrayList<>());
+                        }
+
+                        mapRoleNameInstruct.get(role).add(name);
+
+                    }
+
+                    return new GetEditProposalScheduleByIdDTO(
+                            project.getProjectId(),
+                            project.getProjectTitle(),
+                            project.getProgram(),
+                            project.getSemester(),
+                            mapRoleNameInstruct,
+                            p.getDate(),
+                            p.getStartTime(),
+                            p.getEndTime(),
+                            p.getRoom(),
+                            p.getStatus(),
+                            p.getEditedByUser()
+                    );
+                }).filter(Objects::nonNull)
+                .collect(Collectors.toList());
+        return projectDTO;
+    }
 }
