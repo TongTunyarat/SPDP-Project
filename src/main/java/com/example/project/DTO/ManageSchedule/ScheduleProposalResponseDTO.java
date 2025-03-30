@@ -6,7 +6,6 @@ public class ScheduleProposalResponseDTO {
     private String status;
     private String message;
     private List<ScheduleAssignmentDTO> scheduledAssignments;
-
     private List<TimeSlotDTO> allTimeSlots;
 
 

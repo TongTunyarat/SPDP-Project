@@ -442,6 +442,14 @@ td {
     overflow-x: auto;
 }
 
+.icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1px;
+}
+
+.icon-edit,
 .icon-delete {
     padding: 0;
     /*margin-left: 0.5rem;*/
@@ -456,6 +464,10 @@ td {
     color: #d9534f;
 }
 
+.icon-edit:hover svg{
+    color: #d9534f;
+}
+
 /*.slot-box svg {*/
 /*    display: none;*/
 /*}*/
@@ -464,6 +476,7 @@ td {
     display: inline-block;
 }
 
+/*Status = non-active*/
 .slot-box.non-active {
     border: 2px solid #CE1717;
     border-radius: 4px;
@@ -484,6 +497,29 @@ td {
 
 .icon-delete.hidden {
     visibility: hidden;
+    width: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.icon-edit.hidden {
+    visibility: hidden;
+}
+
+
+/*Status = edit-active*/
+
+.slot-box.edit-active {
+    background-color: #E8DCF0;
+    border: 2px solid #D4C4E2;
+}
+
+.slot-box.edit-active .project-id {
+    color: #7a099d;
+}
+
+.slot-box.edit-active .instructors {
+    color: #7D6B99;
 }
 
 
@@ -620,4 +656,6 @@ td {
         transform: translate(-120px, 0);
     }
 }
+
+/*===================================================================  Conflict popup =================================================================== */
 

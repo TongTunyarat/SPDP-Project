@@ -33,4 +33,10 @@ public interface ProposalSchedRepository extends JpaRepository<ProposalSchedule,
     @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectId AND p.remark = 'User-Add' ")
     List<ProposalSchedule> findEditProjectByProjectId(String projectId);
 
+    @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectId AND p.remark = 'User-Add' ")
+    ProposalSchedule findEditByProjectId(String projectId);
+
+    @Query("SELECT p FROM ProposalSchedule p WHERE p.status = 'Active' ")
+    List<ProposalSchedule> findByAllAndStatusActive();
+
 }

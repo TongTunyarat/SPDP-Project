@@ -77,7 +77,9 @@
 
     <div class="header-section">
       Edit Proposal Timing
-<!--      <div class="btn-header">-->
+      <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+      <!--      <div class="btn-header">-->
 <!--        <button class="template-btn">Template</button>-->
 <!--        <button class="upload-btn">Upload Files</button>-->
 <!--        <button class="addProject-btn">+ Add Projects</button>-->
@@ -164,7 +166,6 @@
 
 
     <div class="card-popup">
-<!--        <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />-->
 <!--        <p>CSRF Token: <span th:text="${_csrf.token}">ไม่มีค่า</span></p>-->
 <!--            <div class="card-header">-->
 <!--                <h1 class="card-title">DST SP2024-04</h1>-->
@@ -230,6 +231,19 @@
 
      </div>
 
+    <!--          https://codepen.io/AdamDipinto/pen/ewKxwE-->
+    <div class="modal-loader-overlay" id="modalLoaderOverlay" style="display:none;">
+      <div class="loader-center">
+        <div class="loader">
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </div>
+    </div>
+
 
   </div>
 </div>
@@ -254,12 +268,50 @@
 
   // ฟังก์ชันกรองโปรเจกต์ตามหมวดหมู่
   function filterProjects(category) {
-    const rows = document.querySelectorAll("#projectTable tr");
+    const tbody = document.getElementById("projectTable");
+    const rows = tbody.querySelectorAll("tr:not(#noDataRow)");
+
+    let found = false;
+
+    const noDataRow = document.getElementById("noDataRow");
+    if(noDataRow) {
+      noDataRow.remove();
+    }
+
     rows.forEach(row => {
+
       if (category === "all") {
         row.style.display = "";
+        found = true;
       } else {
-        row.style.display = row.getAttribute("data-category") === category ? "" : "none";
+
+        if(row.getAttribute("data-category") === category) {
+          row.style.display = "";
+          found = true;
+        } else {
+          row.style.display = "none";
+        }
+        // row.style.display = row.getAttribute("data-category") === category ? "" : "none";
+        //
+        // if(noDataRow) {
+        //   noDataRow.remove();
+        // }
+
+        // ข้อมูลไม่ตรงกับ category
+        if(!found) {
+
+          const row = document.createElement("tr");
+          row.id = "noDataRow";
+
+          const cell = document.createElement("td");
+          cell.innerHTML = "No data available";
+          cell.colSpan = 8;
+          cell.style.textAlign = "center";
+          cell.style.color = "#e23855";
+
+          row.appendChild(cell);
+          tbody.appendChild(row);
+        }
       }
     });
 
@@ -303,6 +355,21 @@
 
               if(data.length === 0) {
                 console.log("No data available");
+
+                const tbody = document.getElementById("projectTable");
+                const row = document.createElement("tr");
+
+                const cell = document.createElement("td");
+
+                cell.innerHTML = "No data available";
+                cell.colSpan = 8;
+                cell.style.textAlign = "center";
+                cell.style.color = "#e23855";
+
+                row.style.marginTop = "1rem";
+
+                row.appendChild(cell);
+                tbody.appendChild(row);
 
               } else {
                 // console.log("Data found: ", data);
@@ -416,19 +483,22 @@
           }
       });
 
-      document.getElementById("cancelBtn").addEventListener("click", function () {
+      document.querySelector('.card-popup').addEventListener("click", function (e) {
+        if(e.target.id === ("cancelBtn") ){
           document.querySelector(".card-popup").style.display = "none";
+        }
       });
 
   });
 
+  // ============================================================= Modal =====================================================================
 
   document.addEventListener("DOMContentLoaded", function() {
 
       window.onclick = function(event) {
       const modal = document.querySelector(".card-popup");
 
-      if (modal && !modal.contains(event.target) && !event.target.classList.contains("edit-btn")) {
+      if (modal && !modal.contains(event.target) && !event.target.classList.contains("edit-btn") && !document.querySelector(".swal2-container")) {
           console.log("⛔ คลิกนอก Modal -> ปิด Modal");
           document.querySelector(".card-popup").style.display = "none";
       }
@@ -436,7 +506,6 @@
       };
   });
 
-  // ============================================================= Modal =====================================================================
   document.addEventListener('DOMContentLoaded', function () {
       console.log("🚀 Load Page");
       getProjectEditProposal();
@@ -501,6 +570,7 @@
 
           radio.type = "radio";
           radio.value = room;
+          radio.name = "room";
           radio.checked = room === selectedRoom;
 
           radio.onchange = function () {
@@ -601,6 +671,8 @@
 
                       let timeSlot = "";
                       let FormattedDate = "";
+                      let newStartTime = "";
+                      let newEndTime = "";
                       if (project.startTime && project.endTime != null) {
                           // JavaScript Date object
                           const startTime = new Date(project.startTime);
@@ -685,6 +757,246 @@
               });
           });
   }
+
+
+  document.addEventListener('DOMContentLoaded', function () {
+
+    document.querySelector('.card-popup').addEventListener("click", function (e) {
+
+      if(e.target.id.includes("saveBtn") ){
+
+        // send value to controlller
+        let projectId = document.querySelector(".card-title").textContent;
+        let cardTitle = document.querySelector(".card-header");
+        let programDiv =cardTitle.querySelector(".tag").textContent.trim();
+        let startDateInput = document.querySelector("input[type='date']");
+        let startTimeInput = document.querySelector("input[type='time']");
+        let endTimeInput = document.querySelectorAll("input[type='time']")[1];
+        let selectedRoomFinal = selectedRoom && selectedRoom !== "Select Room" ? selectedRoom : null;
+
+        let startDate = startDateInput.value;
+        let startTime = startTimeInput.value;
+        let endTime = endTimeInput.value;
+
+        if (!startDate || !startTime || !endTime || !selectedRoomFinal) {
+          Swal.fire({
+            icon: "warning",
+            title: "Oops...",
+            text: "Please fill in all information.",
+            draggable: true,
+            confirmButtonColor: "#dc7633"
+          });
+          return;
+        }
+
+        let settingData = {
+          projectId: projectId,
+          program: programDiv,
+          startDate: startDate,
+          startTime: startTime,
+          endTime: endTime,
+          room: selectedRoomFinal,
+        };
+
+        console.log("📤 settingData: ", settingData);
+        document.getElementById("modalLoaderOverlay").style.display = "flex";
+
+        let csrfToken = document.getElementById("csrfToken").value;
+
+        fetch('http://localhost:8080/admin/EditProposalByProjectId', {
+
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': csrfToken
+          },
+          body: JSON.stringify(settingData)
+
+        })
+         .then(response =>
+               response.json()
+         )
+                .then(data => {
+                  console.log("🐍data: ", data);
+                  document.getElementById("modalLoaderOverlay").style.display = "none";
+
+                  if(data.hasErrorSaveData) {
+                    Swal.fire({
+                      icon: "error",
+                      title: "Oops...",
+                      text: "Sorry, we couldn't save the data",
+                    });
+                  }
+
+                  if(!data.hasRoomConflict && !data.hasInstructorConflict) {
+                      Swal.fire({
+                        icon: "success",
+                        title: "Save data successfully.",
+                        showConfirmButton: false,
+                        timer: 2000
+                      }).then(() => {
+                        window.location.reload();
+                      });
+                      return;
+                    }
+
+                    let conflictHtml = '<div class="conflict-container">';
+
+                    if(data.hasRoomConflict && data.roomConflicts.length > 0) {
+
+                      conflictHtml += `
+                          <div class="conflict-section">
+                                  <h4 class="conflict-title">Room Conflict</h4>
+                                  <div class="conflict-list">
+                      `;
+
+                      const dateGroups = {};
+                      data.roomConflicts.forEach(conflict => {
+                        const startTimeParts = conflict.conflictStartTime.split(':');
+                        const endTimeParts = conflict.conflictEndTime.split(':');
+                        const timeSlot = `${startTimeParts[0]}:${startTimeParts[1]} - ${endTimeParts[0]}:${endTimeParts[1]}`;
+
+                        const getDate = new Date(conflict.date);
+                        let nameDay = getDate.toLocaleDateString('en-us', {weekday: 'short'})
+                        let month = getDate.toLocaleDateString('en-us', {month: 'short'})
+                        let date = getDate.toLocaleDateString('en-us', {day: 'numeric'})
+                        let year = getDate.toLocaleDateString('en-us', {year: 'numeric'})
+
+                        // FormattedDate = `${nameDay} ${month} ${date}, ${year}`
+                        FormattedDate = `${nameDay}, ${date} ${month}. ${year}`
+                        console.log("🗓️ getDate: ", getDate);
+                        console.log("FormattedDate: ", FormattedDate);
+
+                        if(!dateGroups[FormattedDate]) {
+                          dateGroups[FormattedDate] = [];
+                        }
+
+                        dateGroups[FormattedDate].push({
+                          room: conflict.room,
+                          project: conflict.projectId,
+                          time: timeSlot
+                        });
+                      });
+
+                      Object.keys(dateGroups).forEach((date, dateIndex) => {
+
+                        conflictHtml += `
+                            <div class="conflict-group">
+                              <div class="conflict-date">Date: ${date}</div>
+                          `;
+
+                        dateGroups[date].forEach(item => {
+                          conflictHtml += `
+                              <div class="conflict-item">
+                                   <span class="conflict-bullet"></span>
+                                   <span class="conflict-content">Room: ${item.room}</span>
+                              </div>
+
+                               <div class="conflict-item">
+                                  <span class="conflict-bullet"></span>
+                                  <span class="conflict-content">Project: ${item.project}</span>
+                                </div>
+
+                                <div class="conflict-time">
+                                  <span class="conflict-time-icon">⏰</span>
+                                  <span>Time: ${item.time}</span>
+                                </div><br>
+                          `;
+                        });
+                        conflictHtml += `</div>`;
+                      })
+
+                      conflictHtml += `
+                            </div>
+                        </div>
+                      `;
+                    }
+
+                    if(data.hasRoomConflict && data.instructorConflicts.length > 0) {
+
+                      conflictHtml += `
+                          <div class="conflict-section">
+                                  <h4 class="conflict-title">Instructor Conflict</h4>
+                                  <div class="conflict-list">
+                      `;
+
+                      const instructorGroups = {};
+                      data.instructorConflicts.forEach(conflict => {
+
+                        if(!instructorGroups[conflict.instructorName]) {
+                          instructorGroups[conflict.instructorName] = [];
+                        }
+
+                        const startTimeParts = conflict.conflictStartTime.split(':');
+                        const endTimeParts = conflict.conflictEndTime.split(':');
+                        const timeSlot = `${startTimeParts[0]}:${startTimeParts[1]} - ${endTimeParts[0]}:${endTimeParts[1]}`;
+
+                        instructorGroups[conflict.instructorName].push({
+                          project: conflict.conflictingProjectId,
+                          time: timeSlot
+                        });
+                      });
+
+                      Object.keys(instructorGroups).forEach(instructor => {
+                        conflictHtml += `
+                            <div class="conflict-group">
+                              <div class="conflict-instructor">${instructor}</div>
+                          `;
+
+                        instructorGroups[instructor].forEach(item => {
+                          conflictHtml += `
+                              <div class="conflict-item">
+                                <span class="conflict-bullet"></span>
+                                <span class="conflict-content">Project: ${item.project}</span>
+                              </div>
+
+                              <div class="conflict-time">
+                                  <span class="conflict-time-icon">⏰</span>
+                                  <span>Time: ${item.time}</span>
+                                </div><br>
+                                `;
+                        });
+
+                        conflictHtml += '</div>';
+                      });
+
+                      conflictHtml += `
+                            </div>
+                          </div>
+                        `;
+                    }
+
+                  conflictHtml += '</div>';
+
+                      Swal.fire({
+                        icon: "warning",
+                        title: "Schedule overlap found",
+                        html: conflictHtml,
+                        showCancelButton: true,
+                        showConfirmButton: false,
+                        cancelButtonColor: "#d33",
+                        cancelButtonText: "Close"
+                      })
+
+                    })
+         .catch(error => {
+           document.getElementById("modalLoaderOverlay").style.display = "none";
+           console.error('Error fetching data:', error);
+           Swal.fire({
+             icon: "error",
+             title: "Oops...",
+             text: "Something went wrong!",
+           });
+         });
+
+      }
+    });
+
+  });
+
+
+
+
 
 
 
