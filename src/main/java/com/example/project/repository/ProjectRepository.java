@@ -31,6 +31,9 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 
     List<Project> findBySemesterAndProgram(String param, String year);
 
+    List<Project> findBySemesterAndProjectInstructorRoles_Instructor_Account_Username(String semester, String username);
+
+    List<Project> findBySemesterAndProgramAndProjectInstructorRoles_Instructor_Account_Username(String param, String year, String username);
 }
 
 

@@ -330,7 +330,8 @@ public class StatisticsService {
     }
 
     public List<ScoringPeriods> getAllScoringPeriods() {
-        return scoringPeriodsRepository.findAll();
+        String currentYear = String.valueOf(LocalDate.now().getYear());
+        return scoringPeriodsRepository.findByYear(currentYear);
     }
 
     public Map<String, Long> getStudentProposalEvaluationStatus(String evaType, String year, String program) {
@@ -638,7 +639,7 @@ public class StatisticsService {
                 })
                 .filter(score -> score.getTotalAssigned() > 0)  // เฉพาะอาจารย์ที่มีการมอบหมาย
                 .sorted(Comparator.comparing(TeacherScoringDTO::getRemainingCount).reversed())
-                .limit(5)  // จำกัดผลลัพธ์เป็น 5 คน
+//                .limit(5)  // จำกัดผลลัพธ์เป็น 5 คน
                 .collect(Collectors.toList());
 
         // Log final result after filtering

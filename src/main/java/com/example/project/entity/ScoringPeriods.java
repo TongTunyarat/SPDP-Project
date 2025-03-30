@@ -30,6 +30,9 @@ public class ScoringPeriods {
     @JsonManagedReference
     private Account recordedByPeriod;
 
+    @Column(name = "year")
+    private String year;
+
     public Integer getId() {
         return id;
     }
@@ -68,5 +71,13 @@ public class ScoringPeriods {
 
     public void setRecordedByPeriod(Account recordedByPeriod) {
         this.recordedByPeriod = recordedByPeriod;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
     }
 }
