@@ -1,268 +1,300 @@
-<!--<!DOCTYPE html>-->
-<!--<html lang="en">-->
+<!DOCTYPE html>
+<html lang="en">
 
-<!--<head>-->
-<!--  <meta charset="UTF-8">-->
-<!--  <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
-<!--  <title> Dashboard </title>-->
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Dashboard </title>
 
-<!--  &lt;!&ndash; CSS &ndash;&gt;-->
+  <!-- CSS -->
 <!--  <link rel="stylesheet" href="/CSS/sidebar-admin.css">-->
-<!--  <link rel="stylesheet" href="/CSS/PreviewProposalSchedule">-->
+  <link rel="stylesheet" href="/CSS/PreviewProposalSchedule.css">
 
-<!--  &lt;!&ndash; Library &ndash;&gt;-->
-<!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">-->
-<!--  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>-->
+  <!-- Library -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-<!--</head>-->
+</head>
 
-<!--<body>-->
-<!--<div class="container">-->
-<!--  &lt;!&ndash; Slide bar&ndash;&gt;-->
-<!--  <div class="sidebar">-->
-<!--    <h2>ICT MAHIDOL</h2>-->
-<!--    <ul>-->
-<!--      <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">-->
-<!--        <path-->
-<!--                d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">-->
-<!--        </path>-->
-<!--      </svg> Homepage </h4>-->
-<!--      <li><a href="/admin-dashboard">Dashboard</a></li>-->
-<!--      <li><a href="/admin-proposal-report">Proposal Grade Report</a></li>-->
-<!--      <li><a href="/admin-defense-report">Defense Grade Report</a></li>-->
-<!--      <li><a href="/admin-eva-traking">Evaluation Tracking</a></li>-->
-<!--    </ul>-->
+<body>
+  <div class="content">
 
-<!--    <h2> Pages </h2>-->
+    <div class="header-section">
+      Preview Proposal Schedule
+      <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
-<!--    <ul>-->
-<!--      <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
-<!--        <g fill="#ffffff" fill-rule="nonzero">-->
-<!--          <g transform="scale(5.33333,5.33333)">-->
-<!--            <path-->
-<!--                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
-<!--            </path>-->
-<!--          </g>-->
-<!--        </g>-->
-<!--      </svg>Score Evaluation </h4>-->
-<!--      <li><a href="#">Scoring Period Settings</a></li>-->
-<!--    </ul>-->
+      <!--      <div class="btn-header">-->
+      <!--        <button class="template-btn">Template</button>-->
+      <!--        <button class="upload-btn">Upload Files</button>-->
+      <!--        <button class="addProject-btn">+ Add Projects</button>-->
+      <!--      </div>-->
+    </div>
 
-<!--    <ul>-->
-<!--      <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">-->
-<!--        <path-->
-<!--                d="M42 15v-2.5C42 8.916 39.084 6 35.5 6h-23C8.916 6 6 8.916 6 12.5V15H42zM25.5 27H32V33H25.5zM35 27H42V33H35zM6 27H13V33H6zM16 27H22.5V33H16zM35 18H42V24H35zM25.5 18H32V24H25.5zM25.5 36H32V42H25.5zM16 36H22.5V42H16zM35 36v6h.5c3.415 0 6.218-2.649 6.475-6H35zM6.025 36c.257 3.351 3.059 6 6.475 6H13v-6H6.025zM16 18H22.5V24H16zM6 18H13V24H6z">-->
-<!--        </path>-->
-<!--      </svg> Manage Schedule </h4>-->
-<!--      <li><a href="/admin/proposalSchedule">Proposal Schedule</a></li>-->
-<!--      <li><a href="#"  class="active">Edit Proposal Timing</a></li>-->
-<!--      <li><a href="#">Defense Schedule</a></li>-->
-<!--      <li><a href="#">Edit Defense Timing</a></li>-->
-<!--    </ul>-->
+    <div class="body-section">
 
-<!--    <ul>-->
-<!--      <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">-->
-<!--        <path-->
-<!--                d="M35.5,8h-3.551C31.697,5.756,29.81,4,27.5,4h-7c-2.31,0-4.197,1.756-4.449,4H12.5C10.019,8,8,10.019,8,12.5v27	c0,2.481,2.019,4.5,4.5,4.5h23c2.481,0,4.5-2.019,4.5-4.5v-27C40,10.019,37.981,8,35.5,8z M20.5,7h7C28.327,7,29,7.673,29,8.5	S28.327,10,27.5,10h-7C19.673,10,19,9.327,19,8.5S19.673,7,20.5,7z M22.5,34h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,34,22.5,34z M22.5,24h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,24,22.5,24z M34.561,34.439c0.586,0.585,0.586,1.536,0,2.121C34.268,36.854,33.884,37,33.5,37	s-0.768-0.146-1.061-0.439L31,35.121l-1.439,1.439C29.268,36.854,28.884,37,28.5,37s-0.768-0.146-1.061-0.439	c-0.586-0.585-0.586-1.536,0-2.121L28.879,33l-1.439-1.439c-0.586-0.585-0.586-1.536,0-2.121c0.586-0.586,1.535-0.586,2.121,0	L31,30.879l1.439-1.439c0.586-0.586,1.535-0.586,2.121,0c0.586,0.585,0.586,1.536,0,2.121L33.121,33L34.561,34.439z M34.561,21.561	l-4,4C30.268,25.854,29.884,26,29.5,26s-0.768-0.146-1.061-0.439l-2-2c-0.586-0.585-0.586-1.536,0-2.121	c0.586-0.586,1.535-0.586,2.121,0l0.939,0.939l2.939-2.939c0.586-0.586,1.535-0.586,2.121,0	C35.146,20.025,35.146,20.975,34.561,21.561z">-->
-<!--        </path>-->
-<!--      </svg> Manage Project </h4>-->
-<!--      <li><a href="#">Project Overview</a></li>-->
-<!--      <li><a href="#">Project Details</a></li>-->
-<!--      <li><a href="#">Committee</a></li>-->
-<!--      <li><a href="#">Poster Committee</a></li>-->
-<!--    </ul>-->
-<!--  </div>-->
+      <div class="table-container">
+        <div class="filter-controls">
+          <button class="filter active" onclick="filterProjects('all')">All</button>
+          <button class="filter" onclick="filterProjects('ict')">ICT</button>
+          <button class="filter" onclick="filterProjects('dst')">DST</button>
+          <input type="text" id="searchInput" placeholder="Search">
 
-<!--  <div class="content">-->
+        </div>
+        <table>
+          <thead>
+          <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Room</th>
+            <th>Program</th>
+            <th class="left-align">Project ID</th>
+            <th class="left-align">Project Title</th>
+            <th class="left-align">Student ID</th>
+            <th class="left-align">First - Last Name</th>
+            <th>Sec.</th>
+            <th>Track</th>
+            <th class="left-align">Advisor and Committees</th>
 
-<!--    <div class="header-section">-->
-<!--      Edit Proposal Timing-->
-<!--      <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />-->
-
-<!--      &lt;!&ndash;      <div class="btn-header">&ndash;&gt;-->
-<!--      &lt;!&ndash;        <button class="template-btn">Template</button>&ndash;&gt;-->
-<!--      &lt;!&ndash;        <button class="upload-btn">Upload Files</button>&ndash;&gt;-->
-<!--      &lt;!&ndash;        <button class="addProject-btn">+ Add Projects</button>&ndash;&gt;-->
-<!--      &lt;!&ndash;      </div>&ndash;&gt;-->
-<!--    </div>-->
-
-<!--    <div class="body-section">-->
-
-<!--      <div class="table-container">-->
-<!--        <div class="filter-controls">-->
-<!--          <button class="filter active" onclick="filterProjects('all')">All</button>-->
-<!--          <button class="filter" onclick="filterProjects('ict')">ICT</button>-->
-<!--          <button class="filter" onclick="filterProjects('dst')">DST</button>-->
-<!--          <input type="text" id="searchInput" placeholder="Search">-->
-
-<!--        </div>-->
-<!--        <table>-->
-<!--          <thead>-->
-<!--          <tr>-->
-<!--            <th class="left-align">Project ID</th>-->
-<!--            <th class="left-align">Project Name</th>-->
-<!--            <th class="left-align">Instructor</th>-->
-<!--            <th>Date</th>-->
-<!--            <th>Time</th>-->
-<!--            <th>Room</th>-->
-<!--            <th>Actions</th>-->
-<!--          </tr>-->
-<!--          </thead>-->
-<!--          <tbody id="projectTable">-->
+          </tr>
+          </thead>
+          <tbody id="projectTable">
 <!--                <tr data-category="ict">-->
-<!--                  <td><span class="tag ict">ICT</span> SP2024-01 </td>-->
-<!--                  <td>Aj.Akara</td>-->
-<!--                  <td> </td>-->
-<!--                  <td>A Noise-Resilient Model</td>-->
-<!--                  <td>การวิจัยและพัฒนาโมเดล Deep Learning...</td>-->
-<!--                  <td> 6487023 </td>-->
-<!--                  <td> CHAN </td>-->
-<!--                  <td>-->
-<!--                    <button class="edit-btn" onclick="showProjectDetails('project1')">Edit</button>-->
-<!--                    <button class="delete-btn" onclick="showProjectDetails('project1')">Delete</button>-->
+<!--                  <td>Mon, 21 Apr. 25</td>-->
+<!--                  <td>16:15 - 17:30</td>-->
+<!--                  <td>IT321</td>-->
+<!--                  <td><span class="tag ict">ICT</span></td>-->
+<!--                  <td>ICT SP2024-01</td>-->
+<!--                  <td>ASYMBRAINNET</td>-->
+
+<!--                  <td class="id-cell">-->
+<!--                    <div class="student-row">6488009</div>-->
+<!--                    <div class="student-row">6488011</div>-->
+<!--                    <div class="student-row">6488026</div>-->
 <!--                  </td>-->
-<!--                </tr>-->
-<!--                <tr data-category="dst">-->
-<!--                  <td><span class="tag dst">DST</span> SP2024-02 </td>-->
-<!--                  <td>Aj.Dolvara</td>-->
-<!--                  <td> </td>-->
-<!--                  <td>IoT Dashboard</td>-->
-<!--                  <td>การนำเทคโนโลยี IoT มาใช้...</td>-->
-<!--                  <td> 6487023 </td>-->
-<!--                  <td> CHAN </td>-->
-<!--                  <td>-->
-<!--                    <button class="edit-btn" onclick="showProjectDetails('project1')">Edit</button>-->
-<!--                    <button class="delete-btn" onclick="showProjectDetails('project1')">Delete</button>-->
+
+<!--                  <td class="name-cell">-->
+<!--                    <div class="student-row">KANATIP BHONGSPRAPAS</div>-->
+<!--                    <div class="student-row">TAWAN CHAIDEE</div>-->
+<!--                    <div class="student-row">NETITHORN INAMNUAY</div>-->
 <!--                  </td>-->
-<!--                </tr>-->
-<!--                <tr data-category="ict">-->
-<!--                  <td><span class="tag ict">ICT</span> SP2024-03 </td>-->
-<!--                  <td>Aj.Jidapa</td>-->
-<!--                  <td> </td>-->
-<!--                  <td>ICT InternNet</td>-->
-<!--                  <td>ระบบจัดการฝึกงานสำหรับคณะ ICT</td>-->
-<!--                  <td> 6487023 </td>-->
-<!--                  <td> CHAN </td>-->
-<!--                  <td>-->
-<!--                    <button class="edit-btn" onclick="showProjectDetails('project1')">Edit</button>-->
-<!--                    <button class="delete-btn" onclick="showProjectDetails('project1')">Delete</button>-->
+
+<!--                  <td class="sec-cell">-->
+<!--                    <div class="student-row"></div>-->
+<!--                    <div class="student-row"></div>-->
+<!--                    <div class="student-row"></div>-->
 <!--                  </td>-->
-<!--                </tr>-->
-<!--                <tr data-category="ict">-->
-<!--                  <td> <span class="tag ict">ICT</span> SP2024-04</td>-->
-<!--                  <td>Aj.Jidapa</td>-->
-<!--                  <td> </td>-->
-<!--                  <td>Project Management Tools</td>-->
-<!--                  <td>เป็น Website ที่ใช้ช่วยจัดการงานและโครงการ</td>-->
-<!--                  <td> 6487023 </td>-->
-<!--                  <td> CHAN </td>-->
-<!--                  <td>-->
-<!--                    <button class="edit-btn" onclick="showProjectDetails('project1')">Edit</button>-->
-<!--                    <button class="delete-btn" onclick="showProjectDetails('project1')">Delete</button>-->
+
+<!--                  <td class="track-cell">-->
+<!--                    <div class="student-row">1</div>-->
+<!--                    <div class="student-row">1</div>-->
+<!--                    <div class="student-row">1</div>-->
 <!--                  </td>-->
-<!--                </tr>-->
-<!--                <tr data-category="dst">-->
-<!--                  <td><span class="tag dst">DST</span> SP2024-05 </td>-->
-<!--                  <td>Aj.Morakot</td>-->
-<!--                  <td> </td>-->
-<!--                  <td>Testcase Management</td>-->
-<!--                  <td>เว็บไซต์ที่ใช้จัดการ Test case management</td>-->
-<!--                  <td> 6487023 </td>-->
-<!--                  <td> CHAN </td>-->
+
 <!--                  <td>-->
-<!--                    <button class="edit-btn" onclick="showProjectDetails('project1')">Edit</button>-->
-<!--                    <button class="delete-btn" onclick="showProjectDetails('project1')">Delete</button>-->
+<!--                    <div class="advisor-row">Aj.Songsri Tangsripairoj</div>-->
+<!--                    <div class="advisor-row">Aj.Woraluck Wongse-Ek</div>-->
+<!--                    <div class="advisor-row">Aj.Sukanya Phongsuphap</div>-->
 <!--                  </td>-->
+
 <!--                </tr>-->
-<!--                </tbody>-->
-<!--              </table>-->
-<!--            </div>-->
-<!--          </div>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--</body>-->
+                </tbody>
+              </table>
+            </div>
+          </div>
+      </div>
+</body>
 
-<!--</html>-->
+</html>
 
-<!--<script>-->
+<script>
 
-<!--  document.addEventListener("DOMContentLoaded", function () {-->
-<!--    const menuItems = document.querySelectorAll(".sidebar ul li a");-->
+  document.addEventListener("DOMContentLoaded", function () {
+    const menuItems = document.querySelectorAll(".sidebar ul li a");
 
-<!--    // ดึง URL ปัจจุบัน-->
-<!--    const currentPage = window.location.pathname.split("/").pop();-->
+    // ดึง URL ปัจจุบัน
+    const currentPage = window.location.pathname.split("/").pop();
 
-<!--    menuItems.forEach(item => {-->
-<!--      if (item.getAttribute("href") === currentPage) {-->
-<!--        item.classList.add("active"); // เพิ่ม class "active" ให้เมนูปัจจุบัน-->
-<!--      }-->
-<!--    });-->
-<!--  });-->
+    menuItems.forEach(item => {
+      if (item.getAttribute("href") === currentPage) {
+        item.classList.add("active"); // เพิ่ม class "active" ให้เมนูปัจจุบัน
+      }
+    });
+  });
 
-<!--  // ฟังก์ชันกรองโปรเจกต์ตามหมวดหมู่-->
-<!--  function filterProjects(category) {-->
-<!--    const tbody = document.getElementById("projectTable");-->
-<!--    const rows = tbody.querySelectorAll("tr:not(#noDataRow)");-->
+  // ฟังก์ชันกรองโปรเจกต์ตามหมวดหมู่
+  function filterProjects(category) {
+    const tbody = document.getElementById("projectTable");
+    const rows = tbody.querySelectorAll("tr:not(#noDataRow)");
 
-<!--    let found = false;-->
+    let found = false;
 
-<!--    const noDataRow = document.getElementById("noDataRow");-->
-<!--    if(noDataRow) {-->
-<!--      noDataRow.remove();-->
-<!--    }-->
+    const noDataRow = document.getElementById("noDataRow");
+    if(noDataRow) {
+      noDataRow.remove();
+    }
 
-<!--    rows.forEach(row => {-->
+    rows.forEach(row => {
 
-<!--      if (category === "all") {-->
-<!--        row.style.display = "";-->
-<!--        found = true;-->
-<!--      } else {-->
+      if(category === "all" || row.getAttribute("data-category") === category) {
+        row.style.display = "";
+        found = true;
+      } else {
+        row.style.display = "none";
+      }
+      // row.style.display = row.getAttribute("data-category") === category ? "" : "none";
+      //
+      // if(noDataRow) {
+      //   noDataRow.remove();
+      // }
 
-<!--        if(row.getAttribute("data-category") === category) {-->
-<!--          row.style.display = "";-->
-<!--          found = true;-->
-<!--        } else {-->
-<!--          row.style.display = "none";-->
-<!--        }-->
-<!--        // row.style.display = row.getAttribute("data-category") === category ? "" : "none";-->
-<!--        //-->
-<!--        // if(noDataRow) {-->
-<!--        //   noDataRow.remove();-->
-<!--        // }-->
+    });
 
-<!--        // ข้อมูลไม่ตรงกับ category-->
-<!--        if(!found) {-->
+    // ข้อมูลไม่ตรงกับ category
+    if(!found) {
 
-<!--          const row = document.createElement("tr");-->
-<!--          row.id = "noDataRow";-->
+      const row = document.createElement("tr");
+      row.id = "noDataRow";
 
-<!--          const cell = document.createElement("td");-->
-<!--          cell.innerHTML = "No data available";-->
-<!--          cell.colSpan = 8;-->
-<!--          cell.style.textAlign = "center";-->
-<!--          cell.style.color = "#e23855";-->
+      const cell = document.createElement("td");
+      cell.innerHTML = "No data available";
+      cell.colSpan = 8;
+      cell.style.textAlign = "center";
+      cell.style.color = "#e23855";
 
-<!--          row.appendChild(cell);-->
-<!--          tbody.appendChild(row);-->
-<!--        }-->
-<!--      }-->
-<!--    });-->
+      row.appendChild(cell);
+      tbody.appendChild(row);
+    }
 
-<!--    document.querySelectorAll(".filter").forEach(btn => btn.classList.remove("active"));-->
-<!--    document.querySelector(`.filter[onclick="filterProjects('${category}')"]`).classList.add("active");-->
-<!--  }-->
+    document.querySelectorAll(".filter").forEach(btn => btn.classList.remove("active"));
+    document.querySelector(`.filter[onclick="filterProjects('${category}')"]`).classList.add("active");
+  }
 
-<!--  // ฟังก์ชันค้นหาโปรเจกต์-->
-<!--  function searchProjects() {-->
-<!--    const searchValue = document.getElementById("searchInput").value.toLowerCase();-->
-<!--    const rows = document.querySelectorAll("#projectTable tr");-->
+  // ฟังก์ชันค้นหาโปรเจกต์
+  function searchProjects() {
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+    const rows = document.querySelectorAll("#projectTable tr");
 
-<!--    rows.forEach(row => {-->
-<!--      const text = row.innerText.toLowerCase();-->
-<!--      row.style.display = text.includes(searchValue) ? "" : "none";-->
-<!--    });-->
-<!--  }-->
+    rows.forEach(row => {
+      const text = row.innerText.toLowerCase();
+      row.style.display = text.includes(searchValue) ? "" : "none";
+    });
+  }
 
-<!--  document.getElementById("searchInput").addEventListener("input", searchProjects);-->
+  document.getElementById("searchInput").addEventListener("input", searchProjects);
 
-<!--</script>-->
+  // ====================================== get project =====================================
+  document.addEventListener('DOMContentLoaded', function () {
+    console.log("🚀 Load Page");
+    getProjectProposal();
+  });
+  function getProjectProposal() {
+
+    fetch(`http://localhost:8080/admin/getDataPreviewProposalSchedule`, {
+
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+                alert('Network response was not ok ' + response.statusText);
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log("🐍data: ", data);
+              if(data.length === 0) {
+                console.log("No data available");
+
+                const tbody = document.getElementById("projectTable");
+                const row = document.createElement("tr");
+
+                const cell = document.createElement("td");
+
+                cell.innerHTML = "No data available";
+                cell.colSpan = 8;
+                cell.style.textAlign = "center";
+                cell.style.color = "#e23855";
+
+                row.style.marginTop = "1rem";
+
+                row.appendChild(cell);
+                tbody.appendChild(row);
+
+              } else {
+
+                const tbody = document.getElementById("projectTable");
+
+                data.forEach(project => {
+
+                  const row = document.createElement("tr");
+                  row.setAttribute("data-category", project.program.toLowerCase());
+
+                  let advisor = "";
+                  let committee = "";
+
+                  if(typeof project.instructorNames === "object") {
+
+                    advisor = project.instructorNames.Advisor ? {name: project.instructorNames.Advisor[0] }: null;
+                    committee = project.instructorNames.Committee || [];
+                  }
+
+                  let projectId = project.projectId;
+                  let cleanId = projectId.replace(/DST|ICT/g, '').trim();
+
+                  row.innerHTML = `
+
+                          <td class="${!project.date ? 'empty-date' : ''}">${project.date ? project.date: ''}</td>
+                          <td class="${!project.time? 'empty-time' : ''}" data-placeholder="Add Time">${project.time? project.time : ''}</td>
+                          <td class="${!project.room ? 'empty-room' : ''}">${project.room ? project.room: ''}</td>
+                          <td><span class="tag ${project.program.toLowerCase()}">${project.program}</span></td>
+                          <td>${cleanId}</td>
+                          <td>${project.projectTitle}</td>
+
+                          <td class="id-cell">
+                            ${project.students.map(student => `<div class="student-row">${student.studentId}</div>`).join('')}
+                          </td>
+
+                          <td class="name-cell">
+                            ${project.students.map(student => `<div class="student-row">${student.studentName}</div>`).join('')}
+                          </td>
+
+                          <td class="sec-cell">
+                            ${project.students.map(student => `<div class="student-row">${student.section || ''}</div>`).join('')}
+                          </td>
+
+                          <td class="track-cell">
+                            ${project.students.map(student => `<div class="student-row">${student.track || '0'}</div>`).join('')}
+                          </td>
+
+                          <td>
+                           ${advisor
+                          ?`
+                                  <div class="advisor-row"><span class="advisor-label">Advisor</span>${advisor.name}</div>
+                            `
+                          : ''}
+
+                            ${committee.map((comm, index) => `<div class="advisor-row"><span class="committee-label ${index ===0 ? '' : 'hidden-label'}">Committee</span>${comm}</div>`).join('')}
+
+                           </td>
+
+                  `;
+                  tbody.appendChild(row);
+                })
+              }
+
+            })
+            .catch(error => {
+              console.error('Error fetching data:', error);
+
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+              });
+            });
+    }
+
+</script>

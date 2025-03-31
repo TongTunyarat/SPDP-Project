@@ -100,7 +100,7 @@
           <thead>
           <tr>
             <th class="left-align">Project ID</th>
-            <th class="left-align">Project Name</th>
+            <th class="left-align">Project Title</th>
             <th class="left-align">Instructor</th>
             <th>Date</th>
             <th>Time</th>
@@ -280,12 +280,7 @@
 
     rows.forEach(row => {
 
-      if (category === "all") {
-        row.style.display = "";
-        found = true;
-      } else {
-
-        if(row.getAttribute("data-category") === category) {
+        if(category === "all" || row.getAttribute("data-category") === category) {
           row.style.display = "";
           found = true;
         } else {
@@ -297,23 +292,23 @@
         //   noDataRow.remove();
         // }
 
-        // ข้อมูลไม่ตรงกับ category
-        if(!found) {
-
-          const row = document.createElement("tr");
-          row.id = "noDataRow";
-
-          const cell = document.createElement("td");
-          cell.innerHTML = "No data available";
-          cell.colSpan = 8;
-          cell.style.textAlign = "center";
-          cell.style.color = "#e23855";
-
-          row.appendChild(cell);
-          tbody.appendChild(row);
-        }
-      }
     });
+
+    // ข้อมูลไม่ตรงกับ category
+    if(!found) {
+
+      const row = document.createElement("tr");
+      row.id = "noDataRow";
+
+      const cell = document.createElement("td");
+      cell.innerHTML = "No data available";
+      cell.colSpan = 8;
+      cell.style.textAlign = "center";
+      cell.style.color = "#e23855";
+
+      row.appendChild(cell);
+      tbody.appendChild(row);
+    }
 
     document.querySelectorAll(".filter").forEach(btn => btn.classList.remove("active"));
     document.querySelector(`.filter[onclick="filterProjects('${category}')"]`).classList.add("active");
@@ -386,7 +381,7 @@
 
                   if(typeof project.instructorNames === "object") {
 
-                    advisor = project.instructorNames.Advisor ? {name: project.instructorNames.Advisor[0] }: null;
+                    advisor = project.instructorNames.Advisor ? {name: project.instructorNames.Advisor[0]}: null;
                     committee = project.instructorNames.Committee || [];
                   }
 
@@ -468,6 +463,9 @@
   }
 
 
+  // ============================================================= Modal =====================================================================
+
+
   document.addEventListener('DOMContentLoaded', function () {
 
       document.querySelector('tbody').addEventListener('click', function (e) {
@@ -491,7 +489,6 @@
 
   });
 
-  // ============================================================= Modal =====================================================================
 
   document.addEventListener("DOMContentLoaded", function() {
 

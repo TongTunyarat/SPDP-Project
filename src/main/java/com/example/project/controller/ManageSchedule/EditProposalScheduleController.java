@@ -32,6 +32,12 @@ public class EditProposalScheduleController {
         return "ManageSchedule/EditProposalTiming";
     }
 
+    @GetMapping("/admin/previewProposalSchedulePage")
+    public String getPreviewProposalPage() {
+
+        return "ManageSchedule/PreviewProposalSchedule";
+    }
+
     // 👀 เอารายการโปรเจคที่สามารถเเก้ไขได้หลังจากยกเลิก 👀
     @GetMapping("/admin/getProjectEditProposal")
     public ResponseEntity<List<GetAllEditProposalScheduleDTO> > getProjectEditProposal() {

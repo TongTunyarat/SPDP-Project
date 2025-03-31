@@ -1,6 +1,7 @@
 package com.example.project.controller.ManageSchedule;
 
 import com.example.project.DTO.ManageSchedule.*;
+import com.example.project.DTO.ManageSchedule.Preview.PreviewProposalDTO;
 import com.example.project.entity.Project;
 import com.example.project.entity.ProjectInstructorRole;
 import com.example.project.entity.ProposalSchedule;
@@ -134,6 +135,13 @@ public class ProposalScheduleController {
         response.put("deleteProjectByIdStatus", manageProposalScheduleService.deleteProjectAutoGen(projectId));
         return response;
     }
+
+    @GetMapping("/admin/getDataPreviewProposalSchedule")
+    @ResponseBody
+    public ResponseEntity<List<PreviewProposalDTO>> getDataPreviewSchedule() {
+        return ResponseEntity.ok(manageProposalScheduleService.getDataPreviewSchedule());
+    }
+
 
 
 //================================================================= NOT USE =======================================================

@@ -1,7 +1,6 @@
 package com.example.project.service.ManageSchedule;
 
 import com.example.project.DTO.ManageSchedule.EditSchedule.*;
-import com.example.project.DTO.ManageSchedule.ScheduleProposalResponseDTO;
 import com.example.project.entity.Project;
 import com.example.project.entity.ProjectInstructorRole;
 import com.example.project.entity.ProposalSchedule;
@@ -106,6 +105,7 @@ public class EditProposalService {
 //                        }
 //                    } else {
 //                        System.out.println("No student projects available.");
+//                        return null;
 //                    }
 
 
@@ -122,7 +122,6 @@ public class EditProposalService {
                         mapRoleNameInstruct.get(role).add(name);
 
                     }
-
 
                     return new GetAllEditProposalScheduleDTO(
                             project.getProjectId(),
@@ -222,6 +221,12 @@ public class EditProposalService {
         System.out.println("startDateTimeInput: " + startDateTimeInput);
         System.out.println("endDateTimeInput: " + endDateTimeInput);
 
+        ProposalSchedule project = proposalSchedRepository.findEditByProjectId(projectId);
+        String originalStatus = project.getStatus();
+        project.setStatus("In-Progress");
+        proposalSchedRepository.save(project);
+
+
         List<ProposalSchedule> proposalScheduleList = proposalSchedRepository.findByAllAndStatusActive();
 
         List<RoomColflictDTO> roomConflicts = proposalScheduleList.stream()
@@ -320,6 +325,11 @@ public class EditProposalService {
         boolean hasInstructorConflict = !instructorConflict.isEmpty();
 
         System.out.println("🌻 instructorConflict " + instructorConflict);
+
+        if(!roomConflicts.isEmpty() && !instructorConflict.isEmpty()) {
+            project.setStatus(originalStatus);
+            proposalSchedRepository.save(project);
+        }
 
         boolean hasErrorSaveData = false ;
         //❗️❗️❗️❗️❗️ ห้ามลบ

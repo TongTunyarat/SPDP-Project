@@ -1,6 +1,10 @@
 package com.example.project.service.ManageSchedule;
 
+import com.example.project.DTO.ManageSchedule.EditSchedule.GetAllEditProposalScheduleDTO;
+import com.example.project.DTO.ManageSchedule.EditSchedule.GetEditProposalScheduleByIdDTO;
 import com.example.project.DTO.ManageSchedule.GetProposalScheduleDTO;
+import com.example.project.DTO.ManageSchedule.Preview.PreviewProposalDTO;
+import com.example.project.DTO.ManageSchedule.Preview.StudentDataDTO;
 import com.example.project.entity.Project;
 import com.example.project.entity.ProjectInstructorRole;
 import com.example.project.entity.ProposalSchedule;
@@ -16,6 +20,8 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.TextStyle;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -234,4 +240,151 @@ public class ManageProposalScheduleService {
 
         return result;
     }
+
+    public  List<PreviewProposalDTO> getDataPreviewSchedule() {
+
+            List<Project> ProjectList = projectRepository.findAll();
+
+            int maxSemester = ProjectList.stream()
+                    .mapToInt(i -> Integer.parseInt(i.getSemester())).max().orElse(0);
+
+            System.out.println("🧸maxSemester" + maxSemester);
+
+            List<String> projectIdsWithMaxSemester = ProjectList.stream()
+                    .filter(p -> Integer.parseInt(p.getSemester()) == maxSemester)
+                    .map(Project::getProjectId)
+                    .collect(Collectors.toList());
+
+            // get project
+            List<ProposalSchedule> proposalSchedulesPreview = proposalSchedRepository.findPreviewProject(projectIdsWithMaxSemester);
+
+            for(ProposalSchedule s : proposalSchedulesPreview) {
+                System.out.println("🌻 ProjectId: " + s.getProjectId());
+                System.out.println("Remark: " + s.getRemark());
+                System.out.println("Status: " + s.getStatus());
+                System.out.println("Date: " + s.getDate());
+                System.out.println("StartTime: " + s.getStartTime());
+                System.out.println("EndTime: " + s.getEndTime());
+            }
+
+
+            List<PreviewProposalDTO> projectDTO = proposalSchedulesPreview.stream()
+                    .map(p -> {
+                        String projectId = p.getProjectId();
+//                    System.out.println("projectId: " + projectId);
+
+                        Project project = projectRepository.findByProjectId(projectId);
+//                    System.out.println("--- project: " + project);
+
+//                    project.getStudentProjects().stream()
+//                            .forEach(studentProject -> {
+//                                System.out.println("🍭Student Name: " + studentProject.getStudent());
+//                            });
+
+
+                        if (project == null) {
+                            return null;
+                        }
+
+                        List<ProjectInstructorRole> instructors = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(projectId);
+
+                        List<ProjectInstructorRole> filteredInstructors = instructors.stream()
+                                .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
+                                .collect(Collectors.toList());
+
+                        if (filteredInstructors.isEmpty()) {
+//                        System.out.println("filteredInstructors.isEmpty");
+                            return null;
+                        }
+//❗️❗️❗️❗️❗️ ห้ามลบ
+                    if (project.getStudentProjects() != null && !project.getStudentProjects().isEmpty()) {
+                        boolean hasActive = project.getStudentProjects().stream()
+                                .anyMatch(studentProject -> "Active".equalsIgnoreCase(studentProject.getStatus()));
+
+                        boolean allExited = project.getStudentProjects().stream()
+                                .allMatch(studentProject -> "Exited".equalsIgnoreCase(studentProject.getStatus()));
+
+                        if (!hasActive || allExited) {
+                            System.out.println("!hasActive || allExited");
+
+                            project.getStudentProjects().stream()
+                                    .filter(studentProject -> "Exited".equalsIgnoreCase(studentProject.getStatus()))
+                                    .forEach(studentProject -> {
+                                        System.out.println("Student Name: " + studentProject.getStudent().getStudentName());
+                                    });
+
+                            return null;
+                        }
+                        
+                    } else {
+                        System.out.println("No student projects available.");
+                        return null;
+                    }
+
+                        List<StudentDataDTO> studentsData = new ArrayList<>();
+
+                        if (project.getStudentProjects() != null && !project.getStudentProjects().isEmpty()) {
+
+                            studentsData = project.getStudentProjects().stream()
+                                    .filter(studentProject -> "Active".equalsIgnoreCase(studentProject.getStatus()))
+                                    .map(s -> new StudentDataDTO(
+                                            s.getStudent().getStudentId(),
+                                            s.getStudent().getStudentName(),
+                                            s.getStudent().getSection(),
+                                            s.getStudent().getTrack()
+                                    )).filter(Objects::nonNull)
+                                    .collect(Collectors.toList());
+                        }
+
+
+                        Map<String, List<String>> mapRoleNameInstruct = new HashMap<>();
+                        for (ProjectInstructorRole instructor : filteredInstructors) {
+
+                            String role = instructor.getRole();
+                            String name = instructor.getInstructor().getProfessorName();
+
+                            if (!mapRoleNameInstruct.containsKey(role)) {
+                                mapRoleNameInstruct.put(role, new ArrayList<>());
+                            }
+
+                            mapRoleNameInstruct.get(role).add(name);
+
+                        }
+
+                        String timeProject = "";
+                        String dateFormat = "";
+
+                        if(p.getStartTime() != null && p.getEndTime() != null && p.getDate() != null) {
+
+                            timeProject = p.getStartTime().toLocalTime() + " - " + p.getEndTime().toLocalTime();
+
+                            DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                            LocalDate startDateConvert = LocalDate.parse(p.getDate(), dateFormatter);
+                            //https://www.geeksforgeeks.org/dayofweek-getdisplayname-method-in-java-with-examples/
+                            dateFormat = startDateConvert.getDayOfWeek().getDisplayName(TextStyle.SHORT, Locale.ENGLISH) + ", " +
+                                    startDateConvert.getDayOfMonth() + " " +
+                                    startDateConvert.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH) + ". " +
+                                    startDateConvert.getYear();
+                        }
+
+                        return new PreviewProposalDTO(
+                                project.getProjectId(),
+                                project.getProjectTitle(),
+                                studentsData,
+                                project.getProgram(),
+                                project.getSemester(),
+                                mapRoleNameInstruct,
+                                dateFormat,
+                                timeProject,
+                                p.getRoom(),
+                                p.getStatus(),
+                                p.getEditedByUser()
+                        );
+                    }).filter(Objects::nonNull)
+                    .collect(Collectors.toList());
+
+            return projectDTO;
+
+    }
+
 }
