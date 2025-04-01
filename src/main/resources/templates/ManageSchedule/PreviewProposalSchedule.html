@@ -53,7 +53,7 @@
             <th class="left-align">First - Last Name</th>
             <th>Sec.</th>
             <th>Track</th>
-            <th class="left-align">Advisor and Committees</th>
+            <th class="left-align">Instructor</th>
 
           </tr>
           </thead>
@@ -97,7 +97,19 @@
 <!--                  </td>-->
 
 <!--                </tr>-->
-                </tbody>
+
+<!--<td>-->
+<!--  ${advisor-->
+<!--  ?`-->
+<!--  <div class="advisor-row"><span class="advisor-label">Adv.</span>${advisor.name}</div>-->
+<!--  `-->
+<!--  : ''}-->
+
+<!--  ${committee.map((comm, index) => `<div class="advisor-row"><span class="committee-label ${index ===0 ? '' : 'hidden-label'}">Com.</span>${comm}</div>`).join('')}-->
+
+<!--</td>-->
+
+          </tbody>
               </table>
             </div>
           </div>
@@ -272,11 +284,11 @@
                           <td>
                            ${advisor
                           ?`
-                                  <div class="advisor-row"><span class="advisor-label">Advisor</span>${advisor.name}</div>
+                                  <div class="advisor-row" style="color: #5274aa;">${advisor.name}</div>
                             `
                           : ''}
 
-                            ${committee.map((comm, index) => `<div class="advisor-row"><span class="committee-label ${index ===0 ? '' : 'hidden-label'}">Committee</span>${comm}</div>`).join('')}
+                            ${committee.map(comm => `<div class="advisor-row" style="color: #424242;">${comm}</div>`).join('')}
 
                            </td>
 

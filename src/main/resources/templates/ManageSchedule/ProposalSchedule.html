@@ -166,6 +166,33 @@
           }
         </script>
         <button class="export-block">Export</button>
+
+        <script>
+
+          document.querySelector(".export-block").addEventListener("click", function() {
+
+            let program = document.getElementById("program-text").textContent.trim();
+
+            fetch(`/admin/exportProposalSchedule?program=${encodeURIComponent(program)}`, {
+              method: "GET",
+            })
+                    .then(response => {
+                      if (response.ok) return response.blob();
+                      throw new Error("Export failed");
+                    })
+                    .then(blob => {
+                      let a = document.createElement("a");
+                      a.href = URL.createObjectURL(blob);
+                      a.download = "proposal_schedule.xlsx";
+                      document.body.appendChild(a);
+                      a.click();
+                      a.remove();
+                    })
+                    .catch(error => console.error("Error exporting schedule:", error));
+          });
+
+        </script>
+
       </div>
     </div>
 
@@ -804,18 +831,18 @@
                       // sort time
                       const sortTimeSlots =  Object.keys(timeSlots).sort((a, b) => {
 
-                        console.log("🙊 Check sort time: "+a + " AND "+ b);
+                        // console.log("🙊 Check sort time: "+a + " AND "+ b);
 
                         const [hoursA, minutesA] = a.split(' - ')[0].split(':').map(Number);
-                        console.log([hoursA, minutesA]);
+                        // console.log([hoursA, minutesA]);
                         const [hoursB, minutesB] = b.split(' - ')[0].split(':').map(Number);
-                        console.log([hoursB, minutesB]);
+                        // console.log([hoursB, minutesB]);
 
 
                         const totalMinutesA = hoursA * 60 + minutesA;
                         const totalMinutesB = hoursB * 60 + minutesB;
-                        console.log("totalMinutesA: "+ totalMinutesA);
-                        console.log("totalMinutesB: "+ totalMinutesB);
+                        // console.log("totalMinutesA: "+ totalMinutesA);
+                        // console.log("totalMinutesB: "+ totalMinutesB);
 
                         return totalMinutesA - totalMinutesB;
                       })

@@ -371,6 +371,19 @@
 
                 const tbody = document.getElementById("projectTable");
 
+                data.sort((a, b) => {
+
+                  //Note: https://docs.pexip.com/admin/regex_reference.htm
+                  // \d Matches a decimal digit character (i.e. 0-9).
+                  // + Matches 1 or more repetitions of the previous character or expression.
+                  // $ 	Matches the end of the line
+                  let idA = parseInt(a.projectId.match(/\d+$/));
+                  let idB = parseInt(b.projectId.match(/\d+$/));
+
+                  return idA - idB
+
+                })
+
                 data.forEach(project => {
 
                   const row = document.createElement("tr");

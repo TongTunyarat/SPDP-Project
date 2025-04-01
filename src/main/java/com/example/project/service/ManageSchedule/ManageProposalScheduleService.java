@@ -94,8 +94,7 @@ public class ManageProposalScheduleService {
 
     // ====================================== get project =====================================
 
-    // อย่าลืม filter เฉพาะ auto-gen รอดูตอน add ก่อน
-    // อย่าลืม filter student
+    // อย่าลืม filter student เเต่มันเป็นเเค่การ get proposal น่าจะไม่ต้องเเล้ว
     public Map<String, Map<Pair<LocalTime, LocalTime>, List<GetProposalScheduleDTO>>> getProposalSchedule(String program){
 
         List<String> projectIds = projectRepository.findByProjectIdAndProgram(program);
@@ -258,17 +257,35 @@ public class ManageProposalScheduleService {
             // get project
             List<ProposalSchedule> proposalSchedulesPreview = proposalSchedRepository.findPreviewProject(projectIdsWithMaxSemester);
 
-            for(ProposalSchedule s : proposalSchedulesPreview) {
-                System.out.println("🌻 ProjectId: " + s.getProjectId());
-                System.out.println("Remark: " + s.getRemark());
-                System.out.println("Status: " + s.getStatus());
-                System.out.println("Date: " + s.getDate());
-                System.out.println("StartTime: " + s.getStartTime());
-                System.out.println("EndTime: " + s.getEndTime());
-            }
+//            for(ProposalSchedule s : proposalSchedulesPreview) {
+//                System.out.println("🌻 ProjectId: " + s.getProjectId());
+//                System.out.println("Remark: " + s.getRemark());
+//                System.out.println("Status: " + s.getStatus());
+//                System.out.println("Date: " + s.getDate());
+//                System.out.println("StartTime: " + s.getStartTime());
+//                System.out.println("EndTime: " + s.getEndTime());
+//            }
+
+            //https://howtodoinjava.com/java/sort/stream-sort-with-null-values/?utm_source=chatgpt.com (หัวข้อ 2.2.2)
+            List<ProposalSchedule> sortedSchedules = proposalSchedulesPreview.stream()
+                    .sorted(
+                            Comparator.comparing(ProposalSchedule::getDate,
+                                    Comparator.nullsLast(Comparator.naturalOrder()))
+
+                                    .thenComparing(p -> p.getStartTime() != null ? p.getStartTime().toLocalTime() : null,
+                                            Comparator.nullsLast(Comparator.naturalOrder()))
+
+                                    .thenComparing(p -> p.getEndTime() != null ? p.getEndTime().toLocalTime() : null,
+                                            Comparator.nullsLast(Comparator.naturalOrder()))
+
+                    ).collect(Collectors.toList());
+
+                for (ProposalSchedule schedule : sortedSchedules) {
+                    System.out.println("⭐️ sortedSchedules" + schedule);
+                }
 
 
-            List<PreviewProposalDTO> projectDTO = proposalSchedulesPreview.stream()
+            List<PreviewProposalDTO> projectDTO = sortedSchedules.stream()
                     .map(p -> {
                         String projectId = p.getProjectId();
 //                    System.out.println("projectId: " + projectId);
