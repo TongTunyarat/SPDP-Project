@@ -1,11 +1,14 @@
 package com.example.project.controller.Dashboard;
 
+import com.example.project.DTO.ManageSchedule.Preview.PreviewProposalDTO;
 import com.example.project.service.DashboardCardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
 import java.util.Map;
 
 
@@ -39,11 +42,11 @@ public class DashboardController {
 
 
     // Proposal schedule
-//    @GetMapping("/instructor/defenseStatusDashboard")
-//    public  ResponseEntity<String> getProposalScheduleDashboard() {
-//        dashboardService.getProposalSchedule();
-//        return ResponseEntity.ok("OK🥰");
-//    }
+    @GetMapping("/instructor/getProposalScheduleDashboard")
+    @ResponseBody
+    public List<PreviewProposalDTO> getProposalScheduleDashboard() {
+        return dashboardService.getProposalSchedule();
+    }
 
 
 

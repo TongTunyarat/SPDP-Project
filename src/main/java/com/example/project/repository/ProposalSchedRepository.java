@@ -34,6 +34,7 @@ public interface ProposalSchedRepository extends JpaRepository<ProposalSchedule,
             "(p.remark = 'User-Add' OR (p.remark = 'Auto-generated schedule' AND p.status = 'Active'))")
     List<ProposalSchedule> findPreviewProject(@Param("projectIds") List<String> projectIds);
 
+
     @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectId AND p.remark = 'User-Add' ")
     List<ProposalSchedule> findEditProjectByProjectId(String projectId);
 

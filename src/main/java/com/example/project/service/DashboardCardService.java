@@ -1,8 +1,10 @@
 package com.example.project.service;
 
+import com.example.project.DTO.ManageSchedule.Preview.PreviewProposalDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
 import com.example.project.service.*;
+import com.example.project.service.ManageSchedule.ManageProposalScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -55,6 +57,9 @@ public class DashboardCardService {
 
     @Autowired
     private ProposalSchedRepository proposalSchedRepository;
+
+    @Autowired
+    private ManageProposalScheduleService manageProposalScheduleService;
 
     //=========================================== USE ===================================================
 
@@ -275,28 +280,20 @@ public class DashboardCardService {
         return result;
     }
 
-//    public void getProposalSchedule() {
-//
-//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-//        String username = authentication.getName();
-//        System.out.println("💌 Account username: " + username);
-//
-//        List<Project> ProjectList = projectRepository.;
-//
-//        int maxSemester = ProjectList.stream()
-//                .mapToInt(i -> Integer.parseInt(i.getSemester())).max().orElse(0);
-//
-//        System.out.println("🧸maxSemester" + maxSemester);
-//
-//        List<String> projectIdsWithMaxSemester = ProjectList.stream()
-//                .filter(p -> Integer.parseInt(p.getSemester()) == maxSemester)
-//                .map(Project::getProjectId)
-//                .collect(Collectors.toList());
-//
-//        // get project
-//        List<ProposalSchedule> proposalSchedulesPreview = proposalSchedRepository.findPreviewProject(projectIdsWithMaxSemester);
-//
-//
-//    }
+    public List<PreviewProposalDTO> getProposalSchedule() {
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        System.out.println("💌 Account username: " + username);
+
+        List<Project> projectList = projectRepository.findProjectsByUsername(username);
+
+        List<String> projectIds = projectList.stream()
+                .map(Project::getProjectId).collect(Collectors.toList());
+
+        return manageProposalScheduleService.getDataPreviewSchedule().stream()
+                .filter(p -> projectIds.contains(p.getProjectId())).collect(Collectors.toList());
+    }
+
 
 }

@@ -112,4 +112,15 @@ public class ProjectInstructorRole {
     public void setProposalEvaluations(List<ProposalEvaluation> proposalEvaluations) {
         this.proposalEvaluations = proposalEvaluations;
     }
+
+    @Override
+    public String toString() {
+        return "ProjectInstructorRole{" +
+                "instructorId='" + instructorId + '\'' +
+                ", assignDate=" + assignDate +
+                ", role='" + role + '\'' +
+                ", projectId=" + (projectIdRole != null ? projectIdRole.getProjectId() : null) +
+                ", professorId=" + (instructor != null ? instructor.getProfessorId() : null) +
+                '}';
+    }
 }

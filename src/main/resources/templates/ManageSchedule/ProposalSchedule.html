@@ -576,11 +576,25 @@
       let selectedRoom = [...selectedRooms];
       let programData = program;
 
+      let startDateTime = new Date(`${startDate}T${startTime}`)
+      let endDateTime = new Date(`${endDate}T${endTime}`)
+
       if (!startDate || !endDate || !startTime || !endTime || selectedRoom.length === 0) {
         Swal.fire({
           icon: "warning",
           title: "Oops...",
           text: "Please fill in all information.",
+          draggable: true,
+          confirmButtonColor: "#dc7633"
+        });
+        return;
+      }
+
+      if(startDateTime >= endDateTime) {
+        Swal.fire({
+          icon: "warning",
+          title: "Oops...",
+          text: "Start time must be before end time.",
           draggable: true,
           confirmButtonColor: "#dc7633"
         });

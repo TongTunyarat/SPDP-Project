@@ -238,16 +238,10 @@ public class Project {
                 ", projectDescription='" + projectDescription + '\'' +
                 ", recordedOn=" + recordedOn +
                 ", editedOn=" + editedOn +
-                ", recordedProject=" + recordedProject +
-                ", editedProject=" + editedProject +
-                ", defenseEvaluations=" + defenseEvaluations +
-                ", gradingDefenseEvaluations=" + gradingDefenseEvaluations +
-                ", projectInstructorRoles=" + projectInstructorRoles +
-                ", posterEvaluations=" + posterEvaluations +
-                ", studentProjects=" + studentProjects +
-                ", gradingProposalEvaluations=" + gradingProposalEvaluations +
-                ", proposalEvaluations=" + proposalEvaluations +
+                ", recordedBy=" + (recordedProject != null ? recordedProject.getUsername() : null) +
+                ", editedBy=" + (editedProject != null ? editedProject.getUsername() : null) +
                 '}';
     }
+
 }
 
