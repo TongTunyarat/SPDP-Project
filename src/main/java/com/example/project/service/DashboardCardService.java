@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class DashboardCardService {
@@ -48,6 +49,12 @@ public class DashboardCardService {
 
     @Autowired
     private GradingDefenseEvaluationRepository gradingDefenseEvaluationRepository;
+
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
+    private ProposalSchedRepository proposalSchedRepository;
 
     //=========================================== USE ===================================================
 
@@ -267,5 +274,29 @@ public class DashboardCardService {
 
         return result;
     }
+
+//    public void getProposalSchedule() {
+//
+//        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+//        String username = authentication.getName();
+//        System.out.println("💌 Account username: " + username);
+//
+//        List<Project> ProjectList = projectRepository.;
+//
+//        int maxSemester = ProjectList.stream()
+//                .mapToInt(i -> Integer.parseInt(i.getSemester())).max().orElse(0);
+//
+//        System.out.println("🧸maxSemester" + maxSemester);
+//
+//        List<String> projectIdsWithMaxSemester = ProjectList.stream()
+//                .filter(p -> Integer.parseInt(p.getSemester()) == maxSemester)
+//                .map(Project::getProjectId)
+//                .collect(Collectors.toList());
+//
+//        // get project
+//        List<ProposalSchedule> proposalSchedulesPreview = proposalSchedRepository.findPreviewProject(projectIdsWithMaxSemester);
+//
+//
+//    }
 
 }

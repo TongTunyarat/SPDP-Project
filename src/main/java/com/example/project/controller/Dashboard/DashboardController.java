@@ -38,6 +38,15 @@ public class DashboardController {
     }
 
 
+    // Proposal schedule
+//    @GetMapping("/instructor/defenseStatusDashboard")
+//    public  ResponseEntity<String> getProposalScheduleDashboard() {
+//        dashboardService.getProposalSchedule();
+//        return ResponseEntity.ok("OK🥰");
+//    }
+
+
+
 
     //=========================================== NOT USE ===================================================
 

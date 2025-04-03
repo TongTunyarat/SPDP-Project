@@ -5,9 +5,7 @@ import com.example.project.DTO.ManageSchedule.Preview.StudentDataDTO;
 import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.poi.ss.usermodel.CellStyle;
-import org.apache.poi.ss.usermodel.HorizontalAlignment;
-import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFFont;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
@@ -53,7 +51,7 @@ public class ExportScheduleService {
 
         // mime type มาตรฐานการสื่อสารของไฟล์เอกสาร เพื่อให้เบราว์เซอร์รู้ว่าไฟล์ที่กำลังติดต่อกับ server นั้นคือไฟล์รูปแบบใด (https://kb.hostatom.com/content/20612/)
         response.setContentType("application/octet-stream");
-        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd:hh:mm:ss");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss");
         String currentDateTime = dateFormatter.format(new Date());
 
         // ทำให้ browser download ไฟล์แทนที่จะเปิดใน browser
@@ -114,6 +112,9 @@ public class ExportScheduleService {
         } else if (value instanceof  Long) {
             cell.setCellValue((Long) value);
 
+        }else if (value instanceof  Byte) {
+                cell.setCellValue((Byte) value);
+
         } else {
             cell.setCellValue((String) value);
         }
@@ -129,6 +130,8 @@ public class ExportScheduleService {
 
         font.setFontHeight(14);
         style.setFont(font);
+        style.setAlignment(HorizontalAlignment.CENTER);
+        style.setVerticalAlignment(VerticalAlignment.CENTER);
 
         return style;
     }
@@ -138,16 +141,52 @@ public class ExportScheduleService {
         int rowCount = 2;
         CellStyle style = getFontContentExcel();
 
+        CellStyle advisorStyle = workbook.createCellStyle();
+        advisorStyle.cloneStyleFrom(style);
+
+        Font blueFont = workbook.createFont();
+        blueFont.setFontHeightInPoints((short) 14);
+        // https://www.linkedin.com/pulse/color-palette-poi-indexedcolors-aniruddha-duttachowdhury/
+        blueFont.setColor(IndexedColors.LIGHT_BLUE.getIndex());
+        advisorStyle.setFont(blueFont);
+
+
         for(PreviewProposalDTO proposalDTO : data) {
 
             List<StudentDataDTO> students = proposalDTO.getStudents();
 
-            for(int i = 0; i <students.size(); i++) {
-                StudentDataDTO student = students.get(i);
+            List<String> allInstructors = new ArrayList<>();
+            List<Boolean> isAdvisor = new ArrayList<>();
+
+            if(proposalDTO.getInstructorNames() != null) {
+                Map<String, List<String>> instructors = proposalDTO.getInstructorNames();
+
+                if(instructors.containsKey("Advisor")) {
+                    List<String> advisors = instructors.get("Advisor");
+                    for(String advisor : advisors) {
+                        allInstructors.add(advisor);
+                        isAdvisor.add(true);
+                    }
+                }
+
+                if(instructors.containsKey("Committee")) {
+                    List<String> committees = instructors.get("Committee");
+                    for(String committee : committees) {
+                        allInstructors.add(committee);
+                        isAdvisor.add(false);
+                    }
+                }
+            }
+
+            int startRow = rowCount;
+            int maxRow = Math.max(students.size(), allInstructors.size());
+
+            for(int i = 0; i < maxRow; i++) {
 
                 Row row = sheet.createRow(rowCount ++);
                 int columnCount = 0;
 
+                // คนเเรก
                 if(i == 0) {
                     createCell(row, columnCount++, proposalDTO.getDate(), style);
                     createCell(row, columnCount++, proposalDTO.getTime(), style);
@@ -158,17 +197,49 @@ public class ExportScheduleService {
 
                 } else {
 
-                    for (int j = 0; j < 6; j++) {
-                        createCell(row, columnCount++, "", style);
-                    }
+                    columnCount = 6;
                 }
 
-                createCell(row, columnCount++, student.getStudentId(), style);
-                createCell(row, columnCount++, student.getStudentName(), style);
-                createCell(row, columnCount++, String.valueOf(student.getSection()), style);
-                createCell(row, columnCount++, student.getTrack(), style);
+                // loop first st
+                if(i < students.size()) {
+
+                    StudentDataDTO student = students.get(i);
+
+                    createCell(row, columnCount++, student.getStudentId(), style);
+                    createCell(row, columnCount++, student.getStudentName(), style);
+                    createCell(row, columnCount++, student.getSection() != null ? student.getSection() : "0", style);
+                    createCell(row, columnCount++, (student.getTrack() != null && !student.getTrack().isEmpty()) ? student.getTrack() : "0", style);
+                } else {
+
+                    columnCount += 4;
+
+                }
+
+                if(i < allInstructors.size()) {
+
+                    CellStyle instructorStyle = isAdvisor.get(i) ? advisorStyle : style;
+                    createCell(row, columnCount++, allInstructors.get(i), instructorStyle);
+
+                }
 
             }
+
+            if(maxRow > 1 ){
+                // ข้อมูลโปรเจค
+                for(int col = 0; col < 6; col ++) {
+
+                    // firstRow, lastRow, firstCol, lastCol
+                    sheet.addMergedRegion(new CellRangeAddress(
+                            startRow,
+                            startRow + maxRow -1,
+                            col,
+                            col
+                    ));
+
+                }
+
+            }
+
 
         }
 

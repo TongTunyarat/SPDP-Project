@@ -173,22 +173,67 @@
 
             let program = document.getElementById("program-text").textContent.trim();
 
+            document.getElementById("modalLoaderOverlay").style.display = "flex";
+            console.log("Loader should be visible now");
+
             fetch(`/admin/exportProposalSchedule?program=${encodeURIComponent(program)}`, {
               method: "GET",
             })
                     .then(response => {
-                      if (response.ok) return response.blob();
-                      throw new Error("Export failed");
+                      if (!response.ok){
+
+                      throw new Error('Network response was not ok ' + response.statusText);
+
+                      }
+
+                      const filename = response.headers.get('content-disposition')
+                              .split('filename=')[1]
+                              // เอา " ออกจาชื่อ
+                              .replace(/"/g, '');
+
+                      // blob -> Binary Large Object
+                      return response.blob().then(blob => {
+                        return {blob, filename};
+                      });
+
                     })
-                    .then(blob => {
-                      let a = document.createElement("a");
-                      a.href = URL.createObjectURL(blob);
-                      a.download = "proposal_schedule.xlsx";
+                    .then(data => {
+
+                      // https://stackoverflow.com/questions/19327749/javascript-blob-filename-without-link
+
+                      // temp url
+                      const url = window.URL.createObjectURL(data.blob);
+
+                      // <a href="https://example.com">Website</a>
+                      const a = document.createElement("a");
+
+                      a.style.display = "none";
+                      a.href = url;
+                      a.download = data.filename;
+
                       document.body.appendChild(a);
                       a.click();
-                      a.remove();
+
+                      window.URL.revokeObjectURL(url);
+
+                      document.getElementById("modalLoaderOverlay").style.display = "none";
+
+                      Swal.fire({
+                        icon: "success",
+                        title: "Export schedule successfully.",
+                        showConfirmButton: false,
+                        timer: 2000
+                      });
                     })
-                    .catch(error => console.error("Error exporting schedule:", error));
+                    .catch(error => {
+                              console.error("Error exporting schedule:", error);
+                              Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: "Something went wrong!",
+                              });
+                            }
+                    );
           });
 
         </script>

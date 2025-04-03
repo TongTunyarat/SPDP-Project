@@ -240,6 +240,7 @@ public class ManageProposalScheduleService {
         return result;
     }
 
+    // get proposal perview schdule
     public  List<PreviewProposalDTO> getDataPreviewSchedule() {
 
             List<Project> ProjectList = projectRepository.findAll();
