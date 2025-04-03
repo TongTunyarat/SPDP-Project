@@ -341,6 +341,7 @@
 
             <!-- Schedule Present -->
             <div class="schedule-container">
+
                 <div class="schedule-title">
                     <i class="fa-solid fa-calendar"></i>
                     Schedule for Presentation
@@ -351,61 +352,63 @@
                     schedule, please contact staff.
                 </p>
 
-                <div class="schedule-item">
-                    <div class="schedule-header">
-                        <div class="schedule-header-tags">
-                            <span class="tag tag-advisor">Advisor</span>
-                            <span class="tag tag-proposal">Proposal</span>
-                            <span class="tag tag-ict">ICT</span>
-                        </div>
-                        <div class="status-btn status-btn-pending">รอการประเมิน</div>
-                    </div>
+<!--                <div class="schedule-item">-->
+<!--                    <div class="schedule-header">-->
+<!--                        <div class="schedule-header-tags">-->
+<!--                            <span class="tag tag-advisor">Advisor</span>-->
+<!--                            <span class="tag tag-proposal">Proposal</span>-->
+<!--                            <span class="tag tag-ict">ICT</span>-->
+<!--                        </div>-->
+<!--                        <div class="status-btn status-btn-pending">รอการประเมิน</div>-->
+<!--                    </div>-->
 
-                    <div class="schedule-content">
-                        <strong>ระบบ Senior Project Digital Platform</strong>
-                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>
-                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>
-                        <p><span class="schedule-room">Room: </span> Lab 1</p>
-                    </div>
-                </div>
+<!--                    <div class="schedule-content">-->
+<!--                        <strong>ระบบ Senior Project Digital Platform</strong>-->
+<!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
+<!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
+<!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
+<!--                    </div>-->
+<!--                </div>-->
 
-                <div class="schedule-item">
-                    <div class="schedule-header">
-                        <div class="schedule-header-tags">
-                            <span class="tag tag-committee">Committee</span>
-                            <span class="tag tag-proposal">Proposal</span>
-                            <span class="tag tag-dst">DST</span>
-                        </div>
-                        <div class="status-btn status-btn-pending">รอการประเมิน</div>
-                    </div>
+<!--                <div class="schedule-item">-->
+<!--                    <div class="schedule-header">-->
+<!--                        <div class="schedule-header-tags">-->
+<!--                            <span class="tag tag-committee">Committee</span>-->
+<!--                            <span class="tag tag-proposal">Proposal</span>-->
+<!--                            <span class="tag tag-dst">DST</span>-->
+<!--                        </div>-->
+<!--                        <div class="status-btn status-btn-pending">รอการประเมิน</div>-->
+<!--                    </div>-->
 
-                    <div class="schedule-content">
-                        <strong>ระบบ SPDP MANAGEMENT</strong>
-                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>
-                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>
-                        <p><span class="schedule-room">Room: </span> Lab 1</p>
-                    </div>
-                </div>
+<!--                    <div class="schedule-content">-->
+<!--                        <strong>ระบบ SPDP MANAGEMENT</strong>-->
+<!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
+<!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
+<!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
+<!--                    </div>-->
+<!--                </div>-->
 
-                <div class="schedule-item">
-                    <div class="schedule-header">
-                        <div class="schedule-header-tags">
-                            <span class="tag tag-advisor">Advisor</span>
-                            <span class="tag tag-defense">Defense</span>
-                            <span class="tag tag-dst">DST</span>
-                        </div>
-                        <div class="status-btn status-btn-in-progress">กำลังจะมาถึง</div>
-                    </div>
+<!--                <div class="schedule-item">-->
+<!--                    <div class="schedule-header">-->
+<!--                        <div class="schedule-header-tags">-->
+<!--                            <span class="tag tag-advisor">Advisor</span>-->
+<!--                            <span class="tag tag-defense">Defense</span>-->
+<!--                            <span class="tag tag-dst">DST</span>-->
+<!--                        </div>-->
+<!--                        <div class="status-btn status-btn-in-progress">กำลังจะมาถึง</div>-->
+<!--                    </div>-->
 
-                    <div class="schedule-content">
-                        <strong>ระบบ Senior Project Digital Platform</strong>
-                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>
-                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>
-                        <p><span class="schedule-room">Room: </span> Lab 1</p>
-                    </div>
-                </div>
+<!--                    <div class="schedule-content">-->
+<!--                        <strong>ระบบ Senior Project Digital Platform</strong>-->
+<!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
+<!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
+<!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
+<!--                    </div>-->
+<!--                </div>-->
 
             </div>
+
+
         </div>
     </div>
 </div>
@@ -481,6 +484,7 @@
 
     document.addEventListener('DOMContentLoaded', function () {
         fetchData();
+        getProjectProposal();
     })
 
     // ================================  display dashboard card  ==========================================
@@ -500,6 +504,89 @@
         document.querySelector('.header-container:nth-child(5) .text-footer').innerHTML = `${dashboardDefense.instructorPropoSuccessEva}  &nbsp; <span style="color: #919EAB;"> completed </span>`;
 
     }
+
+    // ================================  display schedule card  ==========================================
+
+
+    function getProjectProposal() {
+
+        fetch(`http://localhost:8080/instructor/getProposalScheduleDashboard`, {
+
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                    alert('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+
+            .then(data => {
+
+                console.log("🐍data: ", data);
+                if(data.length === 0) {
+                    console.log("No data available");
+
+                } else {
+
+                    const container = document.querySelector(".schedule-container")
+
+                    data.forEach(project => {
+
+                        let projectId = project.projectId;
+                        let cleanId = projectId.replace(/DST|ICT/g, '').trim();
+
+                        let roleTag = project.instructorNames.Advisor?.length > 0 ? "Advisor" : "Committee";
+
+                        container.innerHTML += `
+
+                            <div class="schedule-item">
+                                <div class="schedule-side">
+                                    <div class="schedule-datetime-box">
+                                        <div class="schedule-date">${project.date} </div>
+                                        <div class="schedule-time">${project.time}</div>
+                                    </div>
+
+                                    <div class="schedule-location">
+                                         <span class="schedule-room">Room: ${project.room}</span>
+                                    </div>
+                                </div>
+
+                                <div class="schedule-main">
+                                    <div class="schedule-header">
+                                        <div class="schedule-header-tags">
+                                            <span class="tag tag-${roleTag.toLowerCase()}">${roleTag}</span>
+                                            <span class="tag tag-proposal">Proposal</span>
+                                            <span class="tag tag-${project.program.toLowerCase()}">${project.program.toUpperCase()}</span>
+                                        </div>
+                                         <div class="status-btn status-btn-pending">Waiting for evaluation</div>
+                                    </div>
+
+                                    <div class="schedule-content">
+                                        <div class="schedule-title">${project.projectTitle}</div>
+                                        <span class="schedule-project-subtitle">${cleanId}</span>
+                                    </div>
+                                </div>
+                            <div>
+
+                    `
+
+                    })
+
+                }
+            })
+
+            .catch(error => {
+                console.error('Error fetching data:', error);
+
+            });
+
+    }
+
 
 </script>
 
