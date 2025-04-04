@@ -57,6 +57,15 @@ public class ProposalScheduleService {
                 .collect(Collectors.toList());
     }
 
+    public Map<String, String> getRoomWithFloor() {
+        List<Room> roomList = roomRepository.findAll();
+        return roomList.stream()
+                .collect(Collectors.toMap(
+                        Room::getRoomNumber,
+                        room -> String.valueOf(room.getFloor())
+                ));
+    }
+
     // prepare data of project in controller
     public List<ProjectWithInstructorsDTO> prepareProject(String program) {
 

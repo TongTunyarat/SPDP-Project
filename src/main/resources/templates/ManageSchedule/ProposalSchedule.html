@@ -122,13 +122,29 @@
             <div class="dropdown">
 
               <button id="selected-label" onclick="toggleDropdown()">
-                <span id="selected-text">Select Room</span>
+                <span id="selected-text">Select Room </span>
+                <i class="fa fa-caret-down"></i>
               </button>
 
               <div class="dropdown-content upward" id="dropdown-content">
-                  <input type="text" id="search" placeholder="Search" onkeyup="filterRooms()">
+
+                <div class="dropdown-header">
+                  <div id="back-button" onclick="backToFloors()">
+                    <span style="font-size: 20px">&larr;</span>
+                  </div>
+                  <h4 id="floor-title">Select Floor</h4>
+                </div>
+
+                <div id="search-container">
+                    <input type="text" id="search" placeholder="Search room" onkeyup="filterRooms()">
+                </div>
+
+                <div id="select-all-container">
                   <label><input type="checkbox" id="select-all" onclick="selectAll()"> Select All</label><br>
+                </div>
+
                   <div id="room-list"></div>
+
               </div>
             </div><br>
 
@@ -284,7 +300,7 @@
 <script>
 
     function fetchData() {
-        let url = 'http://localhost:8080/admin/roomSetting';
+        let url = 'http://localhost:8080/admin/roomFloorSetting';
 
         fetch(url)
                 .then(response => {
@@ -300,11 +316,39 @@
 
                   rooms.length = 0;
 
-                  data.forEach(function(room) {
-                    rooms.push(room);
+                  for(const key in data) {
+
+                      rooms.push({
+                        name: key,
+                        floor: data[key]
+                      });
+
+                  }
+
+                  // console.log("🐍 rooms: " + rooms);
+
+                  // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_localecompare2
+                  rooms.sort((a, b) => {
+
+                    if(a.floor !== b.floor) {
+
+                      return a.floor.localeCompare(b.floor);
+                    }
+
+                    return a.name.localeCompare(b.name);
+
                   });
 
-                  createRooms();
+                  // rooms.forEach(room => {
+                  //   console.log("Room: " + room.name + ", Floor: " + room.floor);
+                  // })
+
+                  const dropdown = document.getElementById("dropdown-content");
+                  if (dropdown.style.display === "block") {
+
+                    showFloors();
+
+                  }
 
                 })
                 .catch(error => {
@@ -434,8 +478,17 @@
 
 
     // room
-    const rooms = [];
+    const rooms = []; // Object {name, floor}
     let selectedRooms = new Set();
+    let selectedFloor = null;
+
+    function getFloors() {
+
+      const flors = new Set();
+      rooms.forEach(room => flors.add(room.floor));
+
+      return Array.from(flors).sort();
+    }
 
     function toggleDropdown() {
       let dropdown = document.getElementById("dropdown-content");
@@ -444,27 +497,137 @@
 
       dropdown.style.display = isVisible ? "none" : "block";
       console.log(`📂 Dropdown ${isVisible ? "close" : "open"}`);
+
+      if (!isVisible) {
+
+        showFloors();
+
+      }
+
+    }
+
+    function showFloors() {
+
+      let roomList = document.getElementById("room-list");
+      roomList.innerHTML = "";
+
+      // set
+      document.getElementById("search-container").style.display = "none";
+      document.getElementById("back-button").style.display = "none";
+      document.getElementById("floor-title").textContent = "Select Floor";
+      document.getElementById("select-all-container").style.display = "none";
+
+      const floors = getFloors();
+
+      console.log("🏢 แสดงรายการชั้น:", floors);
+
+      floors.forEach(floor => {
+
+        let floorItem = document.createElement("div");
+        floorItem.classList.add("floor-item");
+        floorItem.textContent = `Floor ${floor}`;
+
+        // เก็บค่า room ในเเต่ละชั้น
+        const selectedInFloor = Array.from(selectedRooms).filter(roomName => {
+
+          const roomObj = rooms.find(r => r.name === roomName);
+
+          return roomObj && roomObj.floor === floor;
+        });
+
+        if(selectedInFloor.length > 0) {
+
+          let countBadge = document.createElement("span");
+
+          countBadge.classList.add("count-badge");
+          // นับจน.
+          countBadge.textContent = selectedInFloor.length;
+          floorItem.appendChild(countBadge);
+
+        }
+
+        floorItem.onclick = function () {
+
+          selectedFloor = floor;
+          showRoomsByFloor(floor);
+
+        };
+
+        roomList.appendChild(floorItem);
+
+      });
+
+      updateSelectedCount();
+
+    }
+
+    // กรอง room เเต่ละชั้นเพื่อไป create
+    function showRoomsByFloor(floor) {
+
+      let roomList = document.getElementById("room-list");
+      roomList.innerHTML = "";
+
+      document.getElementById("search-container").style.display = "block";
+      document.getElementById("back-button").style.display = "flex";
+      document.getElementById("floor-title").textContent = `Floor ${floor}`;
+      document.getElementById("select-all-container").style.display = "block";
+      document.getElementById("dropdown-content").style.display = "block";
+
+      console.log(`🏢 แสดงห้องในชั้น ${floor}`);
+
+      const roomsInFloor = rooms.filter(room => room.floor === floor)
+              .map(room => room.name);
+
+      createRooms(roomsInFloor);
+
     }
 
     function filterRooms() {
+
+      console.log("Floor:", selectedFloor)
+
+      if(!selectedFloor) return;
+
       // change
       let searchValue = document.getElementById("search").value.toLowerCase();
       console.log(`🔎 Find: ${searchValue}`);
 
-      let filteredRooms = rooms.filter(room => room.toLowerCase().includes(searchValue));
+      let filteredRooms = rooms.filter(room => room.name.toLowerCase().includes(searchValue) && room.floor === selectedFloor)
+              .map(room => room.name);
       console.log("📋 Result:", filteredRooms);
 
       createRooms(filteredRooms); // หลังค้นหา
     }
 
-    function createRooms(filteredRooms = rooms) {
+    function createRooms(roomNames = []) {
+      document.getElementById("select-all-container").style.display = "block";
+
       let roomList = document.getElementById("room-list");
       roomList.innerHTML = ""; // clear
 
       console.log("🔄 Load new room");
-      console.log("🔍 Room:", filteredRooms);
+      console.log("🔍 Room:", roomNames);
 
-      filteredRooms.forEach(room => {
+      // if(roomNames.length === 0 && selectedFloor) {
+      //   roomNames = rooms.filter(room => room.floor === selectedFloor)
+      //           .map(room => room.name);
+      // }
+
+      if (roomNames.length === 0) {
+
+        let noResult = document.createElement("div");
+        noResult.textContent = "Room not found.";
+        noResult.style.color = "#888";
+        noResult.style.padding = "1rem";
+        roomList.appendChild(noResult);
+        updateSelectedCount();
+        document.getElementById("select-all-container").style.display = "none";
+
+        return;
+      }
+
+      roomNames.forEach(room => {
+
         let label = document.createElement("label");
         label.classList.add("room-label");
         let checkbox = document.createElement("input");
@@ -487,7 +650,7 @@
         label.appendChild(checkbox);
         label.appendChild(document.createTextNode(` ${room}`));
         roomList.appendChild(label);
-        roomList.appendChild(document.createElement("br"));
+        // roomList.appendChild(document.createElement("br"));
       });
 
       updateSelectedCount();
@@ -496,6 +659,7 @@
     function selectAll() {
       let selectAllCheckbox = document.getElementById("select-all");
       let checkboxes = document.querySelectorAll("#room-list input[type=checkbox]");
+      // keep true, false;
       let isChecked = selectAllCheckbox.checked;
 
       console.log(isChecked ? "🔘 Select all" : "⭕ Cancle all");
@@ -527,15 +691,25 @@
       console.log("📋 List room:", [...selectedRooms]);
     }
 
+    function backToFloors() {
+
+      selectedFloor = null;
+      showFloors();
+
+    }
+
+
     // close dropdown room
     document.addEventListener("click", function(event) {
 
-      if (!event.target.closest(".dropdown")) {
+      if (!event.target.closest(".dropdown") && !event.target.closest(".floor-item")) {
         document.getElementById("dropdown-content").style.display = "none";
         // console.log("📌 คลิกข้างนอก -> ปิด Dropdown");
       }
 
     });
+
+
 
     <!-- ===================================================================  Generate =================================================================== -->
 

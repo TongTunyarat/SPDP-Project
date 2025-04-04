@@ -63,6 +63,12 @@ public class ProposalScheduleController {
         return proposalScheduleService.getRoom();
     }
 
+    @GetMapping("/admin/roomFloorSetting")
+    @ResponseBody
+    public Map<String, String> getRoomFloorSetting() {
+        return proposalScheduleService.getRoomWithFloor();
+    }
+
     // check have project
     @GetMapping("/admin/checkExitsSchedule")
     @ResponseBody

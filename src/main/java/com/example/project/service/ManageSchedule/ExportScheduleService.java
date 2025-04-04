@@ -150,6 +150,10 @@ public class ExportScheduleService {
         blueFont.setColor(IndexedColors.LIGHT_BLUE.getIndex());
         advisorStyle.setFont(blueFont);
 
+        CellStyle emptyStyle = workbook.createCellStyle();
+        emptyStyle.cloneStyleFrom(style);
+        emptyStyle.setFillForegroundColor(IndexedColors.MAROON.getIndex());
+        emptyStyle.setFillPattern(FillPatternType.SOLID_FOREGROUND);
 
         for(PreviewProposalDTO proposalDTO : data) {
 
@@ -188,9 +192,9 @@ public class ExportScheduleService {
 
                 // คนเเรก
                 if(i == 0) {
-                    createCell(row, columnCount++, proposalDTO.getDate(), style);
-                    createCell(row, columnCount++, proposalDTO.getTime(), style);
-                    createCell(row, columnCount++, proposalDTO.getRoom(), style);
+                    createCell(row, columnCount++, proposalDTO.getDate(), (proposalDTO.getDate() != null && !proposalDTO.getDate().isEmpty()) ? style : emptyStyle);
+                    createCell(row, columnCount++, proposalDTO.getTime(), ( proposalDTO.getTime() != null && ! proposalDTO.getTime().isEmpty()) ? style : emptyStyle);
+                    createCell(row, columnCount++, proposalDTO.getRoom(), (proposalDTO.getRoom() != null && !proposalDTO.getRoom().isEmpty()) ? style : emptyStyle);
                     createCell(row, columnCount++, proposalDTO.getProgram(), style);
                     createCell(row, columnCount++, proposalDTO.getProjectId(), style);
                     createCell(row, columnCount++, proposalDTO.getProjectTitle(), style);

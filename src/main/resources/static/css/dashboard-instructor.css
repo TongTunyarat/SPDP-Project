@@ -347,7 +347,7 @@ label {
     font-size: 1.3rem;
     font-weight: 800;
     color: #1976d2;
-    margin-bottom: 1remx;
+    margin-bottom: 1rem;
 }
 
 
@@ -450,14 +450,34 @@ label {
     cursor: pointer;
 }
 
-.status-btn-pending {
-
-    background-color: #5bc0de;
-}
+/*.status-btn-pending {*/
+/*    background-color: #5bc0de;*/
+/*}*/
 
 .status-btn-in-progress {
     background-color: #a9a9a9;
 }
 
+.status-btn-pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
 
+.status-btn-finished {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.schedule-warning {
+    color: #dc3545;
+    font-weight: bold;
+    background-color: rgba(220, 53, 69, 0.1);
+    border-left: 3px solid #dc3545;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 4px;
+    text-align: center;
+}
 

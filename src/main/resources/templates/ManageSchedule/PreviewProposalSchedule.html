@@ -109,6 +109,8 @@
 
 <!--</td>-->
 
+<!--<td class="${!project.time? 'empty-time' : ''}" data-placeholder="Add Time">${project.time? project.time : ''}</td>-->
+
           </tbody>
               </table>
             </div>
@@ -259,7 +261,7 @@
                   row.innerHTML = `
 
                           <td class="${!project.date ? 'empty-date' : ''}">${project.date ? project.date: ''}</td>
-                          <td class="${!project.time? 'empty-time' : ''}" data-placeholder="Add Time">${project.time? project.time : ''}</td>
+                          <td class="${!project.time? 'empty-time' : ''}">${project.time? project.time : ''}</td>
                           <td class="${!project.room ? 'empty-room' : ''}">${project.room ? project.room: ''}</td>
                           <td><span class="tag ${project.program.toLowerCase()}">${project.program}</span></td>
                           <td>${cleanId}</td>

@@ -453,7 +453,7 @@
                           : ''}
                     </td>
                     <td class="${!FormattedDate? 'empty-date' : ''}">${FormattedDate ? FormattedDate: ''}</td>
-                    <td class="${!timeSlot ? 'empty-time' : ''}" data-placeholder="Add Time">${timeSlot ? timeSlot: ''}</td>
+                    <td class="${!timeSlot ? 'empty-time' : ''}">${timeSlot ? timeSlot: ''}</td>
                     <td class="${!project.room ? 'empty-room' : ''}">${project.room ? project.room: ''}</td>
                     <td>
                       <button class="edit-btn" data-id="${projectId}">Edit</button>
@@ -508,7 +508,7 @@
       window.onclick = function(event) {
       const modal = document.querySelector(".card-popup");
 
-      if (modal && !modal.contains(event.target) && !event.target.classList.contains("edit-btn") && !document.querySelector(".swal2-container")) {
+      if (modal && !modal.contains(event.target) && !event.target.classList.contains("edit-btn") && !document.querySelector(".swal2-container") && !event.target.closest(".floor-item")) {
           console.log("⛔ คลิกนอก Modal -> ปิด Modal");
           document.querySelector(".card-popup").style.display = "none";
       }
@@ -520,8 +520,9 @@
       console.log("🚀 Load Page");
       getProjectEditProposal();
   });
+
   function fetchData() {
-      let url = 'http://localhost:8080/admin/roomSetting';
+      let url = 'http://localhost:8080/admin/roomFloorSetting';
 
       fetch(url)
           .then(response => {
@@ -537,11 +538,39 @@
 
               rooms.length = 0;
 
-              data.forEach(function(room) {
-                  rooms.push(room);
+            for(const key in data) {
+
+              rooms.push({
+                name: key,
+                floor: data[key]
               });
 
-              createRooms();
+            }
+
+            // console.log("🐍 rooms: " + rooms);
+
+            // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_localecompare2
+            rooms.sort((a, b) => {
+
+              if(a.floor !== b.floor) {
+
+                return a.floor.localeCompare(b.floor);
+              }
+
+              return a.name.localeCompare(b.name);
+
+            });
+
+            // rooms.forEach(room => {
+            //   console.log("Room: " + room.name + ", Floor: " + room.floor);
+            // })
+
+            const dropdown = document.getElementById("dropdown-content");
+            if (dropdown.style.display === "block") {
+
+              showFloors();
+
+            }
 
           })
           .catch(error => {
@@ -553,27 +582,122 @@
   // room
   const rooms = [];
   let selectedRoom = ""
+  let selectedFloor = null;
 
-  function filterRooms() {
-      // change
-      let searchValue = document.getElementById("search").value.toLowerCase();
-      console.log(`🔎 Find: ${searchValue}`);
+  function getFloors() {
 
-      let filteredRooms = rooms.filter(room => room.toLowerCase().includes(searchValue));
-      console.log("📋 Result:", filteredRooms);
+    const flors = new Set();
+    rooms.forEach(room => flors.add(room.floor));
 
-      createRooms(filteredRooms); // หลังค้นหา
+    return Array.from(flors).sort();
   }
 
-  function createRooms(filteredRooms = rooms) {
+  function showFloors() {
+
+    let roomList = document.getElementById("room-list");
+    roomList.innerHTML = "";
+
+    // set
+    document.getElementById("search-container").style.display = "none";
+    document.getElementById("back-button").style.display = "none";
+    document.getElementById("floor-title").textContent = "Select Floor";
+
+    const floors = getFloors();
+
+    console.log("🏢 แสดงรายการชั้น:", floors);
+
+    floors.forEach(floor => {
+
+      let floorItem = document.createElement("div");
+      floorItem.classList.add("floor-item");
+      floorItem.textContent = `Floor ${floor}`;
+
+      // เก็บค่า room ในเเต่ละชั้น
+      const selectedInFloor = rooms.filter(r => r.name === selectedRoom && r.floor === floor);
+
+      if(selectedInFloor.length > 0) {
+
+        let countBadge = document.createElement("span");
+
+        countBadge.classList.add("count-badge");
+        // นับจน.
+        countBadge.textContent = selectedInFloor.length;
+        floorItem.appendChild(countBadge);
+
+      }
+
+      floorItem.onclick = function () {
+
+        selectedFloor = floor;
+        showRoomsByFloor(floor);
+
+      };
+
+      roomList.appendChild(floorItem);
+
+    });
+
+  }
+
+  // กรอง room เเต่ละชั้นเพื่อไป create
+  function showRoomsByFloor(floor) {
+
+    let roomList = document.getElementById("room-list");
+    roomList.innerHTML = "";
+
+    document.getElementById("search-container").style.display = "block";
+    document.getElementById("back-button").style.display = "flex";
+    document.getElementById("floor-title").textContent = `Floor ${floor}`;
+    document.getElementById("dropdown-content").style.display = "block";
+
+    console.log(`🏢 แสดงห้องในชั้น ${floor}`);
+
+    const roomsInFloor = rooms.filter(room => room.floor === floor)
+            .map(room => room.name);
+
+    createRooms(roomsInFloor);
+
+  }
+
+  function filterRooms() {
+
+    console.log("Floor:", selectedFloor)
+
+    if(!selectedFloor) return;
+
+    // change
+    let searchValue = document.getElementById("search").value.toLowerCase();
+    console.log(`🔎 Find: ${searchValue}`);
+
+    let filteredRooms = rooms.filter(room => room.name.toLowerCase().includes(searchValue) && room.floor === selectedFloor)
+            .map(room => room.name);
+    console.log("📋 Result:", filteredRooms);
+
+    createRooms(filteredRooms); // หลังค้นหา
+  }
+
+
+  function createRooms(roomNames = []) {
+
       let roomList = document.getElementById("room-list");
       let selectedText = document.getElementById("selected-text");
       roomList.innerHTML = ""; // clear
 
       console.log("🔄 Load new room");
-      console.log("🔍 Room:", filteredRooms);
+      console.log("🔍 Room:", roomNames);
 
-      filteredRooms.forEach(room => {
+    if (roomNames.length === 0) {
+
+      let noResult = document.createElement("div");
+      noResult.textContent = "Room not found.";
+      noResult.style.color = "#888";
+      noResult.style.padding = "1rem";
+      roomList.appendChild(noResult);
+
+      return;
+    }
+
+    roomNames.forEach(room => {
           let label = document.createElement("label");
           label.classList.add("room-label");
           let radio = document.createElement("input");
@@ -599,19 +723,30 @@
 
   }
 
+  function backToFloors() {
 
+    selectedFloor = null;
+    showFloors();
 
+  }
 
 
   // ============================================================= Modal Dropdorn=====================================================================
 
   function toggleDropdown() {
-      let dropdown = document.getElementById("dropdown-content");
-      let isVisible = dropdown.style.display === "block";
-      console.log(`${isVisible}`);
+    let dropdown = document.getElementById("dropdown-content");
+    let isVisible = dropdown.style.display === "block";
+    console.log(`${isVisible}`);
 
-      dropdown.style.display = isVisible ? "none" : "block";
-      console.log(`📂 Dropdown ${isVisible ? "close" : "open"}`);
+    dropdown.style.display = isVisible ? "none" : "block";
+    console.log(`📂 Dropdown ${isVisible ? "close" : "open"}`);
+
+    if (!isVisible) {
+
+      showFloors();
+
+    }
+
   }
 
 
@@ -620,7 +755,7 @@
 
       const dropdown =  document.getElementById("dropdown-content");
 
-      if (dropdown && !event.target.closest(".dropdown")) {
+      if (dropdown && !event.target.closest(".dropdown") && !event.target.closest(".floor-item")) {
           dropdown.style.display = "none";
           // console.log("📌 คลิกข้างนอก -> ปิด Dropdown");
       }
@@ -741,8 +876,19 @@
                                 </button>
 
                                 <div class="dropdown-content upward" id="dropdown-content">
-                                    <input type="text" id="search" placeholder="Search" onkeyup="filterRooms()">
-                                    <div id="room-list"></div>
+
+                                    <div class="dropdown-header">
+                                      <div id="back-button" onclick="backToFloors()">
+                                        <span style="font-size: 20px">&larr;</span>
+                                      </div>
+                                      <h4 id="floor-title">Select Floor</h4>
+                                    </div>
+
+                                     <div id="search-container">
+                                           <input type="text" id="search" placeholder="Search room" onkeyup="filterRooms()">
+                                     </div>
+
+                                      <div id="room-list"></div>
                                 </div>
                             </div>
                         </div>
@@ -769,6 +915,7 @@
   }
 
 
+  // setting
   document.addEventListener('DOMContentLoaded', function () {
 
     document.querySelector('.card-popup').addEventListener("click", function (e) {

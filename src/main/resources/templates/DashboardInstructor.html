@@ -542,20 +542,55 @@
 
                         let roleTag = project.instructorNames.Advisor?.length > 0 ? "Advisor" : "Committee";
 
-                        container.innerHTML += `
+                        const projectDate = new Date(project.date);
+                        const today = new Date();
+
+                        projectDate.setHours(0, 0, 0, 0);
+                        today.setHours(0, 0, 0, 0);
+
+                        let statusClass = "status-btn-pending";
+                        let statusText = "Waiting for evaluation";
+
+                        if(projectDate < today) {
+
+                            statusClass = "status-btn-finished";
+                            statusText = "Evaluation completed";
+
+                        }
+
+                        const dateSet = project.date ? true : false;
+                        const timeSet = project.time ? true : false;
+                        const roomSet = project.room ? true : false;
+
+                        let scheduleHTML = `
 
                             <div class="schedule-item">
                                 <div class="schedule-side">
-                                    <div class="schedule-datetime-box">
-                                        <div class="schedule-date">${project.date} </div>
-                                        <div class="schedule-time">${project.time}</div>
+                        `;
+
+                        if(!dateSet && !timeSet && !roomSet) {
+
+                            scheduleHTML += `
+                                 <div class="schedule-warning">⚠️ Awaiting reschedule of presentation</div>`;
+
+                        } else {
+
+                            scheduleHTML += `
+                                  <div class="schedule-datetime-box">
+                                        <div class="schedule-date">${project.date || ""}</div>
+                                        <div class="schedule-time">${project.time || ""}</div>
                                     </div>
 
                                     <div class="schedule-location">
-                                         <span class="schedule-room">Room: ${project.room}</span>
+                                        <span class="schedule-room">Room: ${project.room || ""}</span>
                                     </div>
-                                </div>
 
+
+                            `;
+                        }
+
+                        scheduleHTML += `
+                                </div>
                                 <div class="schedule-main">
                                     <div class="schedule-header">
                                         <div class="schedule-header-tags">
@@ -563,7 +598,7 @@
                                             <span class="tag tag-proposal">Proposal</span>
                                             <span class="tag tag-${project.program.toLowerCase()}">${project.program.toUpperCase()}</span>
                                         </div>
-                                         <div class="status-btn status-btn-pending">Waiting for evaluation</div>
+                                        <div class="status-btn ${statusClass}">${statusText}</div>
                                     </div>
 
                                     <div class="schedule-content">
@@ -571,9 +606,10 @@
                                         <span class="schedule-project-subtitle">${cleanId}</span>
                                     </div>
                                 </div>
-                            <div>
+                            </div>
 
-                    `
+                    `;
+                        container.innerHTML += scheduleHTML;
 
                     })
 
