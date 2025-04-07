@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface ProposalSchedRepository extends JpaRepository<ProposalSchedule, String> {
@@ -23,7 +24,6 @@ public interface ProposalSchedRepository extends JpaRepository<ProposalSchedule,
     @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectIds AND p.remark = 'Auto-generated schedule'")
     List<ProposalSchedule> findByProjectIds(@Param("projectIds") List<String> projectIds);
 
-
     @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectId AND p.remark = 'Auto-generated schedule' ")
     ProposalSchedule findByProjectId(String projectId);
 
@@ -34,7 +34,6 @@ public interface ProposalSchedRepository extends JpaRepository<ProposalSchedule,
             "(p.remark = 'User-Add' OR (p.remark = 'Auto-generated schedule' AND p.status = 'Active'))")
     List<ProposalSchedule> findPreviewProject(@Param("projectIds") List<String> projectIds);
 
-
     @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectId AND p.remark = 'User-Add' ")
     List<ProposalSchedule> findEditProjectByProjectId(String projectId);
 
@@ -43,5 +42,8 @@ public interface ProposalSchedRepository extends JpaRepository<ProposalSchedule,
 
     @Query("SELECT p FROM ProposalSchedule p WHERE p.status = 'Active' ")
     List<ProposalSchedule> findByAllAndStatusActive();
+
+    @Query("SELECT DISTINCT p.startTime FROM ProposalSchedule p WHERE p.projectId IN :projectIds AND p.remark = 'Auto-generated schedule' ")
+    List<LocalDateTime> findByGenerateSlotTime(@Param("projectIds") List<String> projectIds);
 
 }

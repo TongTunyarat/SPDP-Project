@@ -175,4 +175,6 @@ public class ProposalSchedule {
     public void setEditedByUser(String editedByUser) {
         this.editedByUser = editedByUser;
     }
+
+
 }

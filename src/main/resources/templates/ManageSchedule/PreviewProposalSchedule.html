@@ -258,9 +258,15 @@
                   let projectId = project.projectId;
                   let cleanId = projectId.replace(/DST|ICT/g, '').trim();
 
-                  row.innerHTML = `
+                    const dateObj = new Date(project.date);
+                    const weekday = dateObj.toLocaleDateString('en-US', {weekday: 'long'}).toLowerCase();
 
-                          <td class="${!project.date ? 'empty-date' : ''}">${project.date ? project.date: ''}</td>
+                  row.innerHTML += `
+
+                          <td class="${!project.date ? 'empty-date' : ''}"  style="position: relative;">
+                            ${project.date
+                                  ? `<div class="day-indicator ${weekday}-indicator"></div>${project.date}`: ''}
+                          </td>
                           <td class="${!project.time? 'empty-time' : ''}">${project.time? project.time : ''}</td>
                           <td class="${!project.room ? 'empty-room' : ''}">${project.room ? project.room: ''}</td>
                           <td><span class="tag ${project.program.toLowerCase()}">${project.program}</span></td>

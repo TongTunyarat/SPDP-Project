@@ -1,30 +1,28 @@
-package com.example.project.DTO.ManageSchedule;
-import java.util.*;
+package com.example.project.DTO.ManageSchedule.Defense;
 
-public class ScheduleProposalResponseDTO {
+import com.example.project.DTO.ManageSchedule.ScheduleAssignmentDTO;
+import com.example.project.DTO.ManageSchedule.TimeSlotDTO;
+
+import java.util.List;
+
+public class ScheduleDefenseResponseDTO {
 
     private String status;
     private String message;
     private List<ScheduleAssignmentDTO> scheduledAssignments;
-    private List<TimeSlotDTO> allTimeSlots;
+    private List<String> RoomName;
 
 
-    public ScheduleProposalResponseDTO(String status, String message, List<ScheduleAssignmentDTO> scheduledAssignments, List<TimeSlotDTO> allTimeSlots) {
-        this.status = status;
-        this.message = message;
-        this.scheduledAssignments = scheduledAssignments;
-        this.allTimeSlots = allTimeSlots;
-    }
-
-    public ScheduleProposalResponseDTO(String status, String message) {
+    public ScheduleDefenseResponseDTO(String status, String message) {
         this.status = status;
         this.message = message;
     }
 
-    public ScheduleProposalResponseDTO(String status, String message, List<ScheduleAssignmentDTO> scheduledAssignments) {
+    public ScheduleDefenseResponseDTO(String status, String message, List<ScheduleAssignmentDTO> scheduledAssignments, List<String> roomName) {
         this.status = status;
         this.message = message;
         this.scheduledAssignments = scheduledAssignments;
+        RoomName = roomName;
     }
 
     public String getStatus() {
@@ -51,11 +49,11 @@ public class ScheduleProposalResponseDTO {
         this.scheduledAssignments = scheduledAssignments;
     }
 
-    public List<TimeSlotDTO> getAllTimeSlots() {
-        return allTimeSlots;
+    public List<String> getRoomName() {
+        return RoomName;
     }
 
-    public void setAllTimeSlots(List<TimeSlotDTO> allTimeSlots) {
-        this.allTimeSlots = allTimeSlots;
+    public void setRoomName(List<String> roomName) {
+        RoomName = roomName;
     }
 }

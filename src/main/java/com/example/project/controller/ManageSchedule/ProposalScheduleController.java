@@ -38,7 +38,7 @@ public class ProposalScheduleController {
 
 
     @GetMapping("/admin/proposalSchedule")
-    public String defautlAdmin(Model model, HttpServletRequest request) {
+    public String manageProposalSchedule(Model model, HttpServletRequest request) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         System.out.println("Account username: " + authentication.getName());
         System.out.println("Session ID: " + RequestContextHolder.currentRequestAttributes().getSessionId());

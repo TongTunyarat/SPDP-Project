@@ -326,3 +326,33 @@ td.empty-room:hover::after {
     background-color: #FFF3F3;
 }
 
+.day-indicator {
+    width: 8.5px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.monday-indicator {
+    background-color: #FFF1BA;
+}
+
+.tuesday-indicator {
+    background-color: #FFB7B2;
+}
+
+.wednesday-indicator {
+    background-color: #C7F9CC;
+}
+
+.thursday-indicator {
+    background-color: #FFD3B6;
+}
+
+.friday-indicator {
+    background-color: #B5D0FF;
+}
+
+
+

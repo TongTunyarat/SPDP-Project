@@ -150,7 +150,7 @@ public class ProposalScheduleService {
         List<ScheduleSlotDTO> availableSlots = generateAvailableSlots(allTimeSlots, roomNumbers);
 
 
-        int requiredSlots = (int) (projectWithInstructorsDTOList.size() * 1.30);
+        int requiredSlots = (int) (projectWithInstructorsDTOList.size() * 1.20);
 
         if (availableSlots.size() < requiredSlots) {
 
@@ -183,9 +183,9 @@ public class ProposalScheduleService {
                     " | Instructors: " + assignment.getInstructorUsernames());
         }
 
-//        if (!unscheduledProjects.isEmpty()) {
-//            return new ScheduleProposalResponseDTO("error", "Some projects could not be scheduled");
-//        }
+        if (!unscheduledProjects.isEmpty()) {
+            return new ScheduleProposalResponseDTO("error", "Some projects could not be scheduled");
+        }
 
 
         System.out.println("🔖 All time slot: ");
@@ -692,7 +692,7 @@ public class ProposalScheduleService {
 //        // เก็บเวลาเเละ instructor
 //        Map<LocalDateTime, Set<String>> assignedTimeInstructor = new HashMap<>();
 //
-        List<ProjectWithInstructorsDTO> stillUnscheduledProjects = new ArrayList<>();
+//        List<ProjectWithInstructorsDTO> stillUnscheduledProjects = new ArrayList<>();
 //        List<ProjectWithInstructorsDTO> scheduledProjectsSuccess = new ArrayList<>();
 //        int roomIndex = 0;
 //
