@@ -9,8 +9,9 @@ public class ProposalEvaResponseDTO {
     private String criteriaName;
     private String type;
     private Double score;
+    private String comment;
 
-    public ProposalEvaResponseDTO(String evaId, String studentId, String studentName, String criteriaId, String criteriaName, String type, Double score) {
+    public ProposalEvaResponseDTO(String evaId, String studentId, String studentName, String criteriaId, String criteriaName, String type, Double score, String comment) {
         this.evaId = evaId;
         this.studentId = studentId;
         this.studentName = studentName;
@@ -18,6 +19,7 @@ public class ProposalEvaResponseDTO {
         this.criteriaName = criteriaName;
         this.type = type;
         this.score = score;
+        this.comment = comment;
     }
 
     public String getEvaId() {
@@ -74,5 +76,13 @@ public class ProposalEvaResponseDTO {
 
     public void setScore(Double score) {
         this.score = score;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }

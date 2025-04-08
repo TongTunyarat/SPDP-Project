@@ -713,6 +713,14 @@
                             </table>
                         </div>
 
+                        <div class="table-container">
+                            <div id="comment-box">
+                                <h2>Comment</h2>
+                                <p id="comment-text"></p>
+                            </div>
+                        </div>
+
+
                         <div style="text-align: center; margin-top: 20px;">
                            <button id="pre-instructor" style="margin-right: 10px;">Previous</button>
                            <button id="next-instructor">Next</button>
@@ -840,6 +848,8 @@
                 currentInstructor--;
                 updateModalContent(currentInstructor, instructors);
 
+                flashContent()
+
                 displayScoreModal(modal);
             }
         });
@@ -849,9 +859,26 @@
                 currentInstructor++;
                 updateModalContent(currentInstructor, instructors);
 
+                flashContent()
+
                 displayScoreModal(modal);
             }
         });
+
+        function flashContent() {
+            const modal = document.getElementById("popup-modal");
+            const textElements = modal.querySelectorAll('.table-container td, .table-container strong, .table-container span, .table-container p');
+
+            textElements.forEach(el => {
+                el.classList.add('fade-text', 'active');
+            });
+
+            setTimeout(() => {
+                textElements.forEach(el => {
+                    el.classList.remove('active');
+                });
+            }, 500); // ระยะเวลา fade ออก (ตรงกับ CSS transition)
+        }
 
     }
 
@@ -895,6 +922,13 @@
             console.log('Received score data: ', scoreData);
 
             clearExistingScore(modal);
+
+            if(scoreData.length > 0) {
+
+                const commentText = scoreData[0].comment;
+                const commentBox = modal.querySelector('#comment-text');
+                commentBox.textContent = commentText;
+            }
 
             const tableList = modal.querySelectorAll('table');
 
@@ -947,6 +981,9 @@
         cells.forEach(cell => {
             cell.textContent = '';
         })
+
+        const commentCell = modal.querySelector('#comment-text');
+        commentCell.textContent = '';
     }
 
 </script>
@@ -1048,6 +1085,9 @@
                 console.log("criteriaDefenseEva Length: " + criteriaDefenseEva.length);
                 console.log("Show Data criteriaDefenseEva: " + JSON.stringify(criteriaDefenseEva, null, 2));
 
+                projectInstructor.sort((a, b) =>
+                    a.role.localeCompare(b.role)
+                );
                 console.log("projectInstructor Length: " + projectInstructor.length);
                 console.log("Show Data projectInstructor: " + JSON.stringify(projectInstructor, null, 2));
 

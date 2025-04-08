@@ -303,8 +303,8 @@
                     <th>Role</th>
                     <th>Student ID</th>
                     <th>Student Names</th>
-                    <th>Evaluation</th>
-                    <th>Grade Evaluation</th>
+                    <th >Evaluation</th>
+                    <th style="text-align: center">Grade Evaluation</th>
                     <th>Grade</th>
                     <th>Actions</th>
                 </tr>
@@ -541,11 +541,25 @@
                 console.log("Process project: "+ project);
 
                 const row = document.createElement('tr');
-
                 // status
                 const evaluationStatus = project.allEvaluationsComplete
-                    ? `<td class="evaluation completed" title="Complete Evaluation"><i class="fa-solid fa-check"></i></td>`
-                    : `<td class="evaluation uncompleted" title="Incomplete Evaluation"><i class="fa-solid fa-spinner"></i></td>`;
+                    ? `<td>
+                        <div class="status-icon completed">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                             <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                           </svg>
+                        </div>
+                         </td>`
+
+                    : `<td>
+                        <div class="status-icon pending">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                             <circle cx="12" cy="12" r="10"></circle>
+                             <polyline points="12 6 12 12 16 14"></polyline>
+                           </svg>
+                           </div>
+                         </td>`;
 
                 let maxInstructor = project.students[0].instructorEvaluation.totalInstructors;
                 let completeEva = Math.min(...project.students.map(student => student.instructorEvaluation.completedInstructors));
