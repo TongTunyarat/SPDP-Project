@@ -58,8 +58,10 @@
                 </svg>
                 Manage Schedule
             </h4>
-            <li><a href="#">Proposal Schedule</a></li>
-            <li><a href="#">Defense Schedule</a></li>
+            <li><a href="/admin/proposalSchedule">Proposal Schedule</a></li>
+            <li><a href="/admin/editProposalSchedulePage">Edit Proposal Timing</a></li>
+            <li><a href="/admin/defenseSchedule">Defense Schedule</a></li>
+            <li><a href="#">Edit Defense Timing</a></li>
         </ul>
 
         <ul>
@@ -89,9 +91,9 @@
                     <select id="semester-selector" onchange="fetchData();"></select>
                 </div>
 
-<!--                <div class="export-btn">-->
-<!--                    <button>Export</button>-->
-<!--                </div>-->
+                <!--                <div class="export-btn">-->
+                <!--                    <button>Export</button>-->
+                <!--                </div>-->
             </div>
 
         </div>
@@ -152,7 +154,7 @@
             data.forEach(year => {
                 const option = document.createElement("option");
                 option.value = year;
-                option.textContent = "📆 "+year;
+                option.textContent = "📆 " + year;
                 semesterSelector.appendChild(option);
             });
 
@@ -191,7 +193,7 @@
 </script>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    document.addEventListener('DOMContentLoaded', function () {
         fetchAcademicYears();
 
         // Initialize with default value from select element
@@ -201,7 +203,7 @@
 
         // Tab selection event listener
         document.querySelectorAll('.tab').forEach(tab => {
-            tab.addEventListener('click', function() {
+            tab.addEventListener('click', function () {
                 document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
                 this.classList.add('active');
 
@@ -212,14 +214,14 @@
         });
 
         // Evaluation type selection event listener
-        selectElement.addEventListener('change', function() {
+        selectElement.addEventListener('change', function () {
             evaType = this.options[this.selectedIndex].getAttribute('data-eva-type');
             fetchData();
         });
 
         // Search functionality
         const searchInput = document.querySelector('.tabs input[type="text"]');
-        searchInput.addEventListener('input', function() {
+        searchInput.addEventListener('input', function () {
             const searchTerm = this.value.toLowerCase();
             filterBySearchTerm(searchTerm);
         });
@@ -757,8 +759,6 @@
 <!--        });-->
 <!--    }-->
 <!--</script>-->
-
-
 
 
 </html>
