@@ -12,6 +12,7 @@
 
     <!-- Library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 </head>
 
 <body>
@@ -89,10 +90,18 @@
             Project Details
 
             <div class="btn-header">
-                <button class="template-btn" id="download-template-btn">Template</button>
+                <button id="export-project-excel">Export Project Template </button>
+                <!--                <div class="dropdown" id="template-dropdown">-->
+                <!--                    <button class="template-btn" id="download-template-btn">Download Template</button>-->
+                <!--                    <div class="dropdown-content">-->
+                <!--                        <a href="#" id="export-student">Template Student</a>-->
+                <!--                        <a href="#" id="export-professor">Template Professor</a>-->
+                <!--                        <a href="#" id="export-project">Template Project</a>-->
+                <!--                    </div>-->
+                <!--                </div>-->
                 <input type="file" id="upload-file" accept=".csv, .xlsx, .xls" style="display: none;"/>
                 <button id="upload-btn">Upload Files</button>
-                <button class="addProject-btn">+ Add Projects</button>
+                <button class="addProject-btn"><a href="/project-add-new-project"> + Add Projects </a></button>
             </div>
 
         </div>
@@ -194,17 +203,48 @@
         <!-- Modal สำหรับการอัปโหลดไฟล์ -->
         <div id="uploadModal" class="modal-details" style="display: none;">
             <div class="modal-content">
-                <span class="close-btn" id="closeModal">&times;</span>
-                <h2>Upload File</h2>
-                <input type="file" id="fileInput" accept=".csv, .xlsx, .xls"/>
-                <div id="file-preview">
-                    <h3>File Preview:</h3>
-                    <div id="preview-content"></div>
+                <span id="closeModal" class="close-btn">&times;</span>
+
+                <h2>Upload Files</h2>
+
+                <!-- Upload Type Dropdown -->
+                <div class="form-group">
+                    <label for="uploadType">Upload Type:</label>
+                    <select id="uploadType">
+                        <option value="projectDetails">Upload Project Details</option>
+                        <option value="projectStudent">Upload Student Project</option>
+                        <option value="instructor">Upload Instructor</option>
+                    </select>
                 </div>
-                <button id="confirm-upload-btn" style="display:none;">Upload</button>
+
+                <!-- File Type Dropdown -->
+                <div class="form-group">
+                    <label for="fileType">File Type:</label>
+                    <span class="span-fileType"> * CSV Only * </span>
+                    <select id="fileType" disabled>
+                        <option value="csv">CSV</option>
+                        <!--<option value="excel">Excel</option>-->
+                    </select>
+                </div>
+
+                <!-- File Input -->
+                <div class="form-group">
+                    <label for="fileInput">Choose file:</label>
+                    <input type="file" id="fileInput" required/>
+                </div>
+
+                <!-- File Preview -->
+                <div id="preview-content"></div>
+
+                <!-- Upload Button -->
+                <button type="button" id="confirm-upload-btn" style="display:none;">Upload</button>
             </div>
         </div>
 
+
+        <div class="btn-footer">
+            <button class="deleteAll-btn">Delete ALL</button>
+        </div>
 
         <div class="pagination">
             <button class="page-btn" onclick="changePage('prev')">&lt;</button>
@@ -212,9 +252,27 @@
             <button class="page-btn" onclick="changePage('next')">&gt;</button>
         </div>
 
+        <!-- Popup สำหรับแจ้งเตือนเมื่อกด Delete ของแต่ละ Project -->
+        <div id="confirmDeletePopup" style="display: none;">
+            <div class="popup-overlay">
+                <div class="popup-content">
+                    <p id="delete-confirm-msg"></p>
+                    <button id="confirmDeleteBtn">Delete</button>
+                    <button id="cancelDeleteBtn">Cancel</button>
+                </div>
+            </div>
+        </div>
 
-        <div class="btn-footer">
-            <button class="deleteAll-btn">Delete ALL</button>
+        <!-- Popup สำหรับยืนยันการลบ Project ทั้งหมด -->
+        <div id="deleteAllPopup" style="display: none;">
+            <div class="popup-overlay">
+                <div class="popup-content">
+                    <p>Type "DELETE ALL PROJECT" to confirm deletion.</p>
+                    <input type="text" id="deleteAllInput" placeholder="Type DELETE ALL PROJECT"/>
+                    <button id="confirmDeleteAllBtn">Delete All</button>
+                    <button id="cancelDeleteAllBtn">Cancel</button>
+                </div>
+            </div>
         </div>
 
 
@@ -300,12 +358,10 @@
             // กรอง professorList เพื่อให้แสดงเฉพาะ "Advisor"
             const advisor = project.professorList.find(professor => professor.role === "Advisor");
             const professorName = advisor ? advisor.professorName : "N/A"; // ถ้าไม่มี "Advisor" ให้แสดง "N/A"
-            console.log(professorName); // แสดง professorName ที่กรองแล้ว
 
             // กรอง professorList เพื่อให้แสดงเฉพาะ "Co-Advisor"
             const coadvisor = project.professorList.find(professor => professor.role === "Co-Advisor");
-            const coAdvisorName = coadvisor ? coadvisor.professorName : "N/A"; // ถ้าไม่มี "Advisor" ให้แสดง "N/A"
-            console.log(professorName); // แสดง professorName ที่กรองแล้ว
+            const coAdvisorName = coadvisor ? coadvisor.professorName : " ";
 
             row.innerHTML = `
             <td><span class="tag ${projectProgram}">${project.program || "N/A"}</span> ${project.projectId}</td>
@@ -322,17 +378,20 @@
                 <ul>
                     ${Array.isArray(project.studentList) ? project.studentList.map(student => `<li>${student.studentName}</li>`).join('') : 'ไม่มีนักศึกษา'}
                 </ul>
+            </td> <td>
+                <form action="/admin/editProjectDetails" method="get">
+                    <input type="hidden" name="projectId" value="${project.projectId}">
+                    <button type="submit" class="edit-btn"><span class="material-icons">edit</span></button>
+                </form>
+
+                <form id="deleteForm-${project.projectId}" action="" method="get" onsubmit="return confirmDelete(event, '${project.projectId}')">
+                    <input type="hidden" name="projectId" value="${project.projectId}">
+                    <button type="submit" class="delete-btn">
+                        <span class="material-icons">delete</span>
+                    </button>
+                </form>
             </td>
-            <td>
-           <form action="" method="get">
-                        <input type="hidden" name="projectId" value="${project.projectId}">
-                        <button type="submit"><span class="material-icons">Edit</span></button>
-                    </form>
-            <form action="" method="get">
-                        <input type="hidden" name="projectId" value="${project.projectId}">
-                        <button type="submit"><span class="material-icons">Delete</span></button>
-                    </form>
-            </td>
+
             `;
             tableBody.appendChild(row);
         });
@@ -385,44 +444,19 @@
         paginationContainer.appendChild(nextButton);
     }
 
-
-    // -------------------- Export Template -------------------- //
-    // ฟังก์ชันดาวน์โหลด Template
-    function downloadTemplate() {
-        console.log("Download Template button clicked");
-
-        // สร้างเนื้อหาของไฟล์ CSV เปล่า
-        let csvContent = "\uFEFF"; // เพิ่ม BOM สำหรับรองรับภาษาไทย
-        csvContent += "Project ID,Advisor,Co-Advisor,Program,Project Name,Project Description,Student Id,Student Name\n";
-
-        // สร้างไฟล์ CSV และดาวน์โหลด
-        const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.setAttribute("download", "template.csv");
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-    }
-
-    // เพิ่ม Event Listener ให้กับปุ่ม Download Template
-    document.getElementById("download-template-btn").addEventListener("click", downloadTemplate);
-
-
-
     // -------------------- Upload Files -------------------- //
     // เปิด Modal เมื่อกดปุ่ม Upload Files
     document.getElementById('upload-btn').addEventListener('click', function () {
         document.getElementById('uploadModal').style.display = 'block';
     });
 
-    // ปิด Modal เมื่อคลิกที่ปุ่มปิด
+    // ปิด Modal เมื่อกดปุ่ม close
     document.getElementById('closeModal').addEventListener('click', function () {
         document.getElementById('uploadModal').style.display = 'none';
         window.location.reload();
     });
 
-    // ฟังก์ชันอ่านไฟล์ที่เลือก
+    // ฟังก์ชันอ่านไฟล์ที่เลือกและแปลงข้อมูล
     document.getElementById('fileInput').addEventListener('change', function (event) {
         const file = event.target.files[0];
         if (file) {
@@ -432,9 +466,12 @@
                 let fileContent = e.target.result;
                 fileContent = removeBOM(fileContent); // ลบ BOM (ถ้ามี)
 
-                if (file.type === "text/csv") {
+                if (file.type === "text/csv" || file.name.endsWith(".csv")) {
                     const jsonData = csvToJson(fileContent);
-                    validateAndShowPreview(jsonData);
+                    validateAndShowPreview(jsonData);  // แสดง Preview
+                } else if (file.name.endsWith(".xlsx")) {
+                    // ถ้าไฟล์ Excel
+                    handleExcelFile(fileContent);
                 }
             };
 
@@ -442,76 +479,312 @@
         }
     });
 
-    // แปลง CSV เป็น JSON
+    // ฟังก์ชันแปลง CSV เป็น JSON
     function csvToJson(csv) {
         const lines = csv.split("\n");
         const result = [];
         const headers = lines[0].split(",");
 
-        for (let i = 1; i < lines.length; i++) {
-            const obj = {};
+        let currentProject = null;  // ตัวแปรเก็บข้อมูลโครงการปัจจุบัน
+
+        for (let i = 7; i < lines.length; i++) {  // เริ่มจากบรรทัดที่ 8 (ดัชนี 7)
             const currentLine = lines[i].split(",");
 
-            for (let j = 0; j < headers.length; j++) {
-                obj[headers[j].trim()] = currentLine[j] ? currentLine[j].trim() : "";
+            // ถ้าบรรทัดนี้ไม่มีข้อมูล เราข้ามไป
+            if (currentLine.length < headers.length) {
+                continue;
             }
-            result.push(obj);
+
+            const projectId = currentLine[0].trim();  // Project ID
+            const projectTitle = currentLine[1].trim();  // Project Title
+            const projectDescription = currentLine[2].trim();  // Project Description
+            const advisor = currentLine[10].trim();  // Advisor
+            const coAdvisor = currentLine[11].trim();  // Co-Advisor
+            const committee = currentLine[12].trim();  // Committee
+            const posterCommittee = currentLine[13].trim();  // Poster Committee
+
+            // ถ้ามี projectId (หมายความว่าเป็นข้อมูลที่เกี่ยวข้องกับโครงการ)
+            if (projectId) {
+                // สร้างโครงการใหม่หากยังไม่มีข้อมูลโครงการ
+                currentProject = {
+                    projectId: projectId,
+                    projectTitle: projectTitle,
+                    projectDescription: projectDescription,
+                    program: currentLine[5].trim(),  // Program
+                    professorList: [],
+                    studentList: [],
+                };
+
+                result.push(currentProject);  // เพิ่มโครงการใน result
+            }
+
+            // จัดการข้อมูลอาจารย์
+            if (advisor) {
+                currentProject.professorList.push({professorName: advisor, role: "Advisor"});
+            }
+            if (coAdvisor) {
+                currentProject.professorList.push({professorName: coAdvisor, role: "Co-Advisor"});
+            }
+            if (committee) {
+                currentProject.professorList.push({professorName: committee, role: "Committee"});
+            }
+            if (posterCommittee) {
+                currentProject.professorList.push({professorName: posterCommittee, role: "Poster-Committee"});
+            }
+
+            // จัดการข้อมูลนักศึกษา
+            const studentId = currentLine[3].trim();  // Student ID
+            const studentName = currentLine[4].trim();  // Student Name
+            const section = currentLine[6].trim();  // Section
+            const track = currentLine[7].trim();  // Track
+
+            if (studentId && studentName) {
+                currentProject.studentList.push({
+                    studentId: studentId,
+                    studentName: studentName,
+                    section: section,
+                    track: track,
+                    status: "Active",  // กำหนด status เป็น Active
+                });
+            }
         }
 
         return result;
     }
 
-    // ตรวจสอบข้อมูลก่อนอัปโหลด
-    function validateAndShowPreview(jsonData) {
-        console.log("📌 JSON Data for Preview:", jsonData); // ✅ Debug JSON
+    // ตัวแปรเก็บข้อมูลที่ได้จากไฟล์
+    let uploadedData = null;
 
+
+    // ฟังก์ชันตรวจสอบข้อมูลก่อนอัปโหลดและแสดงผลลัพธ์ใน Preview
+    function validateAndShowPreview(jsonData) {
+        // เก็บข้อมูลไฟล์ที่แปลงแล้ว
+        uploadedData = jsonData;
+
+        const uploadType = document.getElementById('uploadType').value;
         const previewContent = document.getElementById('preview-content');
         previewContent.innerHTML = ''; // เคลียร์ข้อมูลเก่า
 
+        console.log("Validating data:", jsonData);  // พิมพ์ข้อมูลที่กำลังตรวจสอบ
+
+        // เช็คว่ามีข้อมูลหรือไม่
+        if (!jsonData || jsonData.length === 0) {
+            previewContent.innerHTML = "<p>No data available to preview.</p>";
+            return;
+        }
+
+        // รีเฟรชการแสดงผลตามประเภทที่เลือก
+        switch (uploadType) {
+            case 'projectDetails':
+                displayProjectDetailsPreview(jsonData);
+                break;
+            case 'projectStudent':
+                displayStudentProjectPreview(jsonData);
+                break;
+            case 'instructor':
+                displayInstructorPreview(jsonData);
+                break;
+            default:
+                previewContent.innerHTML = "<p>No valid preview available.</p>";
+        }
+    }
+
+    // ฟังก์ชันสำหรับแสดงพรีวิวของ Project Details
+    function displayProjectDetailsPreview(jsonData) {
+        const previewContent = document.getElementById('preview-content');
         const table = document.createElement('table');
         table.classList.add('preview-table');
-
         const headerRow = document.createElement('tr');
         headerRow.innerHTML = `
+        <th>Project ID</th>
+        <th>Project Name</th>
+        <th>Project Description</th>
+        <th>Professor</th>
+        <th>Co-Advisor</th>
         <th>Student ID</th>
         <th>Student Name</th>
-        <th>Project Title</th>
-        <th>Status</th>
     `;
         table.appendChild(headerRow);
 
-        jsonData.forEach(item => {
-            if (Array.isArray(item.studentsList) && item.studentsList.length > 0) {
-                item.studentsList.forEach(student => {
-                    const row = document.createElement('tr');
-                    const studentId = student["Student ID"];
-                    const studentName = student["Student Name"];
-                    const status = studentId ? "✅ Valid" : "❌ Missing Student ID";
+        // รวบรวมข้อมูลที่มี projectId เดียวกัน
+        jsonData.forEach(project => {
+            const row = document.createElement('tr');
 
-                    row.innerHTML = `
-                    <td>${studentId || "-"}</td>
-                    <td>${studentName || "-"}</td>
-                    <td>${item["Project Title"] || "-"}</td>
-                    <td>${status}</td>
-                `;
+            // กำหนดค่า Advisor
+            const professorName = project.professorList?.find(prof => prof.role === "Advisor")?.professorName || " ";
+            const coAdvisorName = project.professorList?.find(prof => prof.role === "Co-Advisor")?.professorName || " ";
 
-                    table.appendChild(row);
-                });
-            } else {
-                console.warn("⚠️ No students found for project:", item["Project ID"]);
-            }
+            // สร้างแถวของข้อมูล Project
+            row.innerHTML = `
+            <td><span class="tag ${project.program}">${project.program || "N/A"}</span> ${project.projectId}</td>
+            <td>${project.projectTitle || "N/A"}</td>
+            <td>${project.projectDescription || "N/A"}</td>
+            <td>${professorName}</td>
+            <td>${coAdvisorName}</td>
+            <td>
+                <ul>
+                    ${Array.isArray(project.studentList) ? project.studentList.map(student => `<li>${student.studentId}</li>`).join('') : 'ไม่มีนักศึกษา'}
+                </ul>
+            </td>
+            <td>
+                <ul>
+                    ${Array.isArray(project.studentList) ? project.studentList.map(student => `<li>${student.studentName}</li>`).join('') : 'ไม่มีนักศึกษา'}
+                </ul>
+            </td>
+        `;
+
+            table.appendChild(row);
         });
 
         previewContent.appendChild(table);
-
-        // แสดงปุ่ม Upload ถ้ามีข้อมูล
-        document.getElementById('confirm-upload-btn').style.display = jsonData.length > 0 ? 'inline-block' : 'none';
     }
+
+    // ฟังก์ชันสำหรับแสดงพรีวิวของ Student Project
+    function displayStudentProjectPreview(jsonData) {
+        const previewContent = document.getElementById('preview-content');
+        const table = document.createElement('table');
+        table.classList.add('preview-table');
+        const headerRow = document.createElement('tr');
+        headerRow.innerHTML = `
+        <th>Project ID</th>
+        <th>Student ID</th>
+        <th>Student Name</th>
+        <th>Track</th>
+    `;
+        table.appendChild(headerRow);
+
+        // รวบรวมข้อมูลที่มี projectId เดียวกัน
+        jsonData.forEach(project => {
+            // สำหรับแต่ละ project ให้แยกแถวของ projectId
+            project.studentList.forEach((student, index) => {
+                const row = document.createElement('tr');
+
+                // ถ้าเป็นแถวแรกให้แสดง projectId แล้วในแถวถัดไปแค่แสดงข้อมูล student ที่เกี่ยวข้อง
+                if (index === 0) {
+                    row.innerHTML = `
+                    <td rowspan="${project.studentList.length}">${project.projectId}</td>
+                    <td>${student.studentId}</td>
+                    <td>${student.studentName}</td>
+                    <td>${student.track || "N/A"}</td>
+                `;
+                } else {
+                    row.innerHTML = `
+                    <td>${student.studentId}</td>
+                    <td>${student.studentName}</td>
+                    <td>${student.track || "N/A"}</td>
+                `;
+                }
+                table.appendChild(row);
+            });
+        });
+
+        previewContent.appendChild(table);
+    }
+
+
+    // ฟังก์ชันสำหรับแสดงพรีวิวของ Instructor
+    function displayInstructorPreview(jsonData) {
+        const previewContent = document.getElementById('preview-content');
+        const table = document.createElement('table');
+        table.classList.add('preview-table');
+        const headerRow = document.createElement('tr');
+        headerRow.innerHTML = `
+        <th>Project ID</th>
+        <th>Instructor Name</th>
+        <th>Role</th>
+    `;
+        table.appendChild(headerRow);
+
+        // รวบรวมข้อมูลที่มี projectId เดียวกัน
+        jsonData.forEach(project => {
+            // สำหรับแต่ละ project ให้แยกแถวของ projectId
+            project.professorList.forEach((instructor, index) => {
+                const row = document.createElement('tr');
+
+                // ถ้าเป็นแถวแรกให้แสดง projectId แล้วในแถวถัดไปแค่แสดงข้อมูล instructor ที่เกี่ยวข้อง
+                if (index === 0) {
+                    row.innerHTML = `
+                    <td rowspan="${project.professorList.length}">${project.projectId}</td>
+                    <td>${instructor.professorName}</td>
+                    <td>${instructor.role}</td>
+                `;
+                } else {
+                    row.innerHTML = `
+                    <td>${instructor.professorName}</td>
+                    <td>${instructor.role}</td>
+                `;
+                }
+                table.appendChild(row);
+            });
+        });
+
+        previewContent.appendChild(table);
+    }
+
+    // เมื่อเลือกไฟล์
+    document.getElementById('fileInput').addEventListener('change', function (event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+
+            reader.onload = function (e) {
+                let fileContent = e.target.result;
+                fileContent = removeBOM(fileContent); // ลบ BOM (ถ้ามี)
+
+                if (file.type === "text/csv" || file.name.endsWith(".csv")) {
+                    const jsonData = csvToJson(fileContent);
+                    validateAndShowPreview(jsonData);  // แสดง Preview
+                } else if (file.name.endsWith(".xlsx")) {
+                    // ถ้าไฟล์ Excel
+                    handleExcelFile(fileContent);
+                }
+
+                // แสดงปุ่ม Upload เมื่อไฟล์ถูกเลือก
+                document.getElementById('confirm-upload-btn').style.display = 'inline-block';  // แสดงปุ่ม Upload
+            };
+
+            reader.readAsText(file, "UTF-8");
+        }
+    });
+
+    // เมื่อเลือกประเภทการอัปโหลดจาก dropdown
+    document.getElementById('uploadType').addEventListener('change', function () {
+        const selectedUploadType = this.value;
+        console.log("Upload Type selected:", selectedUploadType);
+
+        // เมื่อเลือก upload type ใหม่, รีเฟรชการแสดงผลของข้อมูล preview
+        const previewContent = document.getElementById('preview-content');
+        previewContent.innerHTML = '';  // เคลียร์ข้อมูลใน preview
+
+        // รีเฟรชการแสดงผลตามประเภทที่เลือก
+        switch (selectedUploadType) {
+            case 'projectDetails':
+                if (uploadedData) {
+                    displayProjectDetailsPreview(uploadedData);
+                }
+                break;
+            case 'projectStudent':
+                if (uploadedData) {
+                    displayStudentProjectPreview(uploadedData);
+                }
+                break;
+            case 'instructor':
+                if (uploadedData) {
+                    displayInstructorPreview(uploadedData);
+                }
+                break;
+            default:
+                previewContent.innerHTML = "<p>No valid preview available.</p>";
+        }
+    });
 
 
     // ฟังก์ชัน Upload ข้อมูลไปยังเซิร์ฟเวอร์
     document.getElementById('confirm-upload-btn').addEventListener('click', function () {
         const file = document.getElementById('fileInput').files[0];
+        const uploadType = document.getElementById('uploadType').value;  // รับค่า Upload Type จาก dropdown
+        const fileType = document.getElementById('fileType').value;  // รับค่า File Type จาก dropdown
+
         if (!file) {
             alert("Please select a file first!");
             return;
@@ -519,8 +792,10 @@
 
         const formData = new FormData();
         formData.append("file", file);
+        formData.append("uploadType", uploadType);  // ส่งประเภทการอัปโหลดไปด้วย
+        formData.append("fileType", fileType);  // ส่งประเภทไฟล์ไปด้วย
 
-        console.log("📌 Sending file to server:", file.name); // ✅ Debug ก่อนส่งไฟล์
+        console.log("📌 Sending file to server:", file.name);
 
         fetch("http://localhost:8080/admin/uploadFiles", {
             method: "POST",
@@ -528,10 +803,9 @@
         })
             .then(response => response.json())
             .then(data => {
-                console.log("📌 Server Response:", data);
-
                 if (data.message === "File processed successfully") {
                     alert("Upload successful!");
+                    location.reload();
                 } else {
                     alert("Upload failed: " + (data.errors ? data.errors.join(", ") : "Unknown error"));
                 }
@@ -548,5 +822,209 @@
     }
 
 
+    // -------------------- Delete Project -------------------- //
+    // ฟังก์ชันยืนยันการลบ
+    function confirmDelete(event, projectId) {
+        event.preventDefault(); // หยุดการส่งฟอร์ม
+
+        // แสดงข้อความใน popup ด้วย projectId
+        const popup = document.getElementById('confirmDeletePopup');
+        const deleteConfirmMsg = document.getElementById('delete-confirm-msg');
+        deleteConfirmMsg.innerHTML = `Do you want to delete project\n Project ID: ${projectId}?`;
+
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        const cancelBtn = document.getElementById('cancelDeleteBtn');
+
+        // ทำให้ Popup แสดง
+        popup.style.display = 'block';
+
+        // เมื่อกดยืนยันให้ลบโปรเจกต์
+        confirmBtn.onclick = function () {
+            deleteProject(projectId);  // ส่งคำขอลบโปรเจกต์ไปที่ backend
+            popup.style.display = 'none'; // ซ่อน Popup
+        };
+
+        // เมื่อกดยกเลิก
+        cancelBtn.onclick = function () {
+            popup.style.display = 'none'; // ซ่อน Popup
+        };
+
+        return false;  // หยุดการส่งฟอร์ม
+    }
+
+    // ฟังก์ชันลบโปรเจกต์
+    function deleteProject(projectId) {
+        fetch(`http://localhost:8080/admin/deleteProject/${encodeURIComponent(projectId)}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('Delete Success!');  // แจ้งเตือนเมื่อการลบโปรเจกต์สำเร็จ
+                    location.reload();  // รีเฟรชหน้าใหม่เพื่ออัปเดตข้อมูล
+                } else {
+                    alert('เกิดข้อผิดพลาดในการลบโปรเจกต์');
+                }
+            })
+            .catch(error => {
+                alert('เกิดข้อผิดพลาดในการเชื่อมต่อ');
+            });
+    }
+
+
+    // -------------------- Delete ALL Project -------------------- //
+    // เมื่อกดปุ่ม "Delete All"
+    document.querySelector('.deleteAll-btn').addEventListener('click', function () {
+        // แสดง pop-up ยืนยันการลบ
+        const popup = document.getElementById('deleteAllPopup');
+        popup.style.display = 'block';
+    });
+
+    // เมื่อกดยืนยันการลบทั้งหมด
+    document.getElementById('confirmDeleteAllBtn').addEventListener('click', function () {
+        const userInput = document.getElementById('deleteAllInput').value;
+
+        // ตรวจสอบว่าผู้ใช้พิมพ์ "DELETE ALL PROJECT"
+        if (userInput === "DELETE ALL PROJECT") {
+            // เรียกฟังก์ชันลบโปรเจกต์ทั้งหมด
+            deleteAllProjects();
+            document.getElementById('deleteAllPopup').style.display = 'none'; // ซ่อน pop-up
+        } else {
+            alert('Please type "DELETE ALL PROJECT" to confirm');
+        }
+    });
+
+    // เมื่อกดปุ่ม Cancel
+    document.getElementById('cancelDeleteAllBtn').addEventListener('click', function () {
+        document.getElementById('deleteAllPopup').style.display = 'none'; // ซ่อน pop-up
+    });
+
+    // ฟังก์ชันลบโปรเจกต์ทั้งหมด
+    function deleteAllProjects() {
+        fetch('http://localhost:8080/admin/deleteAllProjects', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (response.ok) {
+                    alert('All projects deleted successfully.');
+                    location.reload();  // รีเฟรชหน้าใหม่
+                } else {
+                    alert('Error deleting all projects.');
+                }
+            })
+            .catch(error => {
+                alert('Connection error while deleting projects.');
+            });
+    }
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
+
+<script>
+
+    // -------------------- Export Template -------------------- //
+    // ฟังก์ชันสำหรับ Export Project Template แบบ Excel (รองรับการ merge cells)
+    function exportExcel() {
+        const data = [
+            ["Senior Project 2024: Advisor and Member Sign up sheet", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["Please find an advisor before June 30, 2024", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["Link to view advisor profile ", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["https://docs.google.com/presentation/d/1ZSTVEGbVxQWv4Iwm_YjGeuSOXbBbUnf21tdpeUr0Ivk/edit?fbclid=IwAR10E-OcoQ6euV1cwN3YLiD0mUSDnR87uyy6CPPNjnf2pKfotQn78kdaSiQ#slide=id.g111612b1a81_0_844", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["Project ID", "Project Title", "Project Description", "Student ID", "Student Name", "Program", "Section", "Track", "Advisor", "Co-advisor", "Committee", "Poster Committee"],
+            ["XXX SP20XX-XX", "XXXXX", "XXXXXX", "6487XXX", "MR. XXX XXX", "XX", "XX", "XX", "Aj. XXXX", "Aj. XXXX", "Aj. XXXX", "Aj. XXXX"]
+            // Add more rows as needed
+        ];
+
+        const wb = XLSX.utils.book_new();
+        const ws = XLSX.utils.aoa_to_sheet(data);
+
+        // Set column widths
+        ws['!cols'] = [
+            {wch: 15},   // A - Project ID
+            {wch: 25},   // B - Project Title
+            {wch: 30},   // C - Project Description
+            {wch: 15},   // D - Student ID
+            {wch: 25},   // E - Student Name
+            {wch: 10},   // F - Program
+            {wch: 8},    // G - Section
+            {wch: 10},   // H - Track
+            {wch: 20},   // I - Advisor
+            {wch: 20},   // J - Co-advisor
+            {wch: 20},   // K - Committee
+            {wch: 20},   // L - Poster Committee
+        ];
+
+        // Merge cells for headers
+        const merges = [
+            {s: {r: 0, c: 0}, e: {r: 0, c: 15}}, // Header row
+            {s: {r: 1, c: 0}, e: {r: 1, c: 15}}, // Sub-header row
+            {s: {r: 2, c: 0}, e: {r: 2, c: 15}}, // Link row
+            {s: {r: 3, c: 0}, e: {r: 3, c: 15}}, // URL row
+        ];
+
+        // Apply merges to the sheet
+        ws["!merges"] = merges;
+
+        // Define header style with color (green)
+        const headerStyle = {
+            font: {bold: true, color: {rgb: "FFFFFF"}},
+            alignment: {horizontal: "center", vertical: "center"},
+            fill: {fgColor: {rgb: "4CAF50"}}, // Green background color
+        };
+
+        // Apply style to header row
+        const headerRow = 4;
+        for (let col = 0; col < 12; col++) {
+            const cellRef = XLSX.utils.encode_cell({r: headerRow, c: col});
+            if (!ws[cellRef].s) ws[cellRef].s = {};
+            Object.assign(ws[cellRef].s, headerStyle);
+        }
+
+        // Define style for data rows (light green background for readability)
+        const dataRowStyle = {
+            fill: {fgColor: {rgb: "C8E6C9"}}, // Light green background
+        };
+
+        // Apply style to data rows
+        for (let row = 5; row < data.length; row++) {
+            for (let col = 0; col < 12; col++) {
+                const cellRef = XLSX.utils.encode_cell({r: row, c: col});
+                if (!ws[cellRef].s) ws[cellRef].s = {};
+                Object.assign(ws[cellRef].s, dataRowStyle);
+            }
+        }
+
+        // Add the data sheet to the workbook
+        XLSX.utils.book_append_sheet(wb, ws, "Project List");
+
+        // Export the Excel file
+        XLSX.writeFile(wb, "2024_ICT_SP_Project_List.xlsx");
+
+        console.log("Excel file exported successfully.");
+    }
+
+    // Add event listener for Export button
+    document.getElementById("export-project-excel").addEventListener("click", () => {
+        exportExcel();
+    });
+
+
+    // // เพิ่ม event listener สำหรับปุ่มที่คุณต้องการให้ดาวน์โหลดไฟล์
+    // document.getElementById("export-project-excel").addEventListener("click", function() {
+    //     // กำหนดเส้นทางที่ถูกต้องของไฟล์ในโปรเจกต์
+    //     const fileUrl = '/static/css/TemplateProject.xlsx'; // Path ของไฟล์ Template
+    //
+    //     // สร้างลิงก์ดาวน์โหลด
+    //     const link = document.createElement('a');
+    //     link.href = fileUrl;
+    //     link.download = 'TemplateProject.xlsx'; // กำหนดชื่อไฟล์ที่จะดาวน์โหลด
+    //     link.click(); // เริ่มดาวน์โหลดไฟล์
+    // });
 
 </script>
