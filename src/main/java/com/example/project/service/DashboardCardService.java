@@ -48,13 +48,12 @@ public class DashboardCardService {
 
     @Autowired
     private GradingDefenseEvaluationRepository gradingDefenseEvaluationRepository;
-    @Autowired
-    private ProjectRepository projectRepository;
-    @Autowired
-    private StudentProjectRepository studentProjectRepository;
 
     @Autowired
     private ProjectRepository projectRepository;
+
+    @Autowired
+    private StudentProjectRepository studentProjectRepository;
 
     @Autowired
     private ProposalSchedRepository proposalSchedRepository;

@@ -56,8 +56,8 @@ public class SecurityConfig {
                                     .map(GrantedAuthority::getAuthority)
                                     .collect(Collectors.toSet());
                             if(roles.contains("ROLE_ADMIN")){
-//                                response.sendRedirect("/admin-dashboard");
-                                  response.sendRedirect("/admin/editProposalSchedulePage");
+                                response.sendRedirect("/admin-dashboard");
+//                                  response.sendRedirect("/admin/editProposalSchedulePage");
                             } else if (roles.contains("ROLE_INSTRUCTOR")) {
                                 response.sendRedirect("/instructor/view");
                             }
