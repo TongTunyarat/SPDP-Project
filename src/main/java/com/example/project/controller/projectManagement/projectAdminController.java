@@ -208,6 +208,7 @@ public class projectAdminController {
         }
     }
 
+
     @DeleteMapping("/deleteStudentFromProject")
     public ResponseEntity<Map<String, String>> deleteStudentFromProject(
             @RequestParam String projectId, @RequestParam String studentId) {
