@@ -1,14 +1,17 @@
 package com.example.project.service;
 
+import com.example.project.DTO.ManageSchedule.Preview.PreviewProposalDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
 import com.example.project.service.*;
+import com.example.project.service.ManageSchedule.ManageProposalScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class DashboardCardService {
@@ -49,6 +52,18 @@ public class DashboardCardService {
     private ProjectRepository projectRepository;
     @Autowired
     private StudentProjectRepository studentProjectRepository;
+
+    @Autowired
+    private ProjectRepository projectRepository;
+
+    @Autowired
+    private ProposalSchedRepository proposalSchedRepository;
+
+    @Autowired
+    private ManageProposalScheduleService manageProposalScheduleService;
+
+    @Autowired
+    private InstructorRepository instructorRepository;
 
     //=========================================== USE ===================================================
 
@@ -265,7 +280,8 @@ public class DashboardCardService {
         return result;
     }
 
-    // --------- Grade Distribute ------------ //
+  
+  // --------- Grade Distribute ------------ //
     public Map<String, Integer> getGradeDistribution(String program, String year, String evaType) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -329,5 +345,53 @@ public class DashboardCardService {
 
         return gradeDistribution;
     }
+  
+    public List<PreviewProposalDTO> getProposalSchedule() {
 
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        System.out.println("💌 Account username: " + username);
+
+        List<Project> projectList = projectRepository.findProjectsByUsername(username);
+
+        Optional<Instructor> instructorOpt = instructorRepository.findByAccountUsername(username);
+        String professorName = instructorOpt.map(Instructor::getProfessorName).orElse("Unknown");
+        System.out.println("professorName " + professorName);
+
+        List<String> projectIds = projectList.stream()
+                .map(Project::getProjectId).collect(Collectors.toList());
+
+        List<PreviewProposalDTO> proposals = manageProposalScheduleService.getDataPreviewSchedule().stream()
+                .filter(p -> projectIds.contains(p.getProjectId()))
+                .filter(p -> p.getInstructorNames().values().stream()
+                        .anyMatch(list -> list.stream().anyMatch(name -> name.equals(professorName)))).collect(Collectors.toList());
+
+
+        for(PreviewProposalDTO proposal : proposals ){
+
+            Map<String, List<String>> instructorNames = proposal.getInstructorNames();
+
+            Map<String, List<String>> colletctName =new HashMap<>();
+
+            instructorNames.forEach((role, names) -> {
+
+                if(names.contains(professorName)) {
+
+                    List<String> filterName = new ArrayList<>();
+                    filterName.add(professorName);
+
+                    colletctName.put(role, filterName);
+                }
+            });
+
+            // เอาไปทับทที่
+            proposal.setInstructorNames(colletctName);
+        }
+
+
+        return proposals;
+    }
+  
 }
+
+

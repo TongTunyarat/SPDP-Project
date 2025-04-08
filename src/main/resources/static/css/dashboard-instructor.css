@@ -317,18 +317,67 @@ label {
     border: 1px solid #ddd;
     border-radius: 8px;
     margin-bottom: 15px;
-    padding: 15px;
+    padding: 2rem;
+    display: grid;
+    grid-template-columns: 230px 1fr;
+}
+
+.schedule-side {
+    background: #f8f9fa;
+    padding: 1.3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    border-right: 1px solid #eaeaea;
+}
+
+.schedule-datetime-box{
+    text-align: center;
+    margin-bottom: 16px;
+}
+
+.schedule-date {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #333;
+    margin-bottom: 0.7rem;
+}
+
+.schedule-time {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #1976d2;
+    margin-bottom: 1rem;
+}
+
+
+.schedule-location {
+    text-align: center;
+    padding: 12px 0;
+    border-top: 1px dashed #ddd;
+}
+
+.schedule-room {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #333;
+}
+
+.schedule-main {
+    padding: 1.5rem;
 }
 
 .schedule-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
+    margin-bottom: 20px;
 }
 
 .schedule-header-tags {
     display: flex;
-    gap: 5px;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .tag {
@@ -361,25 +410,21 @@ label {
 .tag-dst {
     background: #f5d76e;
     color: black;
+    font-weight: 600;
 }
 
 .schedule-content {
-    margin-top: 10px;
+    margin-top: 20px;
     /*font-size: 1rem;*/
     margin-left: 0.5rem;
 }
 
-.schedule-content strong {
-    display: block;
-    font-weight: bold;
-    margin-bottom: 5px;
-    font-size: 1.2rem;
-}
 
 .schedule-project-subtitle {
     font-size: 1.1rem;
-    color: #9C9A9A;
-    font-weight: bold;
+    color: #757575;
+    font-weight: 600;
+    margin-bottom: 16px;
 }
 
 .schedule-datetime {
@@ -395,23 +440,36 @@ label {
 }
 
 .status-btn {
-    padding: 5px 10px;
-    border-radius: 4px;
-    font-size: 14px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
     color: white;
     background-color: #5bc0de;
     text-align: center;
     cursor: pointer;
 }
 
-.status-btn-pending {
-    background-color: #5bc0de;
-}
+/*.status-btn-pending {*/
+/*    background-color: #5bc0de;*/
+/*}*/
 
 .status-btn-in-progress {
     background-color: #a9a9a9;
 }
 
+.status-btn-pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+
+.status-btn-finished {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
 
 /* Grade */
 .main-content {
@@ -585,4 +643,21 @@ label {
     font-size: 16px;
 }
 
+.schedule-warning {
+    color: #dc3545;
+    font-weight: bold;
+    background-color: rgba(220, 53, 69, 0.1);
+    border-left: 3px solid #dc3545;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 4px;
+    text-align: center;
+}
 
+.no-schedule {
+    font-size: 1.2rem;
+    color: #757575;
+    font-weight: 550;
+    text-align: center;
+    padding: 3.5rem;
+}

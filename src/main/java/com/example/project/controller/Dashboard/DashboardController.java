@@ -1,5 +1,6 @@
 package com.example.project.controller.Dashboard;
 
+import com.example.project.DTO.ManageSchedule.Preview.PreviewProposalDTO;
 import com.example.project.entity.ScoringPeriods;
 import com.example.project.repository.ScoringPeriodsRepository;
 import com.example.project.service.DashboardCardService;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
@@ -83,6 +85,15 @@ public class DashboardController {
                     .body("An error occurred while processing the request");
         }
     }
+
+    // Proposal schedule
+    @GetMapping("/instructor/getProposalScheduleDashboard")
+    @ResponseBody
+    public List<PreviewProposalDTO> getProposalScheduleDashboard() {
+        return dashboardService.getProposalSchedule();
+    }
+
+
 
 
     //=========================================== NOT USE ===================================================
