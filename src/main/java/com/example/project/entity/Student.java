@@ -63,6 +63,18 @@ public class Student {
         this.studentProjects = studentProjects;
     }
 
+    public Student(String studentId, String studentName, String program, String section, String track, Project project) {
+    }
+
+    public Student(String studentId, String studentName, String program, String section, String track) {
+        this.studentId = studentId;
+        this.studentName = studentName;
+        this.program = program;
+        this.section = Byte.valueOf(section);
+        this.track = track;
+    }
+
+
     public String getStudentId() {
         return studentId;
     }
@@ -149,5 +161,10 @@ public class Student {
 
     public void setDefenseEvaluations(List<DefenseEvaluation> defenseEvaluations) {
         this.defenseEvaluations = defenseEvaluations;
+    }
+
+
+    public void setStatus(String active) {
+
     }
 }

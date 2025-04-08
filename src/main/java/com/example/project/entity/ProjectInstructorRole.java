@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Entity
 @Table(name="projectinstructorrole")
@@ -47,6 +48,13 @@ public class ProjectInstructorRole {
     @OneToMany(mappedBy = "projectInstructorRole", cascade = CascadeType.ALL)
     @JsonBackReference
     private List<ProposalEvaluation> proposalEvaluations;
+
+    public ProjectInstructorRole(Project project) {
+    }
+
+    public ProjectInstructorRole() {
+
+    }
 
 
     public String getInstructorId() {
@@ -111,6 +119,11 @@ public class ProjectInstructorRole {
 
     public void setProposalEvaluations(List<ProposalEvaluation> proposalEvaluations) {
         this.proposalEvaluations = proposalEvaluations;
+    }
+
+
+    public void setProjectInstructorRoleId(String instructorRoleId) {
+
     }
 
     @Override

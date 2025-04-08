@@ -31,6 +31,18 @@ public class StudentProject {
 
     }
 
+    public StudentProject(Student student, Project project) {
+        this.student = student;
+        this.project = project;
+    }
+
+    public StudentProject(String studentId, Project project) {
+        this.student = new Student(studentId, "", "", "", ""); // สร้าง Student Object ด้วย studentId และค่าที่เหลือสามารถกำหนดภายหลัง
+        this.project = project;
+    }
+
+    public StudentProject(Project project, String studentId) {
+    }
 
     public String getStudentPjId() {
         return studentPjId;

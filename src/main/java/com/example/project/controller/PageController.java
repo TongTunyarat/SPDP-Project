@@ -1,8 +1,10 @@
 package com.example.project.controller;
 
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping
@@ -85,6 +87,49 @@ public class PageController {
         return "GiveScore/GiveDefGradeScore";
     }
 
+
+    // ---------- Project Management ---------- //
+    @GetMapping("/project-overview")
+    public String projectOverview() {return "ProjectManagement/projectOverview";}
+
+    @GetMapping("/project-committee")
+    public String projectCommittee() {return "ProjectManagement/projectCommittee";}
+
+    @GetMapping("/project-details")
+    public String projectDetails() {return "ProjectManagement/projectDetails";}
+
+    @GetMapping("/project-poster-committee")
+    public String projectPosterCommittee() {return "ProjectManagement/projectPosterCommittee";}
+
+    @GetMapping("/project-add-new-project")
+    public String projectAddNewProject() {return "ProjectManagement/addNewProject";}
+
+    @GetMapping("/project-edit-committee")
+    public String projectEditCommittee() {return "ProjectManagement/editCommittee";}
+
+    @GetMapping("/project-edit-poster-committee")
+    public String projectEditPosterCommittee() {return "ProjectManagement/editPosterCommittee";}
+
+    @GetMapping("/project-edit-project")
+    public String projectEditProject() {return "ProjectManagement/editProjectDetails";}
+
+    // -------------------- Project Management -------------------- //
+    // ---------- (send project when click edit) ---------- //
+    @GetMapping("/admin/editProjectDetails")
+    public String getEditProjectDetails(@RequestParam String projectId, Model model) {
+
+        model.addAttribute("projectId", projectId);
+
+        return "ProjectManagement/editProjectDetails";
+    }
+
+    @GetMapping("/admin/editCommittee")
+    public String getEditCommittee(@RequestParam String projectId, Model model) {
+
+        model.addAttribute("projectId", projectId);
+
+        return "ProjectManagement/editCommittee";
+    }
 
 }
 

@@ -29,23 +29,17 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf
-// <<<<<<< fern-ja-merge
-//                         .ignoringRequestMatchers("/user/details", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade","/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense", "/get-instructorId", "/api/proposal-evaluation", "/api/defense-evaluation", "/admin/bookingSaveDefense")
-//                 )
-//                 .authorizeHttpRequests(auth -> auth
-//                         .requestMatchers("/login", "/css/**", "/js/**", "/static/**","/publicProjectDetail","/student", "/instructor/criteriaDefenseGrade", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade", "/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense", "/get-instructorId", "/api/proposal-evaluation", "/api/defense-evaluation", "/admin/bookingSaveDefense").permitAll() // อนุญาตให้ทุกคนเข้าถึง
-// =======
+                        .ignoringRequestMatchers("/user/details", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade","/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense", "/admin/projectOverview", "/admin/uploadFiles", "/admin/editDetails", "/admin/updateProjectDetails", "/admin/deleteProject/**", "/admin/deleteStudentFromProject/**", "/admin/addNewProject", "/admin/editDetails")
                         .ignoringRequestMatchers("/user/details", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade","/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense", "/get-instructorId", "/api/proposal-evaluation", "/api/defense-evaluation", "/scoring-periods")
                 )
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login", "/css/**", "/js/**", "/publicProjectDetail","/student", "/instructor/criteriaDefenseGrade", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade", "/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense", "/get-instructorId", "/api/proposal-evaluation", "/api/defense-evaluation",  "/scoring-periods").permitAll() // อนุญาตให้ทุกคนเข้าถึง
-// >>>>>>> tong+fern
+                        .requestMatchers("/login", "/css/**", "/js/**", "/publicProjectDetail", "/instructor/criteriaDefenseGrade", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade", "/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense", "/admin/projectOverview", "/admin/uploadFiles", "/admin/editDetails", "/admin/updateProjectDetails", "/admin/deleteProject/**", "/admin/deleteStudentFromProject/**" ,"/admin/addNewProject", "/admin/editDetails").permitAll() // อนุญาตให้ทุกคนเข้าถึง
 //                        "/publicProjectDetail", "/instructor/criteriaDefenseGrade", "/testsave", "/saveEvaluation", "/getEvaluation", "/saveDefenseEvaluation", "/getDefenseEvaluation", "/savePosterEvaluation", "/getPosterEvaluation", "/scoreTotal", "/scoreTotalPoster", "/saveProposalGrade", "/getGradeProposal", "/saveDefenseGrade", "/getGradeDefense", "/instructor/showGradeScoreDefense"
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         .requestMatchers("/instructor/**").hasRole("INSTRUCTOR")
                         .anyRequest().authenticated()
                 )
-                // "/admin/bookingSave", "/admin/getAllProposalSchedule"
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login") // url ใน post method
