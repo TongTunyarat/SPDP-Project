@@ -493,6 +493,11 @@ body {
     color: #666;
 }
 
+.timeline-lessthan1m .timeline-status {
+    color: #ed991d;
+    font-weight: bold;
+}
+
 .timeline-urgent .timeline-status {
     color: #ff5722;
     font-weight: bold;

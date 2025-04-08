@@ -165,7 +165,7 @@
 
         <div class="main-content-list">
             <div class="panel-list">
-                <div class="panel-title">อาจารย์ที่ยังไม่ลงคะแนน</div>
+                <div class="panel-title">ความคืบหน้าการประเมินนักศึกษาของอาจารย์</div>
                 <canvas id="teacher-scoring-chart"></canvas>
             </div>
         </div>
@@ -768,6 +768,8 @@
                 statusClass = "timeline-urgent";
             } else if (daysRemaining >= 30) {
                 statusClass = "timeline-chill";
+            } else if (daysRemaining < 30) {
+                statusClass = "timeline-lessthan1m"
             }
 
             if (statusClass) timelineItem.classList.add(statusClass);
@@ -891,96 +893,6 @@
 </script>
 
 <!-- ------- Instructor scoring --------- -->
-<!--<script>-->
-<!--    async function fetchTeacherScoringData() {-->
-<!--        try {-->
-<!--            const activeFilter = document.querySelector('.filter.active').textContent.trim();-->
-<!--            const activeProgram = document.querySelector('.tab.active').textContent.trim();-->
-<!--            const selectedYear = document.getElementById('semester-selector').value;-->
-
-<!--            let evaType = activeFilter === 'Proposal' ? 'Proposal' :-->
-<!--                activeFilter === 'Poster' ? 'Poster' :-->
-<!--                    'Defense';-->
-
-<!--            console.log("😈 Scoring");-->
-<!--            console.log("😈", evaType, selectedYear, activeProgram);-->
-
-<!--            const response = await fetch(`http://localhost:8080/api/teacher-scoring/remaining?evaType=${evaType}&year=${selectedYear}&program=${activeProgram}`);-->
-<!--            if (!response.ok) {-->
-<!--                throw new Error(`HTTP error! Status: ${response.status}`);-->
-<!--            }-->
-
-<!--            const data = await response.json();-->
-
-<!--            // ตรวจสอบข้อมูลที่ได้จาก API-->
-<!--            console.log("😈", data);-->
-
-<!--            // เตรียมข้อมูลสำหรับกราฟ-->
-<!--            const labels = [];-->
-<!--            const remainingCounts = [];-->
-<!--            const totalAssignedCounts = [];-->
-
-<!--            // เพิ่มข้อมูลใน arrays-->
-<!--            data.forEach(item => {-->
-<!--                labels.push(item.instructorName);-->
-<!--                remainingCounts.push(item.remainingCount);-->
-<!--                totalAssignedCounts.push(item.totalAssigned);-->
-<!--            });-->
-
-<!--            // ทำลายกราฟเก่าก่อนที่จะสร้างกราฟใหม่-->
-<!--            const ctx = document.getElementById('teacher-scoring-chart').getContext('2d');-->
-<!--            if (window.chartInstance) {-->
-<!--                window.chartInstance.destroy();-->
-<!--            }-->
-
-<!--            // สร้างกราฟใหม่-->
-<!--            window.chartInstance = new Chart(ctx, {-->
-<!--                type: 'bar',-->
-<!--                data: {-->
-<!--                    labels: labels, // ชื่ออาจารย์-->
-<!--                    datasets: [{-->
-<!--                        label: 'จำนวนที่เหลือ',-->
-<!--                        data: remainingCounts, // จำนวนที่ยังไม่ทำ-->
-<!--                        backgroundColor: '#ff8080', // สีแดง (ยังไม่ได้ประเมิน)-->
-<!--                        borderColor: '#ff4d4d',-->
-<!--                        borderWidth: 1-->
-<!--                    }, {-->
-<!--                        label: 'จำนวนที่มอบหมายทั้งหมด',-->
-<!--                        data: totalAssignedCounts, // จำนวนทั้งหมด-->
-<!--                        backgroundColor: '#20c8ba', // สีเขียว (เสร็จแล้ว)-->
-<!--                        borderColor: '#1e9e9b',-->
-<!--                        borderWidth: 1-->
-<!--                    }]-->
-<!--                },-->
-<!--                options: {-->
-<!--                    responsive: true,-->
-<!--                    plugins: {-->
-<!--                        legend: {-->
-<!--                            position: 'top',-->
-<!--                        },-->
-<!--                        tooltip: {-->
-<!--                            callbacks: {-->
-<!--                                label: function(tooltipItem) {-->
-<!--                                    return tooltipItem.raw + ' คน';-->
-<!--                                }-->
-<!--                            }-->
-<!--                        }-->
-<!--                    },-->
-<!--                    scales: {-->
-<!--                        x: {-->
-<!--                            beginAtZero: true-->
-<!--                        },-->
-<!--                        y: {-->
-<!--                            beginAtZero: true-->
-<!--                        }-->
-<!--                    }-->
-<!--                }-->
-<!--            });-->
-<!--        } catch (error) {-->
-<!--            console.error("Error fetching teacher scoring data:", error);-->
-<!--        }-->
-<!--    }-->
-<!--</script>-->
 <script>
     async function fetchTeacherScoringData() {
         try {
@@ -1008,22 +920,19 @@
             // เตรียมข้อมูลสำหรับกราฟ
             const labels = [];
             const remainingCounts = [];
-            const totalAssignedCounts = [];
+            const completedCounts = []; // จำนวนที่ประเมินแล้ว
+            const totalAssignedCounts = []; // เก็บจำนวนทั้งหมด
 
             // เพิ่มข้อมูลใน arrays
             data.forEach(item => {
                 labels.push(item.instructorName);
                 remainingCounts.push(item.remainingCount);
                 totalAssignedCounts.push(item.totalAssigned);
-            });
 
-            // ฟังก์ชันปรับมาตราส่วนกราฟ
-            function normalizeData(data, maxValue = 10) {
-                const maxInData = Math.max(...data);
-                return data.map(value =>
-                    maxInData > 0 ? (value / maxInData) * maxValue : value
-                );
-            }
+                // คำนวณจำนวนที่ประเมินแล้วจาก totalAssigned - remainingCount
+                const completed = item.totalAssigned - item.remainingCount;
+                completedCounts.push(completed);
+            });
 
             // ทำลายกราฟเก่าก่อนที่จะสร้างกราฟใหม่
             const ctx = document.getElementById('teacher-scoring-chart').getContext('2d');
@@ -1031,61 +940,86 @@
                 window.chartInstance.destroy();
             }
 
-            // นอร์มอไลซ์ข้อมูล
-            const normalizedRemaining = normalizeData(remainingCounts);
-            const normalizedTotal = normalizeData(totalAssignedCounts);
-
-            // สร้างกราฟใหม่
+            // สร้างกราฟใหม่แบบ stacked
             window.chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels, // ชื่ออาจารย์
                     datasets: [{
-                        label: 'จำนวนที่เหลือ',
-                        data: normalizedRemaining, // จำนวนที่ยังไม่ทำ
-                        backgroundColor: '#ff8080', // สีแดง (ยังไม่ได้ประเมิน)
-                        borderColor: '#ff4d4d',
-                        borderWidth: 1
-                    }, {
-                        label: 'จำนวนที่มอบหมายทั้งหมด',
-                        data: normalizedTotal, // จำนวนทั้งหมด
+                        label: 'ประเมินแล้ว',
+                        data: completedCounts, // จำนวนที่ประเมินแล้ว
                         backgroundColor: '#20c8ba', // สีเขียว (เสร็จแล้ว)
                         borderColor: '#1e9e9b',
+                        borderWidth: 1
+                    }, {
+                        label: 'ยังไม่ได้ประเมิน',
+                        data: remainingCounts, // จำนวนที่ยังไม่ทำ
+                        backgroundColor: '#ff8080', // สีแดง (ยังไม่ได้ประเมิน)
+                        borderColor: '#ff4d4d',
                         borderWidth: 1
                     }]
                 },
                 options: {
                     responsive: true,
                     plugins: {
+                        title: {
+                            display: true,
+                            text: 'แผนภูมิแสดงความคืบหน้าการประเมินนักศึกษาของอาจารย์',
+                            font: {
+                                size: 16
+                            }
+                        },
                         legend: {
                             position: 'top',
                         },
                         tooltip: {
                             callbacks: {
-                                label: function(tooltipItem) {
-                                    // แสดงค่าดั้งเดิมใน tooltip
-                                    const originalValue = tooltipItem.dataIndex === 0
-                                        ? remainingCounts[tooltipItem.datasetIndex]
-                                        : totalAssignedCounts[tooltipItem.datasetIndex];
-                                    return `${originalValue} คน`;
+                                // แสดงชื่ออาจารย์
+                                title: function(tooltipItems) {
+                                    return tooltipItems[0].label;
+                                },
+                                // แสดงข้อมูลรวม
+                                afterTitle: function(context) {
+                                    const index = context[0].dataIndex;
+                                    return `สรุปข้อมูลการประเมิน:`;
+                                },
+                                // แสดงข้อมูลของแต่ละส่วน
+                                label: function(context) {
+                                    const index = context.dataIndex;
+                                    const datasetIndex = context.datasetIndex;
+
+                                    // เลือกแสดงข้อมูลตาม dataset ที่ผู้ใช้ชี้
+                                    if (datasetIndex === 0) {
+                                        return `ประเมินแล้ว: ${completedCounts[index]} คน`;
+                                    } else {
+                                        return `ยังไม่ได้ประเมิน: ${remainingCounts[index]} คน`;
+                                    }
+                                },
+                                // เพิ่มข้อมูลสรุปหลังจาก label
+                                afterLabel: function(context) {
+                                    const index = context.dataIndex;
+                                    const totalAssigned = totalAssignedCounts[index];
+                                    const completed = completedCounts[index];
+                                    const remaining = remainingCounts[index];
+                                    const percentComplete = totalAssigned > 0
+                                        ? Math.round((completed / totalAssigned) * 100)
+                                        : 0;
+
+                                    return [
+                                        `จำนวนทั้งหมด: ${totalAssigned} คน`,
+                                        `ความคืบหน้า: ${percentComplete}%`
+                                    ];
                                 }
                             }
                         }
                     },
                     scales: {
+                        x: {
+                            stacked: true // ให้แกน x ซ้อนกัน
+                        },
                         y: {
-                            beginAtZero: true,
-                            max: 10,
-                            ticks: {
-                                stepSize: 1,
-                                callback: function(value) {
-                                    // แปลงค่าการ์ฟกลับเป็นค่าจริง
-                                    const maxRemaining = Math.max(...remainingCounts);
-                                    const maxTotal = Math.max(...totalAssignedCounts);
-                                    const maxValue = Math.max(maxRemaining, maxTotal);
-                                    return Math.round((value / 10) * maxValue);
-                                }
-                            }
+                            stacked: true, // ให้แกน y ซ้อนกัน
+                            beginAtZero: true
                         }
                     }
                 }
