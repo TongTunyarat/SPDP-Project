@@ -16,7 +16,7 @@ body {
     color: white;
     padding: 20px;
     text-align: left;
-    font-size: 24px;
+    font-size: 250%;
     font-weight: bold;
     height: 100px;
 }
@@ -29,32 +29,126 @@ body {
     padding: 20px;
 }
 
+/*.card-wrapper {*/
+/*    display: grid;*/
+/*    grid-template-columns: repeat(5, 1fr);*/
+/*    gap: 8px;*/
+/*    margin: 16px 0;*/
+/*}*/
+
+/*.container {*/
+/*    display: flex;*/
+/*    flex-direction: column;*/
+/*    align-items: center;*/
+/*    width: 100%;*/
+/*    margin: auto;*/
+/*}*/
+
+
 .card-wrapper {
+    width: 98%;
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    margin: 16px 0;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* ปรับ layout */
+    gap: 18px; /* ระยะห่างระหว่าง Card */
+    margin: 18px 0; /* ระยะห่างจากขอบ Container */
 }
 
 .header-container {
-    flex: 0 1 calc(33.33% - 16px);
     background-color: #fff;
-    padding: 16px;
+    padding: 20px;
     border-radius: 8px;
     box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
     border: 1px solid #cdcdcd;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    /*min-height: 150px;*/
     position: relative;
-    width: 200px;
-    height: 150px;
-    margin-top: -80px;
+    top: -80px;
+}
+
+
+.header-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+}
+
+.icon-work {
+    display: inline-flex;
+    padding: 8px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 6px;
+    background: #E0DCFE;
+    margin-left: auto;
+    width: 32px;
+    height: 32px;
+}
+
+.icon-prop {
+    display: inline-flex;
+    padding: 8px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 6px;
+    background: #E7FAFE;
+    margin-left: auto;
+    /*margin-top: -15px;*/
+    width: 32px;
+    height: 32px;
+}
+
+.icon-post {
+    display: inline-flex;
+    padding: 8px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 6px;
+    background: #FBEBEC;
+    margin-left: auto;
+    width: 32px;
+    height: 32px;
+}
+
+.icon-defense {
+    display: inline-flex;
+    padding: 4px;
+    align-items: center;
+    gap: 10px;
+    border-radius: 6px;
+    background: #EAF6EC;
+    margin-left: auto;
+    width: 32px;
+    height: 32px;
 }
 
 .text-header {
-    font-size: 20px;
+    font-size: 1.5rem;
     color: #212B36;
+}
+
+.text-centerProgram {
+    display: flex;
+    font-size: 1.5rem;
+    align-items: center;
+    margin-top: -2rem;
+    padding-left: 1.2rem;
+}
+
+.text-center {
+    display: flex;
+    font-size: 1.5rem;
+    align-items: center;
+    margin-top: -1.5rem;
+    padding-left: 2.5rem;
+}
+
+.text-footer {
+    display: flex;
+    font-size: 1.2rem;
+    padding-left: 1rem;
+    margin-top: -1.5rem;
 }
 
 label {
@@ -94,7 +188,7 @@ label {
 .btn-cancel {
     display: flex;
     background-color: #FFFF;
-    color: 909090;
+    color:  #909090;
     width: 100px;
     height: 50px;
     flex-shrink: 0;
@@ -139,10 +233,12 @@ label {
     border: 1px solid #cdcdcd;
     box-shadow: 0px 6px 25px 0px rgba(0, 0, 0, 0.07), 0px 0.751px 3.13px 0px rgba(0, 0, 0, 0.04);
     padding: 20px;
+    position: relative; /* ให้ Card เลื่อนขึ้นได้โดยไม่ชนกัน */
+    top: -80px; /* เลื่อนขึ้นแทน margin-top */
 }
 
 .reminder-title {
-    font-size: 22px;
+    font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 10px;
 }
@@ -156,7 +252,8 @@ label {
 }
 
 .reminder-icon {
-    margin-right: 15px;
+    margin-right: 1rem;
+    margin-left: 2rem;
 }
 
 .reminder-content {
@@ -166,16 +263,16 @@ label {
 }
 
 .reminder-text {
-    font-size: 16px;
+    font-size: 1.2rem;
     color: #333;
     margin-bottom: 5px;
 }
 
 .reminder-subtitle {
-    font-size: 14px;
+    font-size: 0.9rem;
     color: #999;
     margin-top: 2px;
-    margin-left: 40px;
+    margin-left: 4.3rem;
 }
 
 .reminder-date {
@@ -183,7 +280,7 @@ label {
     color: #666;
     padding: 5px 10px;
     border-radius: 4px;
-    font-size: 14px;
+    font-size: 0.9rem;
 }
 
 .schedule-container {
@@ -193,10 +290,12 @@ label {
     border: 1px solid #cdcdcd;
     box-shadow: 0px 6px 25px 0px rgba(0, 0, 0, 0.07), 0px 0.751px 3.13px 0px rgba(0, 0, 0, 0.04);
     padding: 20px;
+    position: relative; /* ให้ Card เลื่อนขึ้นได้โดยไม่ชนกัน */
+    top: -80px; /* เลื่อนขึ้นแทน margin-top */
 }
 
 .schedule-title {
-    font-size: 22px;
+    font-size: 1.5rem;
     font-weight: bold;
     margin-bottom: 10px;
     display: flex;
@@ -209,7 +308,7 @@ label {
 
 .warning-text {
     color: #d9534f;
-    font-size: 14px;
+    font-size: 0.85rem;
     margin: 10px 0;
 }
 
@@ -234,7 +333,7 @@ label {
 
 .tag {
     padding: 3px 8px;
-    font-size: 12px;
+    font-size: 1rem;
     color: white;
     border-radius: 4px;
 }
@@ -266,29 +365,31 @@ label {
 
 .schedule-content {
     margin-top: 10px;
-    font-size: 14px;
+    /*font-size: 1rem;*/
+    margin-left: 0.5rem;
 }
 
 .schedule-content strong {
     display: block;
     font-weight: bold;
     margin-bottom: 5px;
+    font-size: 1.2rem;
 }
 
 .schedule-project-subtitle {
-    font-size: 14px;
+    font-size: 1.1rem;
     color: #9C9A9A;
     font-weight: bold;
 }
 
 .schedule-datetime {
-    font-size: 14px;
+    font-size: 1rem;
     color: #000000;
     font-weight: bold;
 }
 
 .schedule-room {
-    font-size: 14px;
+    font-size: 1rem;
     color: #000000;
     font-weight: bold;
 }
@@ -310,3 +411,178 @@ label {
 .status-btn-in-progress {
     background-color: #a9a9a9;
 }
+
+
+/* Grade */
+.main-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    /*gap: -20px;*/
+    margin-top: -20px;
+}
+
+.panel {
+    background-color: #fff;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+
+    width: 90%;
+    border: 1px solid #cdcdcd;
+    position: relative; /* ให้ Card เลื่อนขึ้นได้โดยไม่ชนกัน */
+    top: -80px; /* เลื่อนขึ้นแทน margin-top */
+}
+
+.panel-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+.chart-container {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    height: 320px;
+}
+
+/* Reminder Card */
+.panel-title {
+    background-color: #f5f5f5;
+    padding: 12px 15px;
+    font-size: 20px;
+    font-weight: bold;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.timeline-date, .timeline-status {
+    font-size: 19px;
+    color: #666;
+}
+
+.timeline-lessthan1m .timeline-status {
+    color: #ed991d;
+    font-weight: bold;
+}
+
+.timeline-urgent .timeline-status {
+    color: #ff5722;
+    font-weight: bold;
+}
+
+.timeline-expired .timeline-status {
+    color: #9e9e9e;
+    font-weight: bold;
+}
+
+.timeline-chill .timeline-status {
+    color: #43bc4a;
+    font-weight: bold;
+}
+
+.timeline-urgent {
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: rgba(255, 87, 34, 0.05);
+    }
+    100% {
+        background-color: transparent;
+    }
+}
+
+.timeline {
+    display: flex;
+    flex-direction: column;
+}
+
+.timeline-item {
+    padding: 10px 15px; /* ลดการเติมพื้นที่ */
+    border-bottom: 1px solid #e0e0e0;
+    display: flex;
+    align-items: center;
+    font-size: 1em; /* ลดขนาดฟอนต์ */
+}
+
+.timeline-item:last-child {
+    border-bottom: none;
+}
+
+.timeline-icon {
+    margin-right: 10px;
+    display: flex;
+    align-items: center;
+    font-size: 1em;
+}
+
+.timeline-content {
+    flex-grow: 1;
+}
+
+.timeline-title {
+    font-weight: bold;
+    margin-bottom: 3px;
+    font-size: 1em;
+}
+
+.timeline-date, .timeline-status {
+    color: #666;
+    font-size: 0.9em; /* ลดขนาดฟอนต์ลงอีก */
+}
+
+/* สำหรับหน้าจอขนาดเล็ก */
+@media (max-width: 480px) {
+    .timeline-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .timeline-icon {
+        margin-bottom: 5px;
+        margin-right: 0;
+    }
+}
+
+/* btn: eva type */
+.eva-btn {
+    padding: 8px 16px;
+    margin: 0 5px;
+    background-color: #f0f0f0;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.eva-btn.active {
+    background-color: #037878;
+    color: white;
+    border-color: #017171;
+}
+
+.eva-btn:hover:not(.active) {
+    background-color: #e0e0e0;
+}
+
+.chart-container {
+    height: 300px;
+    position: relative;
+}
+
+.no-grade-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    color: #666;
+    font-size: 16px;
+}
+
+

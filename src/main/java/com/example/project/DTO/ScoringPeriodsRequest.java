@@ -10,6 +10,7 @@ public class ScoringPeriodsRequest {
     private LocalDate startDate;
     private LocalDate endDate;
     private String recordedBy;
+    private String year;
 
     public String getEvaluationType() {
         return evaluationType;
@@ -41,5 +42,13 @@ public class ScoringPeriodsRequest {
 
     public void setRecordedBy(String recordedBy) {
         this.recordedBy = recordedBy;
+    }
+
+    public String getYear() {
+        return year;
+    }
+
+    public void setYear(String year) {
+        this.year = year;
     }
 }

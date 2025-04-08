@@ -20,6 +20,21 @@ public class PageController {
         return "ScorePeriodSettings";
     }
 
+    // ---------- Admin - Dashboard ---------- //
+    @GetMapping("/admin-dashboard")
+    public String adminDashboard() {
+        return "/Dashboard&Report/Dashboard";
+    }
+
+    // ---------- Admin - Report ---------- //
+    @GetMapping("/admin-proposal-report")
+    public String adminPropReport() { return "/Dashboard&Report/ProposalGradeReport"; }
+    @GetMapping("/admin-defense-report")
+    public String adminDefReport() { return "/Dashboard&Report/DefenseGradeReport"; }
+    @GetMapping("/admin-eva-traking")
+    public String adminEvaTrack() { return "/Dashboard&Report/EvaluationTracking"; }
+
+
 
     // ---------- Show Projects ---------- //
     @GetMapping("/show-proposal-eva-projects")

@@ -331,6 +331,7 @@ public class CalculateService {
                         .setCriteria(criteria)
                         .setDefenseEvaluation(evaluation);
 
+
                 defenseEvalScoreRepository.save(evalScore);
                 System.out.println("[Service] Saved DefenseEvalScore for criteria: " + score.getScoreCriteriaId());
             } else {
@@ -525,9 +526,6 @@ public class CalculateService {
 
 
 
-
-
-
     // ---------------------- GRADE ---------------------- //
     @Transactional
     public String saveProposalGrade(Project project, Student student, ScoreRequestDTO scoreRequest) {
@@ -630,6 +628,7 @@ public class CalculateService {
             gradingDefense.setEvaluateScore(advisorScore.doubleValue());
             gradingDefense.setExtraScore(extraScore.doubleValue());
             gradingDefense.setTotalScore(totalScore.doubleValue());
+            gradingDefense.setGradeResult(gradeResult);
         }
 
         // ✅ อัปเดตค่าต่างๆ และบันทึกลง Database
@@ -638,6 +637,7 @@ public class CalculateService {
         gradingDefense.setEvaluateScore(advisorScore.doubleValue());
         gradingDefense.setExtraScore(extraScore.doubleValue());
         gradingDefense.setTotalScore(totalScore.doubleValue());
+        gradingDefense.setGradeResult(gradeResult);
 
         gradingDefenseEvaluationRepository.save(gradingDefense);
 
