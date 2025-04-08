@@ -531,6 +531,15 @@
                 if(data.length === 0) {
                     console.log("No data available");
 
+                    const container = document.querySelector(".schedule-container")
+                    scheduleHTML = `
+
+                    <div class="no-schedule">⚠️ The schedule is not yet organized ⚠️</div>
+
+                    `;
+
+                    container.innerHTML += scheduleHTML;
+
                 } else {
 
                     const container = document.querySelector(".schedule-container")
