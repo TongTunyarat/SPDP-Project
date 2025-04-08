@@ -271,7 +271,7 @@
                           <td class="${!project.room ? 'empty-room' : ''}">${project.room ? project.room: ''}</td>
                           <td><span class="tag ${project.program.toLowerCase()}">${project.program}</span></td>
                           <td>${cleanId}</td>
-                          <td>${project.projectTitle}</td>
+                          <td class="left-align">${project.projectTitle}</td>
 
                           <td class="id-cell">
                             ${project.students.map(student => `<div class="student-row">${student.studentId}</div>`).join('')}
