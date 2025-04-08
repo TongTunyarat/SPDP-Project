@@ -44,7 +44,7 @@ public class AddNewProjectService {
         String program = projectDetailsDTO.getProgram();
 
         // หาเลขลำดับล่าสุดจากฐานข้อมูล (ใช้รหัส projectId ล่าสุด)
-        String lastProjectId = getLastProjectId(program);  // ใช้ method นี้เพื่อหาค่าล่าสุด
+        String lastProjectId = getLastInstructorRoleId();  // ใช้ method นี้เพื่อหาค่าล่าสุด
         String newProjectId = generateNewProjectId(lastProjectId, program, currentYear); // สร้าง Project ID ใหม่
 
         // สร้างโปรเจกต์ใหม่
@@ -71,9 +71,11 @@ public class AddNewProjectService {
                         new ResponseStatusException(HttpStatus.NOT_FOUND, "Instructor not found: " + professorDTO.getProfessorName())
                 );
 
-                // สร้างรหัส ProjectInstructorRole ใหม่
-                String instructorRoleId = generateNewProjectId(lastProjectId, program, currentYear);  // ใช้ฟังก์ชันเดียวกันในการสร้าง ID ใหม่
-                role.setProjectInstructorRoleId(instructorRoleId);  // ตั้งค่า ID สำหรับ ProjectInstructorRole
+                // สร้างรหัส ProjectInstructorRole ใหม่ โดยใช้ฟังก์ชัน generateNewInstructorRoleId
+                String instructorRoleId = generateNewInstructorRoleId();  // สร้าง ID ใหม่
+                role.setInstructorId(instructorRoleId);  // ตั้งค่า ID สำหรับ ProjectInstructorRole
+
+                System.out.println("Instructor Role ID: " + instructorRoleId); // ตรวจสอบค่า ID
 
                 // ตั้งค่าอาจารย์ใน ProjectInstructorRole
                 role.setProjectIdRole(newProject);  // ตั้งค่าโปรเจกต์
@@ -103,6 +105,24 @@ public class AddNewProjectService {
                 }
             }
         }
+    }
+
+    // ฟังก์ชันในการสร้างรหัส ProjectInstructorRole ใหม่
+    private String generateNewInstructorRoleId() {
+        // ดึงรหัสอาจารย์ล่าสุดจากฐานข้อมูล
+        String lastInstructorId = projectInstructorRoleRepository.findLatestInstructorId();  // ค้นหาจากรหัสล่าสุดของ ProjectInstructorRole
+
+        if (lastInstructorId == null) {
+            return "INST001";  // เริ่มต้นที่ INST001 หากไม่มีข้อมูล
+        }
+
+        // ดึงลำดับจากรหัสล่าสุด
+        String lastSequence = lastInstructorId.substring(4);  // เอาแค่ตัวเลขที่อยู่หลัง "INST"
+        int newSequence = Integer.parseInt(lastSequence) + 1;
+        String newSequenceFormatted = String.format("%03d", newSequence);  // ทำให้ลำดับเป็น 3 หลัก
+
+        // สร้างรหัสใหม่
+        return "INST" + newSequenceFormatted;
     }
 
     private String generateNewProjectId(String lastProjectId, String program, int year) {
@@ -156,21 +176,21 @@ public class AddNewProjectService {
     }
 
     // ฟังก์ชันนี้จะดึงรหัสโปรเจกต์ล่าสุดจากฐานข้อมูล
-    public String getLastProjectId(String program) {
-        // ดึงรหัสโปรเจกต์ล่าสุดจากฐานข้อมูล
-        String lastProjectId = projectInstructorRoleRepository.findLatestInstructorId(); // ค้นหาจากรหัสโปรเจกต์ที่เริ่มต้นด้วย program
+    public String getLastInstructorRoleId() {
+        // ดึงรหัสอาจารย์ล่าสุดจากฐานข้อมูล
+        String lastInstructorId = projectInstructorRoleRepository.findLatestInstructorId(); // ค้นหาจากรหัสล่าสุดของ ProjectInstructorRole
 
-        if (lastProjectId == null) {
-            return "INST001";  // เริ่มต้นที่ SP001 หากไม่มีข้อมูล
+        if (lastInstructorId == null) {
+            return "INST001";  // เริ่มต้นที่ INST001 หากไม่มีข้อมูล
         }
 
         // ดึงลำดับจากรหัสโปรเจกต์ล่าสุด
-        String lastSequence = lastProjectId.substring(lastProjectId.length() - 3);  // ดึง 3 ตัวสุดท้ายจากรหัสโปรเจกต์ (เช่น 99)
+        String lastSequence = lastInstructorId.substring(4);  // เอาแค่ตัวเลขที่อยู่หลัง "INST"
         int newSequence = Integer.parseInt(lastSequence) + 1;
         String newSequenceFormatted = String.format("%03d", newSequence);  // ทำให้ลำดับเป็น 3 หลัก
 
         // สร้างรหัสโปรเจกต์ใหม่
-        return "INST" + newSequenceFormatted;
+        return "INST" + newSequenceFormatted;  // คืนรหัสใหม่เช่น INST001, INST002, ...
     }
 
 
