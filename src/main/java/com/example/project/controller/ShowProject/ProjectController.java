@@ -88,11 +88,34 @@ public class ProjectController {
 
     // show project list page
     @GetMapping("/instructor/view")
-    public String viewInstructorProjectPage() {
+    public String viewInstructorProjectPage(Model model) {
         System.out.println("📌 Show default instructor page");
+
+        List<ProjectInstructorRole> projectInstructorRoleList = projectService.getInstructorProject();
+        Long programDST = projectInstructorRoleList.stream()
+                .filter(i -> "DST".equalsIgnoreCase(i.getProjectIdRole().getProgram()))
+                .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole())).count();
+        Long coProgramDST = projectInstructorRoleList.stream()
+                .filter(i -> "DST".equalsIgnoreCase(i.getProjectIdRole().getProgram()))
+                .filter(i -> "Co-Advisor".equalsIgnoreCase(i.getRole())).count();
+        Long programICT = projectInstructorRoleList.stream()
+                .filter(i -> "ICT".equalsIgnoreCase(i.getProjectIdRole().getProgram()))
+                .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole())).count();
+        Long coProgramICT = projectInstructorRoleList.stream()
+                .filter(i -> "ICT".equalsIgnoreCase(i.getProjectIdRole().getProgram()))
+                .filter(i -> "Co-Advisor".equalsIgnoreCase(i.getRole())).count();
+        System.out.println("📚 Check Program Group");
+
+
+        model.addAttribute("programDST", programDST);
+        model.addAttribute("coProgramDST", coProgramDST);
+        model.addAttribute("programICT", programICT);
+        model.addAttribute("coProgramICT", coProgramICT);
 
         return "DashboardInstructor"; // html
     }
+
+
 
     // project list by user (Proposal)
     @GetMapping("/instructor/projectList")

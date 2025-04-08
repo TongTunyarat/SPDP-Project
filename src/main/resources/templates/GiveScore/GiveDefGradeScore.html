@@ -15,56 +15,263 @@
 </head>
 <body>
 <div class="container">
+    <!-- script ในการเปิดปิด period -->
+    <script>
+        let accessPeriods = {};
+
+        console.log('Calling updateLinkStatus function');
+        window.onload = fetchAccessPeriods;
+        setInterval(updateLinkStatus, 60000);
+
+        async function fetchAccessPeriods() {
+            try {
+                const response = await fetch('http://localhost:8080/api/period'); // เปลี่ยน URL ตาม backend ของคุณ
+                if (!response.ok) {
+                    throw new Error('Failed to fetch access periods');
+                }
+
+                const data = await response.json(); // แปลง response เป็น JSON
+                console.log(data);
+
+                accessPeriods = convertApiResponseToObject(data); // แปลง array จาก API เป็น object ที่ใช้งานง่าย
+                console.log("before set date: ", accessPeriods)
+                updateLinkStatus(); // อัปเดตสถานะของลิงก์
+            } catch (error) {
+                console.error('Error fetching access periods:', error);
+            }
+        }
+
+        // ฟังก์ชันแปลง API Response (Array) เป็น Object ตาม key ที่ใช้ใน HTML
+        function convertApiResponseToObject(data) {
+            console.log("🎞️Convert api");
+            console.log(data);
+
+            // ตรวจสอบว่า data เป็น array และไม่เป็น null หรือ undefined
+            if (!Array.isArray(data) || data.length === 0) {
+                console.log("💡No data to process");
+                return {}; // ถ้าไม่มีข้อมูล หรือไม่เป็น array จะคืนค่าเป็น object ว่างๆ
+            }
+
+            // 1️⃣ กำหนดประเภทของ Evaluation ที่รองรับ
+            const allTypes = {
+                "proposalEvaluation": "/show-proposal-eva-projects",
+                "posterEvaluation": "/show-poster-projects",
+                "defenseEvaluation": "/show-defense-eva-projects",
+                "proposalGrade": "/show-proposal-grade-projects",
+                "defenseGrade": "/show-defense-grade-projects"
+            };
+
+            let periodsObj = {};
+
+            // 2️⃣ สร้างค่าเริ่มต้นให้ทุกประเภท (isActive = false)
+            Object.keys(allTypes).forEach(type => {
+                periodsObj[type] = {
+                    start: null, // ไม่มีข้อมูลให้เป็น null
+                    end: null,
+                    isActive: false, // ปิดการใช้งาน
+                    path: allTypes[type],
+                    title: type
+                };
+            });
+
+            // 3️⃣ อัปเดตค่าถ้ามีข้อมูลจาก API
+            data.forEach((period, index) => {
+                console.log(`💡Processing item at index: ${index}`);
+
+                let evaluationTypeKey;
+
+                // ใช้ switch-case เพื่อแปลง evaluationType ให้ตรงกับคีย์ใน allTypes
+                switch (period.evaluationType) {
+                    case "Proposal Evaluation":
+                        evaluationTypeKey = "proposalEvaluation";
+                        break;
+                    case "Poster Evaluation":
+                        evaluationTypeKey = "posterEvaluation";
+                        break;
+                    case "Defense Evaluation":
+                        evaluationTypeKey = "defenseEvaluation";
+                        break;
+                    case "Proposal Grade":
+                        evaluationTypeKey = "proposalGrade";
+                        break;
+                    case "Defense Grade":
+                        evaluationTypeKey = "defenseGrade";
+                        break;
+                    default:
+                        console.log(`💡No matching key for evaluation type: ${period.evaluationType}`);
+                        return; // ถ้าไม่ตรงกับ case ใดๆ ก็ให้ข้ามไป
+                }
+
+                console.log("💡Evaluation type key:", evaluationTypeKey);
+
+                if (periodsObj.hasOwnProperty(evaluationTypeKey)) {
+                    // ตรวจสอบและแปลงวันที่ ถ้าวันที่เป็น string ที่ไม่สามารถแปลงได้เป็นวันที่ จะตั้งค่าเป็น null
+                    const startDate = Date.parse(period.startDate); // แปลงเป็น timestamp
+                    const endDate = Date.parse(period.endDate); // แปลงเป็น timestamp
+
+                    periodsObj[evaluationTypeKey] = {
+                        start: isNaN(startDate) ? null : new Date(startDate), // ถ้าแปลงไม่สำเร็จให้เป็น null
+                        end: isNaN(endDate) ? null : new Date(endDate), // ถ้าแปลงไม่สำเร็จให้เป็น null
+                        isActive: true, // มีข้อมูล API -> เปิดใช้งาน
+                        path: allTypes[evaluationTypeKey],
+                        title: period.evaluationType
+                    };
+                }
+            });
+
+            console.log("🎞️Final periodsObj: ", periodsObj); // ตรวจสอบผลลัพธ์
+            return periodsObj;
+        }
+
+        function updateLinkStatus() {
+            const currentTime = new Date(); // Get current time
+            console.log("Current Time: ", currentTime); // Debugging line
+            console.log("accessPeriods: ", accessPeriods)
+
+            // Get all links with data-period
+            const links = document.querySelectorAll('a[data-period]');
+            console.log("links:", links); // ตรวจสอบว่าได้ลิงก์ทั้งหมดหรือไม่
+
+            links.forEach(link => {
+                const periodKey = link.getAttribute('data-period');
+                const period = accessPeriods[periodKey];
+                console.log("periodKey:", periodKey); // ตรวจสอบว่า periodKey ถูกต้อง
+                console.log("period: ",period)
+
+                if (period) {
+                    const startTime = period.start ? new Date(period.start) : null;
+                    const endTime = period.end ? new Date(period.end) : null;
+
+                    console.log(`Checking link ${periodKey}:`, currentTime, startTime, endTime); // Debugging
+
+                    const isAccessible =
+                        period.isActive &&
+                        (startTime === null || currentTime >= startTime) &&
+                        (endTime === null || currentTime <= endTime);
+
+                    console.log(`Is Accessible: ${isAccessible}`);
+
+
+                    if (!isAccessible) {
+                        link.classList.add('disabled-link'); // เพิ่มสไตล์
+                        console.log('Disabled link added:', link);
+
+                        link.addEventListener('click', function (e) {
+                            e.preventDefault();
+
+                            let alertMessage = "🚫 This link is not accessible right now.";
+
+                            // ตรวจสอบว่า startTime หรือ endTime เป็น null หรือไม่
+                            if (startTime && endTime) {
+                                alertMessage += ` Available from ${startTime.toLocaleDateString()} to ${endTime.toLocaleDateString()}`;
+                            }
+
+                            console.warn(alertMessage); // แสดง warning ใน console
+                            alert(alertMessage); // แสดง alert ตามข้อความที่กำหนด
+                        });
+                    } else {
+                        link.classList.remove('disabled-link');
+
+                        // ลบ event listener ที่เคยเพิ่มไว้ เพื่อไม่ให้ alert ทำงานถ้าเปลี่ยนสถานะเป็น accessible
+                        link.replaceWith(link.cloneNode(true));
+                    }
+                }
+            });
+        }
+    </script>
+
+
     <div class="sidebar">
         <h2>ICT MAHIDOL</h2>
         <ul>
-            <h4>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
                      style="fill:#FFFFFF;">
-                    <path
-                            d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
-                    </path>
-                </svg>
-                Homepage
-            </h4>
-            <li><a href="/dashboard-instructors">Dashboard</a></li>
+                <path
+                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+                </path>
+            </svg> Homepage </h4>
+            <li><a href="/instructor/view">Dashboard</a></li>
         </ul>
 
         <ul>
-            <h4>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-                    <g fill="#ffffff" fill-rule="nonzero">
-                        <g transform="scale(5.33333,5.33333)">
-                            <path
-                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-                            </path>
-                        </g>
+            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                <g fill="#ffffff" fill-rule="nonzero">
+                    <g transform="scale(5.33333,5.33333)">
+                        <path
+                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                        </path>
                     </g>
-                </svg>
-                Evaluation (40%)
-            </h4>
-            <li><a href="/show-proposal-eva-projects">Proposal Evaluation</a></li>
-            <li><a href="/show-poster-projects">Poster Evaluation</a></li>
-            <li><a href="/show-defense-eva-projects">Defense Evaluation</a></li>
+                </g>
+            </svg> Evaluation (40%) </h4>
+            <li><a href="/show-proposal-eva-projects" data-period="proposalEvaluation">Proposal Evaluation</a></li>
+            <li><a href="/show-poster-projects" data-period="posterEvaluation">Poster Evaluation</a></li>
+            <li><a href="/show-defense-eva-projects" data-period="defenseEvaluation">Defense Evaluation</a></li>
         </ul>
 
         <ul>
-            <h4>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-                    <g fill="#ffffff" fill-rule="nonzero">
-                        <g transform="scale(5.33333,5.33333)">
-                            <path
-                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-                            </path>
-                        </g>
+            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                <g fill="#ffffff" fill-rule="nonzero">
+                    <g transform="scale(5.33333,5.33333)">
+                        <path
+                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                        </path>
                     </g>
-                </svg>
-                Grades (60%)
-            </h4>
-            <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>
-            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>
+                </g>
+            </svg> Grades (60%) </h4>
+            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Proposal Grade</a></li>
+            <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Defense Grade</a></li>
         </ul>
     </div>
+<!--    <div class="sidebar">-->
+<!--        <h2>ICT MAHIDOL</h2>-->
+<!--        <ul>-->
+<!--            <h4>-->
+<!--                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"-->
+<!--                     style="fill:#FFFFFF;">-->
+<!--                    <path-->
+<!--                            d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">-->
+<!--                    </path>-->
+<!--                </svg>-->
+<!--                Homepage-->
+<!--            </h4>-->
+<!--            <li><a href="/instructor/view">Dashboard</a></li>-->
+<!--        </ul>-->
+
+<!--        <ul>-->
+<!--            <h4>-->
+<!--                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
+<!--                    <g fill="#ffffff" fill-rule="nonzero">-->
+<!--                        <g transform="scale(5.33333,5.33333)">-->
+<!--                            <path-->
+<!--                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
+<!--                            </path>-->
+<!--                        </g>-->
+<!--                    </g>-->
+<!--                </svg>-->
+<!--                Evaluation (40%)-->
+<!--            </h4>-->
+<!--            <li><a href="/show-proposal-eva-projects">Proposal Evaluation</a></li>-->
+<!--            <li><a href="/show-poster-projects">Poster Evaluation</a></li>-->
+<!--            <li><a href="/show-defense-eva-projects">Defense Evaluation</a></li>-->
+<!--        </ul>-->
+
+<!--        <ul>-->
+<!--            <h4>-->
+<!--                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
+<!--                    <g fill="#ffffff" fill-rule="nonzero">-->
+<!--                        <g transform="scale(5.33333,5.33333)">-->
+<!--                            <path-->
+<!--                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
+<!--                            </path>-->
+<!--                        </g>-->
+<!--                    </g>-->
+<!--                </svg>-->
+<!--                Grades (60%)-->
+<!--            </h4>-->
+<!--            <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>-->
+<!--            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>-->
+<!--        </ul>-->
+<!--    </div>-->
 
     <div class="content">
 
@@ -494,7 +701,7 @@
                                 </span>
                             </div>
 
-                            <h1>Proposal Presentation (20%)</h1>
+                            <h1>Defense Presentation (20%)</h1>
                             <table class="evaluation-table" id="presentation-table">
                                     <!--              value              -->
                             </table>
@@ -1679,6 +1886,11 @@
     // Updated function to calculate grade with zero or null score check
     async function calculateGradeWithCheck(score, studentId) {
         console.log(`📝 Calculating grade for student: ${studentId} with total score: ${score}`);
+
+        // ดึงรายชื่ออาจารย์ของโปรเจคก่อน
+        const instructors = await projectInstructor(getProjectIdFromURL());
+      
+        console.log('📚 Instructors:', instructors);
 
         // Check if any score from any instructor is 0 or null
         const hasZeroOrNullScores = await checkForZeroScoresForAllInstructors(studentId, instructors);

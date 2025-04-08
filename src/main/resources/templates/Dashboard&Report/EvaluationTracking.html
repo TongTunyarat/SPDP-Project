@@ -1,0 +1,764 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proposal Grade Report</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/sidebar-admin.css">
+    <link rel="stylesheet" href="/css/EvaTracking.css">
+
+</head>
+<body>
+<div class="container">
+    <div class="sidebar">
+        <h2>ICT MAHIDOL</h2>
+        <ul>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                     style="fill:#FFFFFF;">
+                    <path
+                            d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+                    </path>
+                </svg>
+                Homepage
+            </h4>
+            <li><a href="/admin-dashboard">Dashboard</a></li>
+            <li><a href="/admin-proposal-report">Proposal Grade Report</a></li>
+            <li><a href="/admin-defense-report">Defense Grade Report</a></li>
+            <li><a href="/admin-eva-traking" class="active">Evaluation Tracking</a></li>
+        </ul>
+
+        <h2> Pages </h2>
+
+        <ul>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
+                    </g>
+                </svg>
+                Score Evaluation
+            </h4>
+            <li><a href="/scoring-periods">Scoring Period Settings</a></li>
+        </ul>
+
+        <ul>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                     style="fill:#FFFFFF;">
+                    <path
+                            d="M42 15v-2.5C42 8.916 39.084 6 35.5 6h-23C8.916 6 6 8.916 6 12.5V15H42zM25.5 27H32V33H25.5zM35 27H42V33H35zM6 27H13V33H6zM16 27H22.5V33H16zM35 18H42V24H35zM25.5 18H32V24H25.5zM25.5 36H32V42H25.5zM16 36H22.5V42H16zM35 36v6h.5c3.415 0 6.218-2.649 6.475-6H35zM6.025 36c.257 3.351 3.059 6 6.475 6H13v-6H6.025zM16 18H22.5V24H16zM6 18H13V24H6z">
+                    </path>
+                </svg>
+                Manage Schedule
+            </h4>
+            <li><a href="#">Proposal Schedule</a></li>
+            <li><a href="#">Defense Schedule</a></li>
+        </ul>
+
+        <ul>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                     style="fill:#FFFFFF;">
+                    <path
+                            d="M35.5,8h-3.551C31.697,5.756,29.81,4,27.5,4h-7c-2.31,0-4.197,1.756-4.449,4H12.5C10.019,8,8,10.019,8,12.5v27	c0,2.481,2.019,4.5,4.5,4.5h23c2.481,0,4.5-2.019,4.5-4.5v-27C40,10.019,37.981,8,35.5,8z M20.5,7h7C28.327,7,29,7.673,29,8.5	S28.327,10,27.5,10h-7C19.673,10,19,9.327,19,8.5S19.673,7,20.5,7z M22.5,34h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,34,22.5,34z M22.5,24h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,24,22.5,24z M34.561,34.439c0.586,0.585,0.586,1.536,0,2.121C34.268,36.854,33.884,37,33.5,37	s-0.768-0.146-1.061-0.439L31,35.121l-1.439,1.439C29.268,36.854,28.884,37,28.5,37s-0.768-0.146-1.061-0.439	c-0.586-0.585-0.586-1.536,0-2.121L28.879,33l-1.439-1.439c-0.586-0.585-0.586-1.536,0-2.121c0.586-0.586,1.535-0.586,2.121,0	L31,30.879l1.439-1.439c0.586-0.586,1.535-0.586,2.121,0c0.586,0.585,0.586,1.536,0,2.121L33.121,33L34.561,34.439z M34.561,21.561	l-4,4C30.268,25.854,29.884,26,29.5,26s-0.768-0.146-1.061-0.439l-2-2c-0.586-0.585-0.586-1.536,0-2.121	c0.586-0.586,1.535-0.586,2.121,0l0.939,0.939l2.939-2.939c0.586-0.586,1.535-0.586,2.121,0	C35.146,20.025,35.146,20.975,34.561,21.561z">
+                    </path>
+                </svg>
+                Manage Project
+            </h4>
+            <li><a href="/project-overview">Project Overview</a></li>
+            <li><a href="/project-details">Project Details</a></li>
+            <li><a href="/project-committee">Committee</a></li>
+            <li><a href="/project-poster-committee">Poster Committee</a></li>
+        </ul>
+    </div>
+
+    <div class="content">
+        <!--    HEADER    -->
+        <div class="header-section">
+            Evaluation Tracking
+
+            <div class="header-button">
+                <div class="semester-container">
+                    <select id="semester-selector" onchange="fetchData();"></select>
+                </div>
+
+<!--                <div class="export-btn">-->
+<!--                    <button>Export</button>-->
+<!--                </div>-->
+            </div>
+
+        </div>
+
+        <!--    TAB: ICT & DST    -->
+        <div class="tabs">
+            <div class="tab active">All</div>
+            <div class="tab">ICT</div>
+            <div class="tab">DST</div>
+
+            <div class="tabs-right">
+                <select id="evaTypeSelect">
+                    <option value="proposal" data-eva-type="Proposal">Proposal Presentation</option>
+                    <option value="poster" data-eva-type="Poster">Poster Exhibition</option>
+                    <option value="defense" data-eva-type="Defense">Senior Project Defense</option>
+                </select>
+
+                <input type="text" placeholder="Search">
+            </div>
+        </div>
+
+
+        <div class="body-section">
+
+            <div class="table-container">
+
+                <table>
+                    <thead>
+                    <tr>
+                        <th>Instructor ID</th>
+                        <th>Instructor Name</th>
+                        <th>Project ID</th>
+                        <th>Project Name</th>
+                        <th>Evaluation</th>
+                    </tr>
+                    </thead>
+                    <tbody id="projectTable">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+
+<!-- --------- Semester Change ------------- -->
+<script>
+    async function fetchAcademicYears() {
+        try {
+            const response = await fetch('/api/academic-years'); // เรียก API
+            const data = await response.json();
+
+            console.log(data);
+
+            const semesterSelector = document.getElementById('semester-selector');
+            semesterSelector.innerHTML = ""; // เคลียร์ค่าก่อนเติมใหม่
+
+            data.forEach(year => {
+                const option = document.createElement("option");
+                option.value = year;
+                option.textContent = "📆 "+year;
+                semesterSelector.appendChild(option);
+            });
+
+            // ตั้งค่าปีปัจจุบันเป็น default (เช่น 2025)
+            // const currentYear = new Date().getFullYear();  // หาปีปัจจุบัน
+            // if (!semesterSelector.value) {
+            //     semesterSelector.value = currentYear.toString();  // กำหนดค่า default เป็นปีปัจจุบัน
+            // }
+            //
+            // console.log(currentYear);
+            // // เรียก fetchGradingStatistics เพื่อส่งค่า initial ปีไป
+            // await fetchData();
+
+            // ตรวจสอบเดือนปัจจุบัน
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1; // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
+
+            // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
+            const defaultYear = currentMonth <= 6 ? currentYear - 1 : currentYear;
+
+            // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
+            if (data.includes(defaultYear.toString())) {
+                semesterSelector.value = defaultYear.toString();
+            } else {
+                semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+            }
+
+            // เรียก fetchGradingStatistics เพื่อส่งค่า initial ปีไป
+            await fetchData();
+
+        } catch (error) {
+            console.error("Error fetching academic years:", error);
+        }
+    }
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchAcademicYears();
+
+        // Initialize with default value from select element
+        const selectElement = document.querySelector('#evaTypeSelect');
+        let evaType = selectElement.options[selectElement.selectedIndex].getAttribute('data-eva-type');
+        // fetchData(evaType);
+
+        // Tab selection event listener
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                // Filter data by program
+                const program = this.textContent.trim();
+                filterByProgram(program);
+            });
+        });
+
+        // Evaluation type selection event listener
+        selectElement.addEventListener('change', function() {
+            evaType = this.options[this.selectedIndex].getAttribute('data-eva-type');
+            fetchData();
+        });
+
+        // Search functionality
+        const searchInput = document.querySelector('.tabs input[type="text"]');
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            filterBySearchTerm(searchTerm);
+        });
+
+        // Export button functionality
+        document.querySelector('.export-btn button').addEventListener('click', exportToCSV);
+    });
+
+    let allData = [];
+    let filteredData = [];
+    let currentProgram = 'All';
+    let currentSearchTerm = '';
+
+    function fetchData() {
+        let selectElement = document.getElementById('evaTypeSelect');
+        let evaType = selectElement.options[selectElement.selectedIndex].getAttribute('data-eva-type') || 'Proposal';
+        console.log("evaType: ", evaType);
+
+        const selectedYear = document.getElementById("semester-selector").value;  // ดึงปีที่เลือกจาก dropdown
+        console.log("selectedYear: ", selectedYear);  // ตรวจสอบว่าได้ค่าไหมใน console
+        if (!selectedYear) {
+            console.log("No year selected");
+            return;
+        }
+
+        document.getElementById('projectTable').innerHTML = `<tr><td colspan="5" class="loading">Loading...</td></tr>`;
+
+        fetch(`http://localhost:8080/api/evaluation-tracking?evaType=${evaType}&year=${selectedYear}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                processData(data);
+                applyFilters();
+            })
+            .catch(error => {
+                document.getElementById('projectTable').innerHTML = `<tr><td colspan="5" class="error">Error loading data: ${error.message}</td></tr>`;
+                console.error("Fetch error:", error);
+            });
+    }
+
+    function processData(data) {
+        if (!data.projectInstructorRole || !data.instructorEvaStatus) {
+            console.error("Invalid data format:", data);
+            document.getElementById('projectTable').innerHTML = `<tr><td colspan="5" class="error">Invalid data format received from server</td></tr>`;
+            return;
+        }
+
+        // Create a raw data array
+        const rawData = data.projectInstructorRole.map((item, i) => {
+            // Extract program from project ID (assuming format like "ICT-xxx" or "DST-xxx")
+            const projectId = item.projectIdRole?.projectId || '';
+            let program = '';
+            if (projectId.startsWith('ICT')) {
+                program = 'ICT';
+            } else if (projectId.startsWith('DST')) {
+                program = 'DST';
+            }
+
+            return {
+                professorId: item.instructor?.professorId || '-',
+                professorName: item.instructor?.professorName || '-',
+                projectId: projectId,
+                projectName: item.projectIdRole?.projectTitle || '-',
+                evaluationStatus: data.instructorEvaStatus[i]?.projectEvaStatus || '-',
+                program: program  // Keep program at project level
+            };
+        });
+
+        // Group data by professor
+        const groupedData = {};
+        rawData.forEach(item => {
+            const professorId = item.professorId;
+
+            if (!groupedData[professorId]) {
+                groupedData[professorId] = {
+                    professorId: professorId,
+                    professorName: item.professorName,
+                    projects: []
+                };
+            }
+
+            groupedData[professorId].projects.push({
+                projectId: item.projectId,
+                projectName: item.projectName,
+                evaluationStatus: item.evaluationStatus,
+                program: item.program  // Store program with each project
+            });
+        });
+
+        // Convert grouped data back to array
+        allData = Object.values(groupedData);
+        filteredData = [...allData];
+    }
+
+    function applyFilters() {
+        // Start with all professors
+        let result = [...allData];
+
+        // For program filter, we need to filter at the project level
+        if (currentProgram !== 'All') {
+            result = result.map(professor => {
+                // Create a new professor object with only matching projects
+                const filteredProjects = professor.projects.filter(
+                    project => project.program === currentProgram
+                );
+
+                if (filteredProjects.length > 0) {
+                    return {
+                        ...professor,
+                        projects: filteredProjects
+                    };
+                }
+                return null;
+            }).filter(professor => professor !== null); // Remove professors with no matching projects
+        }
+
+        // Then apply search term filter
+        if (currentSearchTerm) {
+            result = result.filter(item =>
+                item.professorId.toLowerCase().includes(currentSearchTerm) ||
+                item.professorName.toLowerCase().includes(currentSearchTerm) ||
+                item.projects.some(project =>
+                    project.projectId.toLowerCase().includes(currentSearchTerm) ||
+                    project.projectName.toLowerCase().includes(currentSearchTerm)
+                )
+            );
+        }
+
+        filteredData = result;
+        renderTable();
+    }
+
+    function renderTable() {
+        const table = document.getElementById('projectTable');
+        table.innerHTML = '';
+
+        if (filteredData.length === 0) {
+            table.innerHTML = `<tr><td colspan="5" class="no-data">No matching records found</td></tr>`;
+            return;
+        }
+
+        filteredData.forEach((professor, professorIndex) => {
+            // Sort projects: completed first, then by projectId
+            professor.projects.sort((a, b) => {
+                if (a.evaluationStatus !== b.evaluationStatus) {
+                    return a.evaluationStatus === 'Completed' ? -1 : 1;
+                }
+                return a.projectId.localeCompare(b.projectId);
+            });
+
+            // For each professor's projects
+            professor.projects.forEach((project, index) => {
+                const row = document.createElement('tr');
+
+                // กำหนดสีพื้นหลังให้กับแต่ละ instructor
+                if (professorIndex % 2 === 0) {
+                    row.style.backgroundColor = '#ffffff';
+                } else {
+                    row.style.backgroundColor = '#f3f3f3';
+                }
+
+                if (index === 0) {
+                    // First project row includes professor info with rowspan
+                    const projectCount = professor.projects.length;
+
+                    // ใช้รูปแบบที่คุณต้องการ โดยแยก projectId และ badge ให้อยู่คนละบรรทัด
+                    const prefix = project.projectId.match(/^(ICT|DST)/)[0];
+                    const remainingId = project.projectId.substring(prefix.length);
+
+                    row.innerHTML = `
+            <td rowspan="${projectCount}">${professor.professorId}</td>
+            <td rowspan="${projectCount}">${professor.professorName}</td>
+            <td>
+                ${remainingId}<br>
+                <div class="${prefix.toLowerCase()}-badge">${prefix}</div>
+            </td>
+            <td>${project.projectName}</td>
+            <td>${getStatusIcon(project.evaluationStatus)}</td>
+        `;
+                } else {
+                    // Subsequent project rows only include project info
+                    const prefix = project.projectId.match(/^(ICT|DST)/)[0];
+                    const remainingId = project.projectId.substring(prefix.length);
+
+                    row.innerHTML = `
+            <td>
+                ${remainingId}<br>
+                <div class="${prefix.toLowerCase()}-badge">${prefix}</div>
+            </td>
+            <td>${project.projectName}</td>
+            <td>${getStatusIcon(project.evaluationStatus)}</td>
+        `;
+                }
+
+                table.appendChild(row);
+            });
+        });
+    }
+
+    function getStatusIcon(status) {
+        if (status === 'success') {
+            return '<div class="status-icon completed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>';
+        } else {
+            return '<div class="status-icon pending"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg></div>';
+        }
+    }
+
+    function filterBySearchTerm(term) {
+        currentSearchTerm = term.toLowerCase();
+        applyFilters();
+    }
+
+    function filterByProgram(program) {
+        currentProgram = program;
+        applyFilters();
+    }
+
+    // function exportToCSV() {
+    //     const evaType = document.querySelector('#evaTypeSelect').options[
+    //         document.querySelector('#evaTypeSelect').selectedIndex
+    //         ].getAttribute('data-eva-type');
+    //
+    //     const headerRow = "Professor ID,Professor Name,Project ID,Project Name,Evaluation Status\n";
+    //
+    //     // Flatten the grouped data for CSV export
+    //     let csvRows = [];
+    //     filteredData.forEach(professor => {
+    //         professor.projects.forEach(project => {
+    //             csvRows.push(`"${professor.professorId}","${professor.professorName}","${project.projectId}","${project.projectName}","${project.evaluationStatus}"`);
+    //         });
+    //     });
+    //
+    //     const fullCsv = headerRow + csvRows.join('\n');
+    //     const blob = new Blob([fullCsv], { type: 'text/csv;charset=utf-8;' });
+    //     const link = document.createElement('a');
+    //     link.href = URL.createObjectURL(blob);
+    //
+    //     // Name the file based on the current evaluation type and date
+    //     const date = new Date().toISOString().slice(0, 10);
+    //     link.download = `${evaType}_evaluation_tracking_${date}.csv`;
+    //
+    //     document.body.appendChild(link);
+    //     link.click();
+    //     document.body.removeChild(link);
+    // }
+</script>
+
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>-->
+<!--<script>-->
+<!--    async function exportToCSV() {-->
+<!--        if (filteredData.length === 0) return;-->
+
+<!--        // ให้แสดงหน้าต่างการเลือกคอลัมน์และฟิลเตอร์สถานะ-->
+<!--        let result = await showColumnSelectionDialog();-->
+<!--        if (!result) return;-->
+
+<!--        const selectedColumns = result.columns;-->
+<!--        const evaluationFilter = result.programFilter;-->
+
+<!--        const workbook = new ExcelJS.Workbook();-->
+<!--        const worksheet = workbook.addWorksheet('Evaluation Tracking');-->
+
+<!--        // กำหนดคอลัมน์ทั้งหมดที่สามารถเลือกได้-->
+<!--        const allColumns = [-->
+<!--            { id: 'professorId', header: 'Instructor ID', key: 'professorId', width: 15 },-->
+<!--            { id: 'professorName', header: 'Instructor Name', key: 'professorName', width: 25 },-->
+<!--            { id: 'projectId', header: 'Project ID', key: 'projectId', width: 15 },-->
+<!--            { id: 'projectName', header: 'Project Name', key: 'projectName', width: 40 },-->
+<!--            { id: 'evaluationStatus', header: 'Evaluation Status', key: 'evaluationStatus', width: 15 }-->
+<!--        ];-->
+
+<!--        // กรองคอลัมน์ตามที่ผู้ใช้เลือก-->
+<!--        const filteredColumns = allColumns.filter(col => selectedColumns.includes(col.id));-->
+<!--        worksheet.columns = filteredColumns;-->
+
+<!--        // สร้างแถวหัวข้อและกำหนดรูปแบบ-->
+<!--        const headerRow = worksheet.getRow(1);-->
+<!--        headerRow.font = { bold: true, color: { argb: 'FFFFFF' } };-->
+<!--        headerRow.alignment = { vertical: 'middle', horizontal: 'center' };-->
+
+<!--        // กำหนดสีพื้นหลังให้กับหัวข้อ-->
+<!--        filteredColumns.forEach((col, index) => {-->
+<!--            const cell = headerRow.getCell(index + 1);-->
+<!--            cell.fill = {-->
+<!--                type: 'pattern',-->
+<!--                pattern: 'solid',-->
+<!--                fgColor: { argb: '4472C4' }-->
+<!--            };-->
+<!--        });-->
+
+<!--        // กรองข้อมูลตามสถานะการประเมิน-->
+<!--        let evaluationsToExport = filteredData;-->
+<!--        if (evaluationFilter !== 'all') {-->
+<!--            evaluationsToExport = filteredData.filter(eval => eval.projects.some(project => project.evaluationStatus.toLowerCase() === evaluationFilter.toLowerCase()));-->
+<!--        }-->
+
+<!--        // เพิ่มแถวข้อมูลลงใน worksheet-->
+<!--        evaluationsToExport.forEach(professor => {-->
+<!--            professor.projects.forEach(project => {-->
+<!--                const rowData = {-->
+<!--                    professorId: professor.professorId,-->
+<!--                    professorName: professor.professorName,-->
+<!--                    projectId: project.projectId,-->
+<!--                    projectName: project.projectName,-->
+<!--                    evaluationStatus: project.evaluationStatus-->
+<!--                };-->
+<!--                worksheet.addRow(rowData);-->
+<!--            });-->
+<!--        });-->
+
+<!--        // การปรับแต่งช่องต่างๆ (เช่น สีพื้นหลัง, ขอบ)-->
+<!--        worksheet.eachRow((row, rowNumber) => {-->
+<!--            if (rowNumber > 1) { // ข้ามแถวหัวข้อ-->
+<!--                row.alignment = { vertical: 'middle' };-->
+
+<!--                row.eachCell((cell, colNumber) => {-->
+<!--                    if (colNumber <= filteredColumns.length) {-->
+<!--                        cell.fill = {-->
+<!--                            type: 'pattern',-->
+<!--                            pattern: 'solid',-->
+<!--                            fgColor: { argb: rowNumber % 2 === 0 ? 'E9EFF7' : 'FFFFFF' }-->
+<!--                        };-->
+<!--                    }-->
+
+<!--                    // กำหนดขอบให้แต่ละเซลล์-->
+<!--                    cell.border = {-->
+<!--                        top: { style: 'thin' },-->
+<!--                        left: { style: 'thin' },-->
+<!--                        bottom: { style: 'thin' },-->
+<!--                        right: { style: 'thin' }-->
+<!--                    };-->
+<!--                });-->
+<!--            }-->
+<!--        });-->
+
+<!--        // สร้างชื่อไฟล์-->
+<!--        let filename = 'evaluation_tracking';-->
+<!--        if (evaluationFilter !== 'all') {-->
+<!--            filename += `_${evaluationFilter}`;-->
+<!--        }-->
+<!--        filename += '.xlsx';-->
+
+<!--        // เขียน buffer และดาวน์โหลดไฟล์-->
+<!--        const buffer = await workbook.xlsx.writeBuffer();-->
+<!--        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });-->
+<!--        const url = URL.createObjectURL(blob);-->
+<!--        const link = document.createElement('a');-->
+<!--        link.href = url;-->
+<!--        link.download = filename;-->
+<!--        document.body.appendChild(link);-->
+<!--        link.click();-->
+<!--        document.body.removeChild(link);-->
+<!--    }-->
+
+<!--    // ฟังก์ชันแสดง dialog ให้ผู้ใช้เลือกคอลัมน์และฟิลเตอร์สถานะ-->
+<!--    function showColumnSelectionDialog() {-->
+<!--        return new Promise(resolve => {-->
+<!--            const allColumns = [-->
+<!--                { id: 'professorId', name: 'Professor ID' },-->
+<!--                { id: 'professorName', name: 'Professor Name' },-->
+<!--                { id: 'projectId', name: 'Project ID' },-->
+<!--                { id: 'projectName', name: 'Project Name' },-->
+<!--                { id: 'evaluationStatus', name: 'Evaluation Status' }-->
+<!--            ];-->
+
+<!--            // สร้าง overlay-->
+<!--            const overlay = document.createElement('div');-->
+<!--            overlay.className = 'export-overlay';-->
+<!--            document.body.appendChild(overlay);-->
+
+<!--            // สร้าง dialog-->
+<!--            const dialog = document.createElement('div');-->
+<!--            dialog.className = 'export-dialog';-->
+
+<!--            // สร้างหัวข้อ-->
+<!--            const title = document.createElement('h3');-->
+<!--            title.textContent = 'เลือกคอลัมน์ที่ต้องการ Export';-->
+<!--            dialog.appendChild(title);-->
+
+<!--            // สร้างส่วนตัวกรอง Program-->
+<!--            const filterContainer = document.createElement('div');-->
+<!--            filterContainer.className = 'program-filter';-->
+
+<!--            const filterLabel = document.createElement('div');-->
+<!--            filterLabel.className = 'filter-label';-->
+<!--            filterLabel.textContent = 'กรองตาม Program:';-->
+<!--            filterContainer.appendChild(filterLabel);-->
+
+<!--            const programFilterOptions = document.createElement('div');-->
+<!--            programFilterOptions.className = 'filter-options';-->
+
+<!--            // ตัวเลือก All-->
+<!--            const allOption = document.createElement('div');-->
+<!--            allOption.className = 'filter-option selected';-->
+<!--            allOption.dataset.value = 'all';-->
+<!--            allOption.textContent = 'ทั้งหมด';-->
+<!--            programFilterOptions.appendChild(allOption);-->
+
+<!--            // ตัวเลือก DST-->
+<!--            const dstOption = document.createElement('div');-->
+<!--            dstOption.className = 'filter-option';-->
+<!--            dstOption.dataset.value = 'DST';-->
+<!--            dstOption.textContent = 'DST';-->
+<!--            programFilterOptions.appendChild(dstOption);-->
+
+<!--            // ตัวเลือก ICT-->
+<!--            const ictOption = document.createElement('div');-->
+<!--            ictOption.className = 'filter-option';-->
+<!--            ictOption.dataset.value = 'ICT';-->
+<!--            ictOption.textContent = 'ICT';-->
+<!--            programFilterOptions.appendChild(ictOption);-->
+
+<!--            filterContainer.appendChild(programFilterOptions);-->
+<!--            dialog.appendChild(filterContainer);-->
+
+<!--            // สร้างตัวเลือก Select All-->
+<!--            const selectAllContainer = document.createElement('div');-->
+<!--            selectAllContainer.className = 'select-all-option';-->
+
+<!--            const selectAllCheckbox = document.createElement('input');-->
+<!--            selectAllCheckbox.type = 'checkbox';-->
+<!--            selectAllCheckbox.id = 'select-all';-->
+<!--            selectAllCheckbox.checked = true;-->
+
+<!--            const selectAllLabel = document.createElement('label');-->
+<!--            selectAllLabel.htmlFor = 'select-all';-->
+<!--            selectAllLabel.textContent = 'เลือกทั้งหมด';-->
+
+<!--            selectAllContainer.appendChild(selectAllCheckbox);-->
+<!--            selectAllContainer.appendChild(selectAllLabel);-->
+<!--            dialog.appendChild(selectAllContainer);-->
+
+<!--            // สร้าง container สำหรับตัวเลือกคอลัมน์-->
+<!--            const columnsContainer = document.createElement('div');-->
+<!--            columnsContainer.className = 'column-options';-->
+
+<!--            // สร้างตัวเลือกคอลัมน์-->
+<!--            const checkboxes = [];-->
+<!--            allColumns.forEach(col => {-->
+<!--                const optionDiv = document.createElement('div');-->
+<!--                optionDiv.className = 'column-option';-->
+
+<!--                const checkbox = document.createElement('input');-->
+<!--                checkbox.type = 'checkbox';-->
+<!--                checkbox.id = `col-${col.id}`;-->
+<!--                checkbox.value = col.id;-->
+<!--                checkbox.checked = true;-->
+<!--                checkboxes.push(checkbox);-->
+
+<!--                const label = document.createElement('label');-->
+<!--                label.htmlFor = `col-${col.id}`;-->
+<!--                label.textContent = col.name;-->
+
+<!--                optionDiv.appendChild(checkbox);-->
+<!--                optionDiv.appendChild(label);-->
+<!--                columnsContainer.appendChild(optionDiv);-->
+<!--            });-->
+<!--            dialog.appendChild(columnsContainer);-->
+
+<!--            // สร้างส่วนปุ่มกด-->
+<!--            const actionsDiv = document.createElement('div');-->
+<!--            actionsDiv.className = 'export-actions';-->
+
+<!--            const cancelBtn = document.createElement('button');-->
+<!--            cancelBtn.className = 'cancel-button';-->
+<!--            cancelBtn.textContent = 'Cancel';-->
+<!--            cancelBtn.onclick = () => {-->
+<!--                document.body.removeChild(dialog);-->
+<!--                document.body.removeChild(overlay);-->
+<!--                resolve(null);-->
+<!--            };-->
+
+<!--            const confirmBtn = document.createElement('button');-->
+<!--            confirmBtn.className = 'export-button';-->
+<!--            confirmBtn.textContent = 'Export';-->
+<!--            confirmBtn.onclick = () => {-->
+<!--                const selectedCols = Array.from(document.querySelectorAll('.column-option input[type=checkbox]:checked')).map(cb => cb.value);-->
+<!--                if (selectedCols.length === 0) {-->
+<!--                    alert('โปรดเลือกอย่างน้อย 1 คอลัมน์');-->
+<!--                    return;-->
+<!--                }-->
+
+<!--                // รับค่าการกรอง program-->
+<!--                const selectedFilter = document.querySelector('.filter-option.selected').dataset.value;-->
+
+<!--                document.body.removeChild(dialog);-->
+<!--                document.body.removeChild(overlay);-->
+
+<!--                // ส่งคืนทั้งคอลัมน์ที่เลือกและตัวกรอง program-->
+<!--                resolve({-->
+<!--                    columns: selectedCols,-->
+<!--                    programFilter: selectedFilter-->
+<!--                });-->
+<!--            };-->
+
+<!--            actionsDiv.appendChild(cancelBtn);-->
+<!--            actionsDiv.appendChild(confirmBtn);-->
+<!--            dialog.appendChild(actionsDiv);-->
+
+<!--            // เพิ่มการทำงานของ Select All-->
+<!--            selectAllCheckbox.addEventListener('change', () => {-->
+<!--                checkboxes.forEach(cb => {-->
+<!--                    cb.checked = selectAllCheckbox.checked;-->
+<!--                });-->
+<!--            });-->
+
+<!--            // ติดตามการเปลี่ยนแปลงของ checkboxes-->
+<!--            checkboxes.forEach(cb => {-->
+<!--                cb.addEventListener('change', () => {-->
+<!--                    const allChecked = checkboxes.every(cb => cb.checked);-->
+<!--                    const noneChecked = checkboxes.every(cb => !cb.checked);-->
+
+<!--                    selectAllCheckbox.checked = allChecked;-->
+<!--                    selectAllCheckbox.indeterminate = !allChecked && !noneChecked;-->
+<!--                });-->
+<!--            });-->
+
+<!--            // เพิ่มการทำงานของตัวกรอง program-->
+<!--            const filterOptionElements = programFilterOptions.querySelectorAll('.filter-option');-->
+<!--            filterOptionElements.forEach(option => {-->
+<!--                option.addEventListener('click', () => {-->
+<!--                    // ลบ class selected จากทุกตัวเลือก-->
+<!--                    filterOptionElements.forEach(opt => opt.classList.remove('selected'));-->
+<!--                    // เพิ่ม class selected ให้กับตัวเลือกที่คลิก-->
+<!--                    option.classList.add('selected');-->
+<!--                });-->
+<!--            });-->
+
+<!--            // แสดง dialog-->
+<!--            document.body.appendChild(dialog);-->
+<!--        });-->
+<!--    }-->
+<!--</script>-->
+
+
+
+
+</html>

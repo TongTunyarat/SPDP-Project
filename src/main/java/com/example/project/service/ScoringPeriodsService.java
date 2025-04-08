@@ -30,7 +30,7 @@ public class ScoringPeriodsService {
         }
 
         // เช็คว่า ScoringPeriod มี evaluationType นั้นๆอยู่แล้วรึเปล่า
-        Optional<ScoringPeriods> existingScoringPeriod = scoringPeriodsRepository.findByEvaluationType(request.getEvaluationType());
+        Optional<ScoringPeriods> existingScoringPeriod = scoringPeriodsRepository.findByEvaluationTypeAndYear(request.getEvaluationType(), request.getYear());
 
         ScoringPeriods scoringPeriods;
 
@@ -40,6 +40,7 @@ public class ScoringPeriodsService {
             scoringPeriods.setStartDate(request.getStartDate());
             scoringPeriods.setEndDate(request.getEndDate());
             scoringPeriods.setRecordedByPeriod(account);
+            scoringPeriods.setYear(request.getYear());
 
             scoringPeriodsRepository.save(scoringPeriods);
         } else {
@@ -49,15 +50,25 @@ public class ScoringPeriodsService {
             scoringPeriods.setStartDate(request.getStartDate());
             scoringPeriods.setEndDate(request.getEndDate());
             scoringPeriods.setRecordedByPeriod(account);
+            scoringPeriods.setYear(request.getYear());
 
             scoringPeriodsRepository.save(scoringPeriods);
         }
     }
 
-    public Map<String, String> getFormattedDatesByEvaluationType(String evaluationType) {
+    public Map<String, String> getFormattedDatesByEvaluationType(String evaluationType, String year) {
         // ดึงวันที่จากฐานข้อมูล
-        LocalDate startDate = scoringPeriodsRepository.findStartDateByEvaluationType(evaluationType);
-        LocalDate endDate = scoringPeriodsRepository.findEndDateByEvaluationType(evaluationType);
+//        LocalDate startDate = scoringPeriodsRepository.findStartDateByEvaluationType(evaluationType);
+//        LocalDate endDate = scoringPeriodsRepository.findEndDateByEvaluationType(evaluationType);
+
+        System.out.println("evaluationType: " + evaluationType);
+        System.out.println("year: " + year);
+
+        LocalDate startDate = scoringPeriodsRepository.findStartDateByEvaluationTypeAndYear(evaluationType, year);
+        LocalDate endDate = scoringPeriodsRepository.findEndDateByEvaluationTypeAndYear(evaluationType, year);
+
+        System.out.println("startDate: " + startDate);
+        System.out.println("endDate: " + endDate);
 
         // จัดรูปแบบวันที่
         Map<String, String> result = new HashMap<>();

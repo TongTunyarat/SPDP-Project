@@ -82,4 +82,14 @@ public class Instructor {
     public void setProjectInstructorRoles(List<ProjectInstructorRole> projectInstructorRoles) {
         this.projectInstructorRoles = projectInstructorRoles;
     }
+
+    @Override
+    public String toString() {
+        return "Instructor{" +
+                "professorId='" + professorId + '\'' +
+                ", professorName='" + professorName + '\'' +
+                ", phone='" + phone + '\'' +
+                ", email='" + email + '\'' +
+                '}';
+    }
 }

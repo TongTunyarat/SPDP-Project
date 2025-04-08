@@ -1,0 +1,358 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap');
+
+body {
+    font-family: Inter;
+    margin: 0;
+    background-color: #f4f4f4;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #006C6C;
+    color: white;
+    /*padding: 2rem;*/
+    font-size: 1.9rem;
+    font-weight: 700;
+    height: 100px;
+    padding-top: 0.1rem;
+    padding-bottom: 5.5rem;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    letter-spacing: 0.05rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1)
+}
+
+.btn-header {
+    display: flex;
+    gap: 5px;
+}
+
+.btn-header button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    height: 30px;
+    cursor: pointer;
+    color: #624BFF;
+    font-weight: 500;
+    box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08),
+    0px 1px 2px 0px rgba(21, 30, 40, 0.08);
+}
+
+.btn-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.btn-footer button {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    height: 30px;
+    cursor: pointer;
+    color: #624BFF;
+    font-weight: 500;
+    box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08),
+    0px 1px 2px 0px rgba(21, 30, 40, 0.08);
+    margin: 20px;
+}
+
+
+/* Table */
+.table-container {
+    max-width: 1500px;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-top: -5rem;
+    margin-left: 32px;
+    margin-right: 32px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.8rem;
+
+}
+
+th,
+td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    max-width: 200px;
+}
+
+th.left-align,
+td.left-align {
+    text-align: left;
+}
+
+td{
+    font-size: 1rem;
+}
+
+th {
+    background-color: #f4f8fa;
+    font-weight: 650;
+    padding-top: 12px;
+    padding-bottom: 12px;
+}
+
+.tag {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 550;
+    margin-top: 4px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.ict {
+    background-color: #77B1B1;
+    color: white;
+}
+
+.dst {
+    background-color: #f5d76e;
+    color: black;
+}
+
+td:nth-child(4) {
+    word-wrap: break-word;
+    /* à¸›à¹‰à¸­à¸‡à¸à¸±à¸™à¸à¸²à¸£à¸¥à¹‰à¸™à¸‚à¸­à¸‡à¸‚à¹‰à¸­à¸„à¸§à¸²à¸¡ */
+    white-space: normal;
+    /* à¸­à¸™à¸¸à¸à¸²à¸•à¹ƒà¸«à¹‰à¹à¸šà¹ˆà¸‡à¸šà¸£à¸£à¸—à¸±à¸”à¹„à¸”à¹‰ */
+}
+
+.filter-controls {
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 10px 30px;
+    padding-left: 0px;
+    gap: 10px;
+}
+
+.filter-controls button {
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    background-color: #f0f2f5;
+}
+
+.filter.active {
+    background-color: #005A5A;
+    color: white;
+    box-shadow: 0 1px 4px rgba(0, 90, 90, 0.2);
+}
+
+.filter-controls input {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    width: 200px;
+}
+
+.filter-controls input {
+    margin-left: auto;
+}
+
+/* Pagination */
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    padding: 20px;
+}
+
+.page-btn {
+    border: none;
+    background-color: #E0E4EA;
+    padding: 8px 12px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.page-btn.active {
+    background-color: #005A5A;
+    color: white;
+}
+
+.student-row {
+    padding: 8px 0px;
+    display: flex;
+    align-items: center;
+}
+
+.student-row:not(:last-child) {
+    border-bottom: 1px dashed #eee;
+}
+
+.sec-cell .student-row, .track-cell .student-row {
+    justify-content: center;
+}
+
+
+.advisor-row {
+    padding: 6px 0;
+    display: block;
+    text-align: left;
+}
+
+.advisor-row:not(:last-child) {
+    border-bottom: 1px dashed #eee;
+}
+
+.id-cell {
+    width: 100px;
+}
+
+/*.name-cell {*/
+/*    width: 300px;*/
+/*}*/
+
+/*.sec-cell, .track-cell {*/
+/*    text-align: center;*/
+/*}*/
+
+
+
+
+/*========================================== Add 🧸 ==========================================*/
+
+tbody tr:hover {
+    background-color: #f9f9f9;
+}
+
+.instructor-container {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 8px;
+    background-color: #f9f9f9;
+    max-width: 250px;
+    text-align: left;
+}
+
+.instructor-group {
+    margin-bottom: 10px;
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 4px;
+}
+
+.instructor-group:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+    padding-bottom: 0;
+}
+
+
+.advisor-label {
+    background-color: #de1174;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    margin-right: 6px;
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.hidden-label {
+    visibility: hidden;
+}
+
+.committee-label {
+    background-color: #9b59b6;
+    color: white;
+    padding: 3px 8px;
+    border-radius: 4px;
+    font-size: 0.8em;
+    margin-right: 6px;
+    display: inline-block;
+    margin-bottom: 5px;
+}
+
+.instructor-name {
+    color: #333;
+    font-weight: 500;
+    margin-left: 5px;
+    font-size: 0.9rem;
+}
+
+.instructor-type {
+    color: #666;
+    font-size: 0.6rem;
+    margin-left: 5px;
+    margin-top: 1px;
+}
+
+td.empty-date,
+td.empty-time,
+td.empty-room {
+    position: relative;
+    background-color: #FFF3F3;
+}
+
+td.empty-date::after,
+td.empty-time::after,
+td.empty-room::after {
+    content: attr(data-placeholder);
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #D32F2F;
+    font-weight: bold;
+    opacity: 0.7;
+    padding: 5px;
+    /*border: 2px dashed #D32F2F;*/
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+td.empty-date:hover::after,
+td.empty-time:hover::after,
+td.empty-room:hover::after {
+    opacity: 1;
+    background-color: #FFF3F3;
+}
+
+.day-indicator {
+    width: 8.5px;
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+}
+
+.monday-indicator {
+    background-color: #FFF1BA;
+}
+
+.tuesday-indicator {
+    background-color: #FFB7B2;
+}
+
+.wednesday-indicator {
+    background-color: #C7F9CC;
+}
+
+.thursday-indicator {
+    background-color: #FFD3B6;
+}
+
+.friday-indicator {
+    background-color: #B5D0FF;
+}
+
+
+

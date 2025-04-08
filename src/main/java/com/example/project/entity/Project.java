@@ -91,6 +91,30 @@ public class Project {
     private List<ProposalEvaluation> proposalEvaluations;
 
 
+    public Project() {
+
+    }
+
+    // Constructor with arguments
+    public Project(String projectId, String program, String semester, String projectTitle,
+                   String projectCategory, String projectDescription,
+                   LocalDateTime recordedOn, LocalDateTime editedOn,
+                   Account recordedProject, Account editedProject) {
+        this.projectId = projectId;
+        this.program = program;
+        this.semester = semester;
+        this.projectTitle = projectTitle;
+        this.projectCategory = projectCategory;
+        this.projectDescription = projectDescription;
+        this.recordedOn = recordedOn;
+        this.editedOn = editedOn;
+        this.recordedProject = recordedProject;
+        this.editedProject = editedProject;
+    }
+
+
+
+
     public String getProjectId() {
         return projectId;
     }
@@ -225,6 +249,22 @@ public class Project {
 
     public void setGradingProposalEvaluations(List<GradingProposalEvaluation> gradingProposalEvaluations) {
         this.gradingProposalEvaluations = gradingProposalEvaluations;
+    }
+
+    @Override
+    public String toString() {
+        return "Project{" +
+                "projectId='" + projectId + '\'' +
+                ", program='" + program + '\'' +
+                ", semester='" + semester + '\'' +
+                ", projectTitle='" + projectTitle + '\'' +
+                ", projectCategory='" + projectCategory + '\'' +
+                ", projectDescription='" + projectDescription + '\'' +
+                ", recordedOn=" + recordedOn +
+                ", editedOn=" + editedOn +
+                ", recordedBy=" + (recordedProject != null ? recordedProject.getUsername() : null) +
+                ", editedBy=" + (editedProject != null ? editedProject.getUsername() : null) +
+                '}';
     }
 
 }

@@ -1,0 +1,96 @@
+<!--<!DOCTYPE html>-->
+<!--<html lang="en">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>Card Popup Edit Proposal</title>-->
+
+<!--  <link rel="stylesheet" href="/CSS/EditScheduleTiming.css">-->
+
+<!--  &lt;!&ndash; Library &ndash;&gt;-->
+<!--  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">-->
+<!--  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>-->
+<!--</head>-->
+<!--<body>-->
+
+<!--<div class="card-popup">-->
+<!--  &lt;!&ndash;        <p>CSRF Token: <span th:text="${_csrf.token}">ไม่มีค่า</span></p>&ndash;&gt;-->
+<!--              <div class="card-header">-->
+<!--                  <h1 class="card-title">DST SP2024-04</h1>-->
+<!--                  <div class="tag ict">ICT</div>-->
+<!--              </div>-->
+
+<!--              <div class="project-info">-->
+<!--                  <p><strong>Project Title : </strong> Project Management Tools (ProjectESS)</p>-->
+<!--              </div>-->
+
+<!--              <div class="students-section">-->
+<!--                  <h2 class="section-title">Instructor</h2>-->
+
+<!--                  <div class="student-card">-->
+<!--                      <div class="student-name">Tunyarat Nithirunpattana</div>-->
+<!--                      <div class="student-details">Advisor</div>-->
+<!--                  </div>-->
+
+<!--                  <div class="student-card">-->
+<!--                      <div class="student-name">Chanyanuch Nuangjumnong</div>-->
+<!--                      <div class="student-details">Committee</div>-->
+<!--                  </div>-->
+
+<!--                  <div class="student-card">-->
+<!--                      <div class="student-name">Neadnapa Thawontaweekul</div>-->
+<!--                      <div class="student-details">Committee</div>-->
+<!--                  </div>-->
+<!--              </div>-->
+
+<!--          <div class="modal-body">-->
+<!--              <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />-->
+<!--                          <p>CSRF Token: <span th:text="${_csrf.token}">ไม่มีค่า</span></p>-->
+<!--              <label>Start Date:</label>-->
+<!--              <input type="date" class="custom-input" id="start-date"/><br>-->
+
+<!--              <label>End Date:</label>-->
+<!--              <input type="date" class="custom-input" id="end-date"/><br>-->
+
+<!--              <label>Time Start :</label>-->
+<!--              <input type="time" class="custom-input"><br>-->
+
+<!--              <label>End Start :</label>-->
+<!--              <input type="time" class="custom-input"><br>-->
+
+<!--              <label>Room: </label>-->
+<!--              <div class="dropdown">-->
+
+<!--                  <button id="selected-label" onclick="toggleDropdown()">-->
+<!--                      <span id="selected-text">Select Room</span>-->
+<!--                  </button>-->
+
+<!--                  <div class="dropdown-content upward" id="dropdown-content">-->
+<!--                      <input type="text" id="search" placeholder="Search" onkeyup="filterRooms()">-->
+<!--                      <div id="room-list"></div>-->
+<!--                  </div>-->
+<!--              </div>-->
+<!--          </div>-->
+
+<!--              <div class="modal-footer">-->
+<!--                  <button id="saveBtn">Save</button>-->
+<!--                  <button id="cancelBtn">Cancel</button>-->
+<!--              </div>-->
+
+<!--</div>-->
+
+<!--&lt;!&ndash;          https://codepen.io/AdamDipinto/pen/ewKxwE&ndash;&gt;-->
+<!--<div class="modal-loader-overlay" id="modalLoaderOverlay" style="display:none;">-->
+<!--  <div class="loader-center">-->
+<!--    <div class="loader">-->
+<!--      <span></span>-->
+<!--      <span></span>-->
+<!--      <span></span>-->
+<!--      <span></span>-->
+<!--      <span></span>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+
+<!--</body>-->
+<!--</html>-->
