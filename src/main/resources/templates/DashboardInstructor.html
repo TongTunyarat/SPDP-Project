@@ -17,100 +17,170 @@
 
 <body>
 <div class="container">
+
     <!-- script ในการเปิดปิด period -->
     <script>
-        const accessPeriods = {
-            proposalEvaluation: {
-                start: "2025-02-01T00:00:00",
-                end: "2025-07-14T23:59:59",
-                isActive: true,
-                path: "/show-proposal-eva-projects",
-                title: "Proposal Evaluation"
-            },
-            posterEvaluation: {
-                start: "2025-02-01T00:00:00",
-                end: "2025-07-14T23:59:59",
-                isActive: true,
-                path: "/show-poster-projects",
-                title: "Poster Evaluation"
-            },
-            proposalGrade: {
-                start: "2025-02-01T00:00:00",
-                end: "2025-07-14T23:59:59",
-                isActive: true,
-                path: "/show-proposal-grade-projects",
-                title: "Proposal Grade"
-            },
-            defenseEvaluation: {
-                start: "2025-02-15T00:00:00",
-                end: "2025-07-15T23:59:59",
-                isActive: true,
-                path: "/show-defense-eva-projects",
-                title: "Defense Evaluation"
-            },
-            defenseGrade: {
-                start: "2025-02-15T00:00:00",
-                end: "2025-07-15T23:59:59",
-                isActive: true,
-                path: "/show-defense-grade-projects",
-                title: "Defense Grade"
+        let accessPeriods = {};
+
+        console.log('Calling updateLinkStatus function');
+        window.onload = fetchAccessPeriods;
+        setInterval(updateLinkStatus, 60000);
+
+        async function fetchAccessPeriods() {
+            try {
+                const response = await fetch('http://localhost:8080/api/period'); // เปลี่ยน URL ตาม backend ของคุณ
+                if (!response.ok) {
+                    throw new Error('Failed to fetch access periods');
+                }
+
+                const data = await response.json(); // แปลง response เป็น JSON
+                console.log(data);
+
+                accessPeriods = convertApiResponseToObject(data); // แปลง array จาก API เป็น object ที่ใช้งานง่าย
+                console.log("before set date: ", accessPeriods)
+                updateLinkStatus(); // อัปเดตสถานะของลิงก์
+            } catch (error) {
+                console.error('Error fetching access periods:', error);
             }
-        };
+        }
+
+        // ฟังก์ชันแปลง API Response (Array) เป็น Object ตาม key ที่ใช้ใน HTML
+        function convertApiResponseToObject(data) {
+            console.log("🎞️Convert api");
+            console.log(data);
+
+            // ตรวจสอบว่า data เป็น array และไม่เป็น null หรือ undefined
+            if (!Array.isArray(data) || data.length === 0) {
+                console.log("💡No data to process");
+                return {}; // ถ้าไม่มีข้อมูล หรือไม่เป็น array จะคืนค่าเป็น object ว่างๆ
+            }
+
+            // 1️⃣ กำหนดประเภทของ Evaluation ที่รองรับ
+            const allTypes = {
+                "proposalEvaluation": "/show-proposal-eva-projects",
+                "posterEvaluation": "/show-poster-projects",
+                "defenseEvaluation": "/show-defense-eva-projects",
+                "proposalGrade": "/show-proposal-grade-projects",
+                "defenseGrade": "/show-defense-grade-projects"
+            };
+
+            let periodsObj = {};
+
+            // 2️⃣ สร้างค่าเริ่มต้นให้ทุกประเภท (isActive = false)
+            Object.keys(allTypes).forEach(type => {
+                periodsObj[type] = {
+                    start: null, // ไม่มีข้อมูลให้เป็น null
+                    end: null,
+                    isActive: false, // ปิดการใช้งาน
+                    path: allTypes[type],
+                    title: type
+                };
+            });
+
+            // 3️⃣ อัปเดตค่าถ้ามีข้อมูลจาก API
+            data.forEach((period, index) => {
+                console.log(`💡Processing item at index: ${index}`);
+
+                let evaluationTypeKey;
+
+                // ใช้ switch-case เพื่อแปลง evaluationType ให้ตรงกับคีย์ใน allTypes
+                switch (period.evaluationType) {
+                    case "Proposal Evaluation":
+                        evaluationTypeKey = "proposalEvaluation";
+                        break;
+                    case "Poster Evaluation":
+                        evaluationTypeKey = "posterEvaluation";
+                        break;
+                    case "Defense Evaluation":
+                        evaluationTypeKey = "defenseEvaluation";
+                        break;
+                    case "Proposal Grade":
+                        evaluationTypeKey = "proposalGrade";
+                        break;
+                    case "Defense Grade":
+                        evaluationTypeKey = "defenseGrade";
+                        break;
+                    default:
+                        console.log(`💡No matching key for evaluation type: ${period.evaluationType}`);
+                        return; // ถ้าไม่ตรงกับ case ใดๆ ก็ให้ข้ามไป
+                }
+
+                console.log("💡Evaluation type key:", evaluationTypeKey);
+
+                if (periodsObj.hasOwnProperty(evaluationTypeKey)) {
+                    // ตรวจสอบและแปลงวันที่ ถ้าวันที่เป็น string ที่ไม่สามารถแปลงได้เป็นวันที่ จะตั้งค่าเป็น null
+                    const startDate = Date.parse(period.startDate); // แปลงเป็น timestamp
+                    const endDate = Date.parse(period.endDate); // แปลงเป็น timestamp
+
+                    periodsObj[evaluationTypeKey] = {
+                        start: isNaN(startDate) ? null : new Date(startDate), // ถ้าแปลงไม่สำเร็จให้เป็น null
+                        end: isNaN(endDate) ? null : new Date(endDate), // ถ้าแปลงไม่สำเร็จให้เป็น null
+                        isActive: true, // มีข้อมูล API -> เปิดใช้งาน
+                        path: allTypes[evaluationTypeKey],
+                        title: period.evaluationType
+                    };
+                }
+            });
+
+            console.log("🎞️Final periodsObj: ", periodsObj); // ตรวจสอบผลลัพธ์
+            return periodsObj;
+        }
 
         function updateLinkStatus() {
             const currentTime = new Date(); // Get current time
             console.log("Current Time: ", currentTime); // Debugging line
+            console.log("accessPeriods: ", accessPeriods)
 
             // Get all links with data-period
             const links = document.querySelectorAll('a[data-period]');
+            console.log("links:", links); // ตรวจสอบว่าได้ลิงก์ทั้งหมดหรือไม่
 
             links.forEach(link => {
                 const periodKey = link.getAttribute('data-period');
                 const period = accessPeriods[periodKey];
+                console.log("periodKey:", periodKey); // ตรวจสอบว่า periodKey ถูกต้อง
+                console.log("period: ",period)
 
                 if (period) {
-                    const startTime = new Date(period.start);
-                    const endTime = new Date(period.end);
-                    console.log(`Checking link ${periodKey}:`, currentTime, startTime, endTime); // Debugging line
+                    const startTime = period.start ? new Date(period.start) : null;
+                    const endTime = period.end ? new Date(period.end) : null;
 
-                    const isAccessible = currentTime >= startTime && currentTime <= endTime && period.isActive;
-                    console.log(`Is Accessible: ${isAccessible}`); // Debugging line
+                    console.log(`Checking link ${periodKey}:`, currentTime, startTime, endTime); // Debugging
+
+                    const isAccessible =
+                        period.isActive &&
+                        (startTime === null || currentTime >= startTime) &&
+                        (endTime === null || currentTime <= endTime);
+
+                    console.log(`Is Accessible: ${isAccessible}`);
+
 
                     if (!isAccessible) {
-                        link.classList.add('disabled-link');
-                        link.onclick = (e) => e.preventDefault(); // Prevent default action when link is disabled
+                        link.classList.add('disabled-link'); // เพิ่มสไตล์
+                        console.log('Disabled link added:', link);
 
-                        // Add tooltip if not already present
-                        if (!link.querySelector('.tooltip')) {
-                            const tooltipText = currentTime < startTime
-                                ? `Available from ${startTime.toLocaleDateString()}`
-                                : `Period ended on ${endTime.toLocaleDateString()}`;
+                        link.addEventListener('click', function (e) {
+                            e.preventDefault();
 
-                            const tooltip = document.createElement('span');
-                            tooltip.className = 'tooltip';
-                            tooltip.textContent = tooltipText;
-                            link.appendChild(tooltip);
-                        }
+                            let alertMessage = "🚫 This link is not accessible right now.";
+
+                            // ตรวจสอบว่า startTime หรือ endTime เป็น null หรือไม่
+                            if (startTime && endTime) {
+                                alertMessage += ` Available from ${startTime.toLocaleDateString()} to ${endTime.toLocaleDateString()}`;
+                            }
+
+                            console.warn(alertMessage); // แสดง warning ใน console
+                            alert(alertMessage); // แสดง alert ตามข้อความที่กำหนด
+                        });
                     } else {
                         link.classList.remove('disabled-link');
-                        link.onclick = null;
-                        const tooltip = link.querySelector('.tooltip');
-                        if (tooltip) {
-                            tooltip.remove();
-                        }
+
+                        // ลบ event listener ที่เคยเพิ่มไว้ เพื่อไม่ให้ alert ทำงานถ้าเปลี่ยนสถานะเป็น accessible
+                        link.replaceWith(link.cloneNode(true));
                     }
                 }
             });
         }
-
-        console.log('Calling updateLinkStatus function');
-        // First execution to update link status
-        // เรียก updateLinkStatus ทันทีเมื่อโหลดหน้า
-        window.onload = updateLinkStatus;
-
-        // ตั้งเวลาอัปเดตทุก 1 นาที
-        setInterval(updateLinkStatus, 60000);
-
     </script>
 
 
@@ -123,7 +193,7 @@
                         d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
                 </path>
             </svg> Homepage </h4>
-            <li><a href="#">Dashboard</a></li>
+            <li><a href="/instructor/view">Dashboard</a></li>
         </ul>
 
         <ul>
@@ -155,48 +225,6 @@
             <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Defense Grade</a></li>
         </ul>
     </div>
-
-    <!--    <div class="sidebar">-->
-    <!--        <h2>ICT MAHIDOL</h2>-->
-    <!--        <ul>-->
-    <!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"-->
-    <!--                     style="fill:#FFFFFF;">-->
-    <!--                <path-->
-    <!--                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">-->
-    <!--                </path>-->
-    <!--            </svg> Homepage </h4>-->
-    <!--            <li><a href="#">Dashboard</a></li>-->
-    <!--        </ul>-->
-
-    <!--        <ul>-->
-    <!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
-    <!--                <g fill="#ffffff" fill-rule="nonzero">-->
-    <!--                    <g transform="scale(5.33333,5.33333)">-->
-    <!--                        <path-->
-    <!--                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
-    <!--                        </path>-->
-    <!--                    </g>-->
-    <!--                </g>-->
-    <!--            </svg> Evaluation (40%) </h4>-->
-    <!--            <li><a href="/show-proposal-eva-projects">Proposal Evaluation</a></li>-->
-    <!--            <li><a href="/show-poster-projects">Poster Evaluation</a></li>-->
-    <!--            <li><a href="/show-defense-eva-projects">Defense Evaluation</a></li>-->
-    <!--        </ul>-->
-
-    <!--        <ul>-->
-    <!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
-    <!--                <g fill="#ffffff" fill-rule="nonzero">-->
-    <!--                    <g transform="scale(5.33333,5.33333)">-->
-    <!--                        <path-->
-    <!--                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
-    <!--                        </path>-->
-    <!--                    </g>-->
-    <!--                </g>-->
-    <!--            </svg> Grades (60%) </h4>-->
-    <!--            <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>-->
-    <!--            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>-->
-    <!--        </ul>-->
-    <!--    </div>-->
 
     <div class="content">
 
@@ -233,6 +261,8 @@
                     </label>
                     <label class="text-footer"><span th:text="${coProgramICT}">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span></label>
                 </div>
+
+
 
                 <div class="header-container">
                     <div class="header-title">
@@ -295,47 +325,67 @@
 
             </div>
 
-
             <!-- Reminder -->
-            <div class="reminder-container">
-                <div class="reminder-title">
-                    <i class="fa-solid fa-bell"></i>
-                    Reminder
-                </div>
+<!--            <div class="reminder-container">-->
+<!--                <div class="reminder-title">-->
+<!--                    <i class="fa-solid fa-bell"></i>-->
+<!--                    Reminder-->
+<!--                </div>-->
 
-                <div class="reminder-item">
-                    <div class="reminder-content">
-                        <div>
-                            <i class="fa-solid fa-circle-notch reminder-icon"></i>
-                            <span class="reminder-text">การประเมิน Proposal Presentation</span>
-                        </div>
-                        <span class="reminder-subtitle">กรอกคะแนน Proposal Evaluation</span>
+<!--                <div class="reminder-item">-->
+<!--                    <div class="reminder-content">-->
+<!--                        <div>-->
+<!--                            <i class="fa-solid fa-circle-notch reminder-icon"></i>-->
+<!--                            <span class="reminder-text">การประเมิน Proposal Presentation</span>-->
+<!--                        </div>-->
+<!--                        <span class="reminder-subtitle">กรอกคะแนน Proposal Evaluation</span>-->
+<!--                    </div>-->
+<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+<!--                </div>-->
+
+<!--                <div class="reminder-item">-->
+<!--                    <div class="reminder-content">-->
+<!--                        <div>-->
+<!--                            <i class="fa-solid fa-circle-notch reminder-icon "></i>-->
+<!--                            <span class="reminder-text">การประเมิน Poster Presentation</span>-->
+<!--                        </div>-->
+<!--                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>-->
+<!--                    </div>-->
+<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+<!--                </div>-->
+
+<!--                <div class="reminder-item">-->
+<!--                    <div class="reminder-content">-->
+<!--                        <div>-->
+<!--                            <i class="fa-solid fa-circle-notch reminder-icon "></i>-->
+<!--                            <span class="reminder-text">การประเมิน Proposal Presentation</span>-->
+<!--                        </div>-->
+<!--                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>-->
+<!--                    </div>-->
+<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+            <div class="main-content">
+                <div class="panel">
+                    <div class="panel-title">สัดส่วนเกรดของนักเรียนทั้งหมด</div>
+                    <div class="evaluation-selector" style="margin-bottom: 15px; text-align: center;">
+                        <button id="proposalBtn" class="eva-btn active" onclick="changeEvaType('Proposal Evaluation')">Proposal Grade</button>
+                        <button id="defenseBtn" class="eva-btn" onclick="changeEvaType('Defense Evaluation')">Defense Grade</button>
                     </div>
-                    <div class="reminder-date">กำหนด: 15/01/2025</div>
-                </div>
-
-                <div class="reminder-item">
-                    <div class="reminder-content">
-                        <div>
-                            <i class="fa-solid fa-circle-notch reminder-icon "></i>
-                            <span class="reminder-text">การประเมิน Poster Presentation</span>
-                        </div>
-                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>
+                    <div class="chart-container">
+                        <canvas id="gradeBarChart"></canvas>
                     </div>
-                    <div class="reminder-date">กำหนด: 15/01/2025</div>
-                </div>
-
-                <div class="reminder-item">
-                    <div class="reminder-content">
-                        <div>
-                            <i class="fa-solid fa-circle-notch reminder-icon "></i>
-                            <span class="reminder-text">การประเมิน Proposal Presentation</span>
-                        </div>
-                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>
+                    <div style="font-size: 13px; text-align: center; margin-top: 10px; color: #666;">
+                        แสดงการกระจายของเกรดในแต่ละระดับ คิดเป็นเปอร์เซ็นต์ของนักเรียนทั้งหมด
                     </div>
-                    <div class="reminder-date">กำหนด: 15/01/2025</div>
                 </div>
 
+                <div class="panel">
+                    <div class="panel-title">กำหนดการสำคัญ</div>
+                    <div class="timeline">
+                    </div>
+                </div>
             </div>
 
 
@@ -634,4 +684,315 @@
 
 
 </script>
+
+<!-- ---------- For Reminder Card ----------- -->
+<script>
+    // ฟังก์ชันสำหรับดึงข้อมูลและอัปเดต timeline
+    function fetchImportantDates() {
+        fetch("http://localhost:8080/api/important-dates")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                updateTimeline(data);
+            })
+            .catch(error => {
+                console.error("Error fetching important dates:", error);
+            });
+    }
+
+    function updateTimeline(scoringPeriods) {
+        const timelineContainer = document.querySelector(".timeline");
+        timelineContainer.innerHTML = ""; // ล้างข้อมูลเก่า
+
+        const displayNames = {
+            "Proposal Evaluation": "Proposal Presentation",
+            "Poster Evaluation": "Poster Exhibition",
+            "Defense Evaluation": "Senior Project Defense",
+            "Proposal Grade": "Proposal Grading",
+            "Defense Grade": "Defense Grading"
+        };
+
+        const today = new Date();
+        const currentYear = today.getFullYear();
+
+        scoringPeriods.forEach(period => {
+            const endDate = new Date(period.endDate);
+            if (endDate.getFullYear() !== currentYear) return;
+
+            const daysRemaining = Math.max(0, Math.ceil((endDate - today) / (1000 * 60 * 60 * 24)));
+
+            const startDateFormatted = formatDate(period.startDate);
+            const endDateFormatted = formatDate(period.endDate);
+
+            const timelineItem = document.createElement("div");
+            timelineItem.classList.add("timeline-item");
+
+            let statusClass = "";
+            let statusText = `เหลือเวลา : ${daysRemaining} วัน`;
+
+            if (daysRemaining === 0) {
+                statusClass = "timeline-expired";
+                statusText = "⏳ กำหนดการสิ้นสุดแล้ว!";
+            } else if (daysRemaining <= 7) {
+                statusClass = "timeline-urgent";
+            } else if (daysRemaining >= 30) {
+                statusClass = "timeline-chill";
+            } else if (daysRemaining < 30) {
+                statusClass = "timeline-lessthan1m"
+            }
+
+            if (statusClass) timelineItem.classList.add(statusClass);
+
+            timelineItem.innerHTML = `
+            <div class="timeline-icon">
+                <i class="fa-solid fa-calendar"></i>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-title">${displayNames[period.evaluationType] || period.evaluationType}</div>
+                <div class="timeline-date">ระยะเวลา : ${startDateFormatted} - ${endDateFormatted}</div>
+                <div class="timeline-status">${statusText}</div>
+            </div>
+        `;
+
+            timelineContainer.appendChild(timelineItem);
+        });
+    }
+
+
+
+    // ฟังก์ชันช่วยในการจัดรูปแบบวันที่
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}/${month}/${day}`;
+    }
+
+    // ดึงข้อมูลเมื่อโหลดหน้า
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchImportantDates();
+        fetchGradeDistribution();
+
+        // อัปเดตข้อมูลทุก 24 ชั่วโมง
+        setInterval(fetchImportantDates, 24 * 60 * 60 * 1000);
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- ---------- For Grade Bar Chart -------------- -->
+<!--<script>-->
+<!--    let gradeChart = null; // เก็บอ็อบเจ็กต์ Chart.js-->
+
+<!--    async function fetchGradeDistribution() {-->
+<!--        try {-->
+<!--            const semesterYear = new Date().getFullYear();-->
+<!--            const activeTab = "All";-->
+<!--            const evaType = "Proposal Evaluation";-->
+
+<!--            console.log(`Fetching data for: ${activeTab} program, ${semesterYear} year, ${evaType}`);-->
+
+<!--            const response = await fetch(`http://localhost:8080/api/grading-graph-instructor?program=${activeTab}&year=${semesterYear}&evaType=${evaType}`);-->
+<!--            const data = await response.json();-->
+<!--            updateChart(data, evaType);-->
+
+<!--        } catch (error) {-->
+<!--            console.error("Error fetching grade distribution:", error);-->
+<!--        }-->
+<!--    }-->
+
+<!--    function updateChart(gradeData, evaType) {-->
+<!--        console.log("👁️‍🗨️ Update Grade Bar Chart: ");-->
+<!--        console.log(gradeData);-->
+<!--        console.log(evaType)-->
+
+<!--        const ctx = document.getElementById("gradeBarChart").getContext("2d");-->
+<!--        const chartContainer = document.querySelector(".chart-container");-->
+<!--        console.log(chartContainer);-->
+
+<!--        // ตรวจสอบว่ามีข้อความเดิมอยู่หรือไม่-->
+<!--        let noGradeMessage = document.getElementById("noGradeMessage");-->
+
+<!--        if (evaType === "Poster Exhibition") {-->
+<!--            document.getElementById("gradeBarChart").style.display = "none";-->
+
+<!--            if (!noGradeMessage) {-->
+<!--                noGradeMessage = document.createElement("div");-->
+<!--                noGradeMessage.id = "noGradeMessage";-->
+<!--                noGradeMessage.classList.add("no-grade-message");-->
+<!--                noGradeMessage.textContent = "Poster Exhibition ไม่มีการประเมินเกรด";-->
+<!--                chartContainer.appendChild(noGradeMessage);-->
+<!--            }-->
+
+<!--            return;-->
+<!--        } else {-->
+<!--            document.getElementById("gradeBarChart").style.display = "block";-->
+<!--            console.log("Update Chart")-->
+<!--            if (noGradeMessage) {-->
+<!--                noGradeMessage.remove();-->
+<!--            }-->
+<!--        }-->
+
+<!--        if (gradeChart) {-->
+<!--            gradeChart.destroy();-->
+<!--        }-->
+
+<!--        const gradeOrder = ["A", "B+", "B", "C+", "C", "D+", "D", "F", "I"];-->
+<!--        const chartData = gradeOrder.map(grade => gradeData[grade] || 0);-->
+
+<!--        gradeChart = new Chart(ctx, {-->
+<!--            type: "bar",-->
+<!--            data: {-->
+<!--                labels: gradeOrder,-->
+<!--                datasets: [{-->
+<!--                    label: "จำนวนนักเรียน",-->
+<!--                    data: chartData,-->
+<!--                    backgroundColor: [-->
+<!--                        "#4CAF50", "#8BC34A", "#CDDC39",-->
+<!--                        "#FFEB3B", "#FFC107", "#FF9800",-->
+<!--                        "#FF5722", "#F44336", "#9E9E9E"-->
+<!--                    ],-->
+<!--                    borderColor: "#444",-->
+<!--                    borderWidth: 1-->
+<!--                }]-->
+<!--            },-->
+<!--            options: {-->
+<!--                responsive: true,-->
+<!--                maintainAspectRatio: false,-->
+<!--                plugins: {-->
+<!--                    legend: { display: false },-->
+<!--                    tooltip: {-->
+<!--                        callbacks: {-->
+<!--                            label: (tooltipItem) => `${tooltipItem.raw} คน`-->
+<!--                        }-->
+<!--                    }-->
+<!--                },-->
+<!--                scales: {-->
+<!--                    x: { grid: { display: false } },-->
+<!--                    y: {-->
+<!--                        beginAtZero: true,-->
+<!--                        title: { display: true, text: "จำนวนนักเรียน" }-->
+<!--                    }-->
+<!--                }-->
+<!--            }-->
+<!--        });-->
+<!--    }-->
+<!--</script>-->
+<script>
+    let gradeChart = null; // เก็บอ็อบเจ็กต์ Chart.js
+    let currentEvaType = "Proposal Evaluation"; // ค่าเริ่มต้น
+
+    // เพิ่มฟังก์ชันเปลี่ยน Evaluation Type
+    function changeEvaType(newEvaType) {
+        currentEvaType = newEvaType;
+
+        // อัปเดตสถานะปุ่ม
+        document.getElementById("proposalBtn").classList.toggle("active", newEvaType === "Proposal Evaluation");
+        document.getElementById("defenseBtn").classList.toggle("active", newEvaType === "Defense Evaluation");
+
+        // ดึงข้อมูลใหม่
+        fetchGradeDistribution();
+    }
+
+    async function fetchGradeDistribution() {
+        try {
+            const semesterYear = new Date().getFullYear();
+            const activeTab = "All";
+
+            console.log(`Fetching data for: ${activeTab} program, ${semesterYear} year, ${currentEvaType}`);
+
+            const response = await fetch(`http://localhost:8080/api/grading-graph-instructor?program=${activeTab}&year=${semesterYear}&evaType=${currentEvaType}`);
+            const data = await response.json();
+            updateChart(data, currentEvaType);
+
+        } catch (error) {
+            console.error("Error fetching grade distribution:", error);
+        }
+    }
+
+    function updateChart(gradeData, evaType) {
+        console.log("👁️‍🗨️ Update Grade Bar Chart: ");
+        console.log(gradeData);
+        console.log(evaType);
+
+        const ctx = document.getElementById("gradeBarChart").getContext("2d");
+        const chartContainer = document.querySelector(".chart-container");
+
+        // ตรวจสอบว่ามีข้อความเดิมอยู่หรือไม่
+        let noGradeMessage = document.getElementById("noGradeMessage");
+
+        if (evaType === "Poster Exhibition") {
+            document.getElementById("gradeBarChart").style.display = "none";
+
+            if (!noGradeMessage) {
+                noGradeMessage = document.createElement("div");
+                noGradeMessage.id = "noGradeMessage";
+                noGradeMessage.classList.add("no-grade-message");
+                noGradeMessage.textContent = "Poster Exhibition ไม่มีการประเมินเกรด";
+                chartContainer.appendChild(noGradeMessage);
+            }
+
+            return;
+        } else {
+            document.getElementById("gradeBarChart").style.display = "block";
+            console.log("Update Chart");
+            if (noGradeMessage) {
+                noGradeMessage.remove();
+            }
+        }
+
+        if (gradeChart) {
+            gradeChart.destroy();
+        }
+
+        const gradeOrder = ["A", "B+", "B", "C+", "C", "D+", "D", "F", "I"];
+        const chartData = gradeOrder.map(grade => gradeData[grade] || 0);
+
+        gradeChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: gradeOrder,
+                datasets: [{
+                    label: "จำนวนนักเรียน",
+                    data: chartData,
+                    backgroundColor: [
+                        "#4CAF50", "#8BC34A", "#CDDC39",
+                        "#FFEB3B", "#FFC107", "#FF9800",
+                        "#FF5722", "#F44336", "#9E9E9E"
+                    ],
+                    borderColor: "#444",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (tooltipItem) => `${tooltipItem.raw} คน`
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: "จำนวนนักเรียน" }
+                    }
+                }
+            }
+        });
+    }
+
+    // เรียกฟังก์ชันครั้งแรกเมื่อโหลดหน้าเว็บ
+    document.addEventListener("DOMContentLoaded", fetchGradeDistribution);
+</script>
+
+
 

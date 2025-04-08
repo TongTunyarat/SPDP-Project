@@ -47,7 +47,7 @@
                     </g>
                 </g>
             </svg>Score Evaluation </h4>
-            <li><a href="#">Scoring Period Settings</a></li>
+            <li><a href="/scoring-periods">Scoring Period Settings</a></li>
         </ul>
 
         <ul>
@@ -83,6 +83,14 @@
             <div class="semester-container">
                 <select id="semester-selector" onchange="fetchGradingStatistics(); fetchProposalData(); fetchDefenseData(); fetchPosterData(); fetchGradeDistribution(); fetchEvaluationStatus(); fetchTeacherScoringData();"></select>
             </div>
+
+            <!--    TAB: Proposal & Poster &  Defense   -->
+            <div class="filters">
+                <div class="filter active">Proposal</div>
+                <div class="filter">Poster</div>
+                <div class="filter">Defense</div>
+            </div>
+
         </div>
 
         <!--    TAB: ICT & DST    -->
@@ -96,12 +104,9 @@
         <div class="card-wrapper">
             <div class="header-container">
                 <label class="text-header"> Proposal Grading </label>
-
                 <label class="text-center">
                     <h1> 0/0 <span style="color: #919EAB;"></span></h1>
                 </label>
-
-                <label class="text-footer"> 0 <span style="color: #919EAB;"> completed </span> </label>
             </div>
 
             <div class="header-container">
@@ -109,7 +114,6 @@
                 <label class="text-center">
                     <h1> 0/0 <span style="color: #919EAB;"></span></h1>
                 </label>
-                <label class="text-footer"> 0 <span style="color: #919EAB;"> completed </span> </label>
             </div>
 
             <div class="header-container">
@@ -117,8 +121,6 @@
                 <label class="text-center">
                     <h1> 0/0 <span style="color: #919EAB;">Groups</span></h1>
                 </label>
-
-                <label class="text-footer"> 0 <span style="color: #919EAB;"> completed </span> </label>
             </div>
 
             <div class="header-container">
@@ -126,8 +128,6 @@
                 <label class="text-center">
                     <h1> 0/0 <span style="color: #919EAB;">Groups</span></h1>
                 </label>
-
-                <label class="text-footer"> 0 <span style="color: #919EAB;"> completed </span> </label>
             </div>
 
             <div class="header-container">
@@ -135,39 +135,17 @@
                 <label class="text-center">
                     <h1> 0/0 <span style="color: #919EAB;">Groups</span></h1>
                 </label>
-
-                <label class="text-footer"> 0 <span style="color: #919EAB;"> completed </span> </label>
             </div>
         </div>
 
-        <!--    TAB: Proposal & Poster &  Defense   -->
-        <div class="filters">
-            <div class="filter active">Proposal</div>
-            <div class="filter">Poster</div>
-            <div class="filter">Defense</div>
-        </div>
 
         <!--    Content    -->
         <div class="main-content">
             <div class="panel">
                 <div class="panel-title">สัดส่วนเกรดของนักเรียนทั้งหมด</div>
                 <div class="chart-container">
-                    <div class="bar-chart" id="barChart">
-                        <!-- แสดงกราฟ -->
-                    </div>
-                    <div class="x-axis">
-                        <div class="x-label">A</div>
-                        <div class="x-label">B+</div>
-                        <div class="x-label">B</div>
-                        <div class="x-label">C+</div>
-                        <div class="x-label">C</div>
-                        <div class="x-label">D+</div>
-                        <div class="x-label">D</div>
-                        <div class="x-label">F</div>
-                        <div class="x-label">I</div>
-                    </div>
+                    <canvas id="gradeBarChart"></canvas>
                 </div>
-                <div class="tooltip" id="tooltip"></div> <!-- เพิ่ม tooltip -->
                 <div style="font-size: 13px; text-align: center; margin-top: 10px; color: #666;">
                     แสดงการกระจายของเกรดในแต่ละระดับ คิดเป็นเปอร์เซ็นต์ของนักเรียนทั้งหมด
                 </div>
@@ -176,109 +154,22 @@
             <div class="panel">
                 <div class="panel-title">กำหนดการสำคัญ</div>
                 <div class="timeline">
-                    <div class="timeline-item">
-                        <div class="timeline-icon">🕒</div>
-                        <div class="timeline-content">
-                            <div class="timeline-title">Proposal Presentation</div>
-                            <div class="timeline-date">ระยะเวลา : 2025/01/15 - 2025/01/15</div>
-                            <div class="timeline-status">เหลือเวลา : 0 วัน</div>
-                        </div>
-                    </div>
+                </div>
+            </div>
 
-                    <div class="timeline-item">
-                        <div class="timeline-icon">🕒</div>
-                        <div class="timeline-content">
-                            <div class="timeline-title">Poster Exhibition</div>
-                            <div class="timeline-date">ระยะเวลา : 2025/01/15 - 2025/01/15</div>
-                            <div class="timeline-status">เหลือเวลา : 1 วัน</div>
-                        </div>
-                    </div>
-
-                    <div class="timeline-item">
-                        <div class="timeline-icon">🕒</div>
-                        <div class="timeline-content">
-                            <div class="timeline-title">Senior Project Defense</div>
-                            <div class="timeline-date">ระยะเวลา : 2025/01/15 - 2025/01/15</div>
-                            <div class="timeline-status">เหลือเวลา : 60 วัน</div>
-                        </div>
-                    </div>
+            <div class="panel">
+                <div class="panel-title">สถานะการประเมินคะแนนนักศึกษา</div>
+                <div class="panel-chart">
+                    <canvas id="evaluationPieChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <div class="main-content">
-            <div class="panel">
-                <div class="panel-title">สถานะการประเมินนักเรียน</div>
-                <div class="panel-chart-legend" style="display: flex;">
-                    <div class="pie-chart">
-                        <div class="percentage green" id="completed"></div>
-                        <div class="percentage yellow" id="partial"></div>
-                        <div class="percentage red" id="notEvaluated"></div>
-                    </div>
-                    <div class="legend" style="margin-left: 20px;">
-                        <div class="legend-item">
-                            <div class="legend-color green"></div>
-                            <div>ได้รับการประเมินครบแล้ว</div>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color yellow"></div>
-                            <div>ได้รับการประเมินบางส่วน</div>
-                        </div>
-                        <div class="legend-item">
-                            <div class="legend-color red"></div>
-                            <div>ยังไม่ได้รับการประเมิน</div>
-                        </div>
-                    </div>
-                </div>
+        <div class="main-content-list">
+            <div class="panel-list">
+                <div class="panel-title">ความคืบหน้าการประเมินนักศึกษาของอาจารย์</div>
+                <canvas id="teacher-scoring-chart"></canvas>
             </div>
-
-            <div class="panel">
-                <div class="panel-title">อาจารย์ที่ยังไม่ลงคะแนน</div>
-                <div class="horizontal-bar-chart" id="teacher-scoring-container">
-                    <!-- ข้อมูลจะถูกเพิ่มที่นี่โดย JavaScript -->
-                </div>
-            </div>
-
-<!--            <div class="panel">-->
-<!--                <div class="panel-title">อาจารย์ที่ยังไม่ลงคะแนน</div>-->
-<!--                <div class="horizontal-bar-chart">-->
-<!--                    <div class="h-bar-item">-->
-<!--                        <div class="h-bar-label">Aj.Siripen</div>-->
-<!--                        <div class="h-bar-container">-->
-<!--                            <div class="h-bar-fill" style="width: 85%;"></div>-->
-<!--                        </div>-->
-<!--                        <div class="h-bar-percentage">15 คนที่เหลือ</div>-->
-<!--                    </div>-->
-<!--                    <div class="h-bar-item">-->
-<!--                        <div class="h-bar-label">Aj.Jidapa</div>-->
-<!--                        <div class="h-bar-container">-->
-<!--                            <div class="h-bar-fill" style="width: 70%;"></div>-->
-<!--                        </div>-->
-<!--                        <div class="h-bar-percentage">10 คนที่เหลือ</div>-->
-<!--                    </div>-->
-<!--                    <div class="h-bar-item">-->
-<!--                        <div class="h-bar-label">Aj.Siripen</div>-->
-<!--                        <div class="h-bar-container">-->
-<!--                            <div class="h-bar-fill" style="width: 65%;"></div>-->
-<!--                        </div>-->
-<!--                        <div class="h-bar-percentage">8 คนที่เหลือ</div>-->
-<!--                    </div>-->
-<!--                    <div class="h-bar-item">-->
-<!--                        <div class="h-bar-label">Aj.Siripen</div>-->
-<!--                        <div class="h-bar-container">-->
-<!--                            <div class="h-bar-fill" style="width: 60%;"></div>-->
-<!--                        </div>-->
-<!--                        <div class="h-bar-percentage">7 คนที่เหลือ</div>-->
-<!--                    </div>-->
-<!--                    <div class="h-bar-item">-->
-<!--                        <div class="h-bar-label">Aj.Siripen</div>-->
-<!--                        <div class="h-bar-container">-->
-<!--                            <div class="h-bar-fill" style="width: 40%;"></div>-->
-<!--                        </div>-->
-<!--                        <div class="h-bar-percentage">5 คนที่เหลือ</div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
         </div>
     </div>
 
@@ -368,14 +259,30 @@
             data.forEach(year => {
                 const option = document.createElement("option");
                 option.value = year;
-                option.textContent = "📆 "+year;
+                option.textContent = "🗓︎ "+year;
+                // option.innerHTML = `<!--<i class='far fa-calendar'></i> ${year} <i class='fas fa-chevron-down dropdown-arrow'></i>-->`;
                 semesterSelector.appendChild(option);
             });
 
             // ตั้งค่าปีปัจจุบันเป็น default (เช่น 2025)
-            const currentYear = new Date().getFullYear();  // หาปีปัจจุบัน
-            if (!semesterSelector.value) {
-                semesterSelector.value = currentYear.toString();  // กำหนดค่า default เป็นปีปัจจุบัน
+            // const currentYear = new Date().getFullYear();  // หาปีปัจจุบัน
+            // if (!semesterSelector.value) {
+            //     semesterSelector.value = currentYear.toString();  // กำหนดค่า default เป็นปีปัจจุบัน
+            // }
+
+            // ตรวจสอบเดือนปัจจุบัน
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1; // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
+
+            // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
+            const defaultYear = currentMonth <= 6 ? currentYear - 1 : currentYear;
+
+            // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
+            if (data.includes(defaultYear.toString())) {
+                semesterSelector.value = defaultYear.toString();
+            } else {
+                semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
             }
 
             // เรียก fetchGradingStatistics เพื่อส่งค่า initial ปีไป
@@ -516,27 +423,27 @@
         const proposalCard = document.querySelector('.card-wrapper .header-container:nth-child(1)');
         if (proposalCard) {
             const headingEl = proposalCard.querySelector('.text-center h1');
-            const footerEl = proposalCard.querySelector('.text-footer');
+            // const footerEl = proposalCard.querySelector('.text-footer');
 
             if (headingEl) {
                 headingEl.innerHTML = `${successfulCount}/${totalCount} <span style="color: #919EAB;"> Students </span>`;
             }
-            if (footerEl) {
-                footerEl.innerHTML = `${successfulCount} <span style="color: #919EAB;"> completed </span>`;
-            }
+            // if (footerEl) {
+            //     footerEl.innerHTML = `${successfulCount} <span style="color: #919EAB;"> completed </span>`;
+            // }
         }
 
         const defenseCard = document.querySelector('.card-wrapper .header-container:nth-child(2)');
         if (defenseCard) {
             const headingEl = defenseCard.querySelector('.text-center h1');
-            const footerEl = defenseCard.querySelector('.text-footer');
+            // const footerEl = defenseCard.querySelector('.text-footer');
 
             if (headingEl) {
                 headingEl.innerHTML = `${successfulCount}/${totalCount} <span style="color: #919EAB;"> Students </span>`;
             }
-            if (footerEl) {
-                footerEl.innerHTML = `${successfulCount} <span style="color: #919EAB;"> completed </span>`;
-            }
+            // if (footerEl) {
+            //     footerEl.innerHTML = `${successfulCount} <span style="color: #919EAB;"> completed </span>`;
+            // }
         }
     }
 </script>
@@ -575,15 +482,15 @@
                 const headerText = container.querySelector(".text-header");
                 if (headerText && headerText.textContent.includes("Proposal Evaluation")) {
                     const proposalHeader = container.querySelector(".text-center h1");
-                    const proposalFooter = container.querySelector(".text-footer");
+                    // const proposalFooter = container.querySelector(".text-footer");
 
                     if (proposalHeader) {
                         proposalHeader.innerHTML = `${data.completedProjects}/${data.totalProjects} <span style="color: #919EAB;">Groups</span>`;
                     }
 
-                    if (proposalFooter) {
-                        proposalFooter.innerHTML = `${data.completedProjects} <span style="color: #919EAB;">completed</span>`;
-                    }
+                    // if (proposalFooter) {
+                    //     proposalFooter.innerHTML = `${data.completedProjects} <span style="color: #919EAB;">completed</span>`;
+                    // }
                 }
             });
 
@@ -636,15 +543,15 @@
                 const headerText = container.querySelector(".text-header");
                 if (headerText && headerText.textContent.includes("Defense Evaluation")) {
                     const defenseHeader = container.querySelector(".text-center h1");
-                    const defenseFooter = container.querySelector(".text-footer");
+                    // const defenseFooter = container.querySelector(".text-footer");
 
                     if (defenseHeader) {
                         defenseHeader.innerHTML = `${data.completedProjects}/${data.totalProjects} <span style="color: #919EAB;">Groups</span>`;
                     }
 
-                    if (defenseFooter) {
-                        defenseFooter.innerHTML = `${data.completedProjects} <span style="color: #919EAB;">completed</span>`;
-                    }
+                    // if (defenseFooter) {
+                    //     defenseFooter.innerHTML = `${data.completedProjects} <span style="color: #919EAB;">completed</span>`;
+                    // }
                 }
             });
 
@@ -683,15 +590,15 @@
                 if (headerText && headerText.textContent.includes("Poster Evaluation")) {
                     console.log("update poster card")
                     const posterHeader = container.querySelector(".text-center h1");
-                    const posterFooter = container.querySelector(".text-footer");
+                    // const posterFooter = container.querySelector(".text-footer");
 
                     if (posterHeader) {
                         posterHeader.innerHTML = `${data.completedProjects}/${data.totalProjects} <span style="color: #919EAB;">Groups</span>`;
                     }
 
-                    if (posterFooter) {
-                        posterFooter.innerHTML = `${data.completedProjects} <span style="color: #919EAB;">completed</span>`;
-                    }
+                    // if (posterFooter) {
+                    //     posterFooter.innerHTML = `${data.completedProjects} <span style="color: #919EAB;">completed</span>`;
+                    // }
                 }
             });
 
@@ -703,107 +610,108 @@
 
 <!-- ---------- For Grade Bar Chart -------------- -->
 <script>
-    // อัปเดตฟังก์ชัน fetchGradeDistribution ให้รับพารามิเตอร์จากตัวเลือกต่างๆ
-    function fetchGradeDistribution() {
-        // อ่านค่าจาก UI elements ทั้งหมด
-        const semesterYear = document.getElementById("semester-selector").value;
+    let gradeChart = null; // เก็บอ็อบเจ็กต์ Chart.js
 
-        // หา tab ที่กำลัง active อยู่ (All, ICT, DST)
-        const activeTab = document.querySelector(".tab.active").textContent;
+    async function fetchGradeDistribution() {
+        try {
+            const semesterYear = document.getElementById("semester-selector").value;
+            const activeTab = document.querySelector(".tab.active").textContent;
+            const activeFilter = document.querySelector(".filter.active").textContent;
 
-        // หา filter ที่กำลัง active อยู่ (Proposal, Poster, Defense)
-        const activeFilter = document.querySelector(".filter.active").textContent;
+            let evaType;
+            switch (activeFilter) {
+                case "Proposal": evaType = "Proposal Evaluation"; break;
+                case "Poster": evaType = "Poster Exhibition"; break;
+                case "Defense": evaType = "Defense Evaluation"; break;
+                default: evaType = "Proposal Evaluation";
+            }
 
-        // Map filter text เป็นค่า evaType ที่ต้องการส่งไป API
-        let evaType;
-        switch (activeFilter) {
-            case "Proposal":
-                evaType = "Proposal Evaluation";
-                break;
-            case "Poster":
-                evaType = "Poster Exhibition";
-                break;
-            case "Defense":
-                evaType = "Defense Evaluation";
-                break;
-            default:
-                evaType = "Proposal Evaluation";
+            console.log(`Fetching data for: ${activeTab} program, ${semesterYear} year, ${evaType}`);
+
+            const response = await fetch(`http://localhost:8080/api/grading-graph?program=${activeTab}&year=${semesterYear}&evaType=${evaType}`);
+            const data = await response.json();
+            updateChart(data, evaType);
+
+        } catch (error) {
+            console.error("Error fetching grade distribution:", error);
         }
-
-        console.log(`Fetching data for: ${activeTab} program, ${semesterYear} year, ${evaType}`);
-
-        // เรียก API พร้อมพารามิเตอร์
-        fetch(`http://localhost:8080/api/grading-graph?program=${activeTab}&year=${semesterYear}&evaType=${evaType}`)
-            .then(response => response.json())
-            .then(data => {
-                updateChart(data, evaType);
-            })
-            .catch(error => {
-                console.error("Error fetching grade distribution:", error);
-            });
     }
 
     function updateChart(gradeData, evaType) {
-        const barChart = document.getElementById("barChart");
-        const tooltip = document.getElementById("tooltip");
-        barChart.innerHTML = ""; // เคลียร์กราฟเก่า
+        console.log("👁️‍🗨️ Update Grade Bar Chart: ");
+        console.log(gradeData);
+        console.log(evaType)
+
+        const ctx = document.getElementById("gradeBarChart").getContext("2d");
+        const chartContainer = document.querySelector(".chart-container");
+
+        // ตรวจสอบว่ามีข้อความเดิมอยู่หรือไม่
+        let noGradeMessage = document.getElementById("noGradeMessage");
 
         if (evaType === "Poster Exhibition") {
-            barChart.innerHTML = `<div style=" position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 16px; color: #ff0000; text-align: center;">
-            Poster Exhibition ไม่มีการประเมินเกรด
-        </div>`;
-            return; // ไม่ต้องแสดงกราฟ
+            document.getElementById("gradeBarChart").style.display = "none";
+
+            if (!noGradeMessage) {
+                noGradeMessage = document.createElement("div");
+                noGradeMessage.id = "noGradeMessage";
+                noGradeMessage.classList.add("no-grade-message");
+                noGradeMessage.textContent = "Poster Exhibition ไม่มีการประเมินเกรด";
+                chartContainer.appendChild(noGradeMessage);
+            }
+
+            return;
+        } else {
+            document.getElementById("gradeBarChart").style.display = "block";
+            if (noGradeMessage) {
+                noGradeMessage.remove();
+            }
         }
 
-        console.log("grade data: ", gradeData)
+        if (gradeChart) {
+            gradeChart.destroy();
+        }
 
         const gradeOrder = ["A", "B+", "B", "C+", "C", "D+", "D", "F", "I"];
-        const maxCount = Math.max(...Object.values(gradeData), 1);
+        const chartData = gradeOrder.map(grade => gradeData[grade] || 0);
 
-        let xAxis = document.querySelector(".x-axis");
-        if (!xAxis) {
-            xAxis = document.createElement("div");
-            xAxis.classList.add("x-axis");
-            barChart.parentNode.insertBefore(xAxis, barChart.nextSibling);
-        }
-        xAxis.innerHTML = "";
-
-        gradeOrder.forEach(grade => {
-            const count = gradeData[grade] || 0;
-            const heightPercent = (count / maxCount) * 100;
-
-            const bar = document.createElement("div");
-            bar.classList.add("bar");
-            bar.style.height = heightPercent + "%";
-            bar.setAttribute("data-grade", grade);
-            bar.setAttribute("data-count", count);
-
-            // Mouse Hover Tooltip
-            bar.addEventListener("mouseenter", (event) => {
-                tooltip.innerText = `เกรด ${grade}: ${count} คน`;
-                tooltip.style.display = "block";
-                tooltip.style.left = event.pageX + "px";
-                tooltip.style.top = (event.pageY - 30) + "px";
-            });
-
-            bar.addEventListener("mousemove", (event) => {
-                tooltip.style.left = event.pageX + "px";
-                tooltip.style.top = (event.pageY - 30) + "px";
-            });
-
-            bar.addEventListener("mouseleave", () => {
-                tooltip.style.display = "none";
-            });
-
-            barChart.appendChild(bar);
-
-            // เพิ่มป้ายชื่อเกรด x-axis
-            const xLabel = document.createElement("div");
-            xLabel.classList.add("x-label");
-            xLabel.textContent = grade;
-            xAxis.appendChild(xLabel);
+        gradeChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: gradeOrder,
+                datasets: [{
+                    label: "จำนวนนักเรียน",
+                    data: chartData,
+                    backgroundColor: [
+                        "#4CAF50", "#8BC34A", "#CDDC39",
+                        "#FFEB3B", "#FFC107", "#FF9800",
+                        "#FF5722", "#F44336", "#9E9E9E"
+                    ],
+                    borderColor: "#444",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (tooltipItem) => `${tooltipItem.raw} คน`
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: "จำนวนนักเรียน" }
+                    }
+                }
+            }
         });
     }
+
 </script>
 
 <!-- ---------- For Reminder Card ----------- -->
@@ -825,67 +733,64 @@
             });
     }
 
-    // ฟังก์ชันสำหรับอัปเดต UI ของ timeline
     function updateTimeline(scoringPeriods) {
         const timelineContainer = document.querySelector(".timeline");
         timelineContainer.innerHTML = ""; // ล้างข้อมูลเก่า
 
-        // Map evaluation types กับชื่อที่แสดงผล
         const displayNames = {
             "Proposal Evaluation": "Proposal Presentation",
             "Poster Evaluation": "Poster Exhibition",
             "Defense Evaluation": "Senior Project Defense",
-            "Proposal Grade": "Proposal Grading Period"
+            "Proposal Grade": "Proposal Grading",
+            "Defense Grade": "Defense Grading"
         };
 
         const today = new Date();
+        const currentYear = today.getFullYear();
 
-        // กรองเฉพาะรายการที่หมดอายุไม่เกิน 7 วัน
-        const filteredPeriods = scoringPeriods.filter(period => {
+        scoringPeriods.forEach(period => {
             const endDate = new Date(period.endDate);
-            const daysPast = Math.ceil((today - endDate) / (1000 * 60 * 60 * 24));
-            return daysPast <= 7; // แสดงเฉพาะที่หมดอายุไม่เกิน 7 วัน
-        });
+            if (endDate.getFullYear() !== currentYear) return;
 
-        // สร้าง timeline items
-        filteredPeriods.forEach(period => {
-            const endDate = new Date(period.endDate);
             const daysRemaining = Math.max(0, Math.ceil((endDate - today) / (1000 * 60 * 60 * 24)));
 
-            // Format dates
             const startDateFormatted = formatDate(period.startDate);
             const endDateFormatted = formatDate(period.endDate);
 
-            // สร้าง timeline item
             const timelineItem = document.createElement("div");
             timelineItem.classList.add("timeline-item");
 
-            // กำหนดสีหรือสถานะตามจำนวนวันที่เหลือ
             let statusClass = "";
+            let statusText = `เหลือเวลา : ${daysRemaining} วัน`;
+
             if (daysRemaining === 0) {
                 statusClass = "timeline-expired";
+                statusText = "⏳ กำหนดการสิ้นสุดแล้ว!";
             } else if (daysRemaining <= 7) {
                 statusClass = "timeline-urgent";
             } else if (daysRemaining >= 30) {
                 statusClass = "timeline-chill";
+            } else if (daysRemaining < 30) {
+                statusClass = "timeline-lessthan1m"
             }
 
-            if (statusClass) {
-                timelineItem.classList.add(statusClass);
-            }
+            if (statusClass) timelineItem.classList.add(statusClass);
 
             timelineItem.innerHTML = `
-            <div class="timeline-icon">🕒</div>
+            <div class="timeline-icon">
+                <i class="fa-solid fa-calendar"></i>
+            </div>
             <div class="timeline-content">
                 <div class="timeline-title">${displayNames[period.evaluationType] || period.evaluationType}</div>
                 <div class="timeline-date">ระยะเวลา : ${startDateFormatted} - ${endDateFormatted}</div>
-                <div class="timeline-status">เหลือเวลา : ${daysRemaining} วัน</div>
+                <div class="timeline-status">${statusText}</div>
             </div>
         `;
 
             timelineContainer.appendChild(timelineItem);
         });
     }
+
 
 
     // ฟังก์ชันช่วยในการจัดรูปแบบวันที่
@@ -907,7 +812,10 @@
 </script>
 
 <!-- ----------- For Pie Chart ------------- -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    let evaluationChart = null; // ตัวแปรเก็บอ็อบเจ็กต์ Chart.js
+
     async function fetchEvaluationStatus() {
         try {
             const activeFilter = document.querySelector('.filter.active').textContent.trim();
@@ -935,125 +843,59 @@
     }
 
     function updatePieChart(data) {
-        // คำนวณผลรวมของนักเรียนทั้งหมด
-        const total = data.completed + data.partial + data.notEvaluated;
+        console.log("🐖 Update Pie Chart: ");
+        console.log(data);
 
-        // คำนวณเปอร์เซ็นต์ของแต่ละสถานะ
-        const completedPercentage = total > 0 ? (data.completed / total) * 100 : 0;
-        const partialPercentage = total > 0 ? (data.partial / total) * 100 : 0;
-        const notEvaluatedPercentage = total > 0 ? (data.notEvaluated / total) * 100 : 0;
+        const ctx = document.getElementById("evaluationPieChart").getContext("2d");
 
-        // หาองศาที่แต่ละส่วนต้องแสดง
-        const completedAngle = completedPercentage * 3.6; // 360 / 100 = 3.6
-        const partialAngle = partialPercentage * 3.6;
-        const notEvaluatedAngle = notEvaluatedPercentage * 3.6;
-
-        // อัปเดต pie chart ด้วย conic-gradient (วิธีที่ถูกต้องสำหรับ pie chart)
-        const pieChart = document.querySelector('.pie-chart');
-
-        // สร้าง conic-gradient ตามสัดส่วนที่คำนวณได้
-        let gradientStr = "";
-
-        if (completedPercentage > 0) {
-            gradientStr += `#26a69a 0deg ${completedAngle}deg`;
+        // Destroy existing chart to prevent overlapping
+        if (evaluationChart) {
+            evaluationChart.destroy();
         }
 
-        if (partialPercentage > 0) {
-            gradientStr += `${gradientStr ? ", " : ""}#feca57 ${completedAngle}deg ${completedAngle + partialAngle}deg`;
-        }
-
-        if (notEvaluatedPercentage > 0) {
-            gradientStr += `${gradientStr ? ", " : ""}#ff6b6b ${completedAngle + partialAngle}deg ${completedAngle + partialAngle + notEvaluatedAngle}deg`;
-        }
-
-        if (gradientStr === "") {
-            gradientStr = "#f5f5f5 0deg 360deg"; // กรณีไม่มีข้อมูล
-        }
-
-        pieChart.style.background = `conic-gradient(${gradientStr})`;
-
-        // ลบ elements ที่ไม่จำเป็นออก
-        const percentageElements = pieChart.querySelectorAll('.percentage');
-        percentageElements.forEach(el => el.remove());
-
-        // อัปเดตข้อความในคำอธิบายเพื่อแสดงจำนวนนักเรียน
-        const legendItems = document.querySelectorAll('.legend-item');
-        legendItems[0].querySelector('div:last-child').textContent =
-            `ได้รับการประเมินครบแล้ว (${data.completed} คน, ${completedPercentage.toFixed(1)}%)`;
-        legendItems[1].querySelector('div:last-child').textContent =
-            `ได้รับการประเมินบางส่วน (${data.partial} คน, ${partialPercentage.toFixed(1)}%)`;
-        legendItems[2].querySelector('div:last-child').textContent =
-            `ยังไม่ได้รับการประเมิน (${data.notEvaluated} คน, ${notEvaluatedPercentage.toFixed(1)}%)`;
+        evaluationChart = new Chart(ctx, {
+            type: "pie",
+            data: {
+                labels: ["ได้รับการประเมินครบแล้ว", "ได้รับการประเมินบางส่วน", "ยังไม่ได้รับการประเมิน"],
+                datasets: [{
+                    data: [data.completed, data.partial, data.notEvaluated],
+                    backgroundColor: ["#26a69a", "#feca57", "#ff6b6b"],
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                layout: {
+                    padding: 10
+                },
+                plugins: {
+                    legend: {
+                        position: "bottom",
+                        labels: {
+                            boxWidth: 20,
+                            padding: 10
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                const value = tooltipItem.raw;
+                                const total = data.completed + data.partial + data.notEvaluated;
+                                const percentage = total > 0 ? (value / total * 100).toFixed(1) : 0;
+                                return `${value} คน (${percentage}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
     }
+
 </script>
 
-<!-- Instructor scoring-->
+<!-- ------- Instructor scoring --------- -->
 <script>
-    // async function fetchTeacherScoringData() {
-    //     try {
-    //         const activeFilter = document.querySelector('.filter.active').textContent.trim();
-    //         const activeProgram = document.querySelector('.tab.active').textContent.trim();
-    //         const selectedYear = document.getElementById('semester-selector').value;
-    //
-    //         let evaType = activeFilter === 'Proposal' ? 'Proposal' :
-    //             activeFilter === 'Poster' ? 'Poster' :
-    //                 'Defense';
-    //
-    //         console.log("😈 Scoring");
-    //         console.log("😈", evaType, selectedYear, activeProgram);
-    //
-    //         const response = await fetch(`http://localhost:8080/api/teacher-scoring/remaining?evaType=${evaType}&year=${selectedYear}&program=${activeProgram}`);
-    //         if (!response.ok) {
-    //             throw new Error(`HTTP error! Status: ${response.status}`);
-    //         }
-    //
-    //         const data = await response.json();
-    //
-    //         // ตรวจสอบข้อมูลที่ได้จาก API
-    //         console.log("😈", data);
-    //
-    //         // แสดงข้อมูลในกราฟ
-    //         const container = document.getElementById('teacher-scoring-container');
-    //         container.innerHTML = ''; // เคลียร์กราฟเดิมก่อน
-    //
-    //         // เพิ่มรายการข้อมูลใหม่จาก API
-    //         data.forEach(item => {
-    //             const barItem = document.createElement('div');
-    //             barItem.classList.add('h-bar-item');
-    //
-    //             const label = document.createElement('div');
-    //             label.classList.add('h-bar-label');
-    //             label.textContent = item.instructorName;
-    //
-    //             const barContainer = document.createElement('div');
-    //             barContainer.classList.add('h-bar-container');
-    //
-    //             const barFill = document.createElement('div');
-    //             barFill.classList.add('h-bar-fill');
-    //
-    //             // คำนวณเปอร์เซ็นต์ที่เหลือจากจำนวนที่มอบหมายและจำนวนที่ทำเสร็จ
-    //             const percentage = ((item.remainingCount / item.totalAssigned) * 100);
-    //
-    //             barFill.style.width = `${percentage}%`;  // ตั้งความยาวตามเปอร์เซ็นต์ที่เหลือ
-    //             // barFill.style.backgroundColor = getColorForPercentage(item.remainingCount);
-    //
-    //             const percentageText = document.createElement('div');
-    //             percentageText.classList.add('h-bar-percentage');
-    //             percentageText.textContent = `${item.remainingCount} คนที่เหลือ`;
-    //
-    //             // รวมทุกส่วนเข้าด้วยกัน
-    //             barContainer.appendChild(barFill);
-    //             barItem.appendChild(label);
-    //             barItem.appendChild(barContainer);
-    //             barItem.appendChild(percentageText);
-    //
-    //             container.appendChild(barItem);
-    //         });
-    //     } catch (error) {
-    //         console.error("Error fetching teacher scoring data:", error);
-    //     }
-    // }
-
     async function fetchTeacherScoringData() {
         try {
             const activeFilter = document.querySelector('.filter.active').textContent.trim();
@@ -1077,59 +919,117 @@
             // ตรวจสอบข้อมูลที่ได้จาก API
             console.log("😈", data);
 
-            // แสดงข้อมูลในกราฟ
-            const container = document.getElementById('teacher-scoring-container');
-            container.innerHTML = ''; // เคลียร์กราฟเดิมก่อน
+            // เตรียมข้อมูลสำหรับกราฟ
+            const labels = [];
+            const remainingCounts = [];
+            const completedCounts = []; // จำนวนที่ประเมินแล้ว
+            const totalAssignedCounts = []; // เก็บจำนวนทั้งหมด
 
-            // เพิ่มรายการข้อมูลใหม่จาก API
+            // เพิ่มข้อมูลใน arrays
             data.forEach(item => {
-                const barItem = document.createElement('div');
-                barItem.classList.add('h-bar-item');
+                labels.push(item.instructorName);
+                remainingCounts.push(item.remainingCount);
+                totalAssignedCounts.push(item.totalAssigned);
 
-                const label = document.createElement('div');
-                label.classList.add('h-bar-label');
-                label.textContent = item.instructorName;
+                // คำนวณจำนวนที่ประเมินแล้วจาก totalAssigned - remainingCount
+                const completed = item.totalAssigned - item.remainingCount;
+                completedCounts.push(completed);
+            });
 
-                const barContainer = document.createElement('div');
-                barContainer.classList.add('h-bar-container');
+            // ทำลายกราฟเก่าก่อนที่จะสร้างกราฟใหม่
+            const ctx = document.getElementById('teacher-scoring-chart').getContext('2d');
+            if (window.chartInstance) {
+                window.chartInstance.destroy();
+            }
 
-                const barFill = document.createElement('div');
-                barFill.classList.add('h-bar-fill');
+            // สร้างกราฟใหม่แบบ stacked
+            window.chartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels, // ชื่ออาจารย์
+                    datasets: [{
+                        label: 'ประเมินแล้ว',
+                        data: completedCounts, // จำนวนที่ประเมินแล้ว
+                        backgroundColor: '#20c8ba', // สีเขียว (เสร็จแล้ว)
+                        borderColor: '#1e9e9b',
+                        borderWidth: 1
+                    }, {
+                        label: 'ยังไม่ได้ประเมิน',
+                        data: remainingCounts, // จำนวนที่ยังไม่ทำ
+                        backgroundColor: '#ff8080', // สีแดง (ยังไม่ได้ประเมิน)
+                        borderColor: '#ff4d4d',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'แผนภูมิแสดงความคืบหน้าการประเมินนักศึกษาของอาจารย์',
+                            font: {
+                                size: 16
+                            }
+                        },
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                // แสดงชื่ออาจารย์
+                                title: function(tooltipItems) {
+                                    return tooltipItems[0].label;
+                                },
+                                // แสดงข้อมูลรวม
+                                afterTitle: function(context) {
+                                    const index = context[0].dataIndex;
+                                    return `สรุปข้อมูลการประเมิน:`;
+                                },
+                                // แสดงข้อมูลของแต่ละส่วน
+                                label: function(context) {
+                                    const index = context.dataIndex;
+                                    const datasetIndex = context.datasetIndex;
 
-                // คำนวณเปอร์เซ็นต์ที่เหลือจากจำนวนที่มอบหมายและจำนวนที่ทำเสร็จ
-                const percentage = ((item.remainingCount / item.totalAssigned) * 100);
-                barFill.style.width = `${100 - percentage}%`;  // ถ้าหาก percentage คือ 100% จะเป็นเทา ถ้า 0% คือเขียว
+                                    // เลือกแสดงข้อมูลตาม dataset ที่ผู้ใช้ชี้
+                                    if (datasetIndex === 0) {
+                                        return `ประเมินแล้ว: ${completedCounts[index]} คน`;
+                                    } else {
+                                        return `ยังไม่ได้ประเมิน: ${remainingCounts[index]} คน`;
+                                    }
+                                },
+                                // เพิ่มข้อมูลสรุปหลังจาก label
+                                afterLabel: function(context) {
+                                    const index = context.dataIndex;
+                                    const totalAssigned = totalAssignedCounts[index];
+                                    const completed = completedCounts[index];
+                                    const remaining = remainingCounts[index];
+                                    const percentComplete = totalAssigned > 0
+                                        ? Math.round((completed / totalAssigned) * 100)
+                                        : 0;
 
-                // ตั้งสีของแท่งตามเปอร์เซ็นต์
-                barFill.style.backgroundColor = getColorForPercentage(percentage);
-
-                const percentageText = document.createElement('div');
-                percentageText.classList.add('h-bar-percentage');
-                percentageText.textContent = `${item.remainingCount} คนที่เหลือ`;
-
-                // รวมทุกส่วนเข้าด้วยกัน
-                barContainer.appendChild(barFill);
-                barItem.appendChild(label);
-                barItem.appendChild(barContainer);
-                barItem.appendChild(percentageText);
-
-                container.appendChild(barItem);
+                                    return [
+                                        `จำนวนทั้งหมด: ${totalAssigned} คน`,
+                                        `ความคืบหน้า: ${percentComplete}%`
+                                    ];
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true // ให้แกน x ซ้อนกัน
+                        },
+                        y: {
+                            stacked: true, // ให้แกน y ซ้อนกัน
+                            beginAtZero: true
+                        }
+                    }
+                }
             });
         } catch (error) {
             console.error("Error fetching teacher scoring data:", error);
         }
     }
-
-    function getColorForPercentage(percentage) {
-        // ถ้าคะแนนที่เหลือคือ 100% (ยังไม่ได้ประเมินเลย) ให้ใช้สีแดง
-        if (percentage === 100) {
-            return '#ff8080'; // สีแดง
-        }
-        // ถ้าคะแนนที่เหลือคือ 0% (ประเมินเสร็จแล้ว) ให้ใช้สีเขียว
-        return '#20c8ba'; // สีเขียว
-    }
-
-
 </script>
 
 

@@ -331,6 +331,7 @@ public class CalculateService {
                         .setCriteria(criteria)
                         .setDefenseEvaluation(evaluation);
 
+
                 defenseEvalScoreRepository.save(evalScore);
                 System.out.println("[Service] Saved DefenseEvalScore for criteria: " + score.getScoreCriteriaId());
             } else {
@@ -522,9 +523,6 @@ public class CalculateService {
 
         return new StudentScoreDTO(scoreDetails, rawTotalScore, totalScore);
     }
-
-
-
 
 
 

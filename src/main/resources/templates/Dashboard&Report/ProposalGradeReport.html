@@ -45,7 +45,7 @@
                 </svg>
                 Score Evaluation
             </h4>
-            <li><a href="/PeriodSetting.html">Scoring Period Settings</a></li>
+            <li><a href="/scoring-periods">Scoring Period Settings</a></li>
         </ul>
 
         <ul>
@@ -150,14 +150,31 @@
             });
 
             // ตั้งค่าปีปัจจุบันเป็น default (เช่น 2025)
-            const currentYear = new Date().getFullYear();  // หาปีปัจจุบัน
-            if (!semesterSelector.value) {
-                semesterSelector.value = currentYear.toString();  // กำหนดค่า default เป็นปีปัจจุบัน
+            // const currentYear = new Date().getFullYear();  // หาปีปัจจุบัน
+            // if (!semesterSelector.value) {
+            //     semesterSelector.value = (currentYear - 1).toString();  // กำหนดค่า default เป็นปีปัจจุบัน
+            // }
+            //
+            // // เรียก fetchGradingStatistics เพื่อส่งค่า initial ปีไป
+            // await fetchProposalGrades();
+
+            // ตรวจสอบเดือนปัจจุบัน
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1; // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
+
+            // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
+            const defaultYear = currentMonth <= 6 ? currentYear - 1 : currentYear;
+
+            // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
+            if (data.includes(defaultYear.toString())) {
+                semesterSelector.value = defaultYear.toString();
+            } else {
+                semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
             }
 
             // เรียก fetchGradingStatistics เพื่อส่งค่า initial ปีไป
             await fetchProposalGrades();
-
 
         } catch (error) {
             console.error("Error fetching academic years:", error);
@@ -407,29 +424,320 @@
     }
 
     // ฟังก์ชัน Export ข้อมูลเป็น CSV
-    function exportToCSV() {
+    // function exportToCSV() {
+    //     if (groupedProjects.length === 0) return;
+    //
+    //     // สร้างข้อมูล CSV
+    //     let csvContent = "Project ID,Project Title,Program,Student ID,Student Name,Advisor,Section,Track,Grade\n";
+    //
+    //     // สร้างแถวข้อมูล
+    //     groupedProjects.forEach(project => {
+    //         project.students.forEach(student => {
+    //             csvContent += `"${project.projectId}","${project.projectTitle}","${project.program}","${student.studentId}","${student.studentName}","${project.advisor}","${student.section}","${student.track}","${student.grade}"\n`;
+    //         });
+    //     });
+    //
+    //     // สร้าง Blob และดาวน์โหลด
+    //     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    //     const url = URL.createObjectURL(blob);
+    //     const link = document.createElement('a');
+    //     link.setAttribute('href', url);
+    //     link.setAttribute('download', 'proposal_grades.csv');
+    //     link.style.visibility = 'hidden';
+    //     document.body.appendChild(link);
+    //     link.click();
+    //     document.body.removeChild(link);
+    // }
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+<script>
+    async function exportToCSV() {
         if (groupedProjects.length === 0) return;
 
-        // สร้างข้อมูล CSV
-        let csvContent = "Project ID,Project Title,Program,Student ID,Student Name,Advisor,Section,Track,Grade\n";
+        let result = await showColumnSelectionDialog();
+        if (!result) return;
 
-        // สร้างแถวข้อมูล
-        groupedProjects.forEach(project => {
+        const selectedColumns = result.columns;
+        const programFilter = result.programFilter;
+
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet('Proposal Grades');
+
+        const allColumns = [
+            { id: 'projectId', header: 'Project ID', key: 'projectId', width: 12 },
+            { id: 'projectTitle', header: 'Project Title', key: 'projectTitle', width: 40 },
+            { id: 'program', header: 'Program', key: 'program', width: 15 },
+            { id: 'studentId', header: 'Student ID', key: 'studentId', width: 15 },
+            { id: 'studentName', header: 'Student Name', key: 'studentName', width: 25 },
+            { id: 'advisor', header: 'Advisor', key: 'advisor', width: 25 },
+            { id: 'section', header: 'Section', key: 'section', width: 10 },
+            { id: 'track', header: 'Track', key: 'track', width: 15 },
+            { id: 'grade', header: 'Grade', key: 'grade', width: 10 }
+        ];
+
+        // กรองเฉพาะคอลัมน์ที่ถูกเลือก
+        const filteredColumns = allColumns.filter(col => selectedColumns.includes(col.id));
+        worksheet.columns = filteredColumns;
+
+        const headerRow = worksheet.getRow(1);
+        headerRow.font = { bold: true, color: { argb: 'FFFFFF' } };
+        headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+
+        // กำหนดสีเฉพาะคอลัมน์ที่มีข้อมูลเท่านั้น
+        filteredColumns.forEach((col, index) => {
+            const cell = headerRow.getCell(index + 1);
+            cell.fill = {
+                type: 'pattern',
+                pattern: 'solid',
+                fgColor: { argb: '4472C4' } // สีน้ำเงินเข้ม
+            };
+        });
+
+        // กรองโปรเจคตาม program ที่เลือก
+        let projectsToExport = [...groupedProjects];
+        if (programFilter !== 'all') {
+            projectsToExport = groupedProjects.filter(project => project.program === programFilter);
+        }
+
+        projectsToExport.forEach(project => {
             project.students.forEach(student => {
-                csvContent += `"${project.projectId}","${project.projectTitle}","${project.program}","${student.studentId}","${student.studentName}","${project.advisor}","${student.section}","${student.track}","${student.grade}"\n`;
+                const rowData = {};
+                filteredColumns.forEach(col => {
+                    rowData[col.key] = ['studentId', 'studentName', 'section', 'track', 'grade'].includes(col.key) ? student[col.key] : project[col.key];
+                });
+                worksheet.addRow(rowData);
             });
         });
 
-        // สร้าง Blob และดาวน์โหลด
-        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        worksheet.eachRow((row, rowNumber) => {
+            if (rowNumber > 1) { // ข้าม Header row
+                row.alignment = { vertical: 'middle' };
+
+                row.eachCell((cell, colNumber) => {
+                    if (colNumber <= filteredColumns.length) { // ป้องกันสีเกินคอลัมน์ที่มีข้อมูล
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: { argb: rowNumber % 2 === 0 ? 'E9EFF7' : 'FFFFFF' }
+                        };
+                    }
+
+                    // ใส่เส้นขอบให้เซลล์
+                    cell.border = {
+                        top: { style: 'thin' },
+                        left: { style: 'thin' },
+                        bottom: { style: 'thin' },
+                        right: { style: 'thin' }
+                    };
+                });
+            }
+        });
+
+
+        if (selectedColumns.includes('grade')) {
+            worksheet.getColumn('grade').alignment = { horizontal: 'center' };
+        }
+
+        // สร้างชื่อไฟล์ที่แสดงว่ากรองด้วย program ไหน
+        let filename = 'proposal_grades';
+        if (programFilter !== 'all') {
+            filename += `_${programFilter}`;
+        }
+        filename += '.xlsx';
+
+        const buffer = await workbook.xlsx.writeBuffer();
+        const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
-        link.setAttribute('href', url);
-        link.setAttribute('download', 'proposal_grades.csv');
-        link.style.visibility = 'hidden';
+        link.href = url;
+        link.download = filename;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
     }
+
+    function showColumnSelectionDialog() {
+        return new Promise(resolve => {
+            const allColumns = [
+                { id: 'projectId', name: 'Project ID' },
+                { id: 'projectTitle', name: 'Project Title' },
+                { id: 'program', name: 'Program' },
+                { id: 'studentId', name: 'Student ID' },
+                { id: 'studentName', name: 'Student Name' },
+                { id: 'advisor', name: 'Advisor' },
+                { id: 'section', name: 'Section' },
+                { id: 'track', name: 'Track' },
+                { id: 'grade', name: 'Grade' }
+            ];
+
+            // สร้าง overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'export-overlay';
+            document.body.appendChild(overlay);
+
+            // สร้าง dialog
+            const dialog = document.createElement('div');
+            dialog.className = 'export-dialog';
+
+            // สร้างหัวข้อ
+            const title = document.createElement('h3');
+            title.textContent = 'เลือกคอลัมน์ที่ต้องการ Export';
+            dialog.appendChild(title);
+
+            // สร้างส่วนตัวกรอง Program
+            const filterContainer = document.createElement('div');
+            filterContainer.className = 'program-filter';
+
+            const filterLabel = document.createElement('div');
+            filterLabel.className = 'filter-label';
+            filterLabel.textContent = 'กรองตาม Program:';
+            filterContainer.appendChild(filterLabel);
+
+            const programFilterOptions = document.createElement('div');
+            programFilterOptions.className = 'filter-options';
+
+            // ตัวเลือก All
+            const allOption = document.createElement('div');
+            allOption.className = 'filter-option selected';
+            allOption.dataset.value = 'all';
+            allOption.textContent = 'ทั้งหมด';
+            programFilterOptions.appendChild(allOption);
+
+            // ตัวเลือก DST
+            const dstOption = document.createElement('div');
+            dstOption.className = 'filter-option';
+            dstOption.dataset.value = 'DST';
+            dstOption.textContent = 'DST';
+            programFilterOptions.appendChild(dstOption);
+
+            // ตัวเลือก ICT
+            const ictOption = document.createElement('div');
+            ictOption.className = 'filter-option';
+            ictOption.dataset.value = 'ICT';
+            ictOption.textContent = 'ICT';
+            programFilterOptions.appendChild(ictOption);
+
+            filterContainer.appendChild(programFilterOptions);
+            dialog.appendChild(filterContainer);
+
+            // สร้างตัวเลือก Select All
+            const selectAllContainer = document.createElement('div');
+            selectAllContainer.className = 'select-all-option';
+
+            const selectAllCheckbox = document.createElement('input');
+            selectAllCheckbox.type = 'checkbox';
+            selectAllCheckbox.id = 'select-all';
+            selectAllCheckbox.checked = true;
+
+            const selectAllLabel = document.createElement('label');
+            selectAllLabel.htmlFor = 'select-all';
+            selectAllLabel.textContent = 'เลือกทั้งหมด';
+
+            selectAllContainer.appendChild(selectAllCheckbox);
+            selectAllContainer.appendChild(selectAllLabel);
+            dialog.appendChild(selectAllContainer);
+
+            // สร้าง container สำหรับตัวเลือกคอลัมน์
+            const columnsContainer = document.createElement('div');
+            columnsContainer.className = 'column-options';
+
+            // สร้างตัวเลือกคอลัมน์
+            const checkboxes = [];
+            allColumns.forEach(col => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'column-option';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `col-${col.id}`;
+                checkbox.value = col.id;
+                checkbox.checked = true;
+                checkboxes.push(checkbox);
+
+                const label = document.createElement('label');
+                label.htmlFor = `col-${col.id}`;
+                label.textContent = col.name;
+
+                optionDiv.appendChild(checkbox);
+                optionDiv.appendChild(label);
+                columnsContainer.appendChild(optionDiv);
+            });
+            dialog.appendChild(columnsContainer);
+
+            // สร้างส่วนปุ่มกด
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'export-actions';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'cancel-button';
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.onclick = () => {
+                document.body.removeChild(dialog);
+                document.body.removeChild(overlay);
+                resolve(null);
+            };
+
+            const confirmBtn = document.createElement('button');
+            confirmBtn.className = 'export-button';
+            confirmBtn.textContent = 'Export';
+            confirmBtn.onclick = () => {
+                const selectedCols = Array.from(document.querySelectorAll('.column-option input[type=checkbox]:checked')).map(cb => cb.value);
+                if (selectedCols.length === 0) {
+                    alert('โปรดเลือกอย่างน้อย 1 คอลัมน์');
+                    return;
+                }
+
+                // รับค่าการกรอง program
+                const selectedFilter = document.querySelector('.filter-option.selected').dataset.value;
+
+                document.body.removeChild(dialog);
+                document.body.removeChild(overlay);
+
+                // ส่งคืนทั้งคอลัมน์ที่เลือกและตัวกรอง program
+                resolve({
+                    columns: selectedCols,
+                    programFilter: selectedFilter
+                });
+            };
+
+            actionsDiv.appendChild(cancelBtn);
+            actionsDiv.appendChild(confirmBtn);
+            dialog.appendChild(actionsDiv);
+
+            // เพิ่มการทำงานของ Select All
+            selectAllCheckbox.addEventListener('change', () => {
+                checkboxes.forEach(cb => {
+                    cb.checked = selectAllCheckbox.checked;
+                });
+            });
+
+            // ติดตามการเปลี่ยนแปลงของ checkboxes
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const allChecked = checkboxes.every(cb => cb.checked);
+                    const noneChecked = checkboxes.every(cb => !cb.checked);
+
+                    selectAllCheckbox.checked = allChecked;
+                    selectAllCheckbox.indeterminate = !allChecked && !noneChecked;
+                });
+            });
+
+            // เพิ่มการทำงานของตัวกรอง program
+            const filterOptionElements = programFilterOptions.querySelectorAll('.filter-option');
+            filterOptionElements.forEach(option => {
+                option.addEventListener('click', () => {
+                    // ลบ class selected จากทุกตัวเลือก
+                    filterOptionElements.forEach(opt => opt.classList.remove('selected'));
+                    // เพิ่ม class selected ให้กับตัวเลือกที่คลิก
+                    option.classList.add('selected');
+                });
+            });
+
+            // แสดง dialog
+            document.body.appendChild(dialog);
+        });
+    }
 </script>
+
 </html>
