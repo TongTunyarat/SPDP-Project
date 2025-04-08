@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title> Dashboard </title>
+
+  <!-- CSS -->
+<!--  <link rel="stylesheet" href="/CSS/sidebar-admin.css">-->
+  <link rel="stylesheet" href="/CSS/PreviewProposalSchedule.css">
+
+  <!-- Library -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+</head>
+
+<body>
+  <div class="content">
+
+    <div class="header-section">
+      Preview Proposal Schedule
+      <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+      <!--      <div class="btn-header">-->
+      <!--        <button class="template-btn">Template</button>-->
+      <!--        <button class="upload-btn">Upload Files</button>-->
+      <!--        <button class="addProject-btn">+ Add Projects</button>-->
+      <!--      </div>-->
+    </div>
+
+    <div class="body-section">
+
+      <div class="table-container">
+        <div class="filter-controls">
+          <button class="filter active" onclick="filterProjects('all')">All</button>
+          <button class="filter" onclick="filterProjects('ict')">ICT</button>
+          <button class="filter" onclick="filterProjects('dst')">DST</button>
+          <input type="text" id="searchInput" placeholder="Search">
+
+        </div>
+        <table>
+          <thead>
+          <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Room</th>
+            <th>Program</th>
+            <th class="left-align">Project ID</th>
+            <th class="left-align">Project Title</th>
+            <th class="left-align">Student ID</th>
+            <th class="left-align">First - Last Name</th>
+            <th>Sec.</th>
+            <th>Track</th>
+            <th class="left-align">Instructor</th>
+
+          </tr>
+          </thead>
+          <tbody id="projectTable">
+<!--                <tr data-category="ict">-->
+<!--                  <td>Mon, 21 Apr. 25</td>-->
+<!--                  <td>16:15 - 17:30</td>-->
+<!--                  <td>IT321</td>-->
+<!--                  <td><span class="tag ict">ICT</span></td>-->
+<!--                  <td>ICT SP2024-01</td>-->
+<!--                  <td>ASYMBRAINNET</td>-->
+
+<!--                  <td class="id-cell">-->
+<!--                    <div class="student-row">6488009</div>-->
+<!--                    <div class="student-row">6488011</div>-->
+<!--                    <div class="student-row">6488026</div>-->
+<!--                  </td>-->
+
+<!--                  <td class="name-cell">-->
+<!--                    <div class="student-row">KANATIP BHONGSPRAPAS</div>-->
+<!--                    <div class="student-row">TAWAN CHAIDEE</div>-->
+<!--                    <div class="student-row">NETITHORN INAMNUAY</div>-->
+<!--                  </td>-->
+
+<!--                  <td class="sec-cell">-->
+<!--                    <div class="student-row"></div>-->
+<!--                    <div class="student-row"></div>-->
+<!--                    <div class="student-row"></div>-->
+<!--                  </td>-->
+
+<!--                  <td class="track-cell">-->
+<!--                    <div class="student-row">1</div>-->
+<!--                    <div class="student-row">1</div>-->
+<!--                    <div class="student-row">1</div>-->
+<!--                  </td>-->
+
+<!--                  <td>-->
+<!--                    <div class="advisor-row">Aj.Songsri Tangsripairoj</div>-->
+<!--                    <div class="advisor-row">Aj.Woraluck Wongse-Ek</div>-->
+<!--                    <div class="advisor-row">Aj.Sukanya Phongsuphap</div>-->
+<!--                  </td>-->
+
+<!--                </tr>-->
+
+<!--<td>-->
+<!--  ${advisor-->
+<!--  ?`-->
+<!--  <div class="advisor-row"><span class="advisor-label">Adv.</span>${advisor.name}</div>-->
+<!--  `-->
+<!--  : ''}-->
+
+<!--  ${committee.map((comm, index) => `<div class="advisor-row"><span class="committee-label ${index ===0 ? '' : 'hidden-label'}">Com.</span>${comm}</div>`).join('')}-->
+
+<!--</td>-->
+
+<!--<td class="${!project.time? 'empty-time' : ''}" data-placeholder="Add Time">${project.time? project.time : ''}</td>-->
+
+          </tbody>
+              </table>
+            </div>
+          </div>
+      </div>
+</body>
+
+</html>
+
+<script>
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const menuItems = document.querySelectorAll(".sidebar ul li a");
+
+    // ดึง URL ปัจจุบัน
+    const currentPage = window.location.pathname.split("/").pop();
+
+    menuItems.forEach(item => {
+      if (item.getAttribute("href") === currentPage) {
+        item.classList.add("active"); // เพิ่ม class "active" ให้เมนูปัจจุบัน
+      }
+    });
+  });
+
+  // ฟังก์ชันกรองโปรเจกต์ตามหมวดหมู่
+  function filterProjects(category) {
+    const tbody = document.getElementById("projectTable");
+    const rows = tbody.querySelectorAll("tr:not(#noDataRow)");
+
+    let found = false;
+
+    const noDataRow = document.getElementById("noDataRow");
+    if(noDataRow) {
+      noDataRow.remove();
+    }
+
+    rows.forEach(row => {
+
+      if(category === "all" || row.getAttribute("data-category") === category) {
+        row.style.display = "";
+        found = true;
+      } else {
+        row.style.display = "none";
+      }
+      // row.style.display = row.getAttribute("data-category") === category ? "" : "none";
+      //
+      // if(noDataRow) {
+      //   noDataRow.remove();
+      // }
+
+    });
+
+    // ข้อมูลไม่ตรงกับ category
+    if(!found) {
+
+      const row = document.createElement("tr");
+      row.id = "noDataRow";
+
+      const cell = document.createElement("td");
+      cell.innerHTML = "No data available";
+      cell.colSpan = 8;
+      cell.style.textAlign = "center";
+      cell.style.color = "#e23855";
+
+      row.appendChild(cell);
+      tbody.appendChild(row);
+    }
+
+    document.querySelectorAll(".filter").forEach(btn => btn.classList.remove("active"));
+    document.querySelector(`.filter[onclick="filterProjects('${category}')"]`).classList.add("active");
+  }
+
+  // ฟังก์ชันค้นหาโปรเจกต์
+  function searchProjects() {
+    const searchValue = document.getElementById("searchInput").value.toLowerCase();
+    const rows = document.querySelectorAll("#projectTable tr");
+
+    rows.forEach(row => {
+      const text = row.innerText.toLowerCase();
+      row.style.display = text.includes(searchValue) ? "" : "none";
+    });
+  }
+
+  document.getElementById("searchInput").addEventListener("input", searchProjects);
+
+  // ====================================== get project =====================================
+  document.addEventListener('DOMContentLoaded', function () {
+    console.log("🚀 Load Page");
+    getProjectProposal();
+  });
+  function getProjectProposal() {
+
+    fetch(`http://localhost:8080/admin/getDataPreviewProposalSchedule`, {
+
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+            .then(response => {
+              if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+                alert('Network response was not ok ' + response.statusText);
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log("🐍data: ", data);
+              if(data.length === 0) {
+                console.log("No data available");
+
+                const tbody = document.getElementById("projectTable");
+                const row = document.createElement("tr");
+
+                const cell = document.createElement("td");
+
+                cell.innerHTML = "No data available";
+                cell.colSpan = 8;
+                cell.style.textAlign = "center";
+                cell.style.color = "#e23855";
+
+                row.style.marginTop = "1rem";
+
+                row.appendChild(cell);
+                tbody.appendChild(row);
+
+              } else {
+
+                const tbody = document.getElementById("projectTable");
+
+                data.forEach(project => {
+
+                  const row = document.createElement("tr");
+                  row.setAttribute("data-category", project.program.toLowerCase());
+
+                  let advisor = "";
+                  let committee = "";
+
+                  if(typeof project.instructorNames === "object") {
+
+                    advisor = project.instructorNames.Advisor ? {name: project.instructorNames.Advisor[0] }: null;
+                    committee = project.instructorNames.Committee || [];
+                  }
+
+                  let projectId = project.projectId;
+                  let cleanId = projectId.replace(/DST|ICT/g, '').trim();
+
+                    const dateObj = new Date(project.date);
+                    const weekday = dateObj.toLocaleDateString('en-US', {weekday: 'long'}).toLowerCase();
+
+                  row.innerHTML += `
+
+                          <td class="${!project.date ? 'empty-date' : ''}"  style="position: relative;">
+                            ${project.date
+                                  ? `<div class="day-indicator ${weekday}-indicator"></div>${project.date}`: ''}
+                          </td>
+                          <td class="${!project.time? 'empty-time' : ''}">${project.time? project.time : ''}</td>
+                          <td class="${!project.room ? 'empty-room' : ''}">${project.room ? project.room: ''}</td>
+                          <td><span class="tag ${project.program.toLowerCase()}">${project.program}</span></td>
+                          <td>${cleanId}</td>
+                          <td class="left-align">${project.projectTitle}</td>
+
+                          <td class="id-cell">
+                            ${project.students.map(student => `<div class="student-row">${student.studentId}</div>`).join('')}
+                          </td>
+
+                          <td class="name-cell">
+                            ${project.students.map(student => `<div class="student-row">${student.studentName}</div>`).join('')}
+                          </td>
+
+                          <td class="sec-cell">
+                            ${project.students.map(student => `<div class="student-row">${student.section || ''}</div>`).join('')}
+                          </td>
+
+                          <td class="track-cell">
+                            ${project.students.map(student => `<div class="student-row">${student.track || '0'}</div>`).join('')}
+                          </td>
+
+                          <td>
+                           ${advisor
+                          ?`
+                                  <div class="advisor-row" style="color: #5274aa;">${advisor.name}</div>
+                            `
+                          : ''}
+
+                            ${committee.map(comm => `<div class="advisor-row" style="color: #424242;">${comm}</div>`).join('')}
+
+                           </td>
+
+                  `;
+                  tbody.appendChild(row);
+                })
+              }
+
+            })
+            .catch(error => {
+              console.error('Error fetching data:', error);
+
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+              });
+            });
+    }
+
+</script>

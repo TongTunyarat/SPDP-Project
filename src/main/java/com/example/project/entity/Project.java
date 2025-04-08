@@ -251,5 +251,21 @@ public class Project {
         this.gradingProposalEvaluations = gradingProposalEvaluations;
     }
 
+    @Override
+    public String toString() {
+        return "Project{" +
+                "projectId='" + projectId + '\'' +
+                ", program='" + program + '\'' +
+                ", semester='" + semester + '\'' +
+                ", projectTitle='" + projectTitle + '\'' +
+                ", projectCategory='" + projectCategory + '\'' +
+                ", projectDescription='" + projectDescription + '\'' +
+                ", recordedOn=" + recordedOn +
+                ", editedOn=" + editedOn +
+                ", recordedBy=" + (recordedProject != null ? recordedProject.getUsername() : null) +
+                ", editedBy=" + (editedProject != null ? editedProject.getUsername() : null) +
+                '}';
+    }
+
 }
 

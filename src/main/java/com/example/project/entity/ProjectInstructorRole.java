@@ -125,4 +125,15 @@ public class ProjectInstructorRole {
     public void setProjectInstructorRoleId(String instructorRoleId) {
 
     }
+
+    @Override
+    public String toString() {
+        return "ProjectInstructorRole{" +
+                "instructorId='" + instructorId + '\'' +
+                ", assignDate=" + assignDate +
+                ", role='" + role + '\'' +
+                ", projectId=" + (projectIdRole != null ? projectIdRole.getProjectId() : null) +
+                ", professorId=" + (instructor != null ? instructor.getProfessorId() : null) +
+                '}';
+    }
 }

@@ -9,7 +9,8 @@ public interface PosterEvaRepository extends JpaRepository<PosterEvaluation, Str
 
     PosterEvaluation findByInstructorIdPosterAndProjectIdPoster(ProjectInstructorRole instructorIdPoster, Project projectIdPoster);
 
-//    List<PosterEvaluation> findByProjectIdPoster(Project project);
-
     List<PosterEvaluation> findByProjectIdPoster_ProjectId(String projectId);
+
+    int countByInstructorIdPoster_Instructor_ProfessorIdAndProjectIdPoster(String professorId, Project projectIdPoster);
+
 }

@@ -22,6 +22,9 @@ public class ScoringPeriodsController {
     @PostMapping
     public ResponseEntity<String> createScoringPeriod(@RequestBody ScoringPeriodsRequest request) {
         try {
+            System.out.println("request");
+            System.out.println(request);
+
             scoringPeriodsService.createOrUpdateScoringPeriod(request);
             return ResponseEntity.ok("Scoring Period saved successfully!");
         } catch (IllegalArgumentException e) {
@@ -31,9 +34,12 @@ public class ScoringPeriodsController {
 
     // ดึงข้อมูลวันที่จากฐานข้อมูล
     @GetMapping("/get-dates")
-    public ResponseEntity<Map<String, String>> getDates(@RequestParam String evaluationType) {
+    public ResponseEntity<Map<String, String>> getDates(
+            @RequestParam String evaluationType,
+            @RequestParam String year
+    ) {
         try {
-            Map<String, String> dates = scoringPeriodsService.getFormattedDatesByEvaluationType(evaluationType);
+            Map<String, String> dates = scoringPeriodsService.getFormattedDatesByEvaluationType(evaluationType,year);
             if (dates.isEmpty()) {
                 return ResponseEntity.noContent().build();
             }

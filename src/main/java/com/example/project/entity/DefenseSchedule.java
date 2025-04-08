@@ -30,26 +30,48 @@ public class DefenseSchedule {
     @Column(name = "remark")
     private String remark;
 
+    @Column(name = "record_on")
+    private LocalDateTime recordOn;
+
     @Column(name = "edited_on")
     private LocalDateTime editedOn;
 
     // edited_by
+//    @ManyToOne
+//    @JoinColumn(name = "edited_by")
+//    @JsonManagedReference
+//    private Account editedBy;
+
     @ManyToOne
-    @JoinColumn(name = "edited_by")
+    @JoinColumn(name = "edited_by", insertable = false, updatable = false)
     @JsonManagedReference
     private Account editedBy;
 
+    @Column(name = "edited_by")
+    private String editedByUser;
+
     // project_id
+//    @ManyToOne
+//    @JoinColumn(name = "project_id")
+//    @JsonManagedReference
+//    private Project projectId;
     @ManyToOne
-    @JoinColumn(name = "project_id")
+    @JoinColumn(name = "project_id", insertable = false, updatable = false)
     @JsonManagedReference
-    private Project projectId;
+    private Project project;
+
+    @Column(name = "project_id")
+    private String projectId;
+
 
     // room_number
     @ManyToOne
     @JoinColumn(name = "room_number")
     @JsonManagedReference
     private Room roomNumber;
+
+    @Column(name = "temp_room")
+    private String roomTemp;
 
     public String getDefenseScheduleId() {
         return defenseScheduleId;
@@ -99,6 +121,14 @@ public class DefenseSchedule {
         this.remark = remark;
     }
 
+    public LocalDateTime getRecordOn() {
+        return recordOn;
+    }
+
+    public void setRecordOn(LocalDateTime recordOn) {
+        this.recordOn = recordOn;
+    }
+
     public LocalDateTime getEditedOn() {
         return editedOn;
     }
@@ -115,11 +145,27 @@ public class DefenseSchedule {
         this.editedBy = editedBy;
     }
 
-    public Project getProjectId() {
+    public String getEditedByUser() {
+        return editedByUser;
+    }
+
+    public void setEditedByUser(String editedByUser) {
+        this.editedByUser = editedByUser;
+    }
+
+    public Project getProject() {
+        return project;
+    }
+
+    public void setProject(Project project) {
+        this.project = project;
+    }
+
+    public String getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(Project projectId) {
+    public void setProjectId(String projectId) {
         this.projectId = projectId;
     }
 
@@ -129,5 +175,13 @@ public class DefenseSchedule {
 
     public void setRoomNumber(Room roomNumber) {
         this.roomNumber = roomNumber;
+    }
+
+    public String getRoomTemp() {
+        return roomTemp;
+    }
+
+    public void setRoomTemp(String roomTemp) {
+        this.roomTemp = roomTemp;
     }
 }

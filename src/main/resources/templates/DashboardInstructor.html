@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
+
 
 <head>
     <meta charset="UTF-8">
@@ -16,203 +17,214 @@
 
 <body>
 <div class="container">
+
     <!-- script ในการเปิดปิด period -->
     <script>
-        const accessPeriods = {
-            proposalEvaluation: {
-                start: "2025-02-01T00:00:00",
-                end: "2025-07-14T23:59:59",
-                isActive: true,
-                path: "/show-proposal-eva-projects",
-                title: "Proposal Evaluation"
-            },
-            posterEvaluation: {
-                start: "2025-02-01T00:00:00",
-                end: "2025-07-14T23:59:59",
-                isActive: true,
-                path: "/show-poster-projects",
-                title: "Poster Evaluation"
-            },
-            proposalGrade: {
-                start: "2025-02-01T00:00:00",
-                end: "2025-07-14T23:59:59",
-                isActive: true,
-                path: "/show-proposal-grade-projects",
-                title: "Proposal Grade"
-            },
-            defenseEvaluation: {
-                start: "2025-02-15T00:00:00",
-                end: "2025-07-15T23:59:59",
-                isActive: true,
-                path: "/show-defense-eva-projects",
-                title: "Defense Evaluation"
-            },
-            defenseGrade: {
-                start: "2025-02-15T00:00:00",
-                end: "2025-07-15T23:59:59",
-                isActive: true,
-                path: "/show-defense-grade-projects",
-                title: "Defense Grade"
+        let accessPeriods = {};
+
+        console.log('Calling updateLinkStatus function');
+        window.onload = fetchAccessPeriods;
+        setInterval(updateLinkStatus, 60000);
+
+        async function fetchAccessPeriods() {
+            try {
+                const response = await fetch('http://localhost:8080/api/period'); // เปลี่ยน URL ตาม backend ของคุณ
+                if (!response.ok) {
+                    throw new Error('Failed to fetch access periods');
+                }
+
+                const data = await response.json(); // แปลง response เป็น JSON
+                console.log(data);
+
+                accessPeriods = convertApiResponseToObject(data); // แปลง array จาก API เป็น object ที่ใช้งานง่าย
+                console.log("before set date: ", accessPeriods)
+                updateLinkStatus(); // อัปเดตสถานะของลิงก์
+            } catch (error) {
+                console.error('Error fetching access periods:', error);
             }
-        };
+        }
+
+        // ฟังก์ชันแปลง API Response (Array) เป็น Object ตาม key ที่ใช้ใน HTML
+        function convertApiResponseToObject(data) {
+            console.log("🎞️Convert api");
+            console.log(data);
+
+            // ตรวจสอบว่า data เป็น array และไม่เป็น null หรือ undefined
+            if (!Array.isArray(data) || data.length === 0) {
+                console.log("💡No data to process");
+                return {}; // ถ้าไม่มีข้อมูล หรือไม่เป็น array จะคืนค่าเป็น object ว่างๆ
+            }
+
+            // 1️⃣ กำหนดประเภทของ Evaluation ที่รองรับ
+            const allTypes = {
+                "proposalEvaluation": "/show-proposal-eva-projects",
+                "posterEvaluation": "/show-poster-projects",
+                "defenseEvaluation": "/show-defense-eva-projects",
+                "proposalGrade": "/show-proposal-grade-projects",
+                "defenseGrade": "/show-defense-grade-projects"
+            };
+
+            let periodsObj = {};
+
+            // 2️⃣ สร้างค่าเริ่มต้นให้ทุกประเภท (isActive = false)
+            Object.keys(allTypes).forEach(type => {
+                periodsObj[type] = {
+                    start: null, // ไม่มีข้อมูลให้เป็น null
+                    end: null,
+                    isActive: false, // ปิดการใช้งาน
+                    path: allTypes[type],
+                    title: type
+                };
+            });
+
+            // 3️⃣ อัปเดตค่าถ้ามีข้อมูลจาก API
+            data.forEach((period, index) => {
+                console.log(`💡Processing item at index: ${index}`);
+
+                let evaluationTypeKey;
+
+                // ใช้ switch-case เพื่อแปลง evaluationType ให้ตรงกับคีย์ใน allTypes
+                switch (period.evaluationType) {
+                    case "Proposal Evaluation":
+                        evaluationTypeKey = "proposalEvaluation";
+                        break;
+                    case "Poster Evaluation":
+                        evaluationTypeKey = "posterEvaluation";
+                        break;
+                    case "Defense Evaluation":
+                        evaluationTypeKey = "defenseEvaluation";
+                        break;
+                    case "Proposal Grade":
+                        evaluationTypeKey = "proposalGrade";
+                        break;
+                    case "Defense Grade":
+                        evaluationTypeKey = "defenseGrade";
+                        break;
+                    default:
+                        console.log(`💡No matching key for evaluation type: ${period.evaluationType}`);
+                        return; // ถ้าไม่ตรงกับ case ใดๆ ก็ให้ข้ามไป
+                }
+
+                console.log("💡Evaluation type key:", evaluationTypeKey);
+
+                if (periodsObj.hasOwnProperty(evaluationTypeKey)) {
+                    // ตรวจสอบและแปลงวันที่ ถ้าวันที่เป็น string ที่ไม่สามารถแปลงได้เป็นวันที่ จะตั้งค่าเป็น null
+                    const startDate = Date.parse(period.startDate); // แปลงเป็น timestamp
+                    const endDate = Date.parse(period.endDate); // แปลงเป็น timestamp
+
+                    periodsObj[evaluationTypeKey] = {
+                        start: isNaN(startDate) ? null : new Date(startDate), // ถ้าแปลงไม่สำเร็จให้เป็น null
+                        end: isNaN(endDate) ? null : new Date(endDate), // ถ้าแปลงไม่สำเร็จให้เป็น null
+                        isActive: true, // มีข้อมูล API -> เปิดใช้งาน
+                        path: allTypes[evaluationTypeKey],
+                        title: period.evaluationType
+                    };
+                }
+            });
+
+            console.log("🎞️Final periodsObj: ", periodsObj); // ตรวจสอบผลลัพธ์
+            return periodsObj;
+        }
 
         function updateLinkStatus() {
             const currentTime = new Date(); // Get current time
             console.log("Current Time: ", currentTime); // Debugging line
+            console.log("accessPeriods: ", accessPeriods)
 
             // Get all links with data-period
             const links = document.querySelectorAll('a[data-period]');
+            console.log("links:", links); // ตรวจสอบว่าได้ลิงก์ทั้งหมดหรือไม่
 
             links.forEach(link => {
                 const periodKey = link.getAttribute('data-period');
                 const period = accessPeriods[periodKey];
+                console.log("periodKey:", periodKey); // ตรวจสอบว่า periodKey ถูกต้อง
+                console.log("period: ",period)
 
                 if (period) {
-                    const startTime = new Date(period.start);
-                    const endTime = new Date(period.end);
-                    console.log(`Checking link ${periodKey}:`, currentTime, startTime, endTime); // Debugging line
+                    const startTime = period.start ? new Date(period.start) : null;
+                    const endTime = period.end ? new Date(period.end) : null;
 
-                    const isAccessible = currentTime >= startTime && currentTime <= endTime && period.isActive;
-                    console.log(`Is Accessible: ${isAccessible}`); // Debugging line
+                    console.log(`Checking link ${periodKey}:`, currentTime, startTime, endTime); // Debugging
+
+                    const isAccessible =
+                        period.isActive &&
+                        (startTime === null || currentTime >= startTime) &&
+                        (endTime === null || currentTime <= endTime);
+
+                    console.log(`Is Accessible: ${isAccessible}`);
+
 
                     if (!isAccessible) {
-                        link.classList.add('disabled-link');
-                        link.onclick = (e) => e.preventDefault(); // Prevent default action when link is disabled
+                        link.classList.add('disabled-link'); // เพิ่มสไตล์
+                        console.log('Disabled link added:', link);
 
-                        // Add tooltip if not already present
-                        if (!link.querySelector('.tooltip')) {
-                            const tooltipText = currentTime < startTime
-                                ? `Available from ${startTime.toLocaleDateString()}`
-                                : `Period ended on ${endTime.toLocaleDateString()}`;
+                        link.addEventListener('click', function (e) {
+                            e.preventDefault();
 
-                            const tooltip = document.createElement('span');
-                            tooltip.className = 'tooltip';
-                            tooltip.textContent = tooltipText;
-                            link.appendChild(tooltip);
-                        }
+                            let alertMessage = "🚫 This link is not accessible right now.";
+
+                            // ตรวจสอบว่า startTime หรือ endTime เป็น null หรือไม่
+                            if (startTime && endTime) {
+                                alertMessage += ` Available from ${startTime.toLocaleDateString()} to ${endTime.toLocaleDateString()}`;
+                            }
+
+                            console.warn(alertMessage); // แสดง warning ใน console
+                            alert(alertMessage); // แสดง alert ตามข้อความที่กำหนด
+                        });
                     } else {
                         link.classList.remove('disabled-link');
-                        link.onclick = null;
-                        const tooltip = link.querySelector('.tooltip');
-                        if (tooltip) {
-                            tooltip.remove();
-                        }
+
+                        // ลบ event listener ที่เคยเพิ่มไว้ เพื่อไม่ให้ alert ทำงานถ้าเปลี่ยนสถานะเป็น accessible
+                        link.replaceWith(link.cloneNode(true));
                     }
                 }
             });
         }
-
-        console.log('Calling updateLinkStatus function');
-        // First execution to update link status
-        // เรียก updateLinkStatus ทันทีเมื่อโหลดหน้า
-        window.onload = updateLinkStatus;
-
-        // ตั้งเวลาอัปเดตทุก 1 นาที
-        setInterval(updateLinkStatus, 60000);
-
     </script>
 
 
     <div class="sidebar">
         <h2>ICT MAHIDOL</h2>
         <ul>
-            <h4>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
                      style="fill:#FFFFFF;">
-                    <path
-                            d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
-                    </path>
-                </svg>
-                Homepage
-            </h4>
-            <li><a href="#" class="active">Dashboard</a></li>
+                <path
+                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+                </path>
+            </svg> Homepage </h4>
+            <li><a href="/instructor/view">Dashboard</a></li>
         </ul>
 
         <ul>
-            <h4>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-                    <g fill="#ffffff" fill-rule="nonzero">
-                        <g transform="scale(5.33333,5.33333)">
-                            <path
-                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-                            </path>
-                        </g>
+            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                <g fill="#ffffff" fill-rule="nonzero">
+                    <g transform="scale(5.33333,5.33333)">
+                        <path
+                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                        </path>
                     </g>
-                </svg>
-                Evaluation (40%)
-            </h4>
+                </g>
+            </svg> Evaluation (40%) </h4>
             <li><a href="/show-proposal-eva-projects" data-period="proposalEvaluation">Proposal Evaluation</a></li>
             <li><a href="/show-poster-projects" data-period="posterEvaluation">Poster Evaluation</a></li>
             <li><a href="/show-defense-eva-projects" data-period="defenseEvaluation">Defense Evaluation</a></li>
         </ul>
 
         <ul>
-            <h4>
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-                    <g fill="#ffffff" fill-rule="nonzero">
-                        <g transform="scale(5.33333,5.33333)">
-                            <path
-                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-                            </path>
-                        </g>
+            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                <g fill="#ffffff" fill-rule="nonzero">
+                    <g transform="scale(5.33333,5.33333)">
+                        <path
+                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                        </path>
                     </g>
-                </svg>
-                Grades (60%)
-            </h4>
+                </g>
+            </svg> Grades (60%) </h4>
             <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Proposal Grade</a></li>
             <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Defense Grade</a></li>
         </ul>
-
-        <ul>
-            <form th:action="@{/logout}" method="post">
-                <!-- ค่าที่ใช้สำหรับป้องกัน Cross-Site Request Forgery (CSRF) -->
-                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-                <button type="submit">Logout</button>
-            </form>
-        </ul>
     </div>
-
-    <!--    <div class="sidebar">-->
-    <!--        <h2>ICT MAHIDOL</h2>-->
-    <!--        <ul>-->
-    <!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"-->
-    <!--                     style="fill:#FFFFFF;">-->
-    <!--                <path-->
-    <!--                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">-->
-    <!--                </path>-->
-    <!--            </svg> Homepage </h4>-->
-    <!--            <li><a href="#">Dashboard</a></li>-->
-    <!--        </ul>-->
-
-    <!--        <ul>-->
-    <!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
-    <!--                <g fill="#ffffff" fill-rule="nonzero">-->
-    <!--                    <g transform="scale(5.33333,5.33333)">-->
-    <!--                        <path-->
-    <!--                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
-    <!--                        </path>-->
-    <!--                    </g>-->
-    <!--                </g>-->
-    <!--            </svg> Evaluation (40%) </h4>-->
-    <!--            <li><a href="/show-proposal-eva-projects">Proposal Evaluation</a></li>-->
-    <!--            <li><a href="/show-poster-projects">Poster Evaluation</a></li>-->
-    <!--            <li><a href="/show-defense-eva-projects">Defense Evaluation</a></li>-->
-    <!--        </ul>-->
-
-    <!--        <ul>-->
-    <!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
-    <!--                <g fill="#ffffff" fill-rule="nonzero">-->
-    <!--                    <g transform="scale(5.33333,5.33333)">-->
-    <!--                        <path-->
-    <!--                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
-    <!--                        </path>-->
-    <!--                    </g>-->
-    <!--                </g>-->
-    <!--            </svg> Grades (60%) </h4>-->
-    <!--            <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>-->
-    <!--            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>-->
-    <!--        </ul>-->
-    <!--    </div>-->
 
     <div class="content">
 
@@ -222,100 +234,164 @@
 
         <div class="body-section">
 
-            <!-- Card Header -->
+            <!-- =============================================== Card Header =============================================== -->
             <div class="card-wrapper">
                 <div class="header-container">
-                    <label class="text-header"> DST Project </label>
+                    <div class="header-title">
+                        <label class="text-header">DST Project</label>
+                        <svg class="icon-work" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M6.5 1C5.67173 1 5 1.67117 5 2.49976V3H1.5C0.671573 3 0 3.67157 0 4.5V12.5C0 13.3284 0.671573 14 1.5 14H14.5C15.3284 14 16 13.3284 16 12.5V4.5C16 3.67157 15.3284 3 14.5 3H11V2.49976C11 1.67117 10.3283 1 9.5 1H6.5ZM6.5 2H9.5C9.7763 2 10 2.22463 10 2.50061V3H6V2.49976C6 2.22377 6.2237 2 6.5 2ZM8.38649 8.91441L15 7.15081V12.5C15 12.7761 14.7761 13 14.5 13H1.5C1.22386 13 1 12.7761 1 12.5V7.15081L7.61351 8.91441C7.86674 8.98194 8.13326 8.98194 8.38649 8.91441ZM1.5 4H14.5C14.7761 4 15 4.22386 15 4.5V6.11586L8.12883 7.94817C8.04442 7.97068 7.95558 7.97068 7.87117 7.94817L1 6.11586V4.5C1 4.22386 1.22386 4 1.5 4Z" fill="#624BFF"/>
+                        </svg>
+                    </div>
+                    <label class="text-centerProgram">
+                        <h1 th:text="${programDST}"></h1><span style="color: #919EAB; font-size: 2.5rem; padding-left: 1rem;">Groups</span>
+                    </label>
+                    <label class="text-footer"><span th:text="${coProgramDST}">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span></label>
+                </div>
 
+                <div class="header-container">
+                    <div class="header-title">
+                        <label class="text-header"> ICT Project</label>
+                        <svg class="icon-work" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M6.5 1C5.67173 1 5 1.67117 5 2.49976V3H1.5C0.671573 3 0 3.67157 0 4.5V12.5C0 13.3284 0.671573 14 1.5 14H14.5C15.3284 14 16 13.3284 16 12.5V4.5C16 3.67157 15.3284 3 14.5 3H11V2.49976C11 1.67117 10.3283 1 9.5 1H6.5ZM6.5 2H9.5C9.7763 2 10 2.22463 10 2.50061V3H6V2.49976C6 2.22377 6.2237 2 6.5 2ZM8.38649 8.91441L15 7.15081V12.5C15 12.7761 14.7761 13 14.5 13H1.5C1.22386 13 1 12.7761 1 12.5V7.15081L7.61351 8.91441C7.86674 8.98194 8.13326 8.98194 8.38649 8.91441ZM1.5 4H14.5C14.7761 4 15 4.22386 15 4.5V6.11586L8.12883 7.94817C8.04442 7.97068 7.95558 7.97068 7.87117 7.94817L1 6.11586V4.5C1 4.22386 1.22386 4 1.5 4Z" fill="#624BFF"/>
+                        </svg>
+                    </div>
+                    <label class="text-centerProgram">
+                        <h1 th:text="${programICT}">0</h1><span style="color: #919EAB; font-size: 2.5rem; padding-left: 1rem;">Groups</span>
+                    </label>
+                    <label class="text-footer"><span th:text="${coProgramICT}">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span></label>
+                </div>
+
+
+
+                <div class="header-container">
+                    <div class="header-title">
+                        <label class="text-header"> Proposal Evaluation </label>
+                        <svg class="icon-prop" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M2 2.5C1.72386 2.5 1.5 2.72386 1.5 3V4C1.5 4.27614 1.72386 4.5 2 4.5H3C3.27614 4.5 3.5 4.27614 3.5 4V3C3.5 2.72386 3.27614 2.5 3 2.5H2ZM3 3H2V4H3V3Z" fill="#0DCAF0"/>
+                            <path d="M5 3.5C5 3.22386 5.22386 3 5.5 3H14.5C14.7761 3 15 3.22386 15 3.5C15 3.77614 14.7761 4 14.5 4H5.5C5.22386 4 5 3.77614 5 3.5Z" fill="#0DCAF0"/>
+                            <path d="M5.5 7C5.22386 7 5 7.22386 5 7.5C5 7.77614 5.22386 8 5.5 8H14.5C14.7761 8 15 7.77614 15 7.5C15 7.22386 14.7761 7 14.5 7H5.5Z" fill="#0DCAF0"/>
+                            <path d="M5.5 11C5.22386 11 5 11.2239 5 11.5C5 11.7761 5.22386 12 5.5 12H14.5C14.7761 12 15 11.7761 15 11.5C15 11.2239 14.7761 11 14.5 11H5.5Z" fill="#0DCAF0"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M1.5 7C1.5 6.72386 1.72386 6.5 2 6.5H3C3.27614 6.5 3.5 6.72386 3.5 7V8C3.5 8.27614 3.27614 8.5 3 8.5H2C1.72386 8.5 1.5 8.27614 1.5 8V7ZM2 7H3V8H2V7Z" fill="#0DCAF0"/>
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M2 10.5C1.72386 10.5 1.5 10.7239 1.5 11V12C1.5 12.2761 1.72386 12.5 2 12.5H3C3.27614 12.5 3.5 12.2761 3.5 12V11C3.5 10.7239 3.27614 10.5 3 10.5H2ZM3 11H2V12H3V11Z" fill="#0DCAF0"/>
+                        </svg>
+                    </div>
                     <label class="text-center">
-                        <h1> 5 <span style="color: #919EAB;">Groups</span></h1>
+                        <h1> 0 </h1>
                     </label>
 
                     <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
                 </div>
 
                 <div class="header-container">
-                    <label class="text-header"> ICT Project </label>
+                    <div class="header-title">
+                        <label class="text-header"> Poster Evaluation </label>
+                        <svg class="icon-post" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <path d="M15 14C15 14 16 14 16 13C16 12 15 9 11 9C7 9 6 12 6 13C6 14 7 14 7 14H15ZM7.02235 13C7.01888 12.9996 7.01403 12.999 7.00815 12.998C7.00538 12.9975 7.00266 12.997 7.00001 12.9965C7.00146 12.7325 7.16687 11.9669 7.75926 11.2758C8.31334 10.6294 9.28269 10 11 10C12.7173 10 13.6867 10.6294 14.2407 11.2758C14.8331 11.9669 14.9985 12.7325 15 12.9965C14.9973 12.997 14.9946 12.9975 14.9919 12.998C14.986 12.999 14.9811 12.9996 14.9777 13H7.02235Z" fill="#DC3545"/>
+                            <path d="M11 7C12.1046 7 13 6.10457 13 5C13 3.89543 12.1046 3 11 3C9.89543 3 9 3.89543 9 5C9 6.10457 9.89543 7 11 7ZM14 5C14 6.65685 12.6569 8 11 8C9.34315 8 8 6.65685 8 5C8 3.34315 9.34315 2 11 2C12.6569 2 14 3.34315 14 5Z" fill="#DC3545"/>
+                            <path d="M6.93593 9.27996C6.56813 9.16232 6.15954 9.07679 5.70628 9.03306C5.48195 9.01141 5.24668 9 5 9C1 9 0 12 0 13C0 13.6667 0.333333 14 1 14H5.21636C5.07556 13.7159 5 13.3791 5 13C5 11.9897 5.37724 10.958 6.08982 10.0962C6.33327 9.80174 6.61587 9.52713 6.93593 9.27996ZM4.92004 10.0005C4.32256 10.9136 4 11.9547 4 13H1C1 12.7393 1.16424 11.97 1.75926 11.2758C2.30468 10.6395 3.25249 10.0197 4.92004 10.0005Z" fill="#DC3545"/>
+                            <path d="M1.5 5.5C1.5 3.84315 2.84315 2.5 4.5 2.5C6.15685 2.5 7.5 3.84315 7.5 5.5C7.5 7.15685 6.15685 8.5 4.5 8.5C2.84315 8.5 1.5 7.15685 1.5 5.5ZM4.5 3.5C3.39543 3.5 2.5 4.39543 2.5 5.5C2.5 6.60457 3.39543 7.5 4.5 7.5C5.60457 7.5 6.5 6.60457 6.5 5.5C6.5 4.39543 5.60457 3.5 4.5 3.5Z" fill="#DC3545"/>
+                        </svg>
+                    </div>
                     <label class="text-center">
-                        <h1> 5 <span style="color: #919EAB;">Groups</span></h1>
-                    </label>
-                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
-                </div>
-
-                <div class="header-container">
-                    <label class="text-header"> Proposal Evaluation </label>
-                    <label class="text-center">
-                        <h1> 5 <span style="color: #919EAB;">Groups</span></h1>
-                    </label>
-
-                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
-                </div>
-
-                <div class="header-container">
-                    <label class="text-header"> Poster Evaluation </label>
-                    <label class="text-center">
-                        <h1> 5 <span style="color: #919EAB;">Groups</span></h1>
+                        <h1> 0 </h1>
                     </label>
 
                     <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
                 </div>
 
                 <div class="header-container">
-                    <label class="text-header"> Defense Evaluation </label>
+                    <div class="header-title">
+                        <label class="text-header"> Defense Evaluation </label>
+                        <svg class="icon-defense" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">
+                            <g clip-path="url(#clip0_1371_7321)">
+                                <path d="M8.00016 14.6654C11.6821 14.6654 14.6668 11.6806 14.6668 7.9987C14.6668 4.3168 11.6821 1.33203 8.00016 1.33203C4.31826 1.33203 1.3335 4.3168 1.3335 7.9987C1.3335 11.6806 4.31826 14.6654 8.00016 14.6654Z" stroke="#28A745" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M8 12C10.2091 12 12 10.2091 12 8C12 5.79086 10.2091 4 8 4C5.79086 4 4 5.79086 4 8C4 10.2091 5.79086 12 8 12Z" stroke="#28A745" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M7.99984 9.33464C8.73622 9.33464 9.33317 8.73768 9.33317 8.0013C9.33317 7.26492 8.73622 6.66797 7.99984 6.66797C7.26346 6.66797 6.6665 7.26492 6.6665 8.0013C6.6665 8.73768 7.26346 9.33464 7.99984 9.33464Z" stroke="#28A745" stroke-linecap="round" stroke-linejoin="round"/>
+                            </g>
+                            <defs>
+                                <clipPath id="clip0_1371_7321">
+                                    <rect width="16" height="16" fill="white"/>
+                                </clipPath>
+                            </defs>
+                        </svg>
+                    </div>
                     <label class="text-center">
-                        <h1> 5 <span style="color: #919EAB;">Groups</span></h1>
+                        <h1> 0 </h1>
                     </label>
 
                     <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
                 </div>
+
             </div>
 
-
             <!-- Reminder -->
-            <div class="reminder-container">
-                <div class="reminder-title">
-                    <i class="fa-solid fa-bell"></i>
-                    Reminder
-                </div>
+<!--            <div class="reminder-container">-->
+<!--                <div class="reminder-title">-->
+<!--                    <i class="fa-solid fa-bell"></i>-->
+<!--                    Reminder-->
+<!--                </div>-->
 
-                <div class="reminder-item">
-                    <div class="reminder-content">
-                        <div>
-                            <i class="fa-solid fa-circle-notch reminder-icon"></i>
-                            <span class="reminder-text">การประเมิน Proposal Presentation</span>
-                        </div>
-                        <span class="reminder-subtitle">กรอกคะแนน Proposal Evaluation</span>
+<!--                <div class="reminder-item">-->
+<!--                    <div class="reminder-content">-->
+<!--                        <div>-->
+<!--                            <i class="fa-solid fa-circle-notch reminder-icon"></i>-->
+<!--                            <span class="reminder-text">การประเมิน Proposal Presentation</span>-->
+<!--                        </div>-->
+<!--                        <span class="reminder-subtitle">กรอกคะแนน Proposal Evaluation</span>-->
+<!--                    </div>-->
+<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+<!--                </div>-->
+
+<!--                <div class="reminder-item">-->
+<!--                    <div class="reminder-content">-->
+<!--                        <div>-->
+<!--                            <i class="fa-solid fa-circle-notch reminder-icon "></i>-->
+<!--                            <span class="reminder-text">การประเมิน Poster Presentation</span>-->
+<!--                        </div>-->
+<!--                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>-->
+<!--                    </div>-->
+<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+<!--                </div>-->
+
+<!--                <div class="reminder-item">-->
+<!--                    <div class="reminder-content">-->
+<!--                        <div>-->
+<!--                            <i class="fa-solid fa-circle-notch reminder-icon "></i>-->
+<!--                            <span class="reminder-text">การประเมิน Proposal Presentation</span>-->
+<!--                        </div>-->
+<!--                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>-->
+<!--                    </div>-->
+<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+<!--                </div>-->
+<!--            </div>-->
+
+            <div class="main-content">
+                <div class="panel">
+                    <div class="panel-title">สัดส่วนเกรดของนักเรียนทั้งหมด</div>
+                    <div class="evaluation-selector" style="margin-bottom: 15px; text-align: center;">
+                        <button id="proposalBtn" class="eva-btn active" onclick="changeEvaType('Proposal Evaluation')">Proposal Grade</button>
+                        <button id="defenseBtn" class="eva-btn" onclick="changeEvaType('Defense Evaluation')">Defense Grade</button>
                     </div>
-                    <div class="reminder-date">กำหนด: 15/01/2025</div>
-                </div>
-
-                <div class="reminder-item">
-                    <div class="reminder-content">
-                        <div>
-                            <i class="fa-solid fa-circle-notch reminder-icon "></i>
-                            <span class="reminder-text">การประเมิน Poster Presentation</span>
-                        </div>
-                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>
+                    <div class="chart-container">
+                        <canvas id="gradeBarChart"></canvas>
                     </div>
-                    <div class="reminder-date">กำหนด: 15/01/2025</div>
-                </div>
-
-                <div class="reminder-item">
-                    <div class="reminder-content">
-                        <div>
-                            <i class="fa-solid fa-circle-notch reminder-icon "></i>
-                            <span class="reminder-text">การประเมิน Proposal Presentation</span>
-                        </div>
-                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>
+                    <div style="font-size: 13px; text-align: center; margin-top: 10px; color: #666;">
+                        แสดงการกระจายของเกรดในแต่ละระดับ คิดเป็นเปอร์เซ็นต์ของนักเรียนทั้งหมด
                     </div>
-                    <div class="reminder-date">กำหนด: 15/01/2025</div>
                 </div>
 
+                <div class="panel">
+                    <div class="panel-title">กำหนดการสำคัญ</div>
+                    <div class="timeline">
+                    </div>
+                </div>
             </div>
 
 
             <!-- Schedule Present -->
             <div class="schedule-container">
+
                 <div class="schedule-title">
                     <i class="fa-solid fa-calendar"></i>
                     Schedule for Presentation
@@ -326,65 +402,597 @@
                     schedule, please contact staff.
                 </p>
 
-                <div class="schedule-item">
-                    <div class="schedule-header">
-                        <div class="schedule-header-tags">
-                            <span class="tag tag-advisor">Advisor</span>
-                            <span class="tag tag-proposal">Proposal</span>
-                            <span class="tag tag-ict">ICT</span>
-                        </div>
-                        <div class="status-btn status-btn-pending">รอการประเมิน</div>
-                    </div>
+<!--                <div class="schedule-item">-->
+<!--                    <div class="schedule-header">-->
+<!--                        <div class="schedule-header-tags">-->
+<!--                            <span class="tag tag-advisor">Advisor</span>-->
+<!--                            <span class="tag tag-proposal">Proposal</span>-->
+<!--                            <span class="tag tag-ict">ICT</span>-->
+<!--                        </div>-->
+<!--                        <div class="status-btn status-btn-pending">รอการประเมิน</div>-->
+<!--                    </div>-->
 
-                    <div class="schedule-content">
-                        <strong>ระบบ Senior Project Digital Platform</strong>
-                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>
-                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>
-                        <p><span class="schedule-room">Room: </span> Lab 1</p>
-                    </div>
-                </div>
+<!--                    <div class="schedule-content">-->
+<!--                        <strong>ระบบ Senior Project Digital Platform</strong>-->
+<!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
+<!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
+<!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
+<!--                    </div>-->
+<!--                </div>-->
 
-                <div class="schedule-item">
-                    <div class="schedule-header">
-                        <div class="schedule-header-tags">
-                            <span class="tag tag-committee">Committee</span>
-                            <span class="tag tag-proposal">Proposal</span>
-                            <span class="tag tag-dst">DST</span>
-                        </div>
-                        <div class="status-btn status-btn-pending">รอการประเมิน</div>
-                    </div>
+<!--                <div class="schedule-item">-->
+<!--                    <div class="schedule-header">-->
+<!--                        <div class="schedule-header-tags">-->
+<!--                            <span class="tag tag-committee">Committee</span>-->
+<!--                            <span class="tag tag-proposal">Proposal</span>-->
+<!--                            <span class="tag tag-dst">DST</span>-->
+<!--                        </div>-->
+<!--                        <div class="status-btn status-btn-pending">รอการประเมิน</div>-->
+<!--                    </div>-->
 
-                    <div class="schedule-content">
-                        <strong>ระบบ SPDP MANAGEMENT</strong>
-                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>
-                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>
-                        <p><span class="schedule-room">Room: </span> Lab 1</p>
-                    </div>
-                </div>
+<!--                    <div class="schedule-content">-->
+<!--                        <strong>ระบบ SPDP MANAGEMENT</strong>-->
+<!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
+<!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
+<!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
+<!--                    </div>-->
+<!--                </div>-->
 
-                <div class="schedule-item">
-                    <div class="schedule-header">
-                        <div class="schedule-header-tags">
-                            <span class="tag tag-advisor">Advisor</span>
-                            <span class="tag tag-defense">Defense</span>
-                            <span class="tag tag-dst">DST</span>
-                        </div>
-                        <div class="status-btn status-btn-in-progress">กำลังจะมาถึง</div>
-                    </div>
+<!--                <div class="schedule-item">-->
+<!--                    <div class="schedule-header">-->
+<!--                        <div class="schedule-header-tags">-->
+<!--                            <span class="tag tag-advisor">Advisor</span>-->
+<!--                            <span class="tag tag-defense">Defense</span>-->
+<!--                            <span class="tag tag-dst">DST</span>-->
+<!--                        </div>-->
+<!--                        <div class="status-btn status-btn-in-progress">กำลังจะมาถึง</div>-->
+<!--                    </div>-->
 
-                    <div class="schedule-content">
-                        <strong>ระบบ Senior Project Digital Platform</strong>
-                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>
-                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>
-                        <p><span class="schedule-room">Room: </span> Lab 1</p>
-                    </div>
-                </div>
+<!--                    <div class="schedule-content">-->
+<!--                        <strong>ระบบ Senior Project Digital Platform</strong>-->
+<!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
+<!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
+<!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
+<!--                    </div>-->
+<!--                </div>-->
 
             </div>
-        </div>
 
+
+        </div>
     </div>
 </div>
 </body>
 
 </html>
+
+<script>
+
+    // ================================  fetch data  ==========================================
+
+    function dashboardProposal() {
+        let url = `http://localhost:8080/instructor/proposalStatusDashboard`;
+
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                // console.log("JSON: " + response.json());
+                return response.json();
+            });
+    }
+
+    function dashboardPoster() {
+        let url = `http://localhost:8080/instructor/posterStatusDashboard`;
+
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                // console.log("JSON: " + response.json());
+                return response.json();
+            });
+    }
+
+    function dashboardDefense() {
+        let url = `http://localhost:8080/instructor/defenseStatusDashboard`;
+
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                // console.log("JSON: " + response.json());
+                return response.json();
+            });
+    }
+
+    function fetchData() {
+        Promise.all([
+            dashboardProposal(),
+            dashboardPoster(),
+            dashboardDefense()
+
+        ])
+            .then(data => {
+                const dashboardProposal = data[0];
+                const dashboardPoster = data[1];
+                const dashboardDefense = data[2];
+
+                console.log("✅ Show Data dashboardProposal: " + JSON.stringify(dashboardProposal, null, 2));
+                console.log("✅ Show Data dashboardPoster: " + JSON.stringify(dashboardPoster, null, 2));
+                console.log("✅ Show Data dashboardDefense: " + JSON.stringify(dashboardDefense, null, 2));
+
+                displayCard(data)
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+            });
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchData();
+        getProjectProposal();
+    })
+
+    // ================================  display dashboard card  ==========================================
+
+    function displayCard(data) {
+        const dashboardProposal = data[0];
+        const dashboardPoster = data[1];
+        const dashboardDefense = data[2];
+
+        document.querySelector('.header-container:nth-child(3) .text-center h1').innerText = dashboardProposal.instructorPropoSuccessEva + " / " + dashboardProposal.totalProjects;
+        document.querySelector('.header-container:nth-child(3) .text-footer').innerHTML = `${dashboardProposal.instructorPropoSuccessEva} &nbsp;<span style="color: #919EAB;"> completed </span>`;
+
+        document.querySelector('.header-container:nth-child(4) .text-center h1').innerText = dashboardPoster.instructorPropoSuccessEva + " / " + dashboardPoster.totalProjects;
+        document.querySelector('.header-container:nth-child(4) .text-footer').innerHTML = `${dashboardPoster.instructorPropoSuccessEva}  &nbsp; <span style="color: #919EAB;">  completed </span>`;
+
+        document.querySelector('.header-container:nth-child(5) .text-center h1').innerText = dashboardDefense.instructorPropoSuccessEva + " / " +  dashboardDefense.totalProjects;
+        document.querySelector('.header-container:nth-child(5) .text-footer').innerHTML = `${dashboardDefense.instructorPropoSuccessEva}  &nbsp; <span style="color: #919EAB;"> completed </span>`;
+
+    }
+
+    // ================================  display schedule card  ==========================================
+
+
+    function getProjectProposal() {
+
+        fetch(`http://localhost:8080/instructor/getProposalScheduleDashboard`, {
+
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                    alert('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+
+            .then(data => {
+
+                console.log("🐍data: ", data);
+                if(data.length === 0) {
+                    console.log("No data available");
+
+                    const container = document.querySelector(".schedule-container")
+                    scheduleHTML = `
+
+                    <div class="no-schedule">⚠️ The schedule is not yet organized ⚠️</div>
+
+                    `;
+
+                    container.innerHTML += scheduleHTML;
+
+                } else {
+
+                    const container = document.querySelector(".schedule-container")
+
+                    data.forEach(project => {
+
+                        let projectId = project.projectId;
+                        let cleanId = projectId.replace(/DST|ICT/g, '').trim();
+
+                        let roleTag = project.instructorNames.Advisor?.length > 0 ? "Advisor" : "Committee";
+
+                        const projectDate = new Date(project.date);
+                        const today = new Date();
+
+                        projectDate.setHours(0, 0, 0, 0);
+                        today.setHours(0, 0, 0, 0);
+
+                        let statusClass = "status-btn-pending";
+                        let statusText = "Waiting for evaluation";
+
+                        if(projectDate < today) {
+
+                            statusClass = "status-btn-finished";
+                            statusText = "Evaluation completed";
+
+                        }
+
+                        const dateSet = project.date ? true : false;
+                        const timeSet = project.time ? true : false;
+                        const roomSet = project.room ? true : false;
+
+                        let scheduleHTML = `
+
+                            <div class="schedule-item">
+                                <div class="schedule-side">
+                        `;
+
+                        if(!dateSet && !timeSet && !roomSet) {
+
+                            scheduleHTML += `
+                                 <div class="schedule-warning">⚠️ Awaiting reschedule of presentation</div>`;
+
+                        } else {
+
+                            scheduleHTML += `
+                                  <div class="schedule-datetime-box">
+                                        <div class="schedule-date">${project.date || ""}</div>
+                                        <div class="schedule-time">${project.time || ""}</div>
+                                    </div>
+
+                                    <div class="schedule-location">
+                                        <span class="schedule-room">Room: ${project.room || ""}</span>
+                                    </div>
+
+
+                            `;
+                        }
+
+                        scheduleHTML += `
+                                </div>
+                                <div class="schedule-main">
+                                    <div class="schedule-header">
+                                        <div class="schedule-header-tags">
+                                            <span class="tag tag-${roleTag.toLowerCase()}">${roleTag}</span>
+                                            <span class="tag tag-proposal">Proposal</span>
+                                            <span class="tag tag-${project.program.toLowerCase()}">${project.program.toUpperCase()}</span>
+                                        </div>
+                                        <div class="status-btn ${statusClass}">${statusText}</div>
+                                    </div>
+
+                                    <div class="schedule-content">
+                                        <div class="schedule-title">${project.projectTitle}</div>
+                                        <span class="schedule-project-subtitle">${cleanId}</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                    `;
+                        container.innerHTML += scheduleHTML;
+
+                    })
+
+                }
+            })
+
+            .catch(error => {
+                console.error('Error fetching data:', error);
+
+            });
+
+    }
+
+
+</script>
+
+<!-- ---------- For Reminder Card ----------- -->
+<script>
+    // ฟังก์ชันสำหรับดึงข้อมูลและอัปเดต timeline
+    function fetchImportantDates() {
+        fetch("http://localhost:8080/api/important-dates")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                updateTimeline(data);
+            })
+            .catch(error => {
+                console.error("Error fetching important dates:", error);
+            });
+    }
+
+    function updateTimeline(scoringPeriods) {
+        const timelineContainer = document.querySelector(".timeline");
+        timelineContainer.innerHTML = ""; // ล้างข้อมูลเก่า
+
+        const displayNames = {
+            "Proposal Evaluation": "Proposal Presentation",
+            "Poster Evaluation": "Poster Exhibition",
+            "Defense Evaluation": "Senior Project Defense",
+            "Proposal Grade": "Proposal Grading",
+            "Defense Grade": "Defense Grading"
+        };
+
+        const today = new Date();
+        const currentYear = today.getFullYear();
+
+        scoringPeriods.forEach(period => {
+            const endDate = new Date(period.endDate);
+            if (endDate.getFullYear() !== currentYear) return;
+
+            const daysRemaining = Math.max(0, Math.ceil((endDate - today) / (1000 * 60 * 60 * 24)));
+
+            const startDateFormatted = formatDate(period.startDate);
+            const endDateFormatted = formatDate(period.endDate);
+
+            const timelineItem = document.createElement("div");
+            timelineItem.classList.add("timeline-item");
+
+            let statusClass = "";
+            let statusText = `เหลือเวลา : ${daysRemaining} วัน`;
+
+            if (daysRemaining === 0) {
+                statusClass = "timeline-expired";
+                statusText = "⏳ กำหนดการสิ้นสุดแล้ว!";
+            } else if (daysRemaining <= 7) {
+                statusClass = "timeline-urgent";
+            } else if (daysRemaining >= 30) {
+                statusClass = "timeline-chill";
+            } else if (daysRemaining < 30) {
+                statusClass = "timeline-lessthan1m"
+            }
+
+            if (statusClass) timelineItem.classList.add(statusClass);
+
+            timelineItem.innerHTML = `
+            <div class="timeline-icon">
+                <i class="fa-solid fa-calendar"></i>
+            </div>
+            <div class="timeline-content">
+                <div class="timeline-title">${displayNames[period.evaluationType] || period.evaluationType}</div>
+                <div class="timeline-date">ระยะเวลา : ${startDateFormatted} - ${endDateFormatted}</div>
+                <div class="timeline-status">${statusText}</div>
+            </div>
+        `;
+
+            timelineContainer.appendChild(timelineItem);
+        });
+    }
+
+
+
+    // ฟังก์ชันช่วยในการจัดรูปแบบวันที่
+    function formatDate(dateString) {
+        const date = new Date(dateString);
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}/${month}/${day}`;
+    }
+
+    // ดึงข้อมูลเมื่อโหลดหน้า
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchImportantDates();
+        fetchGradeDistribution();
+
+        // อัปเดตข้อมูลทุก 24 ชั่วโมง
+        setInterval(fetchImportantDates, 24 * 60 * 60 * 1000);
+    });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- ---------- For Grade Bar Chart -------------- -->
+<!--<script>-->
+<!--    let gradeChart = null; // เก็บอ็อบเจ็กต์ Chart.js-->
+
+<!--    async function fetchGradeDistribution() {-->
+<!--        try {-->
+<!--            const semesterYear = new Date().getFullYear();-->
+<!--            const activeTab = "All";-->
+<!--            const evaType = "Proposal Evaluation";-->
+
+<!--            console.log(`Fetching data for: ${activeTab} program, ${semesterYear} year, ${evaType}`);-->
+
+<!--            const response = await fetch(`http://localhost:8080/api/grading-graph-instructor?program=${activeTab}&year=${semesterYear}&evaType=${evaType}`);-->
+<!--            const data = await response.json();-->
+<!--            updateChart(data, evaType);-->
+
+<!--        } catch (error) {-->
+<!--            console.error("Error fetching grade distribution:", error);-->
+<!--        }-->
+<!--    }-->
+
+<!--    function updateChart(gradeData, evaType) {-->
+<!--        console.log("👁️‍🗨️ Update Grade Bar Chart: ");-->
+<!--        console.log(gradeData);-->
+<!--        console.log(evaType)-->
+
+<!--        const ctx = document.getElementById("gradeBarChart").getContext("2d");-->
+<!--        const chartContainer = document.querySelector(".chart-container");-->
+<!--        console.log(chartContainer);-->
+
+<!--        // ตรวจสอบว่ามีข้อความเดิมอยู่หรือไม่-->
+<!--        let noGradeMessage = document.getElementById("noGradeMessage");-->
+
+<!--        if (evaType === "Poster Exhibition") {-->
+<!--            document.getElementById("gradeBarChart").style.display = "none";-->
+
+<!--            if (!noGradeMessage) {-->
+<!--                noGradeMessage = document.createElement("div");-->
+<!--                noGradeMessage.id = "noGradeMessage";-->
+<!--                noGradeMessage.classList.add("no-grade-message");-->
+<!--                noGradeMessage.textContent = "Poster Exhibition ไม่มีการประเมินเกรด";-->
+<!--                chartContainer.appendChild(noGradeMessage);-->
+<!--            }-->
+
+<!--            return;-->
+<!--        } else {-->
+<!--            document.getElementById("gradeBarChart").style.display = "block";-->
+<!--            console.log("Update Chart")-->
+<!--            if (noGradeMessage) {-->
+<!--                noGradeMessage.remove();-->
+<!--            }-->
+<!--        }-->
+
+<!--        if (gradeChart) {-->
+<!--            gradeChart.destroy();-->
+<!--        }-->
+
+<!--        const gradeOrder = ["A", "B+", "B", "C+", "C", "D+", "D", "F", "I"];-->
+<!--        const chartData = gradeOrder.map(grade => gradeData[grade] || 0);-->
+
+<!--        gradeChart = new Chart(ctx, {-->
+<!--            type: "bar",-->
+<!--            data: {-->
+<!--                labels: gradeOrder,-->
+<!--                datasets: [{-->
+<!--                    label: "จำนวนนักเรียน",-->
+<!--                    data: chartData,-->
+<!--                    backgroundColor: [-->
+<!--                        "#4CAF50", "#8BC34A", "#CDDC39",-->
+<!--                        "#FFEB3B", "#FFC107", "#FF9800",-->
+<!--                        "#FF5722", "#F44336", "#9E9E9E"-->
+<!--                    ],-->
+<!--                    borderColor: "#444",-->
+<!--                    borderWidth: 1-->
+<!--                }]-->
+<!--            },-->
+<!--            options: {-->
+<!--                responsive: true,-->
+<!--                maintainAspectRatio: false,-->
+<!--                plugins: {-->
+<!--                    legend: { display: false },-->
+<!--                    tooltip: {-->
+<!--                        callbacks: {-->
+<!--                            label: (tooltipItem) => `${tooltipItem.raw} คน`-->
+<!--                        }-->
+<!--                    }-->
+<!--                },-->
+<!--                scales: {-->
+<!--                    x: { grid: { display: false } },-->
+<!--                    y: {-->
+<!--                        beginAtZero: true,-->
+<!--                        title: { display: true, text: "จำนวนนักเรียน" }-->
+<!--                    }-->
+<!--                }-->
+<!--            }-->
+<!--        });-->
+<!--    }-->
+<!--</script>-->
+<script>
+    let gradeChart = null; // เก็บอ็อบเจ็กต์ Chart.js
+    let currentEvaType = "Proposal Evaluation"; // ค่าเริ่มต้น
+
+    // เพิ่มฟังก์ชันเปลี่ยน Evaluation Type
+    function changeEvaType(newEvaType) {
+        currentEvaType = newEvaType;
+
+        // อัปเดตสถานะปุ่ม
+        document.getElementById("proposalBtn").classList.toggle("active", newEvaType === "Proposal Evaluation");
+        document.getElementById("defenseBtn").classList.toggle("active", newEvaType === "Defense Evaluation");
+
+        // ดึงข้อมูลใหม่
+        fetchGradeDistribution();
+    }
+
+    async function fetchGradeDistribution() {
+        try {
+            const semesterYear = new Date().getFullYear();
+            const activeTab = "All";
+
+            console.log(`Fetching data for: ${activeTab} program, ${semesterYear} year, ${currentEvaType}`);
+
+            const response = await fetch(`http://localhost:8080/api/grading-graph-instructor?program=${activeTab}&year=${semesterYear}&evaType=${currentEvaType}`);
+            const data = await response.json();
+            updateChart(data, currentEvaType);
+
+        } catch (error) {
+            console.error("Error fetching grade distribution:", error);
+        }
+    }
+
+    function updateChart(gradeData, evaType) {
+        console.log("👁️‍🗨️ Update Grade Bar Chart: ");
+        console.log(gradeData);
+        console.log(evaType);
+
+        const ctx = document.getElementById("gradeBarChart").getContext("2d");
+        const chartContainer = document.querySelector(".chart-container");
+
+        // ตรวจสอบว่ามีข้อความเดิมอยู่หรือไม่
+        let noGradeMessage = document.getElementById("noGradeMessage");
+
+        if (evaType === "Poster Exhibition") {
+            document.getElementById("gradeBarChart").style.display = "none";
+
+            if (!noGradeMessage) {
+                noGradeMessage = document.createElement("div");
+                noGradeMessage.id = "noGradeMessage";
+                noGradeMessage.classList.add("no-grade-message");
+                noGradeMessage.textContent = "Poster Exhibition ไม่มีการประเมินเกรด";
+                chartContainer.appendChild(noGradeMessage);
+            }
+
+            return;
+        } else {
+            document.getElementById("gradeBarChart").style.display = "block";
+            console.log("Update Chart");
+            if (noGradeMessage) {
+                noGradeMessage.remove();
+            }
+        }
+
+        if (gradeChart) {
+            gradeChart.destroy();
+        }
+
+        const gradeOrder = ["A", "B+", "B", "C+", "C", "D+", "D", "F", "I"];
+        const chartData = gradeOrder.map(grade => gradeData[grade] || 0);
+
+        gradeChart = new Chart(ctx, {
+            type: "bar",
+            data: {
+                labels: gradeOrder,
+                datasets: [{
+                    label: "จำนวนนักเรียน",
+                    data: chartData,
+                    backgroundColor: [
+                        "#4CAF50", "#8BC34A", "#CDDC39",
+                        "#FFEB3B", "#FFC107", "#FF9800",
+                        "#FF5722", "#F44336", "#9E9E9E"
+                    ],
+                    borderColor: "#444",
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: (tooltipItem) => `${tooltipItem.raw} คน`
+                        }
+                    }
+                },
+                scales: {
+                    x: { grid: { display: false } },
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: "จำนวนนักเรียน" }
+                    }
+                }
+            }
+        });
+    }
+
+    // เรียกฟังก์ชันครั้งแรกเมื่อโหลดหน้าเว็บ
+    document.addEventListener("DOMContentLoaded", fetchGradeDistribution);
+</script>
+
+
+

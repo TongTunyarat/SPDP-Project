@@ -55,6 +55,10 @@ public class TestController {
 
     @Autowired
     private PosterEvaScoreRepository posterEvaScoreRepository;
+    @Autowired
+    private StudentRepository studentRepository;
+    @Autowired
+    private StudentProjectRepository studentProjectRepository;
 
 
 //    @GetMapping("/")
@@ -114,4 +118,7 @@ public class TestController {
 
     @GetMapping("/posterEva/score")
     public List<PosterEvaluationScore> getAllPosterEvaScore() {return posterEvaScoreRepository.findAll();}
+
+    @GetMapping("/student")
+    public List<StudentProject> getAllStudent() {return studentProjectRepository.findAll();}
 }

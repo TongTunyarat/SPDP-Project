@@ -13,7 +13,6 @@ public class ScheduleAssignmentDTO {
     private LocalDateTime startTime;
     private LocalDateTime endTime;
     private List<String> instructorUsernames;
-
     public ScheduleAssignmentDTO(String projectId, String roomNumber, LocalDateTime startTime, LocalDateTime endTime, List<String> instructorUsernames) {
         this.projectId = projectId;
         this.roomNumber = roomNumber;
@@ -62,4 +61,14 @@ public class ScheduleAssignmentDTO {
         this.instructorUsernames = instructorUsernames;
     }
 
+    @Override
+    public String toString() {
+        return "ScheduleAssignmentDTO{" +
+                "projectId='" + projectId + '\'' +
+                ", roomNumber='" + roomNumber + '\'' +
+                ", startTime=" + startTime +
+                ", endTime=" + endTime +
+                ", instructorUsernames=" + instructorUsernames +
+                '}';
+    }
 }

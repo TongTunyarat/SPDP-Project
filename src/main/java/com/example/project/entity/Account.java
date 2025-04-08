@@ -189,4 +189,11 @@ public class Account {
     public void setProposalEvaluationsRecord(List<ProposalEvaluation> proposalEvaluationsRecord) {
         this.proposalEvaluationsRecord = proposalEvaluationsRecord;
     }
+
+    @Override
+    public String toString() {
+        return "Account{" +
+                "username='" + username + '\'' +
+                '}';
+    }
 }

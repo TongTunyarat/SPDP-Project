@@ -18,10 +18,10 @@ body {
     background-color: #006C6C;
     color: white;
     /*padding: 2rem;*/
-    font-size: 2rem;
+    font-size: 1.9rem;
     font-weight: 700;
     height: 100px;
-    padding-top: 1rem;
+    padding-top: 0.1rem;
     padding-bottom: 5.5rem;
     padding-left: 2rem;
     padding-right: 2rem;
@@ -35,11 +35,11 @@ body {
 .set-btn {
     display: inline-flex;
     align-items: center;
-    padding: 14px 20px;
+    padding: 10px 15px;
     gap: 10px;
     border-radius: 0.7rem;
     color: #624BFF;
-    font-size: 1rem;
+    font-size: 0.9rem;
     font-style: normal;
     font-weight: 500;
     border: none;
@@ -54,7 +54,7 @@ body {
     border-radius: 0.5rem;
     background: #FFF;
     box-shadow: 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
-    font-size: 1.2rem;
+    font-size: 1rem;
     font-style: normal;
     font-weight: 570;
     border: none;
@@ -65,12 +65,86 @@ body {
 .title-group {
     display: flex;
     align-items: center;
-    gap: 1.2rem;
+    gap: 1rem;
     flex-grow: 1; /* ให้ขยายพื้นที่ไปทางขวา */
 }
 
+.program-selector {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 0.7rem;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-family: Arial, sans-serif;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    min-width: 100px;
+    font-size: 1.2rem;
+}
 
-/*===================================================================  Modal =================================================================== */
+.program-selector:hover {
+    border-color: #aaa;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.program-selector i {
+    margin-right: 0.5rem;
+    color: #555;
+}
+
+.program-selector .selected-program {
+    flex-grow: 1;
+    font-weight: bold;
+    color: #333;
+}
+
+.program-selector .dropdown-arrow {
+    margin-left: 0.5rem;
+    color: #555;
+    transition: transform 0.2s ease;
+}
+
+.program-selector.active .dropdown-arrow {
+    transform: rotate(180deg);
+}
+
+.dropdown-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: #3d5779;
+    border: 1px solid #ccc;
+    border-radius: 1rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    display: none;
+    margin-top: 2px;
+}
+
+/*.dropdown-options.visible {*/
+/*    display: block;*/
+/*}*/
+
+.dropdown-option {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.dropdown-option:hover {
+    background-color: #f5f5f5;
+    color: #3d5779;
+    border-radius: 1rem;
+}
+
+.dropdown-option:last-child {
+    border-radius: 0 0 8px 8px;
+}
+
+
+ /*===================================================================  Modal =================================================================== */
 
 
 .modal {
@@ -86,7 +160,7 @@ body {
 
 .modal-content {
     background-color: white;
-    margin: 10% auto;
+    margin: 5% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 40%;
@@ -102,7 +176,7 @@ body {
 }
 
 .modal-title {
-    font-size: 1.5rem;
+    font-size: 1.2rem;
     font-weight: 700;
     letter-spacing: 0.04rem;
     margin-bottom: 1rem;
@@ -115,17 +189,18 @@ body {
 
 .modal-body {
     padding: 1rem;
+    font-size: 0.8rem;
 }
 
 label {
-    margin-bottom: 1rem;
+    margin-bottom: 0.3rem;
     display: block;
     font-weight: 600;
     letter-spacing: 0.03rem;
 }
 
 .room-label {
-    font-weight: 450;
+    font-weight: 400;
 }
 
 .custom-input {
@@ -134,6 +209,7 @@ label {
     margin-bottom: 2rem;
     border: 1px solid #ccc;
     border-radius: 5px;
+    font-size: 0.8rem;
 }
 
 .modal-footer {
@@ -148,7 +224,7 @@ label {
     border-radius: 5px;
     cursor: pointer;
     align-items: end;
-    padding: 1rem;
+    padding: 0.8rem;
     margin-top: 2rem;
     margin-right: 1rem;
 }
@@ -159,12 +235,11 @@ label {
     border-radius: 5px;
     cursor: pointer;
     color: white;
-    padding: 1rem;
+    padding: 0.8rem;
     margin-top: 2rem;
 }
 
 /*===================================================================  Modal =================================================================== */
-
 
 .dropdown {
     position: relative;
@@ -192,7 +267,7 @@ label {
     border-radius: 6px;
     padding: 10px;
     width: 100%;
-    max-height: 200px;
+    max-height: 250px;
     overflow-y: auto;
     border: 1px solid #ccc;
     z-index: 1000;
@@ -203,16 +278,47 @@ label {
 }
 
 .dropdown-content.upward {
-    bottom: 100%;
+    bottom: 120%;
     top: auto;
 }
 
+.dropdown-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 7px;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #eee;
+}
+
+#back-button {
+    display: none;
+    cursor: pointer;
+    padding: 5px;
+    width: 24px;
+    height: 24px;
+    justify-content: center;
+    align-items: center;
+    border-radius: 50%;
+    background-color: #f0f0f0;
+    margin-right: 10px;
+}
+
+#back-button:hover {
+    background-color: #e0e0e0;
+}
+
+#floor-title {
+    margin: 0;
+    flex-grow: 1;
+    font-size: 15px;
+}
 
 .dropdown-content label {
     display: flex;
     align-items: center;
     padding: 0.5rem 0.7rem;  /* ลด padding ให้เล็กลง */
-    margin: 2px 0;     /* ลดระยะห่างระหว่าง label */
+    /*margin: 1px 0;     !* ลดระยะห่างระหว่าง label *!*/
+    margin-bottom: 0.8rem;
     cursor: pointer;
 }
 
@@ -221,14 +327,34 @@ label {
     border-radius: 4px;
 }
 
+#select-all-container {
+    margin-bottom: -0.8rem;
+    display: none;
+}
+
 .dropdown-content input[type="text"] {
     width: 100%;
-    padding: 1rem;
+    padding: 0.8rem;
     margin-bottom: 5px;
     box-sizing: border-box;
     border: 1px solid #ccc;
     border-radius: 4px;
-    font-size: 1rem;
+    font-size: 0.7rem;
+}
+
+.floor-item {
+    padding: 15px;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-bottom: 5px;
+    background-color: #f5f5f5;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.floor-item:hover {
+    background-color: #e0e0e0;
 }
 
 /*.body-section {*/
@@ -238,3 +364,363 @@ label {
 /*    background: #ffffff;*/
 /*    padding: 20px;*/
 /*}*/
+
+.count-badge {
+    background-color: #007bff;
+    color: white;
+    border-radius: 50%;
+    min-width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    padding: 0 4px;
+}
+
+
+
+
+/*===================================================================  Schedule =================================================================== */
+
+.background-schedule {
+    background-color: #fff;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 0.7rem;
+    margin-top: -5.5rem;
+    margin-left: 2rem;
+    margin-right: 2rem;
+
+}
+
+.schedule-contanier {
+    font-family: Arial, sans-serif;
+    /*margin: 1.rem;*/
+    margin-top: -3rem;
+    padding: 3rem;
+}
+
+.shedule-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-left: 1.8rem;
+    padding-right: 1.8rem;
+    background-color: #f9f9f9;
+    /*border-radius: 0.5rem;*/
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.date-title {
+    font-size: 1.1rem;
+    color: #333;
+}
+
+.nav-button {
+    background: none;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    color: #3D3D3D;
+}
+
+.schedule-table{
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+
+}
+
+table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th {
+    background-color: #f5f5f5;
+    padding: 0.5rem;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    color: #333;
+    font-size: 0.9rem;
+}
+
+.time-column {
+    width: 150px;
+}
+
+td {
+    padding: 0.75rem;
+    text-align: center;
+    border: 1px solid #e0e0e0;
+    color: #333;
+    font-size: 0.5rem;
+}
+
+.time-slot{
+    font-weight: bold;
+    font-size: 0.7rem;
+    background-color: #f9f9f9;
+}
+
+.slot-box {
+    background-color: #EFF6FF;
+    border: 2px solid #b8d8f8;
+    border-radius: 4px;
+    padding: 0.1rem;
+    color: #555;
+    min-height: 3.1rem;
+}
+
+.break-row{
+    background-color: #2f6f74;
+    text-align: center;
+    font-weight: bold;
+    color: white;
+}
+
+.break-row td{
+    padding: 1rem;
+    color: white;
+    font-size: 0.8rem;
+}
+
+
+.slot-box svg {
+    margin-left: 5px;
+    margin-top: 0.5rem;
+    cursor: pointer;
+}
+
+.project-id {
+    font-weight: bold;
+    font-size: 0.7rem;
+    color: #3d5779;
+}
+
+.instructors {
+    font-size: 0.6rem;
+    color: #7b7b7b;
+    margin-top: 0.1rem;
+    white-space: nowrap;
+    overflow-x: auto;
+}
+
+.icon-container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1px;
+}
+
+.icon-edit,
+.icon-delete {
+    padding: 0;
+    /*margin-left: 0.5rem;*/
+    /*margin-right: -2.5rem;*/
+    display: flex;
+    justify-content: flex-end;
+    color: #878D96;
+    visibility: visible;
+}
+
+.icon-delete:hover svg{
+    color: #d9534f;
+}
+
+.icon-edit:hover svg{
+    color: #d9534f;
+}
+
+/*.slot-box svg {*/
+/*    display: none;*/
+/*}*/
+
+.slot-box:hover svg {
+    display: inline-block;
+}
+
+/*Status = non-active*/
+.slot-box.non-active {
+    border: 2px solid #CE1717;
+    border-radius: 4px;
+    padding: 0.3rem;
+    min-height: 3.1rem;
+    background-color: #FFE7E7;
+}
+
+.slot-box.non-active .project-id {
+    color: #CE1717;
+    text-decoration: line-through;
+    text-decoration-thickness: 1px;
+}
+
+/*.slot-box.non-active .instructors {*/
+/*    color: #363434;*/
+/*}*/
+
+.icon-delete.hidden {
+    visibility: hidden;
+    width: 0;
+    margin: 0;
+    padding: 0;
+}
+
+.icon-edit.hidden {
+    visibility: hidden;
+}
+
+
+/*Status = edit-active*/
+
+.slot-box.edit-active {
+    background-color: #E8DCF0;
+    border: 2px solid #D4C4E2;
+}
+
+.slot-box.edit-active .project-id {
+    color: #7a099d;
+}
+
+.slot-box.edit-active .instructors {
+    color: #7D6B99;
+}
+
+
+.button-container {
+    display: flex;
+    justify-content: flex-end;
+    padding: 3rem;
+}
+
+.export-block {
+    margin-left: 1rem;
+}
+
+.preview-block, .export-block{
+    display: inline-flex;
+    padding: 10px 15px;
+    gap: 10px;
+    border-radius: 0.7rem;
+    color: #624BFF;
+    font-size: 0.9rem;
+    font-style: normal;
+    font-weight: 500;
+    border: none;
+    cursor: pointer;
+    letter-spacing: 0.05rem;
+    background-color: white;
+    box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08), 0px 1px 2px 0px rgba(21, 30, 40, 0.08);
+}
+
+
+.empty-state-image {
+    width: 70%;
+    height: auto;
+    display: block; /* จัดให้ภาพแสดงในบล็อก */
+    margin: 0 auto; /* จัดกลาง */
+}
+
+/*===================================================================  Load =================================================================== */
+
+.modal-loader-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    backdrop-filter: blur(4px); /* ทำให้ blur modal ด้านหลัง */
+    background-color: rgba(255, 255, 255, 0.4); /* เพิ่มความขาวบางๆ ซ้อน */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 999;
+    border-radius: 10px;
+}
+
+.loader-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.loader {
+    text-align: center;
+    vertical-align: middle;
+    position: relative;
+    display: flex;
+    background: white;
+    padding: 150px;
+    box-shadow: 0px 40px 60px -20px rgba(0, 0, 0, 0.2);
+}
+
+.loader span {
+    display: block;
+    width: 20px;
+    height: 20px;
+    background: #eee;
+    border-radius: 50%;
+    margin: 0 5px;
+    box-shadow: 0 2px 2px rgba(0, 0, 0, 0.2);
+}
+
+.loader span:nth-child(2) {
+    background: #f07e6e;
+}
+
+.loader span:nth-child(3) {
+    background: #84cdfa;
+}
+
+.loader span:nth-child(4) {
+    background: #5ad1cd;
+}
+
+.loader span:not(:last-child) {
+    animation: animate 1.5s linear infinite;
+}
+
+@keyframes animate {
+    0% {
+        transform: translateX(0);
+    }
+
+    100% {
+        transform: translateX(30px);
+    }
+}
+
+.loader span:last-child {
+    animation: jump 1.5s ease-in-out infinite;
+}
+
+@keyframes jump {
+    0% {
+        transform: translate(0, 0);
+    }
+    10% {
+        transform: translate(10px, -10px);
+    }
+    20% {
+        transform: translate(20px, 10px);
+    }
+    30% {
+        transform: translate(30px, -50px);
+    }
+    70% {
+        transform: translate(-150px, -50px);
+    }
+    80% {
+        transform: translate(-140px, 10px);
+    }
+    90% {
+        transform: translate(-130px, -10px);
+    }
+    100% {
+        transform: translate(-120px, 0);
+    }
+}
+
+/*===================================================================  Conflict popup =================================================================== */
+

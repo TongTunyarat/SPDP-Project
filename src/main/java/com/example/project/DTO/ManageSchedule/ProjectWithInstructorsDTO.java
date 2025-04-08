@@ -30,4 +30,11 @@ public class ProjectWithInstructorsDTO {
         this.instructorUsernames = instructorUsernames;
     }
 
+    @Override
+    public String toString() {
+        return "ProjectWithInstructorsDTO{" +
+                "project=" + project.getProjectId() +
+                ", instructorUsernames=" + instructorUsernames +
+                '}';
+    }
 }

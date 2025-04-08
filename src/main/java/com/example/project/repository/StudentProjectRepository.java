@@ -1,7 +1,13 @@
 package com.example.project.repository;
 
+import com.example.project.entity.Project;
+import com.example.project.entity.Project;
 import com.example.project.entity.StudentProject;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+
+import java.util.*;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
@@ -19,5 +25,11 @@ public interface StudentProjectRepository extends JpaRepository<StudentProject, 
 
     // ฟังก์ชันตรวจสอบว่านักศึกษามีการเชื่อมโยงกับโปรเจกต์หรือไม่
     boolean existsByStudentStudentId(String studentId);
+
+    List<StudentProject> findByProject_Semester(String year);
+
+    List<StudentProject> findByProject_SemesterAndProject_Program(String year, String program);
+
+    int countByProject(Project project);
 
 }
