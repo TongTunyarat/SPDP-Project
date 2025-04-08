@@ -38,6 +38,9 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
             "LEFT JOIN pir.instructor i")
     List<ProjectDTO> findAllProjectsWithRolesAndInstructor();
 
+    @Query("SELECT MAX(p.projectId) FROM Project p")
+    String findLastProjectId();  // ค้นหาค่ารหัสล่าสุด
+
 
 
 }

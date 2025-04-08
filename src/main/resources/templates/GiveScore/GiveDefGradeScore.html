@@ -62,7 +62,7 @@
                 Grades (60%)
             </h4>
             <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>
-            <li><a href="/show-defense-grade-projects" class="active">Defense Grade</a></li>
+            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>
         </ul>
     </div>
 
@@ -592,10 +592,10 @@
         rowHeader.innerHTML = `
                <th></th>
                 ${students.map(student => {
-                    const nameParts = student.studentName.split(' '); // แยกชื่อกับนามสกุล
-                    const lastNameAbbr = nameParts[1] ? nameParts[1].slice(0, 3) + '.' : ''; // ตัดเหลือ 3 ตัว + จุด
-                    return `<th>${student.studentId} ${nameParts[0]} ${lastNameAbbr}</th>`;
-                }).join('')}
+            const nameParts = student.studentName.split(' '); // แยกชื่อกับนามสกุล
+            const lastNameAbbr = nameParts[1] ? nameParts[1].slice(0, 3) + '.' : ''; // ตัดเหลือ 3 ตัว + จุด
+            return `<th>${student.studentId} ${nameParts[0]} ${lastNameAbbr}</th>`;
+        }).join('')}
         `;
         thead.appendChild(rowHeader);
         table.appendChild(thead);
@@ -872,7 +872,7 @@
 
     });
 
-    //================================  displayGradetCriteria  ==========================================
+    //================================  displayGradeCriteria  ==========================================
     function displayGradeCriteria(data) {
 
         const criterias = data[0];
@@ -1679,6 +1679,9 @@
     // Updated function to calculate grade with zero or null score check
     async function calculateGradeWithCheck(score, studentId) {
         console.log(`📝 Calculating grade for student: ${studentId} with total score: ${score}`);
+
+        // ดึงรายชื่ออาจารย์ของโปรเจคก่อน
+        const instructors = await projectInstructor(getProjectIdFromURL());console.log('📚 Instructors:', instructors);
 
         // Check if any score from any instructor is 0 or null
         const hasZeroOrNullScores = await checkForZeroScoresForAllInstructors(studentId, instructors);

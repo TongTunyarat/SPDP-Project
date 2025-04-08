@@ -207,13 +207,17 @@ td:nth-child(7) {
 }
 
 /* View Button */
+td form {
+    display: inline-flex;
+    margin-right: 1px;
+}
+
 .view-btn,
 .edit-btn,
 .delete-btn {
     background-color: #005A5A;
     color: white;
     border: none;
-    padding: 6px 12px;
     border-radius: 5px;
     cursor: pointer;
     transition: background-color 0.3s ease, transform 0.2s ease;
@@ -224,12 +228,6 @@ td:nth-child(7) {
 .delete-btn:hover {
     background-color: #007777; /* สีเมื่อ hover */
     transform: scale(1.05); /* ขยายขนาดเล็กน้อยเมื่อ hover */
-}
-
-
-.edit-btn:hover, .delete-btn:hover {
-    background-color: #f0f0f0;  /* เมื่อ hover ให้พื้นหลังปุ่มเปลี่ยน */
-    border-radius: 5px;  /* ให้ปุ่มมีมุมโค้ง */
 }
 
 /* Pagination */
@@ -252,3 +250,5 @@ td:nth-child(7) {
     background-color: #005A5A;
     color: white;
 }
+
+

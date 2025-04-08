@@ -3,6 +3,7 @@ package com.example.project.repository;
 import com.example.project.entity.Account;
 import com.example.project.entity.Instructor;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,9 @@ public interface InstructorRepository extends JpaRepository<Instructor, String> 
     Optional<Instructor> findByProfessorName(String professorName);
 
     List<Instructor> findAll();
+
+    @Query("SELECT i FROM Instructor i WHERE i.professorId NOT IN (SELECT pr.instructor.professorId FROM ProjectInstructorRole pr)")
+    List<Instructor> findInstructorsWithoutProject();
 
 }
 

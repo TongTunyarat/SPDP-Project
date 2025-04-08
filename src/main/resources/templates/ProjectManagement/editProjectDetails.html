@@ -212,7 +212,7 @@
                 <div class="form-group">
                     <label>Student:</label>
                     <div class="input-icon">
-                        <input type="text" id="student-${student.studentId}" value="${student.studentName}" disabled>
+                        <input type="text" id="student-${student.studentId}" value="${student.studentName}" readonly>
                         <!-- เพิ่มปุ่มลบ -->
                         <button class="delete-btn" data-student-id="${student.studentId}">🗑️</button>
                     </div>
@@ -363,7 +363,7 @@
             };
         }
 
-// ฟังก์ชันสำหรับลบ student ออกจาก project
+        // ฟังก์ชันสำหรับลบ student ออกจาก project
         function deleteStudentFromProject(studentId, projectId) {
             // ส่งคำขอลบข้อมูลไปยังเซิร์ฟเวอร์
             fetch(`http://localhost:8080/admin/deleteStudentFromProject?projectId=${encodeURIComponent(projectId)}&studentId=${encodeURIComponent(studentId)}`, {

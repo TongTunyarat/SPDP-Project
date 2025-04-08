@@ -120,4 +120,9 @@ public class ProjectInstructorRole {
     public void setProposalEvaluations(List<ProposalEvaluation> proposalEvaluations) {
         this.proposalEvaluations = proposalEvaluations;
     }
+
+
+    public void setProjectInstructorRoleId(String instructorRoleId) {
+
+    }
 }

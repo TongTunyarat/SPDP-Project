@@ -98,7 +98,7 @@ public class PageController {
     @GetMapping("/project-edit-project")
     public String projectEditProject() {return "ProjectManagement/editProjectDetails";}
 
-    // ---------- Project Management ---------- //
+    // -------------------- Project Management -------------------- //
     // ---------- (send project when click edit) ---------- //
     @GetMapping("/admin/editProjectDetails")
     public String getEditProjectDetails(@RequestParam String projectId, Model model) {
@@ -107,5 +107,14 @@ public class PageController {
 
         return "ProjectManagement/editProjectDetails";
     }
+
+    @GetMapping("/admin/editCommittee")
+    public String getEditCommittee(@RequestParam String projectId, Model model) {
+
+        model.addAttribute("projectId", projectId);
+
+        return "ProjectManagement/editCommittee";
+    }
+
 }
 

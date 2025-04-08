@@ -1,5 +1,9 @@
 package com.example.project.DTO.projectManagement;
 
+import com.example.project.entity.Account;
+
+import java.time.LocalDateTime;
+
 public class ProjectDTO {
     private String projectId;
     private String program;

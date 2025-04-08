@@ -540,3 +540,144 @@ td form {
     background-color: #624BFF;  /* สีเมื่อคลิก */
     transform: scale(1);  /* ทำให้ปุ่มกลับมาเป็นขนาดเดิมเมื่อคลิก */
 }
+
+.span-fileType {
+    font-size: 14px; /* ขนาดฟอนต์เล็ก */
+    color: #FF6347; /* สีสำหรับข้อความคำเตือน */
+    left: 0;
+    right: 0;
+}
+
+/* Modal Styles */
+.modal-details {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    padding-top: 60px;
+    overflow: auto;
+    font-family: Arial, sans-serif;
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: white;
+    margin: 2% auto;
+    padding: 20px;
+    border-radius: 8px;
+    width: 100%; /* ขยายความกว้างของ modal */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    max-height: 80%;
+    overflow-y: auto;
+}
+
+/* Close Button */
+.close-btn {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    font-size: 16px;
+    font-weight: bold;
+    display: block;
+}
+
+input[type="file"],
+select {
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    width: 100%;
+    margin-top: 8px;
+}
+
+#preview-content {
+    margin-top: 20px;
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+}
+
+#confirm-upload-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 20%;  /* ทำให้ปุ่มกว้างเต็ม */
+    font-size: 16px;
+    display: none;
+}
+
+#confirm-upload-btn:hover {
+    background-color: #45a049;
+}
+
+/* Preview Table */
+.preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    table-layout: fixed; /* ใช้ table layout fixed เพื่อให้ขนาดตารางไม่เกินขอบ */
+}
+
+.preview-table th,
+.preview-table td {
+    padding: 12px; /* เพิ่มการเว้นช่องว่าง */
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    word-wrap: break-word;  /* เพื่อไม่ให้คำยาวเกินไปออกจากตาราง */
+}
+
+.preview-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.preview-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+#preview-content {
+    margin-top: 20px;
+    max-height: 60vh;  /* ให้พื้นที่การแสดงผลสูงสุด 60% ของความสูงหน้าจอ */
+    overflow-y: auto;  /* ให้ scrollbar หากข้อมูลมากเกินไป */
+}
+
+/* ปุ่ม Upload */
+#confirm-upload-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+#confirm-upload-btn:hover {
+    background-color: #45a049;
+}

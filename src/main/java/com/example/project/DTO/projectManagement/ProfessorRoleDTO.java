@@ -1,5 +1,7 @@
 package com.example.project.DTO.projectManagement;
 
+import com.example.project.entity.Instructor;
+
 public class ProfessorRoleDTO {
     private String professorName;
     private String role;
@@ -26,4 +28,6 @@ public class ProfessorRoleDTO {
     public void setRole(String role) {
         this.role = role;
     }
+
+
 }

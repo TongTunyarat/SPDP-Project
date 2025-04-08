@@ -39,6 +39,9 @@ public class ExcelDataDTO {
     @ExcelProperty("Track")
     private String track;
 
+    public ExcelDataDTO() {
+    }
+
     public ExcelDataDTO(String projectId, String projectTitle, String projectDescription, String advisor, String committee, String posterCommittee, String studentId, String studentName, String program, String section, String track) {
         this.projectId = projectId;
         this.projectTitle = projectTitle;

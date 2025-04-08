@@ -1,12 +1,14 @@
 package com.example.project.controller.ProjectManagement;
 
 import com.example.project.DTO.projectManagement.ProfessorRoleDTO;
+import com.example.project.DTO.projectManagement.ProjectDetailsResponseDTO;
 import com.example.project.DTO.projectManagement.StudentProjectDTO;
 import com.example.project.DTO.projectManagement.ProjectDetailsDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
 import com.example.project.service.ProjectManagement.EditProjectService;
 import com.example.project.service.ProjectManagement.UploadFilesService;
+import com.example.project.service.ProjectManagement.AddNewProjectService;
 import com.example.project.service.ProjectService;
 import com.example.project.service.ProposalEvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,6 +50,8 @@ public class projectAdminController {
     private StudentRepository studentRepository;
     @Autowired
     private StudentProjectRepository studentProjectRepository;
+    @Autowired
+    private AddNewProjectService AddNewProjectService;
 
     @Autowired
     public projectAdminController(ProjectService projectService) {
@@ -223,76 +227,127 @@ public class projectAdminController {
         }
     }
 
+    // ฟังก์ชัน POST สำหร0ับการสร้างโปรเจกต์ใหม่
     @PostMapping("/addNewProject")
-    @ResponseBody
-    public ResponseEntity<ProjectDetailsDTO> addProject(@RequestBody ProjectDetailsDTO projectDetailsDTO) {
-        // ตรวจสอบว่า projectId มีอยู่ในฐานข้อมูลแล้วหรือไม่
-        Project existingProject = projectService.getProjectDetails(projectDetailsDTO.getProjectId());
+    public ResponseEntity<Map<String, String>> addNewProject(@RequestBody ProjectDetailsDTO projectDetailsDTO) {
+        try {
+            AddNewProjectService.addNewProject(projectDetailsDTO);  // เรียกใช้ Service สำหรับเพิ่มโปรเจกต์ใหม่
 
-        if (existingProject != null) {
-            // ถ้ามีโปรเจกต์ที่มี projectId ซ้ำ
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Project ID already exists");
+            // ส่งข้อความสำเร็จเป็น JSON
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Project added successfully");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // ส่งข้อผิดพลาดเป็น JSON
+            Map<String, String> response = new HashMap<>();
+            response.put("message", "Error: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-
-        // สร้างโปรเจกต์ใหม่จากข้อมูลที่ส่งมา
-        Project newProject = new Project();
-        newProject.setProjectId(projectDetailsDTO.getProjectId());
-        newProject.setProjectTitle(projectDetailsDTO.getProjectTitle());
-        newProject.setProjectDescription(projectDetailsDTO.getProjectDescription());
-        newProject.setProgram(projectDetailsDTO.getProgram());
-
-        // บันทึกข้อมูลโปรเจกต์ใหม่
-        projectService.saveProject(newProject);
-
-        // ดึงข้อมูลอาจารย์ที่ปรึกษาและบันทึกบทบาทอาจารย์
-        List<ProfessorRoleDTO> professorList = projectDetailsDTO.getProfessorList();
-        for (ProfessorRoleDTO professorDTO : professorList) {
-            ProjectInstructorRole role = new ProjectInstructorRole();
-
-            // ค้นหาข้อมูลอาจารย์ในฐานข้อมูล (ใช้ชื่ออาจารย์)
-            Optional<Instructor> instructorOptional = instructorRepository.findByProfessorName(professorDTO.getProfessorName());
-            Instructor instructor = instructorOptional.orElseThrow(() ->
-                    new ResponseStatusException(HttpStatus.NOT_FOUND, "Instructor not found: " + professorDTO.getProfessorName())
-            );
-
-            // ตั้งค่าอาจารย์ใน ProjectInstructorRole
-            role.setProjectIdRole(newProject);  // ตั้งค่าโปรเจกต์
-            role.setInstructor(instructor);     // ตั้งค่าอาจารย์
-            role.setRole(professorDTO.getRole());  // ตั้งค่าบทบาท
-            role.setAssignDate(LocalDateTime.now());  // ตั้งค่าวันที่ที่มอบหมาย
-            projectInstructorRoleRepository.save(role);
-        }
-
-        // ดึงข้อมูลนักศึกษาและบันทึกข้อมูลนักศึกษา
-        List<StudentProjectDTO> studentList = projectDetailsDTO.getStudentList();
-        for (StudentProjectDTO studentDTO : studentList) {
-            StudentProject studentProject = new StudentProject();
-
-            // ค้นหาข้อมูลนักศึกษาในฐานข้อมูล
-            Student student = studentRepository.findByStudentId(studentDTO.getStudentId());
-            if (student != null) {
-                studentProject.setProject(newProject); // ตั้งค่าโปรเจกต์
-                studentProject.setStudent(student);   // ตั้งค่านักศึกษา
-                studentProject.setStatus(studentDTO.getStatus()); // ตั้งค่าสถานะ
-                studentProject.setStatus("Active");   // ตั้งค่าสถานะเริ่มต้น
-                studentProjectRepository.save(studentProject);
-            } else {
-                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found: " + studentDTO.getStudentId());
-            }
-        }
-
-        // ส่งกลับข้อมูลโปรเจกต์ใหม่ในรูปแบบ DTO
-        ProjectDetailsDTO response = new ProjectDetailsDTO(
-                newProject.getProjectId(),
-                newProject.getProjectTitle(),
-                professorList,
-                newProject.getProjectDescription(),
-                newProject.getProgram(),
-                studentList
-        );
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);  // ส่งกลับ status CREATED
     }
+
+    @GetMapping("/getLastProjectId")
+    public ResponseEntity<Map<String, String>> getLastProjectId() {
+        String lastProjectId = AddNewProjectService.findLastProjectId();  // Get the last project ID from the service
+        Map<String, String> response = new HashMap<>();
+        response.put("lastProjectId", lastProjectId);  // Wrap it in a JSON object
+
+        return ResponseEntity.ok(response);  // Return the response as JSON
+    }
+
+    @GetMapping("/getStudentsWithoutProject")
+    public ResponseEntity<List<Student>> getStudentsWithoutProject() {
+        List<Student> students = AddNewProjectService.getStudentsWithoutProject();  // ค้นหานักศึกษาที่ยังไม่มีกระบวนการโปรเจกต์
+        return ResponseEntity.ok(students);
+    }
+
+    @GetMapping("/getInstructorsWithoutProject")
+    public ResponseEntity<List<Instructor>> getInstructorsWithoutProject() {
+        List<Instructor> instructors = AddNewProjectService.getInstructorsWithoutProject();
+        return ResponseEntity.ok(instructors);
+    }
+
+    @GetMapping("/getInstructors")
+    public ResponseEntity<List<Instructor>> getInstructors() {
+        List<Instructor> instructors = instructorRepository.findAll();  // ดึงข้อมูลอาจารย์ทั้งหมดจากฐานข้อมูล
+        return ResponseEntity.ok(instructors);  // ส่งข้อมูลอาจารย์ไปยังฝั่ง Client
+    }
+
+
+
+//    @GetMapping("/editCommittee")
+//    @ResponseBody
+//    public ProjectDetailsResponseDTO getEditCommitteeDetails(@RequestParam String projectId) {
+//        // ดึงข้อมูลโครงการจาก Service
+//        Project project = projectService.getProjectDetails(projectId);
+//
+//        if (project == null) {
+//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found");
+//        }
+//
+//        // ดึงข้อมูลอาจารย์ทั้งหมดในระบบจาก Instructor (ไม่มี Role)
+//        List<Instructor> allInstructor = instructorRepository.findAll();  // ดึงข้อมูลอาจารย์ทั้งหมดจากฐานข้อมูล
+//
+//        // สร้างรายการ allProfessor ที่จะเก็บข้อมูลอาจารย์ทั้งหมดโดยไม่มีการแบ่งบทบาท
+//        List<ProfessorRoleDTO> allProfessor = allInstructor.stream()
+//                .map(instructor -> new ProfessorRoleDTO(instructor.getProfessorName(), "Unknown")) // ไม่มี Role ระบุในนี้
+//                .collect(Collectors.toList());
+//
+//        // ดึงข้อมูลอาจารย์ที่ปรึกษาของโปรเจค
+//        List<ProjectInstructorRole> roles = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(projectId);
+//
+//        // สร้างรายการ professorList ที่จะเก็บข้อมูลอาจารย์และบทบาทจาก ProjectInstructorRole
+//        List<ProfessorRoleDTO> professorList = roles.stream()
+//                .map(role -> new ProfessorRoleDTO(
+//                        role.getInstructor().getProfessorName(),  // ชื่ออาจารย์
+//                        role.getRole()  // บทบาทของอาจารย์
+//                ))
+//                .collect(Collectors.toList());
+//
+//        // แยกข้อมูลอาจารย์ตามบทบาท (Advisor, Co-Advisor, Committee)
+//        List<ProfessorRoleDTO> advisors = roles.stream()
+//                .filter(role -> "Advisor".equalsIgnoreCase(role.getRole()))
+//                .map(role -> new ProfessorRoleDTO(role.getInstructor().getProfessorName(), "Advisor"))
+//                .collect(Collectors.toList());
+//
+//        List<ProfessorRoleDTO> coAdvisors = roles.stream()
+//                .filter(role -> "Co-Advisor".equalsIgnoreCase(role.getRole()))
+//                .map(role -> new ProfessorRoleDTO(role.getInstructor().getProfessorName(), "Co-Advisor"))
+//                .collect(Collectors.toList());
+//
+//        List<ProfessorRoleDTO> committees = roles.stream()
+//                .filter(role -> "Committee".equalsIgnoreCase(role.getRole()))
+//                .map(role -> new ProfessorRoleDTO(role.getInstructor().getProfessorName(), "Committee"))
+//                .collect(Collectors.toList());
+//
+//        // ดึงข้อมูลนักศึกษาในโครงการ
+//        List<StudentProjectDTO> studentList = project.getStudentProjects().stream()
+//                .filter(studentProject -> "Active".equalsIgnoreCase(studentProject.getStatus()))
+//                .map(studentProject -> new StudentProjectDTO(
+//                        studentProject.getStudent().getStudentId(),
+//                        studentProject.getStudent().getStudentName(),
+//                        (studentProject.getStudent().getSection() != null)
+//                                ? studentProject.getStudent().getSection().toString()
+//                                : "N/A", // ป้องกัน null
+//                        studentProject.getStudent().getTrack(),
+//                        studentProject.getStatus()
+//                ))
+//                .collect(Collectors.toList());
+//
+//        // สร้าง DTO เพื่อส่งกลับ
+//        ProjectDetailsResponseDTO response = new ProjectDetailsResponseDTO(
+//                project.getProjectId(),
+//                project.getProjectTitle(),
+//                allProfessor,  // ส่งอาจารย์ทั้งหมดที่มีในระบบ (จาก Instructor ไม่มี Role)
+//                project.getProjectDescription(),
+//                project.getProgram(),
+//                studentList,
+//                professorList,   // ส่งอาจารย์ที่มีบทบาท (จาก ProjectInstructorRole)
+//                professorList,   // ส่งข้อมูลเดียวกันในแต่ละ dropdown
+//                professorList    // ส่งข้อมูลเดียวกันในแต่ละ dropdown
+//        );
+//
+//        return response;  // Spring จะทำการแปลง ProjectDetailsDTO เป็น JSON
+//    }
 
 }
 

@@ -95,6 +95,25 @@ public class Project {
 
     }
 
+    // Constructor with arguments
+    public Project(String projectId, String program, String semester, String projectTitle,
+                   String projectCategory, String projectDescription,
+                   LocalDateTime recordedOn, LocalDateTime editedOn,
+                   Account recordedProject, Account editedProject) {
+        this.projectId = projectId;
+        this.program = program;
+        this.semester = semester;
+        this.projectTitle = projectTitle;
+        this.projectCategory = projectCategory;
+        this.projectDescription = projectDescription;
+        this.recordedOn = recordedOn;
+        this.editedOn = editedOn;
+        this.recordedProject = recordedProject;
+        this.editedProject = editedProject;
+    }
+
+
+
 
     public String getProjectId() {
         return projectId;
