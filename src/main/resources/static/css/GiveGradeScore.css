@@ -345,7 +345,7 @@ hr {
     margin: 5% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 80%;
+    width: 50%;
 }
 
 .close-button {
@@ -378,4 +378,14 @@ button {
     background-color: #f44336;
     color: white;
     border: none;
+}
+
+.invalid-score {
+    border: 2px solid red !important;
+    background-color: rgba(255, 0, 0, 0.1) !important;
+    color: red;
+}
+
+.invalid-score:focus {
+    outline-color: red;
 }

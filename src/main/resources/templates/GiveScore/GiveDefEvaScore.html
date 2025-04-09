@@ -21,10 +21,14 @@
         let accessPeriods = {};
 
         console.log('Calling updateLinkStatus function');
-        window.onload = fetchAccessPeriods;
+        // window.onload = fetchAccessPeriods;
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchAccessPeriods();
+        });
         setInterval(updateLinkStatus, 60000);
 
         async function fetchAccessPeriods() {
+            console.log("💩💩💩")
             try {
                 const response = await fetch('http://localhost:8080/api/period'); // เปลี่ยน URL ตาม backend ของคุณ
                 if (!response.ok) {
@@ -223,56 +227,6 @@
             <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Defense Grade</a></li>
         </ul>
     </div>
-<!--    <div class="sidebar">-->
-<!--        <h2>ICT MAHIDOL</h2>-->
-<!--        <ul>-->
-<!--            <h4>-->
-<!--                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"-->
-<!--                     style="fill:#FFFFFF;">-->
-<!--                    <path-->
-<!--                            d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">-->
-<!--                    </path>-->
-<!--                </svg>-->
-<!--                Homepage-->
-<!--            </h4>-->
-<!--            <li><a href="/instructor/view">Dashboard</a></li>-->
-<!--        </ul>-->
-
-<!--        <ul>-->
-<!--            <h4>-->
-<!--                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
-<!--                    <g fill="#ffffff" fill-rule="nonzero">-->
-<!--                        <g transform="scale(5.33333,5.33333)">-->
-<!--                            <path-->
-<!--                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
-<!--                            </path>-->
-<!--                        </g>-->
-<!--                    </g>-->
-<!--                </svg>-->
-<!--                Evaluation (40%)-->
-<!--            </h4>-->
-<!--            <li><a href="/show-proposal-eva-projects">Proposal Evaluation</a></li>-->
-<!--            <li><a href="/show-poster-projects">Poster Evaluation</a></li>-->
-<!--            <li><a href="/show-defense-eva-projects">Defense Evaluation</a></li>-->
-<!--        </ul>-->
-
-<!--        <ul>-->
-<!--            <h4>-->
-<!--                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
-<!--                    <g fill="#ffffff" fill-rule="nonzero">-->
-<!--                        <g transform="scale(5.33333,5.33333)">-->
-<!--                            <path-->
-<!--                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
-<!--                            </path>-->
-<!--                        </g>-->
-<!--                    </g>-->
-<!--                </svg>-->
-<!--                Grades (60%)-->
-<!--            </h4>-->
-<!--            <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>-->
-<!--            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>-->
-<!--        </ul>-->
-<!--    </div>-->
 
     <div class="content">
 
@@ -347,9 +301,9 @@
             <div id="confirmationModal" class="modal">
                 <div class="modal-content">
                     <span class="close-button" id="closeModal">&times;</span>
-                    <h3>Are you sure you want to submit the scores?</h3>
+                    <h3>Are you sure you want to save the scores?</h3>
                     <div>
-                        <button id="confirmSave" class="confirm-button">Yes, Submit</button>
+                        <button id="confirmSave" class="confirm-button">Yes, Save</button>
                         <button id="cancelSave" class="cancel-button">Cancel</button>
                     </div>
                 </div>
@@ -380,6 +334,7 @@
 
 <script>
     window.onload = function () {
+
         const projectId = getProjectIdFromURL();
 
         if (!projectId) {
@@ -567,34 +522,6 @@
         inputListenersPresent();
     }
 
-    // function inputListenersPresent() {
-    //     // all tr
-    //     const rows = document.querySelectorAll("#presentation-table tbody tr");
-    //
-    //     rows.forEach(row => {
-    //         // all input tr
-    //         const inputs = row.querySelectorAll(".present-score-input");
-    //         inputs.forEach(input => {
-    //             input.addEventListener("input", (event) => {
-    //                 // ตรวจสอบค่าเมื่อกรอก input
-    //                 const value = parseFloat(event.target.value);
-    //                 if (value > 10) {
-    //                     event.target.value = 10;  // รีเซ็ตค่าเป็น 10 ถ้ากรอกเกิน
-    //                 }
-    //
-    //                 // ตรวจสอบว่า checkbox "sameScoreDocument" ถูกเลือกหรือไม่
-    //                 const checkbox = document.getElementById("sameScorePresent");
-    //                 if (checkbox.checked) {
-    //                     const newValue = event.target.value;
-    //                     // apply
-    //                     inputs.forEach(otherInput => {
-    //                         otherInput.value = newValue;
-    //                     });
-    //                 }
-    //             });
-    //         });
-    //     });
-    // }
     function inputListenersPresent() {
         const rows = document.querySelectorAll("#presentation-table tbody tr");
 
@@ -610,12 +537,23 @@
                         let value = parseFloat(event.target.value);
 
                         // protect maxScore
-                        if (value > maxScore) {
-                            event.target.value = maxScore;
-                        } else if (value < 0 || isNaN(value)) {
-                            event.target.value = 0;
-                        }
+                        // if (value > maxScore) {
+                        //     event.target.value = maxScore;
+                        // } else if (value < 0 || isNaN(value)) {
+                        //     event.target.value = 0;
+                        // }
                         // event.target.value = value;
+                        if (value > maxScore) {
+                            input.classList.add("invalid-score");
+                            // Optionally add title attribute for tooltip
+                            input.title = `Maximum score is ${maxScore}`;
+                        } else if (value < 0) {
+                            input.classList.add("invalid-score");
+                            input.title = "Score cannot be negative";
+                        } else {
+                            input.classList.remove("invalid-score");
+                            input.title = "";
+                        }
 
                         const checkbox = document.getElementById("sameScorePresent");
                         if (checkbox.checked && index === 0) {
@@ -626,6 +564,18 @@
                                 if (otherIndex !== 0) {
                                     otherInput.value = newValue;
                                     otherInput.readOnly = true;
+
+                                    if (parseFloat(newValue) > parseFloat(otherInput.getAttribute("max"))) {
+                                        otherInput.classList.add("invalid-score");
+                                        otherInput.title = `Maximum score is ${otherInput.getAttribute("max")}`;
+                                    } else if (parseFloat(newValue) < 0) {
+                                        otherInput.classList.add("invalid-score");
+                                        otherInput.title = "Score cannot be negative";
+                                    } else {
+                                        otherInput.classList.remove("invalid-score");
+                                        otherInput.title = "";
+                                    }
+
                                     affectedStudentIds.add(otherInput.getAttribute('data-student-id'));
                                 }
                             });
@@ -645,36 +595,6 @@
     }
 
     // https://www.geeksforgeeks.org/javascript-auto-filling-one-field/
-    // function applySameScorePresent() {
-    //
-    //     const checkBox = document.getElementById("sameScorePresent").checked;
-    //     // all of tr
-    //     const rows = document.querySelectorAll("#presentation-table tbody tr");
-    //
-    //     if (checkBox) {
-    //         rows.forEach(row => {
-    //             // ทุกตัวภายใน input tr
-    //             const inputs = row.querySelectorAll(".present-score-input");
-    //             let firstValue = "";
-    //
-    //             // check first value
-    //             for (let input of inputs) {
-    //                 if (input.value.trim() !== "") {
-    //                     firstValue = input.value;
-    //                     break;
-    //                 }
-    //             }
-    //
-    //             // apply value
-    //             if (firstValue !== "") {
-    //                 inputs.forEach(input => {
-    //                     input.value = firstValue;
-    //                 });
-    //             }
-    //
-    //         });
-    //     }
-    // }
     function applySameScorePresent() {
         console.log("applySameScorePresent called ❗️");
 
@@ -701,6 +621,21 @@
                         if (index !== 0) {
                             input.value = firstValue;
                             input.readOnly = true;
+
+                            const maxScore = parseFloat(input.getAttribute("max"));
+                            const value = parseFloat(firstValue);
+
+                            if (value > maxScore) {
+                                input.classList.add("invalid-score");
+                                input.title = `Maximum score is ${maxScore}`;
+                            } else if (value < 0) {
+                                input.classList.add("invalid-score");
+                                input.title = "Score cannot be negative";
+                            } else {
+                                input.classList.remove("invalid-score");
+                                input.title = "";
+                            }
+
                             affectedStudentIds.add(input.getAttribute('data-student-id'));
                         }
                     });
@@ -770,35 +705,6 @@
         inputListenersDocument();
     }
 
-    // function inputListenersDocument() {
-    //     // all tr
-    //     const rows = document.querySelectorAll("#document-table tbody tr");
-    //
-    //     rows.forEach(row => {
-    //         // all input tr
-    //         const inputs = row.querySelectorAll(".document-score-input");
-    //         inputs.forEach(input => {
-    //             input.addEventListener("input", (event) => {
-    //                 // ตรวจสอบค่าเมื่อกรอก input
-    //                 const value = parseFloat(event.target.value);
-    //                 if (value > 10) {
-    //                     event.target.value = 10;  // รีเซ็ตค่าเป็น 10 ถ้ากรอกเกิน
-    //                 }
-    //
-    //                 // ตรวจสอบว่า checkbox "sameScoreDocument" ถูกเลือกหรือไม่
-    //                 const checkbox = document.getElementById("sameScoreDocument");
-    //                 if (checkbox.checked) {
-    //                     const newValue = event.target.value;
-    //                     // apply
-    //                     inputs.forEach(otherInput => {
-    //                         otherInput.value = newValue;
-    //                     });
-    //                 }
-    //             });
-    //         });
-    //     });
-    // }
-
     function inputListenersDocument() {
 
         const rows = document.querySelectorAll("#document-table tbody tr");
@@ -816,12 +722,23 @@
                         let value = parseFloat(event.target.value);
 
                         // protect maxScore
-                        if (value > maxScore) {
-                            event.target.value = maxScore;
-                        } else if (value < 0 || isNaN(value)) {
-                            event.target.value = 0;
-                        }
+                        // if (value > maxScore) {
+                        //     event.target.value = maxScore;
+                        // } else if (value < 0 || isNaN(value)) {
+                        //     event.target.value = 0;
+                        // }
                         // event.target.value = value;
+                        if (value > maxScore) {
+                            input.classList.add("invalid-score");
+                            // Optionally add title attribute for tooltip
+                            input.title = `Maximum score is ${maxScore}`;
+                        } else if (value < 0) {
+                            input.classList.add("invalid-score");
+                            input.title = "Score cannot be negative";
+                        } else {
+                            input.classList.remove("invalid-score");
+                            input.title = "";
+                        }
 
                         const checkbox = document.getElementById("sameScoreDocument");
                         if (checkbox.checked && index === 0) {
@@ -832,6 +749,18 @@
                                 if (otherIndex !== 0) {
                                     otherInput.value = newValue;
                                     otherInput.readOnly = true;
+
+                                    if (parseFloat(newValue) > parseFloat(otherInput.getAttribute("max"))) {
+                                        otherInput.classList.add("invalid-score");
+                                        otherInput.title = `Maximum score is ${otherInput.getAttribute("max")}`;
+                                    } else if (parseFloat(newValue) < 0) {
+                                        otherInput.classList.add("invalid-score");
+                                        otherInput.title = "Score cannot be negative";
+                                    } else {
+                                        otherInput.classList.remove("invalid-score");
+                                        otherInput.title = "";
+                                    }
+
                                     affectedStudentIds.add(otherInput.getAttribute('data-student-id'));
                                 }
                             });
@@ -851,37 +780,6 @@
     }
 
     // https://www.geeksforgeeks.org/javascript-auto-filling-one-field/
-    // function applySameScoreDocument() {
-    //     console.log("applySameScoreDocument called");
-    //     const checkBox = document.getElementById("sameScoreDocument").checked;
-    //     // all of tr
-    //     const rows = document.querySelectorAll("#document-table tbody tr");
-    //
-    //     if (checkBox) {
-    //         rows.forEach(row => {
-    //             // ทุกตัวภายใน input tr
-    //             const inputs = row.querySelectorAll(".document-score-input");
-    //             let firstValue = "";
-    //
-    //             // check first value
-    //             for (let input of inputs) {
-    //                 if (input.value.trim() !== "") {
-    //                     firstValue = input.value;
-    //                     break;
-    //                 }
-    //             }
-    //
-    //             // apply value
-    //             if (firstValue !== "") {
-    //                 inputs.forEach(input => {
-    //                     input.value = firstValue;
-    //                 });
-    //             }
-    //
-    //         });
-    //     }
-    // }
-
     function applySameScoreDocument() {
         console.log("applySameScoreDocument called ❗️");
 
@@ -908,6 +806,21 @@
                         if (index !== 0) {
                             input.value = firstValue;
                             input.readOnly = true;
+
+                            const maxScore = parseFloat(input.getAttribute("max"));
+                            const value = parseFloat(firstValue);
+
+                            if (value > maxScore) {
+                                input.classList.add("invalid-score");
+                                input.title = `Maximum score is ${maxScore}`;
+                            } else if (value < 0) {
+                                input.classList.add("invalid-score");
+                                input.title = "Score cannot be negative";
+                            } else {
+                                input.classList.remove("invalid-score");
+                                input.title = "";
+                            }
+
                             affectedStudentIds.add(input.getAttribute('data-student-id'));
                         }
                     });
@@ -977,10 +890,88 @@
         return zeroScoreStudents;
     }
 
+    function checkForInvalidScores() {
+        const invalidInputs = document.querySelectorAll('.invalid-score');
+        const invalidScoreDetails = [];
+
+        invalidInputs.forEach(input => {
+            const studentId = input.getAttribute('data-student-id');
+            const maxScore = input.getAttribute('max');
+            const value = input.value;
+
+            // Find student name if available
+            const studentElement = document.querySelector(`.card-score-result[data-student-id="${studentId}"]`);
+            let studentName = '';
+
+            if (studentElement) {
+                const iconSpan = studentElement.querySelector('.icon');
+                if (iconSpan) {
+                    studentName = iconSpan.textContent.trim();
+                }
+            }
+
+            invalidScoreDetails.push({
+                id: studentId,
+                name: studentName || studentId,
+                value: value,
+                maxScore: maxScore
+            });
+        });
+
+        return invalidScoreDetails;
+    }
+
     // Update the save button click event handler
     document.querySelector('.save-button').addEventListener('click', function(event) {
         console.log("Save Process");
         event.preventDefault();
+
+        const invalidScores = checkForInvalidScores();
+
+        if (invalidScores.length > 0) {
+            // Create and show invalid score alert
+            const invalidScoreAlert = document.createElement('div');
+            invalidScoreAlert.className = 'invalid-score-alert';
+            invalidScoreAlert.style.position = 'fixed';
+            invalidScoreAlert.style.top = '20px';
+            invalidScoreAlert.style.left = '50%';
+            invalidScoreAlert.style.transform = 'translateX(-50%)';
+            invalidScoreAlert.style.backgroundColor = '#f8d7da';
+            invalidScoreAlert.style.color = '#721c24';
+            invalidScoreAlert.style.padding = '15px 20px';
+            invalidScoreAlert.style.borderRadius = '5px';
+            invalidScoreAlert.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
+            invalidScoreAlert.style.zIndex = '1000';
+            invalidScoreAlert.style.maxWidth = '80%';
+
+            let alertContent = '<h3 style="margin-top:0">⚠️ Invalid Scores Detected</h3>';
+            alertContent += '<p>Cannot save evaluation. Please correct the following scores:</p><ul>';
+
+            invalidScores.forEach(item => {
+                alertContent += `<li><strong>${item.name}</strong>: Score ${item.value} exceeds maximum of ${item.maxScore}</li>`;
+            });
+
+            alertContent += '</ul>';
+            alertContent += '<button id="closeInvalidAlert" style="background-color:#dc3545;color:white;border:none;padding:8px 15px;border-radius:4px;cursor:pointer;float:right">Close</button>';
+            alertContent += '<div style="clear:both"></div>';
+
+            invalidScoreAlert.innerHTML = alertContent;
+            document.body.appendChild(invalidScoreAlert);
+
+            // Add event listener to close button
+            document.getElementById('closeInvalidAlert').addEventListener('click', function() {
+                invalidScoreAlert.remove();
+            });
+
+            // Automatically remove after 10 seconds
+            setTimeout(() => {
+                if (document.body.contains(invalidScoreAlert)) {
+                    invalidScoreAlert.remove();
+                }
+            }, 10000);
+
+            return; // Stop execution and don't show the confirmation modal
+        }
 
         // Check for zero scores before showing the modal
         const zeroScoreStudents = checkForZeroScores();

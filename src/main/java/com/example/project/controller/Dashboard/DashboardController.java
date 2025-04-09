@@ -1,9 +1,13 @@
 package com.example.project.controller.Dashboard;
 
+import ch.qos.logback.core.model.Model;
 import com.example.project.DTO.ManageSchedule.Preview.PreviewProposalDTO;
+import com.example.project.entity.ProjectInstructorRole;
 import com.example.project.entity.ScoringPeriods;
+import com.example.project.entity.StudentProject;
 import com.example.project.repository.ScoringPeriodsRepository;
 import com.example.project.service.DashboardCardService;
+import com.example.project.service.ProjectService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +17,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,26 +29,28 @@ public class DashboardController {
     private DashboardCardService dashboardService;
     @Autowired
     private ScoringPeriodsRepository scoringPeriodsRepository;
-
+    @Autowired
+    private ProjectService projectService;
 
     // Proposal
     @GetMapping("/instructor/proposalStatusDashboard")
-    public ResponseEntity<Map<String, Object>> checkGroupEvaStatus() {
-        Map<String, Object> response = dashboardService.checkGroupEvaStatus();
+    public ResponseEntity<Map<String, Object>> checkGroupEvaStatus(@RequestParam("year") String year) {
+        System.out.println("🌻 year" + year);
+        Map<String, Object> response = dashboardService.checkGroupEvaStatus(year);
         return ResponseEntity.ok(response);
     }
 
     // Poster
     @GetMapping("/instructor/posterStatusDashboard")
-    public ResponseEntity<Map<String, Object>> checkGroupPosterEvaStatus() {
-        Map<String, Object> response =dashboardService.checkGroupPosterEvaStatus();
+    public ResponseEntity<Map<String, Object>> checkGroupPosterEvaStatus(@RequestParam("year") String year) {
+        Map<String, Object> response =dashboardService.checkGroupPosterEvaStatus(year);
         return ResponseEntity.ok(response);
     }
 
     // Defense
     @GetMapping("/instructor/defenseStatusDashboard")
-    public  ResponseEntity<Map<String, Object>> checkGroupDefenseEvaStatus() {
-        Map<String, Object> response = dashboardService.checkGroupDefenseEvaStatus();
+    public  ResponseEntity<Map<String, Object>> checkGroupDefenseEvaStatus(@RequestParam("year") String year) {
+        Map<String, Object> response = dashboardService.checkGroupDefenseEvaStatus(year);
         return ResponseEntity.ok(response);
     }
 
@@ -94,6 +101,23 @@ public class DashboardController {
     }
 
 
+    // Get Project by Instructor
+    @GetMapping("/instructor/getProjectByInstructor")
+    @ResponseBody
+    public Map<String, Long> getProjectByInstructor (@RequestParam("year") String year){
+
+        System.out.println("🌻 year" + year);
+        List<ProjectInstructorRole> projectInstructorRoleList = projectService.getInstructorProject();
+
+        Map<String, Long> counts = dashboardService.getProjectByInstructor(projectInstructorRoleList, year);
+
+        System.out.println("📚 Check Program Group: " + counts);
+
+        return counts;
+
+    }
+
+
 
 
     //=========================================== NOT USE ===================================================
@@ -114,4 +138,3 @@ public class DashboardController {
 //        return "DST: " + programDST + " ICT: " + programICT;
 //    }
 }
-

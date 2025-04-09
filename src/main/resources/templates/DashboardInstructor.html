@@ -232,7 +232,7 @@
             Dashboard
 
             <div class="semester-container">
-                <select id="semester-selector" onchange="fetchGradeDistribution(); fetchImportantDates();"></select>
+                <select id="semester-selector" onchange="fetchGradeDistribution(); fetchImportantDates(); fetchProjectByInstructor(); dashboardProposal(); dashboardPoster(); dashboardDefense();"></select>
             </div>
 
         </div>
@@ -249,9 +249,9 @@
                         </svg>
                     </div>
                     <label class="text-centerProgram">
-                        <h1 th:text="${programDST}"></h1><span style="color: #919EAB; font-size: 2.5rem; padding-left: 1rem;">Groups</span>
+                        <h1 id="programDST">0</h1><span style="color: #919EAB; font-size: 2.1rem; padding-left: 1rem;">Groups</span>
                     </label>
-                    <label class="text-footer"><span th:text="${coProgramDST}">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span></label>
+                    <label class="text-footer" style="justify-content: space-between; align-items: center; width: 100%;"><span id="coProgramDST" style="margin-right: -1rem;">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span> &nbsp;<span id="committeeProgramDST" style="margin-right: -1rem;">0</span><span style="color: #919EAB;"> &nbsp; Committee </span></label>
                 </div>
 
                 <div class="header-container">
@@ -262,9 +262,9 @@
                         </svg>
                     </div>
                     <label class="text-centerProgram">
-                        <h1 th:text="${programICT}">0</h1><span style="color: #919EAB; font-size: 2.5rem; padding-left: 1rem;">Groups</span>
+                        <h1 id="programICT">0</h1><span style="color: #919EAB; font-size: 2.1rem; padding-left: 1rem;">Groups</span>
                     </label>
-                    <label class="text-footer"><span th:text="${coProgramICT}">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span></label>
+                    <label class="text-footer" style="justify-content: space-between; align-items: center; width: 100%;"><span id="coProgramICT" style="margin-right: -1rem;">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span> <span id="committeeProgramICT" style="margin-right: -1rem;">0</span><span style="color: #919EAB;"> &nbsp; Committee </span></label>
                 </div>
 
 
@@ -285,7 +285,7 @@
                         <h1> 0 </h1>
                     </label>
 
-                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
+                    <label class="text-footer"> 0 <span style="color: #919EAB; margin-left: 1rem;"> completed </span> </label>
                 </div>
 
                 <div class="header-container">
@@ -302,7 +302,7 @@
                         <h1> 0 </h1>
                     </label>
 
-                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
+                    <label class="text-footer"> 0 <span style="color: #919EAB; margin-left: 1rem;"> completed </span> </label>
                 </div>
 
                 <div class="header-container">
@@ -325,51 +325,51 @@
                         <h1> 0 </h1>
                     </label>
 
-                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
+                    <label class="text-footer"> 0 <span style="color: #919EAB; margin-left: 1rem;"> completed </span> </label>
                 </div>
 
             </div>
 
             <!-- Reminder -->
-<!--            <div class="reminder-container">-->
-<!--                <div class="reminder-title">-->
-<!--                    <i class="fa-solid fa-bell"></i>-->
-<!--                    Reminder-->
-<!--                </div>-->
+            <!--            <div class="reminder-container">-->
+            <!--                <div class="reminder-title">-->
+            <!--                    <i class="fa-solid fa-bell"></i>-->
+            <!--                    Reminder-->
+            <!--                </div>-->
 
-<!--                <div class="reminder-item">-->
-<!--                    <div class="reminder-content">-->
-<!--                        <div>-->
-<!--                            <i class="fa-solid fa-circle-notch reminder-icon"></i>-->
-<!--                            <span class="reminder-text">การประเมิน Proposal Presentation</span>-->
-<!--                        </div>-->
-<!--                        <span class="reminder-subtitle">กรอกคะแนน Proposal Evaluation</span>-->
-<!--                    </div>-->
-<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
-<!--                </div>-->
+            <!--                <div class="reminder-item">-->
+            <!--                    <div class="reminder-content">-->
+            <!--                        <div>-->
+            <!--                            <i class="fa-solid fa-circle-notch reminder-icon"></i>-->
+            <!--                            <span class="reminder-text">การประเมิน Proposal Presentation</span>-->
+            <!--                        </div>-->
+            <!--                        <span class="reminder-subtitle">กรอกคะแนน Proposal Evaluation</span>-->
+            <!--                    </div>-->
+            <!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+            <!--                </div>-->
 
-<!--                <div class="reminder-item">-->
-<!--                    <div class="reminder-content">-->
-<!--                        <div>-->
-<!--                            <i class="fa-solid fa-circle-notch reminder-icon "></i>-->
-<!--                            <span class="reminder-text">การประเมิน Poster Presentation</span>-->
-<!--                        </div>-->
-<!--                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>-->
-<!--                    </div>-->
-<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
-<!--                </div>-->
+            <!--                <div class="reminder-item">-->
+            <!--                    <div class="reminder-content">-->
+            <!--                        <div>-->
+            <!--                            <i class="fa-solid fa-circle-notch reminder-icon "></i>-->
+            <!--                            <span class="reminder-text">การประเมิน Poster Presentation</span>-->
+            <!--                        </div>-->
+            <!--                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>-->
+            <!--                    </div>-->
+            <!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+            <!--                </div>-->
 
-<!--                <div class="reminder-item">-->
-<!--                    <div class="reminder-content">-->
-<!--                        <div>-->
-<!--                            <i class="fa-solid fa-circle-notch reminder-icon "></i>-->
-<!--                            <span class="reminder-text">การประเมิน Proposal Presentation</span>-->
-<!--                        </div>-->
-<!--                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>-->
-<!--                    </div>-->
-<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
-<!--                </div>-->
-<!--            </div>-->
+            <!--                <div class="reminder-item">-->
+            <!--                    <div class="reminder-content">-->
+            <!--                        <div>-->
+            <!--                            <i class="fa-solid fa-circle-notch reminder-icon "></i>-->
+            <!--                            <span class="reminder-text">การประเมิน Proposal Presentation</span>-->
+            <!--                        </div>-->
+            <!--                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>-->
+            <!--                    </div>-->
+            <!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+            <!--                </div>-->
+            <!--            </div>-->
 
             <div class="main-content">
                 <div class="panel">
@@ -407,59 +407,59 @@
                     schedule, please contact staff.
                 </p>
 
-<!--                <div class="schedule-item">-->
-<!--                    <div class="schedule-header">-->
-<!--                        <div class="schedule-header-tags">-->
-<!--                            <span class="tag tag-advisor">Advisor</span>-->
-<!--                            <span class="tag tag-proposal">Proposal</span>-->
-<!--                            <span class="tag tag-ict">ICT</span>-->
-<!--                        </div>-->
-<!--                        <div class="status-btn status-btn-pending">รอการประเมิน</div>-->
-<!--                    </div>-->
+                <!--                <div class="schedule-item">-->
+                <!--                    <div class="schedule-header">-->
+                <!--                        <div class="schedule-header-tags">-->
+                <!--                            <span class="tag tag-advisor">Advisor</span>-->
+                <!--                            <span class="tag tag-proposal">Proposal</span>-->
+                <!--                            <span class="tag tag-ict">ICT</span>-->
+                <!--                        </div>-->
+                <!--                        <div class="status-btn status-btn-pending">รอการประเมิน</div>-->
+                <!--                    </div>-->
 
-<!--                    <div class="schedule-content">-->
-<!--                        <strong>ระบบ Senior Project Digital Platform</strong>-->
-<!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
-<!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
-<!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <!--                    <div class="schedule-content">-->
+                <!--                        <strong>ระบบ Senior Project Digital Platform</strong>-->
+                <!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
+                <!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
+                <!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
+                <!--                    </div>-->
+                <!--                </div>-->
 
-<!--                <div class="schedule-item">-->
-<!--                    <div class="schedule-header">-->
-<!--                        <div class="schedule-header-tags">-->
-<!--                            <span class="tag tag-committee">Committee</span>-->
-<!--                            <span class="tag tag-proposal">Proposal</span>-->
-<!--                            <span class="tag tag-dst">DST</span>-->
-<!--                        </div>-->
-<!--                        <div class="status-btn status-btn-pending">รอการประเมิน</div>-->
-<!--                    </div>-->
+                <!--                <div class="schedule-item">-->
+                <!--                    <div class="schedule-header">-->
+                <!--                        <div class="schedule-header-tags">-->
+                <!--                            <span class="tag tag-committee">Committee</span>-->
+                <!--                            <span class="tag tag-proposal">Proposal</span>-->
+                <!--                            <span class="tag tag-dst">DST</span>-->
+                <!--                        </div>-->
+                <!--                        <div class="status-btn status-btn-pending">รอการประเมิน</div>-->
+                <!--                    </div>-->
 
-<!--                    <div class="schedule-content">-->
-<!--                        <strong>ระบบ SPDP MANAGEMENT</strong>-->
-<!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
-<!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
-<!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <!--                    <div class="schedule-content">-->
+                <!--                        <strong>ระบบ SPDP MANAGEMENT</strong>-->
+                <!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
+                <!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
+                <!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
+                <!--                    </div>-->
+                <!--                </div>-->
 
-<!--                <div class="schedule-item">-->
-<!--                    <div class="schedule-header">-->
-<!--                        <div class="schedule-header-tags">-->
-<!--                            <span class="tag tag-advisor">Advisor</span>-->
-<!--                            <span class="tag tag-defense">Defense</span>-->
-<!--                            <span class="tag tag-dst">DST</span>-->
-<!--                        </div>-->
-<!--                        <div class="status-btn status-btn-in-progress">กำลังจะมาถึง</div>-->
-<!--                    </div>-->
+                <!--                <div class="schedule-item">-->
+                <!--                    <div class="schedule-header">-->
+                <!--                        <div class="schedule-header-tags">-->
+                <!--                            <span class="tag tag-advisor">Advisor</span>-->
+                <!--                            <span class="tag tag-defense">Defense</span>-->
+                <!--                            <span class="tag tag-dst">DST</span>-->
+                <!--                        </div>-->
+                <!--                        <div class="status-btn status-btn-in-progress">กำลังจะมาถึง</div>-->
+                <!--                    </div>-->
 
-<!--                    <div class="schedule-content">-->
-<!--                        <strong>ระบบ Senior Project Digital Platform</strong>-->
-<!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
-<!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
-<!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <!--                    <div class="schedule-content">-->
+                <!--                        <strong>ระบบ Senior Project Digital Platform</strong>-->
+                <!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
+                <!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
+                <!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
+                <!--                    </div>-->
+                <!--                </div>-->
 
             </div>
 
@@ -528,6 +528,12 @@
             await fetchGradeDistribution();
             await fetchImportantDates();
 
+            await fetchProjectByInstructor();
+
+            await dashboardProposal();
+            await dashboardPoster();
+            await dashboardDefense();
+
         } catch (error) {
             console.error("Error fetching academic years:", error);
         }
@@ -540,8 +546,55 @@
 
     // ================================  fetch data  ==========================================
 
+
+    function fetchProjectByInstructor() {
+
+        const semesterYear = document.getElementById("semester-selector").value;
+
+        fetch(`http://localhost:8080/instructor/getProjectByInstructor?year=${semesterYear}`, {
+
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                    alert('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+
+            .then(data => {
+
+                console.log("🐍data: ", data);
+                if(data.length === 0) {
+                    console.log("No data available");
+
+                } else {
+
+                    document.getElementById("programDST").innerText = data.programDST;
+                    document.getElementById("coProgramDST").innerText = data.coProgramDST;
+                    document.getElementById("programICT").innerText = data.programICT;
+                    document.getElementById("coProgramICT").innerText = data.coProgramICT;
+                    document.getElementById("committeeProgramDST").innerText = data.committeeProgramDST;
+                    document.getElementById("committeeProgramICT").innerText = data.committeeProgramICT;
+                }
+            })
+
+            .catch(error => {
+                console.error('Error fetching data:', error);
+
+            });
+
+    }
+
     function dashboardProposal() {
-        let url = `http://localhost:8080/instructor/proposalStatusDashboard`;
+
+        const semesterYear = document.getElementById("semester-selector").value;
+
+        let url = `http://localhost:8080/instructor/proposalStatusDashboard?year=${semesterYear}`;
 
         return fetch(url)
             .then(response => {
@@ -554,7 +607,9 @@
     }
 
     function dashboardPoster() {
-        let url = `http://localhost:8080/instructor/posterStatusDashboard`;
+        const semesterYear = document.getElementById("semester-selector").value;
+
+        let url = `http://localhost:8080/instructor/posterStatusDashboard?year=${semesterYear}`;
 
         return fetch(url)
             .then(response => {
@@ -567,7 +622,9 @@
     }
 
     function dashboardDefense() {
-        let url = `http://localhost:8080/instructor/defenseStatusDashboard`;
+        const semesterYear = document.getElementById("semester-selector").value;
+
+        let url = `http://localhost:8080/instructor/defenseStatusDashboard?year=${semesterYear}`;
 
         return fetch(url)
             .then(response => {
@@ -615,13 +672,13 @@
         const dashboardDefense = data[2];
 
         document.querySelector('.header-container:nth-child(3) .text-center h1').innerText = dashboardProposal.instructorPropoSuccessEva + " / " + dashboardProposal.totalProjects;
-        document.querySelector('.header-container:nth-child(3) .text-footer').innerHTML = `${dashboardProposal.instructorPropoSuccessEva} &nbsp;<span style="color: #919EAB;"> completed </span>`;
+        document.querySelector('.header-container:nth-child(3) .text-footer').innerHTML = `${dashboardProposal.instructorPropoSuccessEva} &nbsp;<span style="color: #919EAB; margin-left: 1rem;"> completed </span>`;
 
         document.querySelector('.header-container:nth-child(4) .text-center h1').innerText = dashboardPoster.instructorPropoSuccessEva + " / " + dashboardPoster.totalProjects;
-        document.querySelector('.header-container:nth-child(4) .text-footer').innerHTML = `${dashboardPoster.instructorPropoSuccessEva}  &nbsp; <span style="color: #919EAB;">  completed </span>`;
+        document.querySelector('.header-container:nth-child(4) .text-footer').innerHTML = `${dashboardPoster.instructorPropoSuccessEva}  &nbsp; <span style="color: #919EAB; margin-left: 1rem;">  completed </span>`;
 
         document.querySelector('.header-container:nth-child(5) .text-center h1').innerText = dashboardDefense.instructorPropoSuccessEva + " / " +  dashboardDefense.totalProjects;
-        document.querySelector('.header-container:nth-child(5) .text-footer').innerHTML = `${dashboardDefense.instructorPropoSuccessEva}  &nbsp; <span style="color: #919EAB;"> completed </span>`;
+        document.querySelector('.header-container:nth-child(5) .text-footer').innerHTML = `${dashboardDefense.instructorPropoSuccessEva}  &nbsp; <span style="color: #919EAB; margin-left: 1rem;"> completed </span>`;
 
     }
 
@@ -971,6 +1028,5 @@
     // เรียกฟังก์ชันครั้งแรกเมื่อโหลดหน้าเว็บ
     document.addEventListener("DOMContentLoaded", fetchGradeDistribution);
 </script>
-
 
 

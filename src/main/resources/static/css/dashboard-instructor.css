@@ -173,7 +173,7 @@ body {
 
 .text-centerProgram {
     display: flex;
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     align-items: center;
     margin-top: -2rem;
     padding-left: 1.2rem;
@@ -181,7 +181,7 @@ body {
 
 .text-center {
     display: flex;
-    font-size: 1.5rem;
+    font-size: 1rem;
     align-items: center;
     margin-top: -1.5rem;
     padding-left: 2.5rem;
@@ -189,10 +189,11 @@ body {
 
 .text-footer {
     display: flex;
-    font-size: 1.2rem;
-    padding-left: 1rem;
+    font-size: 1rem;
+    /*padding-left: 1rem;*/
     margin-top: -1.5rem;
 }
+
 
 label {
     font-size: 14px;
