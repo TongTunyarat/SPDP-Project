@@ -662,6 +662,7 @@
       });
 
       updateSelectedCount();
+      updateSelectAllCheckbox();
     }
 
     function selectAll() {
@@ -685,6 +686,15 @@
 
       updateSelectedCount();
     }
+
+    function updateSelectAllCheckbox() {
+      const checkboxes = document.querySelectorAll("#room-list input[type=checkbox]");
+      const total = checkboxes.length;
+      const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+
+      document.getElementById("select-all").checked = total > 0 && total === checked;
+    }
+
 
     function updateSelectedCount() {
       let count = selectedRooms.size;
