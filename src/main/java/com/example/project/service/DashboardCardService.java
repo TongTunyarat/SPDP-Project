@@ -201,7 +201,7 @@ public class DashboardCardService {
 //        return "✅ instructorPosterSuccessEva: " + instructorPosterSuccessEva + " From 📊 totalProjects: " + totalProjects;
         Map<String, Object> result = new HashMap<>();
         result.put("totalProjects", (int) totalProjects);
-        result.put("instructorPropoSuccessEva", (int) instructorPosterSuccessEva);
+        result.put("instructorPosterSuccessEva", (int) instructorPosterSuccessEva);
 
         return result;
     }
@@ -280,7 +280,7 @@ public class DashboardCardService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("totalProjects", (int) totalProjects);
-        result.put("instructorPropoSuccessEva", (int) instructorDefenseSuccessEva);
+        result.put("instructorDefenseSuccessEva", (int) instructorDefenseSuccessEva);
 
         return result;
     }
@@ -351,13 +351,15 @@ public class DashboardCardService {
         return gradeDistribution;
     }
 
-    public List<PreviewProposalDTO> getProposalSchedule() {
+    // get proposchedule instructor
+    public List<PreviewProposalDTO> getProposalSchedule(String year) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         System.out.println("💌 Account username: " + username);
 
-        List<Project> projectList = projectRepository.findProjectsByUsername(username);
+        List<Project> projectList = projectRepository.findProjectsByUsername(username).stream()
+                .filter(y -> y.getSemester().equalsIgnoreCase(year)).collect(Collectors.toList());
 
         Optional<Instructor> instructorOpt = instructorRepository.findByAccountUsername(username);
         String professorName = instructorOpt.map(Instructor::getProfessorName).orElse("Unknown");
@@ -371,6 +373,9 @@ public class DashboardCardService {
                 .filter(p -> p.getInstructorNames().values().stream()
                         .anyMatch(list -> list.stream().anyMatch(name -> name.equals(professorName)))).collect(Collectors.toList());
 
+        System.out.println("project list: "+projectIds.size());
+        System.out.println("projectIds list: "+projectIds);
+        System.out.println("year: "+year);
 
         for(PreviewProposalDTO proposal : proposals ){
 
@@ -391,6 +396,8 @@ public class DashboardCardService {
 
             // เอาไปทับทที่
             proposal.setInstructorNames(colletctName);
+
+            System.out.println(proposal);
         }
 
 

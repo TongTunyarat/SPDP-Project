@@ -232,7 +232,7 @@
             Dashboard
 
             <div class="semester-container">
-                <select id="semester-selector" onchange="fetchGradeDistribution(); fetchImportantDates(); fetchProjectByInstructor(); dashboardProposal(); dashboardPoster(); dashboardDefense();"></select>
+                <select id="semester-selector" onchange="fetchGradeDistribution(); fetchImportantDates(); fetchProjectByInstructor(); dashboardProposal(); dashboardPoster(); dashboardDefense(); getProjectProposal();"></select>
             </div>
 
         </div>
@@ -249,7 +249,7 @@
                         </svg>
                     </div>
                     <label class="text-centerProgram">
-                        <h1 id="programDST">0</h1><span style="color: #919EAB; font-size: 2.1rem; padding-left: 1rem;">Groups</span>
+                        <h1 id="programDST">0</h1><span style="color: #919EAB; font-size: 1.7rem; padding-left: 1rem;">Advisor Groups</span>
                     </label>
                     <label class="text-footer" style="justify-content: space-between; align-items: center; width: 100%;"><span id="coProgramDST" style="margin-right: -1rem;">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span> &nbsp;<span id="committeeProgramDST" style="margin-right: -1rem;">0</span><span style="color: #919EAB;"> &nbsp; Committee </span></label>
                 </div>
@@ -262,7 +262,7 @@
                         </svg>
                     </div>
                     <label class="text-centerProgram">
-                        <h1 id="programICT">0</h1><span style="color: #919EAB; font-size: 2.1rem; padding-left: 1rem;">Groups</span>
+                        <h1 id="programICT">0</h1><span style="color: #919EAB; font-size: 1.7rem; padding-left: 1rem;">Advisor Groups</span>
                     </label>
                     <label class="text-footer" style="justify-content: space-between; align-items: center; width: 100%;"><span id="coProgramICT" style="margin-right: -1rem;">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span> <span id="committeeProgramICT" style="margin-right: -1rem;">0</span><span style="color: #919EAB;"> &nbsp; Committee </span></label>
                 </div>
@@ -530,6 +530,8 @@
 
             await fetchProjectByInstructor();
 
+            await getProjectProposal();
+
             await dashboardProposal();
             await dashboardPoster();
             await dashboardDefense();
@@ -590,7 +592,7 @@
 
     }
 
-    function dashboardProposal() {
+    async function dashboardProposal() {
 
         const semesterYear = document.getElementById("semester-selector").value;
 
@@ -636,32 +638,36 @@
             });
     }
 
-    function fetchData() {
-        Promise.all([
-            dashboardProposal(),
-            dashboardPoster(),
-            dashboardDefense()
+    async function fetchData() {
+        try {
 
-        ])
-            .then(data => {
-                const dashboardProposal = data[0];
-                const dashboardPoster = data[1];
-                const dashboardDefense = data[2];
+            const proposalData = await dashboardProposal();
+            console.log("🔍 ProposalData Raw:", JSON.stringify(proposalData));
 
-                console.log("✅ Show Data dashboardProposal: " + JSON.stringify(dashboardProposal, null, 2));
-                console.log("✅ Show Data dashboardPoster: " + JSON.stringify(dashboardPoster, null, 2));
-                console.log("✅ Show Data dashboardDefense: " + JSON.stringify(dashboardDefense, null, 2));
+            const [posterData, defenseData] = await Promise.all([
+                dashboardPoster(),
+                dashboardDefense()
+            ]);
 
-                displayCard(data)
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
+            console.log("✅ Show Data dashboardProposal: " + JSON.stringify(proposalData, null, 2));
+            console.log("✅ Show Data dashboardPoster: " + JSON.stringify(posterData, null, 2));
+            console.log("✅ Show Data dashboardDefense: " + JSON.stringify(defenseData, null, 2));
+
+            // ส่งข้อมูลไปยัง displayCard ในรูปแบบที่ถูกต้อง
+            displayCard([proposalData, posterData, defenseData]);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
-        fetchData();
-        getProjectProposal();
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        await dashboardProposal();
+        await dashboardPoster();
+        await dashboardDefense();
+        await fetchData();
+
+        // getProjectProposal();
     })
 
     // ================================  display dashboard card  ==========================================
@@ -674,11 +680,11 @@
         document.querySelector('.header-container:nth-child(3) .text-center h1').innerText = dashboardProposal.instructorPropoSuccessEva + " / " + dashboardProposal.totalProjects;
         document.querySelector('.header-container:nth-child(3) .text-footer').innerHTML = `${dashboardProposal.instructorPropoSuccessEva} &nbsp;<span style="color: #919EAB; margin-left: 1rem;"> completed </span>`;
 
-        document.querySelector('.header-container:nth-child(4) .text-center h1').innerText = dashboardPoster.instructorPropoSuccessEva + " / " + dashboardPoster.totalProjects;
-        document.querySelector('.header-container:nth-child(4) .text-footer').innerHTML = `${dashboardPoster.instructorPropoSuccessEva}  &nbsp; <span style="color: #919EAB; margin-left: 1rem;">  completed </span>`;
+        document.querySelector('.header-container:nth-child(4) .text-center h1').innerText = dashboardPoster.instructorPosterSuccessEva + " / " + dashboardPoster.totalProjects;
+        document.querySelector('.header-container:nth-child(4) .text-footer').innerHTML = `${dashboardPoster.instructorPosterSuccessEva}  &nbsp; <span style="color: #919EAB; margin-left: 1rem;">  completed </span>`;
 
-        document.querySelector('.header-container:nth-child(5) .text-center h1').innerText = dashboardDefense.instructorPropoSuccessEva + " / " +  dashboardDefense.totalProjects;
-        document.querySelector('.header-container:nth-child(5) .text-footer').innerHTML = `${dashboardDefense.instructorPropoSuccessEva}  &nbsp; <span style="color: #919EAB; margin-left: 1rem;"> completed </span>`;
+        document.querySelector('.header-container:nth-child(5) .text-center h1').innerText = dashboardDefense.instructorDefenseSuccessEva + " / " +  dashboardDefense.totalProjects;
+        document.querySelector('.header-container:nth-child(5) .text-footer').innerHTML = `${dashboardDefense.instructorDefenseSuccessEva}  &nbsp; <span style="color: #919EAB; margin-left: 1rem;"> completed </span>`;
 
     }
 
@@ -686,9 +692,9 @@
 
 
     function getProjectProposal() {
+        const semesterYear = document.getElementById("semester-selector").value;
 
-        fetch(`http://localhost:8080/instructor/getProposalScheduleDashboard`, {
-
+        fetch(`http://localhost:8080/instructor/getProposalScheduleDashboard?year=${semesterYear}`, {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -701,28 +707,45 @@
                 }
                 return response.json();
             })
-
             .then(data => {
+                console.log("🐽🐽🐽data: ", data);
 
-                console.log("🐍data: ", data);
+                const container = document.querySelector(".schedule-container");
+                container.innerHTML = '';
+
                 if(data.length === 0) {
                     console.log("No data available");
 
-                    const container = document.querySelector(".schedule-container")
-                    scheduleHTML = `
+                    const scheduleHTML = `
+            <div class="schedule-title">
+                <i class="fa-solid fa-calendar"></i>
+                Schedule for Presentation
+            </div>
 
-                    <div class="no-schedule">⚠️ The schedule is not yet organized ⚠️</div>
+            <p class="warning-text">
+                <i class="fa-solid fa-triangle-exclamation"></i> If you wish to cancel the presentation
+                schedule, please contact staff.
+            </p>
+            <div class="no-schedule">⚠️ The schedule is not yet organized ⚠️</div>
+            `;
 
-                    `;
-
-                    container.innerHTML += scheduleHTML;
-
+                    container.innerHTML = scheduleHTML; // Use = instead of +=
                 } else {
+                    // Start with the header content
+                    let scheduleHTML = `
+            <div class="schedule-title">
+                <i class="fa-solid fa-calendar"></i>
+                Schedule for Presentation
+            </div>
 
-                    const container = document.querySelector(".schedule-container")
+            <p class="warning-text">
+                <i class="fa-solid fa-triangle-exclamation"></i> If you wish to cancel the presentation
+                schedule, please contact staff.
+            </p>
+            `;
 
+                    // Add all projects to the HTML string
                     data.forEach(project => {
-
                         let projectId = project.projectId;
                         let cleanId = projectId.replace(/DST|ICT/g, '').trim();
 
@@ -738,75 +761,63 @@
                         let statusText = "Waiting for evaluation";
 
                         if(projectDate < today) {
-
                             statusClass = "status-btn-finished";
                             statusText = "Evaluation completed";
-
                         }
 
                         const dateSet = project.date ? true : false;
                         const timeSet = project.time ? true : false;
                         const roomSet = project.room ? true : false;
 
-                        let scheduleHTML = `
-
-                            <div class="schedule-item">
-                                <div class="schedule-side">
-                        `;
+                        scheduleHTML += `
+                    <div class="schedule-item">
+                        <div class="schedule-side">
+                `;
 
                         if(!dateSet && !timeSet && !roomSet) {
-
                             scheduleHTML += `
-                                 <div class="schedule-warning">⚠️ Awaiting reschedule of presentation</div>`;
-
+                         <div class="schedule-warning">⚠️ Awaiting reschedule of presentation</div>`;
                         } else {
-
                             scheduleHTML += `
-                                  <div class="schedule-datetime-box">
-                                        <div class="schedule-date">${project.date || ""}</div>
-                                        <div class="schedule-time">${project.time || ""}</div>
-                                    </div>
+                          <div class="schedule-datetime-box">
+                                <div class="schedule-date">${project.date || ""}</div>
+                                <div class="schedule-time">${project.time || ""}</div>
+                            </div>
 
-                                    <div class="schedule-location">
-                                        <span class="schedule-room">Room: ${project.room || ""}</span>
-                                    </div>
-
-
-                            `;
+                            <div class="schedule-location">
+                                <span class="schedule-room">Room: ${project.room || ""}</span>
+                            </div>
+                    `;
                         }
 
                         scheduleHTML += `
+                        </div>
+                        <div class="schedule-main">
+                            <div class="schedule-header">
+                                <div class="schedule-header-tags">
+                                    <span class="tag tag-${roleTag.toLowerCase()}">${roleTag}</span>
+                                    <span class="tag tag-proposal">Proposal</span>
+                                    <span class="tag tag-${project.program.toLowerCase()}">${project.program.toUpperCase()}</span>
                                 </div>
-                                <div class="schedule-main">
-                                    <div class="schedule-header">
-                                        <div class="schedule-header-tags">
-                                            <span class="tag tag-${roleTag.toLowerCase()}">${roleTag}</span>
-                                            <span class="tag tag-proposal">Proposal</span>
-                                            <span class="tag tag-${project.program.toLowerCase()}">${project.program.toUpperCase()}</span>
-                                        </div>
-                                        <div class="status-btn ${statusClass}">${statusText}</div>
-                                    </div>
-
-                                    <div class="schedule-content">
-                                        <div class="schedule-title">${project.projectTitle}</div>
-                                        <span class="schedule-project-subtitle">${cleanId}</span>
-                                    </div>
-                                </div>
+                                <div class="status-btn ${statusClass}">${statusText}</div>
                             </div>
 
-                    `;
-                        container.innerHTML += scheduleHTML;
+                            <div class="schedule-content">
+                                <div class="schedule-title">${project.projectTitle}</div>
+                                <span class="schedule-project-subtitle">${cleanId}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                    });
 
-                    })
-
+                    // Set the entire HTML content at once AFTER the loop
+                    container.innerHTML = scheduleHTML;
                 }
             })
-
             .catch(error => {
                 console.error('Error fetching data:', error);
-
             });
-
     }
 
 

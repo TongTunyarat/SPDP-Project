@@ -1144,27 +1144,9 @@
         return zeroScoreStudents;
     }
 
-    function checkForInvalidScores() {
-        const invalidScores = [];
-        const rows = document.querySelectorAll('.present-score-input'); // เลือก input ที่มีคะแนน
-
-        rows.forEach(input => {
-            // ตรวจสอบว่า input มี attribute 'max' และค่าของ input นั้นถูกต้อง
-            const score = parseFloat(input.value);
-            const maxScore = parseFloat(input.getAttribute('max'));
-
-            if (isNaN(score) || score < 0 || score > maxScore) {
-                const studentName = input.dataset.studentName || "Unknown";
-                invalidScores.push({
-                    name: studentName,
-                    value: score,
-                    maxScore: maxScore
-                });
-            }
-        });
-
-        return invalidScores;
-    }
+    // function checkForInvalidScores() {
+    //     ....
+    // }
 
     document.querySelector('.save-button').addEventListener('click', async function (event) {
         console.log("📝 Save Process Started");
