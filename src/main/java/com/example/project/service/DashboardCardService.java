@@ -310,11 +310,19 @@ public class DashboardCardService {
         Map<String, Integer> gradeDistribution = new HashMap<>();
 
         for (Project project : allProjects) {
+            // เช็กว่า project นี้ มี instructor ที่มี role == Advisor ไหม
+            boolean hasAdvisorRole = project.getProjectInstructorRoles().stream()
+                    .anyMatch(role -> "Advisor".equalsIgnoreCase(role.getRole()) &&
+                            username.equals(role.getInstructor().getAccount().getUsername()));
+
+            if (!hasAdvisorRole) {
+                continue; // ข้ามถ้าไม่ใช่ Advisor
+            }
+
             List<StudentProject> studentProjects = studentProjectRepository.findByProject_ProjectId(project.getProjectId());
             System.out.println("studentProjects [grade distribute]: " + studentProjects.size() + ", " + project.getProjectId());
 
             for (StudentProject studentProject : studentProjects) {
-                // เพิ่มการเช็คว่า studentProjects.ต้องมีสถานะเท่ากับ active ถึงจะนับ
                 if ("active".equalsIgnoreCase(studentProject.getStatus())) {
                     String studentId = studentProject.getStudent().getStudentId();
                     System.out.println("studentId: " + studentId);
@@ -330,23 +338,22 @@ public class DashboardCardService {
                                     .findGradeResultByProjectIdAndStudentId_StudentId(project, studentId)
                                     .getGradeResult();
                         } else if ("Poster Exhibition".equalsIgnoreCase(evaType)) {
-                            return new HashMap<>(); // ไม่มีการให้เกรดสำหรับ Poster Exhibition
+                            return new HashMap<>();
                         } else {
                             throw new IllegalArgumentException("Invalid evaType: " + evaType);
                         }
                     } catch (NullPointerException e) {
-                        // ถ้าเกิด NullPointerException ให้ถือว่าเป็นเกรด "I"
                         grade = "I";
                     }
-                    // ถ้า grade เป็น null หรือว่าง ให้ถือว่าเป็น "I"
+
                     if (grade == null || grade.isEmpty()) {
                         grade = "I";
                     }
-                    // เพิ่มเข้า gradeDistribution
                     gradeDistribution.put(grade, gradeDistribution.getOrDefault(grade, 0) + 1);
                 }
             }
         }
+
 
         return gradeDistribution;
     }

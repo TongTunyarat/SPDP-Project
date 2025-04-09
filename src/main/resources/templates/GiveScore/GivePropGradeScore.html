@@ -1154,6 +1154,18 @@
 
         // Check for zero scores before showing the modal
         const zeroScoreStudents = checkForZeroScores();
+        const iGradeStudents = [];
+
+        // ตรวจสอบเกรด 'I'
+        document.querySelectorAll('.present-score-input').forEach(input => {
+            const studentId = input.getAttribute('data-student-id');
+            const studentElement = document.querySelector(`.card-score-result[data-student-id="${studentId}"]`);
+            const grade = studentElement ? studentElement.querySelector('.grade').textContent.trim() : '';
+
+            if (grade === 'I') {
+                iGradeStudents.push({ id: studentId });
+            }
+        });
 
         // แสดง Modal
         const modal = document.getElementById('confirmationModal');
@@ -1168,6 +1180,11 @@
         const oldWarning = modalContent.querySelector('.zero-score-warning');
         if (oldWarning) {
             oldWarning.remove();
+        }
+
+        const oldIGradeWarning = modalContent.querySelector('.i-grade-warning');
+        if (oldIGradeWarning) {
+            oldIGradeWarning.remove();
         }
 
         if (zeroScoreStudents.length > 0) {
@@ -1192,6 +1209,22 @@
             modalContent.insertBefore(warningDiv, buttonDiv);
         }
 
+        if (iGradeStudents.length > 0) {
+            const iGradeWarningDiv = document.createElement('div');
+            iGradeWarningDiv.className = 'i-grade-warning';
+            iGradeWarningDiv.style.color = '#d88d14';
+            iGradeWarningDiv.style.marginBottom = '15px';
+            iGradeWarningDiv.style.fontWeight = 'bold';
+
+            let iGradeMessage = '<p>⚠️ The student has an \'I\' grade because the committee has not yet given all the required scores.</p><ul>';
+            // iGradeStudents.forEach(student => {
+            //     iGradeMessage += `<li>${student.id}</li>`;
+            // });
+            // iGradeMessage += '</ul><p>ต้องการยืนยันการให้คะแนนใช่หรือไม่?</p>';
+            iGradeWarningDiv.innerHTML = iGradeMessage;
+            const buttonDiv = modalContent.querySelector('div');
+            modalContent.insertBefore(iGradeWarningDiv, buttonDiv);
+        }
 
         modal.style.display = "block"; // เปิด Modal
 
@@ -1776,15 +1809,21 @@
 
             if (currentStudentName === studentName) {
                 // เรียกใช้งาน checkForInvalidScores เพื่อเช็คค่าผิดปกติในคอลัมน์คะแนน
-                if (checkForInvalidScores(row, studentName)) {
-                    console.warn(`⚠️ Invalid score detected for ${studentName}. Setting grade to 'I'`);
-                    updateScoreCard(studentId, 0, 'I'); // อัปเดตคะแนนเป็น 'I'
-                    return; // หยุดการคำนวณคะแนน
-                }
+                // if (checkForInvalidScores(row, studentName)) {
+                //     console.warn(`⚠️ Invalid score detected for ${studentName}. Setting grade to 'I'`);
+                //     updateScoreCard(studentId, 0, 'I'); // อัปเดตคะแนนเป็น 'I'
+                //     return; // หยุดการคำนวณคะแนน
+                // }
 
                 const resultScore = getResultScore(studentName);
                 const inputScore = getInputScore(studentId);
                 const totalScore = resultScore + inputScore;
+
+                if (checkForInvalidScores(row, studentName)) {
+                    console.warn(`⚠️ Invalid score detected for ${studentName}. Setting grade to 'I'`);
+                    updateScoreCard(studentId, totalScore, 'I'); // อัปเดตคะแนนเป็น 'I'
+                    return; // หยุดการคำนวณคะแนน
+                }
 
                 // ดึงรายชื่ออาจารย์ของโปรเจคก่อน
                 const instructors = await projectInstructor(getProjectIdFromURL());
