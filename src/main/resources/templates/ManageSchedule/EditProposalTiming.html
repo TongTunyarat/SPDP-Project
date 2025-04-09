@@ -844,6 +844,7 @@
 
                       cardPop.innerHTML = `
                           <div class="card-header">
+                              <input type="hidden" id="hiddenInfo" name="projectId" value="${projectId}">
                               <h1 class="card-title">${cleanId}</h1>
                               <div class="tag ${project.program.toLowerCase()}">${project.program}</div>
                           </div>
@@ -931,7 +932,9 @@
       if(e.target.id.includes("saveBtn") ){
 
         // send value to controlller
-        let projectId = document.querySelector(".card-title").textContent;
+        let projectId = document.querySelector("#hiddenInfo").value;
+        console.log("❗️Do you want to edit project id " + projectId);
+        // let projectId = document.querySelector(".card-title").textContent;
         let cardTitle = document.querySelector(".card-header");
         let programDiv =cardTitle.querySelector(".tag").textContent.trim();
         let startDateInput = document.querySelector("input[type='date']");
