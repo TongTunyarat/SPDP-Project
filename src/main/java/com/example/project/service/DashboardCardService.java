@@ -68,7 +68,7 @@ public class DashboardCardService {
 
 
     // Proposal
-    public Map<String, Object> checkGroupEvaStatus() {
+    public Map<String, Object> checkGroupEvaStatus(String year) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -80,12 +80,14 @@ public class DashboardCardService {
 
         long totalProjects = projectInstructorRoles.stream()
                 .filter(role -> ("Advisor".equalsIgnoreCase(role.getRole()) || "Committee".equalsIgnoreCase(role.getRole())) && role.getInstructor().getAccount().getUsername().equals(username))
+                .filter(i -> year.equalsIgnoreCase(i.getProjectIdRole().getSemester()))
                 .count();
 
         List<String> successfulProjects = new ArrayList<>();
 
         long instructorPropoSuccessEva = projectInstructorRoles.stream()
                 .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
+                .filter(i -> year.equalsIgnoreCase(i.getProjectIdRole().getSemester()))
                 .filter(i -> {
 
                     List<StudentProject> studentProjectsList = i.getProjectIdRole().getStudentProjects();
@@ -145,7 +147,7 @@ public class DashboardCardService {
     }
 
     // Poster
-    public Map<String, Object> checkGroupPosterEvaStatus() {
+    public Map<String, Object> checkGroupPosterEvaStatus(String year) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -156,10 +158,12 @@ public class DashboardCardService {
 
         long totalProjects = projectInstructorRoles.stream()
                 .filter(role -> ("Poster-Committee".equalsIgnoreCase(role.getRole()) || "Committee".equalsIgnoreCase(role.getRole())) && role.getInstructor().getAccount().getUsername().equals(username))
+                .filter(i -> year.equalsIgnoreCase(i.getProjectIdRole().getSemester()))
                 .count();
 
         long instructorPosterSuccessEva = projectInstructorRoles.stream()
                 .filter(i -> "Poster-Committee".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
+                .filter(i -> year.equalsIgnoreCase(i.getProjectIdRole().getSemester()))
                 .filter(i -> {
 
                     // get projectId
@@ -197,13 +201,13 @@ public class DashboardCardService {
 //        return "✅ instructorPosterSuccessEva: " + instructorPosterSuccessEva + " From 📊 totalProjects: " + totalProjects;
         Map<String, Object> result = new HashMap<>();
         result.put("totalProjects", (int) totalProjects);
-        result.put("instructorPropoSuccessEva", (int) instructorPosterSuccessEva);
+        result.put("instructorPosterSuccessEva", (int) instructorPosterSuccessEva);
 
         return result;
     }
 
     // Defense
-    public Map<String, Object> checkGroupDefenseEvaStatus() {
+    public Map<String, Object> checkGroupDefenseEvaStatus(String year) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -215,10 +219,12 @@ public class DashboardCardService {
 
         long totalProjects = projectInstructorRoles.stream()
                 .filter(role -> ("Advisor".equalsIgnoreCase(role.getRole()) || "Committee".equalsIgnoreCase(role.getRole())) && role.getInstructor().getAccount().getUsername().equals(username))
+                .filter(i -> year.equalsIgnoreCase(i.getProjectIdRole().getSemester()))
                 .count();
 
         long instructorDefenseSuccessEva = projectInstructorRoles.stream()
                 .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
+                .filter(i -> year.equalsIgnoreCase(i.getProjectIdRole().getSemester()))
                 .filter(i -> {
 
                     List<StudentProject> studentProjectsList = i.getProjectIdRole().getStudentProjects();
@@ -274,13 +280,13 @@ public class DashboardCardService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("totalProjects", (int) totalProjects);
-        result.put("instructorPropoSuccessEva", (int) instructorDefenseSuccessEva);
+        result.put("instructorDefenseSuccessEva", (int) instructorDefenseSuccessEva);
 
         return result;
     }
 
-  
-  // --------- Grade Distribute ------------ //
+
+    // --------- Grade Distribute ------------ //
     public Map<String, Integer> getGradeDistribution(String program, String year, String evaType) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -344,14 +350,16 @@ public class DashboardCardService {
 
         return gradeDistribution;
     }
-  
-    public List<PreviewProposalDTO> getProposalSchedule() {
+
+    // get proposchedule instructor
+    public List<PreviewProposalDTO> getProposalSchedule(String year) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         System.out.println("💌 Account username: " + username);
 
-        List<Project> projectList = projectRepository.findProjectsByUsername(username);
+        List<Project> projectList = projectRepository.findProjectsByUsername(username).stream()
+                .filter(y -> y.getSemester().equalsIgnoreCase(year)).collect(Collectors.toList());
 
         Optional<Instructor> instructorOpt = instructorRepository.findByAccountUsername(username);
         String professorName = instructorOpt.map(Instructor::getProfessorName).orElse("Unknown");
@@ -365,6 +373,9 @@ public class DashboardCardService {
                 .filter(p -> p.getInstructorNames().values().stream()
                         .anyMatch(list -> list.stream().anyMatch(name -> name.equals(professorName)))).collect(Collectors.toList());
 
+        System.out.println("project list: "+projectIds.size());
+        System.out.println("projectIds list: "+projectIds);
+        System.out.println("year: "+year);
 
         for(PreviewProposalDTO proposal : proposals ){
 
@@ -385,12 +396,58 @@ public class DashboardCardService {
 
             // เอาไปทับทที่
             proposal.setInstructorNames(colletctName);
+
+            System.out.println(proposal);
         }
 
 
         return proposals;
     }
-  
-}
 
+    // get project foe each instructor
+    public Map<String, Long> getProjectByInstructor(List<ProjectInstructorRole> list, String year) {
+
+        Map<String, Long> result = new HashMap<>();
+
+        String[][] conditions = {
+                {"DST", "Advisor", "programDST"},
+                {"DST", "Committee", "committeeProgramDST"},
+                {"DST", "Co-Advisor", "coProgramDST"},
+                {"ICT", "Advisor", "programICT"},
+                {"ICT", "Committee", "committeeProgramICT"},
+                {"ICT", "Co-Advisor", "coProgramICT"}
+
+        };
+
+        for(String[] condition : conditions) {
+
+            String program = condition[0];
+            String role = condition[1];
+            String keyName = condition[2];
+
+            long count = list.stream()
+                    .filter(i -> program.equalsIgnoreCase(i.getProjectIdRole().getProgram()) && year.equalsIgnoreCase(i.getProjectIdRole().getSemester()))
+                    .filter(i -> role.equalsIgnoreCase(i.getRole()))
+                    .map(i -> {
+
+                        List<StudentProject> studentProjects = i.getProjectIdRole().getStudentProjects();
+                        if (studentProjects == null || studentProjects.isEmpty()) return false;
+
+                        boolean hasActive = studentProjects.stream()
+                                .anyMatch(studentProject -> "Active".equalsIgnoreCase(studentProject.getStatus()));
+
+                        boolean allExited = studentProjects.stream()
+                                .allMatch(studentProject -> "Exited".equalsIgnoreCase(studentProject.getStatus()));
+
+                        return hasActive && !allExited;
+
+                    }).count();
+
+            result.put(keyName, count);
+
+        }
+
+        return result;
+    }
+}
 

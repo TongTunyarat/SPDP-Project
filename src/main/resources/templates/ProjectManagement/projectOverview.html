@@ -258,6 +258,7 @@
             })
             .catch(error => console.error("Error fetching project data:", error));
     }
+
     // ฟังก์ชันแสดงข้อมูลในตาราง
     function displayResults(page) {
         let tableBody = document.querySelector("tbody");
@@ -436,10 +437,16 @@
     });
 
 
-// -------------------- Export to CSV -------------------- //
+    // -------------------- Export to CSV -------------------- //
     // ฟังก์ชันสร้างและดาวน์โหลดไฟล์ CSV
-    function exportToCSV() {
+    async function exportToCSV() {
         console.log("Export button clicked");
+        const result = await showColumnSelectionDialog(); // แสดง dialog ให้ผู้ใช้เลือกคอลัมน์และโปรแกรมที่ต้องการกรอง
+        if (!result) return;
+
+        const selectedColumns = result.columns;
+        const programFilter = result.programFilter;
+
         fetch("http://localhost:8080/admin/projectOverview")
             .then(response => response.json())
             .then(data => {
@@ -454,7 +461,6 @@
                 // คำนวณจำนวนสูงสุดของ Committee และ PosterCommittee
                 let maxCommittees = 0;
                 let maxPosterCommittees = 0;
-
                 data.forEach(project => {
                     const committeeCount = project.professorList.filter(p => p.role === "Committee").length;
                     const posterCommitteeCount = project.professorList.filter(p => p.role === "Poster-Committee").length;
@@ -464,12 +470,19 @@
 
                 // สร้าง Header
                 csvContent += "Project ID,Project Title,Project Description,Advisor,";
+
                 for (let i = 1; i <= maxCommittees; i++) csvContent += `Committee ${i},`;
                 for (let i = 1; i <= maxPosterCommittees; i++) csvContent += `Poster Committee ${i},`;
                 csvContent += "Student ID,Student Name,Program,Section,Track\r\n";
 
+                // กรองข้อมูลตามโปรแกรมที่เลือก
+                let filteredData = [...data];
+                if (programFilter !== 'all') {
+                    filteredData = data.filter(project => project.program === programFilter);
+                }
+
                 // สร้างข้อมูล CSV
-                data.forEach(project => {
+                filteredData.forEach(project => {
                     const projectId = `"${project.projectId || "N/A"}"`;
                     const projectTitle = `"${project.projectTitle || "N/A"}"`;
                     const projectDescription = `"${project.projectDescription || "N/A"}"`;
@@ -506,7 +519,7 @@
                 });
 
                 // สร้างไฟล์ CSV และดาวน์โหลด
-                const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+                const blob = new Blob([csvContent], {type: "text/csv;charset=utf-8;"});
                 const link = document.createElement("a");
                 link.href = URL.createObjectURL(blob);
                 link.setAttribute("download", "project_data.csv");
@@ -517,9 +530,143 @@
             .catch(error => console.error("Error exporting CSV:", error));
     }
 
-    // ให้ปุ่ม Export เรียกใช้งานฟังก์ชัน exportToCSV
-    document.getElementById("export-btn").addEventListener("click", exportToCSV);
+    function showColumnSelectionDialog() {
+        return new Promise(resolve => {
+            const allColumns = [
+                {id: 'projectId', name: 'Project ID'},
+                {id: 'projectTitle', name: 'Project Name'},
+                {id: 'projectDescription', name: 'Project Description'},
+                {id: 'advisor', name: 'Advisor'},
+                {id: 'committee', name: 'Committee'},
+                {id: 'posterCommittee', name: 'Poster Committee'},
+                {id: 'studentId', name: 'Student ID'},
+                {id: 'studentName', name: 'Student Name'},
+                {id: 'program', name: 'Program'},
+                {id: 'section', name: 'Section'},
+                {id: 'track', name: 'Track'}
+            ];
 
+            // สร้าง overlay
+            const overlay = document.createElement('div');
+            overlay.className = 'export-overlay';
+            document.body.appendChild(overlay);
+
+            // สร้าง dialog
+            const dialog = document.createElement('div');
+            dialog.className = 'export-dialog';
+
+            // สร้างหัวข้อ
+            const title = document.createElement('h3');
+            title.textContent = 'เลือกคอลัมน์ที่ต้องการ Export';
+            dialog.appendChild(title);
+
+            // สร้างตัวเลือก Select All
+            const selectAllContainer = document.createElement('div');
+            selectAllContainer.className = 'select-all-option';
+
+            const selectAllCheckbox = document.createElement('input');
+            selectAllCheckbox.type = 'checkbox';
+            selectAllCheckbox.id = 'select-all';
+            selectAllCheckbox.checked = true;
+
+            const selectAllLabel = document.createElement('label');
+            selectAllLabel.htmlFor = 'select-all';
+            selectAllLabel.textContent = 'เลือกทั้งหมด';
+
+            selectAllContainer.appendChild(selectAllCheckbox);
+            selectAllContainer.appendChild(selectAllLabel);
+            dialog.appendChild(selectAllContainer);
+
+            // สร้าง container สำหรับตัวเลือกคอลัมน์
+            const columnsContainer = document.createElement('div');
+            columnsContainer.className = 'column-options';
+
+            // สร้างตัวเลือกคอลัมน์
+            const checkboxes = [];
+            allColumns.forEach(col => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'column-option';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `col-${col.id}`;
+                checkbox.value = col.id;
+                checkbox.checked = true;
+                checkboxes.push(checkbox);
+
+                const label = document.createElement('label');
+                label.htmlFor = `col-${col.id}`;
+                label.textContent = col.name;
+
+                optionDiv.appendChild(checkbox);
+                optionDiv.appendChild(label);
+                columnsContainer.appendChild(optionDiv);
+            });
+            dialog.appendChild(columnsContainer);
+
+            // สร้างส่วนปุ่มกด
+            const actionsDiv = document.createElement('div');
+            actionsDiv.className = 'export-actions';
+
+            const cancelBtn = document.createElement('button');
+            cancelBtn.className = 'cancel-button';
+            cancelBtn.textContent = 'Cancel';
+            cancelBtn.onclick = () => {
+                document.body.removeChild(dialog);
+                document.body.removeChild(overlay);
+                resolve(null);
+            };
+
+            const confirmBtn = document.createElement('button');
+            confirmBtn.className = 'export-button';
+            confirmBtn.textContent = 'Export';
+            confirmBtn.onclick = () => {
+                const selectedCols = Array.from(document.querySelectorAll('.column-option input[type=checkbox]:checked')).map(cb => cb.value);
+                if (selectedCols.length === 0) {
+                    alert('โปรดเลือกอย่างน้อย 1 คอลัมน์');
+                    return;
+                }
+
+                document.body.removeChild(dialog);
+                document.body.removeChild(overlay);
+
+                // ส่งคืนทั้งคอลัมน์ที่เลือกและตัวกรอง program
+                resolve({
+                    columns: selectedCols,
+                    programFilter: 'all' // ถ้าจะให้สามารถเลือกโปรแกรมได้ ให้เพิ่มฟังก์ชันเลือกโปรแกรม
+                });
+            };
+
+            actionsDiv.appendChild(cancelBtn);
+            actionsDiv.appendChild(confirmBtn);
+            dialog.appendChild(actionsDiv);
+
+            // เพิ่มการทำงานของ Select All
+            selectAllCheckbox.addEventListener('change', () => {
+                checkboxes.forEach(cb => {
+                    cb.checked = selectAllCheckbox.checked;
+                });
+            });
+
+            // ติดตามการเปลี่ยนแปลงของ checkboxes
+            checkboxes.forEach(cb => {
+                cb.addEventListener('change', () => {
+                    const allChecked = checkboxes.every(cb => cb.checked);
+                    const noneChecked = checkboxes.every(cb => !cb.checked);
+
+                    selectAllCheckbox.checked = allChecked;
+                    selectAllCheckbox.indeterminate = !allChecked && !noneChecked;
+                });
+            });
+
+            // แสดง dialog
+            document.body.appendChild(dialog);
+        });
+    }
+
+    // เพิ่ม event listener สำหรับปุ่ม Export
+    const exportBtn = document.querySelector('.export-btn');
+    exportBtn.addEventListener('click', exportToCSV);
 
 
 </script>

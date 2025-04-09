@@ -235,6 +235,11 @@
 
         <div class="header-section">
             Dashboard
+
+            <div class="semester-container">
+                <select id="semester-selector" onchange="fetchGradeDistribution(); fetchImportantDates(); fetchProjectByInstructor(); dashboardProposal(); dashboardPoster(); dashboardDefense(); getProjectProposal();"></select>
+            </div>
+
         </div>
 
         <div class="body-section">
@@ -249,9 +254,9 @@
                         </svg>
                     </div>
                     <label class="text-centerProgram">
-                        <h1 th:text="${programDST}"></h1><span style="color: #919EAB; font-size: 2.5rem; padding-left: 1rem;">Groups</span>
+                        <h1 id="programDST">0</h1><span style="color: #919EAB; font-size: 1.7rem; padding-left: 1rem;">Advisor Groups</span>
                     </label>
-                    <label class="text-footer"><span th:text="${coProgramDST}">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span></label>
+                    <label class="text-footer" style="justify-content: space-between; align-items: center; width: 100%;"><span id="coProgramDST" style="margin-right: -1rem;">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span> &nbsp;<span id="committeeProgramDST" style="margin-right: -1rem;">0</span><span style="color: #919EAB;"> &nbsp; Committee </span></label>
                 </div>
 
                 <div class="header-container">
@@ -262,9 +267,9 @@
                         </svg>
                     </div>
                     <label class="text-centerProgram">
-                        <h1 th:text="${programICT}">0</h1><span style="color: #919EAB; font-size: 2.5rem; padding-left: 1rem;">Groups</span>
+                        <h1 id="programICT">0</h1><span style="color: #919EAB; font-size: 1.7rem; padding-left: 1rem;">Advisor Groups</span>
                     </label>
-                    <label class="text-footer"><span th:text="${coProgramICT}">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span></label>
+                    <label class="text-footer" style="justify-content: space-between; align-items: center; width: 100%;"><span id="coProgramICT" style="margin-right: -1rem;">0</span><span style="color: #919EAB;"> &nbsp; Co-Advisor </span> <span id="committeeProgramICT" style="margin-right: -1rem;">0</span><span style="color: #919EAB;"> &nbsp; Committee </span></label>
                 </div>
 
 
@@ -285,7 +290,7 @@
                         <h1> 0 </h1>
                     </label>
 
-                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
+                    <label class="text-footer"> 0 <span style="color: #919EAB; margin-left: 1rem;"> completed </span> </label>
                 </div>
 
                 <div class="header-container">
@@ -302,7 +307,7 @@
                         <h1> 0 </h1>
                     </label>
 
-                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
+                    <label class="text-footer"> 0 <span style="color: #919EAB; margin-left: 1rem;"> completed </span> </label>
                 </div>
 
                 <div class="header-container">
@@ -325,51 +330,51 @@
                         <h1> 0 </h1>
                     </label>
 
-                    <label class="text-footer"> 4 <span style="color: #919EAB;"> completed </span> </label>
+                    <label class="text-footer"> 0 <span style="color: #919EAB; margin-left: 1rem;"> completed </span> </label>
                 </div>
 
             </div>
 
             <!-- Reminder -->
-<!--            <div class="reminder-container">-->
-<!--                <div class="reminder-title">-->
-<!--                    <i class="fa-solid fa-bell"></i>-->
-<!--                    Reminder-->
-<!--                </div>-->
+            <!--            <div class="reminder-container">-->
+            <!--                <div class="reminder-title">-->
+            <!--                    <i class="fa-solid fa-bell"></i>-->
+            <!--                    Reminder-->
+            <!--                </div>-->
 
-<!--                <div class="reminder-item">-->
-<!--                    <div class="reminder-content">-->
-<!--                        <div>-->
-<!--                            <i class="fa-solid fa-circle-notch reminder-icon"></i>-->
-<!--                            <span class="reminder-text">การประเมิน Proposal Presentation</span>-->
-<!--                        </div>-->
-<!--                        <span class="reminder-subtitle">กรอกคะแนน Proposal Evaluation</span>-->
-<!--                    </div>-->
-<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
-<!--                </div>-->
+            <!--                <div class="reminder-item">-->
+            <!--                    <div class="reminder-content">-->
+            <!--                        <div>-->
+            <!--                            <i class="fa-solid fa-circle-notch reminder-icon"></i>-->
+            <!--                            <span class="reminder-text">การประเมิน Proposal Presentation</span>-->
+            <!--                        </div>-->
+            <!--                        <span class="reminder-subtitle">กรอกคะแนน Proposal Evaluation</span>-->
+            <!--                    </div>-->
+            <!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+            <!--                </div>-->
 
-<!--                <div class="reminder-item">-->
-<!--                    <div class="reminder-content">-->
-<!--                        <div>-->
-<!--                            <i class="fa-solid fa-circle-notch reminder-icon "></i>-->
-<!--                            <span class="reminder-text">การประเมิน Poster Presentation</span>-->
-<!--                        </div>-->
-<!--                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>-->
-<!--                    </div>-->
-<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
-<!--                </div>-->
+            <!--                <div class="reminder-item">-->
+            <!--                    <div class="reminder-content">-->
+            <!--                        <div>-->
+            <!--                            <i class="fa-solid fa-circle-notch reminder-icon "></i>-->
+            <!--                            <span class="reminder-text">การประเมิน Poster Presentation</span>-->
+            <!--                        </div>-->
+            <!--                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>-->
+            <!--                    </div>-->
+            <!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+            <!--                </div>-->
 
-<!--                <div class="reminder-item">-->
-<!--                    <div class="reminder-content">-->
-<!--                        <div>-->
-<!--                            <i class="fa-solid fa-circle-notch reminder-icon "></i>-->
-<!--                            <span class="reminder-text">การประเมิน Proposal Presentation</span>-->
-<!--                        </div>-->
-<!--                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>-->
-<!--                    </div>-->
-<!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
-<!--                </div>-->
-<!--            </div>-->
+            <!--                <div class="reminder-item">-->
+            <!--                    <div class="reminder-content">-->
+            <!--                        <div>-->
+            <!--                            <i class="fa-solid fa-circle-notch reminder-icon "></i>-->
+            <!--                            <span class="reminder-text">การประเมิน Proposal Presentation</span>-->
+            <!--                        </div>-->
+            <!--                        <span class="reminder-subtitle">ตรวจสอบข้อมูลก่อนการนำเสนอ</span>-->
+            <!--                    </div>-->
+            <!--                    <div class="reminder-date">กำหนด: 15/01/2025</div>-->
+            <!--                </div>-->
+            <!--            </div>-->
 
             <div class="main-content">
                 <div class="panel">
@@ -407,59 +412,59 @@
                     schedule, please contact staff.
                 </p>
 
-<!--                <div class="schedule-item">-->
-<!--                    <div class="schedule-header">-->
-<!--                        <div class="schedule-header-tags">-->
-<!--                            <span class="tag tag-advisor">Advisor</span>-->
-<!--                            <span class="tag tag-proposal">Proposal</span>-->
-<!--                            <span class="tag tag-ict">ICT</span>-->
-<!--                        </div>-->
-<!--                        <div class="status-btn status-btn-pending">รอการประเมิน</div>-->
-<!--                    </div>-->
+                <!--                <div class="schedule-item">-->
+                <!--                    <div class="schedule-header">-->
+                <!--                        <div class="schedule-header-tags">-->
+                <!--                            <span class="tag tag-advisor">Advisor</span>-->
+                <!--                            <span class="tag tag-proposal">Proposal</span>-->
+                <!--                            <span class="tag tag-ict">ICT</span>-->
+                <!--                        </div>-->
+                <!--                        <div class="status-btn status-btn-pending">รอการประเมิน</div>-->
+                <!--                    </div>-->
 
-<!--                    <div class="schedule-content">-->
-<!--                        <strong>ระบบ Senior Project Digital Platform</strong>-->
-<!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
-<!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
-<!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <!--                    <div class="schedule-content">-->
+                <!--                        <strong>ระบบ Senior Project Digital Platform</strong>-->
+                <!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
+                <!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
+                <!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
+                <!--                    </div>-->
+                <!--                </div>-->
 
-<!--                <div class="schedule-item">-->
-<!--                    <div class="schedule-header">-->
-<!--                        <div class="schedule-header-tags">-->
-<!--                            <span class="tag tag-committee">Committee</span>-->
-<!--                            <span class="tag tag-proposal">Proposal</span>-->
-<!--                            <span class="tag tag-dst">DST</span>-->
-<!--                        </div>-->
-<!--                        <div class="status-btn status-btn-pending">รอการประเมิน</div>-->
-<!--                    </div>-->
+                <!--                <div class="schedule-item">-->
+                <!--                    <div class="schedule-header">-->
+                <!--                        <div class="schedule-header-tags">-->
+                <!--                            <span class="tag tag-committee">Committee</span>-->
+                <!--                            <span class="tag tag-proposal">Proposal</span>-->
+                <!--                            <span class="tag tag-dst">DST</span>-->
+                <!--                        </div>-->
+                <!--                        <div class="status-btn status-btn-pending">รอการประเมิน</div>-->
+                <!--                    </div>-->
 
-<!--                    <div class="schedule-content">-->
-<!--                        <strong>ระบบ SPDP MANAGEMENT</strong>-->
-<!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
-<!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
-<!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <!--                    <div class="schedule-content">-->
+                <!--                        <strong>ระบบ SPDP MANAGEMENT</strong>-->
+                <!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
+                <!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
+                <!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
+                <!--                    </div>-->
+                <!--                </div>-->
 
-<!--                <div class="schedule-item">-->
-<!--                    <div class="schedule-header">-->
-<!--                        <div class="schedule-header-tags">-->
-<!--                            <span class="tag tag-advisor">Advisor</span>-->
-<!--                            <span class="tag tag-defense">Defense</span>-->
-<!--                            <span class="tag tag-dst">DST</span>-->
-<!--                        </div>-->
-<!--                        <div class="status-btn status-btn-in-progress">กำลังจะมาถึง</div>-->
-<!--                    </div>-->
+                <!--                <div class="schedule-item">-->
+                <!--                    <div class="schedule-header">-->
+                <!--                        <div class="schedule-header-tags">-->
+                <!--                            <span class="tag tag-advisor">Advisor</span>-->
+                <!--                            <span class="tag tag-defense">Defense</span>-->
+                <!--                            <span class="tag tag-dst">DST</span>-->
+                <!--                        </div>-->
+                <!--                        <div class="status-btn status-btn-in-progress">กำลังจะมาถึง</div>-->
+                <!--                    </div>-->
 
-<!--                    <div class="schedule-content">-->
-<!--                        <strong>ระบบ Senior Project Digital Platform</strong>-->
-<!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
-<!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
-<!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <!--                    <div class="schedule-content">-->
+                <!--                        <strong>ระบบ Senior Project Digital Platform</strong>-->
+                <!--                        <span class="schedule-project-subtitle"> SPDP2024-12 </span>-->
+                <!--                        <p><span class="schedule-datetime">Date & Time: </span> 15/12/2025 13:00-14:00</p>-->
+                <!--                        <p><span class="schedule-room">Room: </span> Lab 1</p>-->
+                <!--                    </div>-->
+                <!--                </div>-->
 
             </div>
 
@@ -471,101 +476,89 @@
 
 </html>
 
+<!-- ----------- Set Header Value -------------- -->
+<script>
+    // ดึงค่าที่เลือกจาก Dropdown (สามารถใช้ค่าที่เลือกไปทำอย่างอื่นได้)
+    const semesterSelect = document.getElementById("semester-selector");
+    semesterSelect.addEventListener("change", function () {
+        console.log("Selected Semester:", semesterSelect.value);
+    });
+
+    // ตั้งค่า event listeners
+    document.addEventListener("DOMContentLoaded", function () {
+        // อัปเดต event listener สำหรับ semester selector
+        const semesterSelect = document.getElementById("semester-selector");
+        semesterSelect.addEventListener("change", function () {
+            console.log("Selected Semester:", semesterSelect.value);
+        });
+    });
+</script>
+
+<!-- --------- Semester Change ------------- -->
+<script>
+    async function fetchAcademicYears() {
+        try {
+            const response = await fetch('/api/academic-years'); // เรียก API
+            const data = await response.json();
+
+            console.log("Year: ", data);
+
+            const semesterSelector = document.getElementById('semester-selector');
+            semesterSelector.innerHTML = ""; // เคลียร์ค่าก่อนเติมใหม่
+
+            data.forEach(year => {
+                const option = document.createElement("option");
+                option.value = year;
+                option.textContent = "🗓︎ "+year;
+                // option.innerHTML = `<!--<i class='far fa-calendar'></i> ${year} <i class='fas fa-chevron-down dropdown-arrow'></i>-->`;
+                semesterSelector.appendChild(option);
+            });
+
+            // ตรวจสอบเดือนปัจจุบัน
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1; // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
+
+            // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
+            const defaultYear = currentMonth <= 6 ? currentYear - 1 : currentYear;
+
+            // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
+            if (data.includes(defaultYear.toString())) {
+                semesterSelector.value = defaultYear.toString();
+                console.log("yearrrrrrrrrrrrrr : ",document.getElementById('semester-selector').value)
+            } else {
+                semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+            }
+
+            await fetchGradeDistribution();
+            await fetchImportantDates();
+
+            await fetchProjectByInstructor();
+
+            await getProjectProposal();
+
+            await dashboardProposal();
+            await dashboardPoster();
+            await dashboardDefense();
+
+        } catch (error) {
+            console.error("Error fetching academic years:", error);
+        }
+    }
+    fetchAcademicYears();
+</script>
+
+
 <script>
 
     // ================================  fetch data  ==========================================
 
-    function dashboardProposal() {
-        let url = `http://localhost:8080/instructor/proposalStatusDashboard`;
 
-        return fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                // console.log("JSON: " + response.json());
-                return response.json();
-            });
-    }
+    function fetchProjectByInstructor() {
 
-    function dashboardPoster() {
-        let url = `http://localhost:8080/instructor/posterStatusDashboard`;
+        const semesterYear = document.getElementById("semester-selector").value;
 
-        return fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                // console.log("JSON: " + response.json());
-                return response.json();
-            });
-    }
-
-    function dashboardDefense() {
-        let url = `http://localhost:8080/instructor/defenseStatusDashboard`;
-
-        return fetch(url)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                }
-                // console.log("JSON: " + response.json());
-                return response.json();
-            });
-    }
-
-    function fetchData() {
-        Promise.all([
-            dashboardProposal(),
-            dashboardPoster(),
-            dashboardDefense()
-
-        ])
-            .then(data => {
-                const dashboardProposal = data[0];
-                const dashboardPoster = data[1];
-                const dashboardDefense = data[2];
-
-                console.log("✅ Show Data dashboardProposal: " + JSON.stringify(dashboardProposal, null, 2));
-                console.log("✅ Show Data dashboardPoster: " + JSON.stringify(dashboardPoster, null, 2));
-                console.log("✅ Show Data dashboardDefense: " + JSON.stringify(dashboardDefense, null, 2));
-
-                displayCard(data)
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-            });
-    }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        fetchData();
-        getProjectProposal();
-    })
-
-    // ================================  display dashboard card  ==========================================
-
-    function displayCard(data) {
-        const dashboardProposal = data[0];
-        const dashboardPoster = data[1];
-        const dashboardDefense = data[2];
-
-        document.querySelector('.header-container:nth-child(3) .text-center h1').innerText = dashboardProposal.instructorPropoSuccessEva + " / " + dashboardProposal.totalProjects;
-        document.querySelector('.header-container:nth-child(3) .text-footer').innerHTML = `${dashboardProposal.instructorPropoSuccessEva} &nbsp;<span style="color: #919EAB;"> completed </span>`;
-
-        document.querySelector('.header-container:nth-child(4) .text-center h1').innerText = dashboardPoster.instructorPropoSuccessEva + " / " + dashboardPoster.totalProjects;
-        document.querySelector('.header-container:nth-child(4) .text-footer').innerHTML = `${dashboardPoster.instructorPropoSuccessEva}  &nbsp; <span style="color: #919EAB;">  completed </span>`;
-
-        document.querySelector('.header-container:nth-child(5) .text-center h1').innerText = dashboardDefense.instructorPropoSuccessEva + " / " +  dashboardDefense.totalProjects;
-        document.querySelector('.header-container:nth-child(5) .text-footer').innerHTML = `${dashboardDefense.instructorPropoSuccessEva}  &nbsp; <span style="color: #919EAB;"> completed </span>`;
-
-    }
-
-    // ================================  display schedule card  ==========================================
-
-
-    function getProjectProposal() {
-
-        fetch(`http://localhost:8080/instructor/getProposalScheduleDashboard`, {
+        fetch(`http://localhost:8080/instructor/getProjectByInstructor?year=${semesterYear}`, {
 
             method: 'GET',
             headers: {
@@ -586,21 +579,178 @@
                 if(data.length === 0) {
                     console.log("No data available");
 
-                    const container = document.querySelector(".schedule-container")
-                    scheduleHTML = `
-
-                    <div class="no-schedule">⚠️ The schedule is not yet organized ⚠️</div>
-
-                    `;
-
-                    container.innerHTML += scheduleHTML;
-
                 } else {
 
-                    const container = document.querySelector(".schedule-container")
+                    document.getElementById("programDST").innerText = data.programDST;
+                    document.getElementById("coProgramDST").innerText = data.coProgramDST;
+                    document.getElementById("programICT").innerText = data.programICT;
+                    document.getElementById("coProgramICT").innerText = data.coProgramICT;
+                    document.getElementById("committeeProgramDST").innerText = data.committeeProgramDST;
+                    document.getElementById("committeeProgramICT").innerText = data.committeeProgramICT;
+                }
+            })
 
+            .catch(error => {
+                console.error('Error fetching data:', error);
+
+            });
+
+    }
+
+    async function dashboardProposal() {
+
+        const semesterYear = document.getElementById("semester-selector").value;
+
+        let url = `http://localhost:8080/instructor/proposalStatusDashboard?year=${semesterYear}`;
+
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                // console.log("JSON: " + response.json());
+                return response.json();
+            });
+    }
+
+    function dashboardPoster() {
+        const semesterYear = document.getElementById("semester-selector").value;
+
+        let url = `http://localhost:8080/instructor/posterStatusDashboard?year=${semesterYear}`;
+
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                // console.log("JSON: " + response.json());
+                return response.json();
+            });
+    }
+
+    function dashboardDefense() {
+        const semesterYear = document.getElementById("semester-selector").value;
+
+        let url = `http://localhost:8080/instructor/defenseStatusDashboard?year=${semesterYear}`;
+
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                }
+                // console.log("JSON: " + response.json());
+                return response.json();
+            });
+    }
+
+    async function fetchData() {
+        try {
+
+            const proposalData = await dashboardProposal();
+            console.log("🔍 ProposalData Raw:", JSON.stringify(proposalData));
+
+            const [posterData, defenseData] = await Promise.all([
+                dashboardPoster(),
+                dashboardDefense()
+            ]);
+
+            console.log("✅ Show Data dashboardProposal: " + JSON.stringify(proposalData, null, 2));
+            console.log("✅ Show Data dashboardPoster: " + JSON.stringify(posterData, null, 2));
+            console.log("✅ Show Data dashboardDefense: " + JSON.stringify(defenseData, null, 2));
+
+            // ส่งข้อมูลไปยัง displayCard ในรูปแบบที่ถูกต้อง
+            displayCard([proposalData, posterData, defenseData]);
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        }
+    }
+
+
+    document.addEventListener('DOMContentLoaded', async function () {
+        await dashboardProposal();
+        await dashboardPoster();
+        await dashboardDefense();
+        await fetchData();
+
+        // getProjectProposal();
+    })
+
+    // ================================  display dashboard card  ==========================================
+
+    function displayCard(data) {
+        const dashboardProposal = data[0];
+        const dashboardPoster = data[1];
+        const dashboardDefense = data[2];
+
+        document.querySelector('.header-container:nth-child(3) .text-center h1').innerText = dashboardProposal.instructorPropoSuccessEva + " / " + dashboardProposal.totalProjects;
+        document.querySelector('.header-container:nth-child(3) .text-footer').innerHTML = `${dashboardProposal.instructorPropoSuccessEva} &nbsp;<span style="color: #919EAB; margin-left: 1rem;"> completed </span>`;
+
+        document.querySelector('.header-container:nth-child(4) .text-center h1').innerText = dashboardPoster.instructorPosterSuccessEva + " / " + dashboardPoster.totalProjects;
+        document.querySelector('.header-container:nth-child(4) .text-footer').innerHTML = `${dashboardPoster.instructorPosterSuccessEva}  &nbsp; <span style="color: #919EAB; margin-left: 1rem;">  completed </span>`;
+
+        document.querySelector('.header-container:nth-child(5) .text-center h1').innerText = dashboardDefense.instructorDefenseSuccessEva + " / " +  dashboardDefense.totalProjects;
+        document.querySelector('.header-container:nth-child(5) .text-footer').innerHTML = `${dashboardDefense.instructorDefenseSuccessEva}  &nbsp; <span style="color: #919EAB; margin-left: 1rem;"> completed </span>`;
+
+    }
+
+    // ================================  display schedule card  ==========================================
+
+
+    function getProjectProposal() {
+        const semesterYear = document.getElementById("semester-selector").value;
+
+        fetch(`http://localhost:8080/instructor/getProposalScheduleDashboard?year=${semesterYear}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok ' + response.statusText);
+                    alert('Network response was not ok ' + response.statusText);
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log("🐽🐽🐽data: ", data);
+
+                const container = document.querySelector(".schedule-container");
+                container.innerHTML = '';
+
+                if(data.length === 0) {
+                    console.log("No data available");
+
+                    const scheduleHTML = `
+            <div class="schedule-title">
+                <i class="fa-solid fa-calendar"></i>
+                Schedule for Presentation
+            </div>
+
+            <p class="warning-text">
+                <i class="fa-solid fa-triangle-exclamation"></i> If you wish to cancel the presentation
+                schedule, please contact staff.
+            </p>
+            <div class="no-schedule">⚠️ The schedule is not yet organized ⚠️</div>
+            `;
+
+                    container.innerHTML = scheduleHTML; // Use = instead of +=
+                } else {
+                    // Start with the header content
+                    let scheduleHTML = `
+            <div class="schedule-title">
+                <i class="fa-solid fa-calendar"></i>
+                Schedule for Presentation
+            </div>
+
+            <p class="warning-text">
+                <i class="fa-solid fa-triangle-exclamation"></i> If you wish to cancel the presentation
+                schedule, please contact staff.
+            </p>
+            `;
+
+                    // Add all projects to the HTML string
                     data.forEach(project => {
-
                         let projectId = project.projectId;
                         let cleanId = projectId.replace(/DST|ICT/g, '').trim();
 
@@ -616,75 +766,63 @@
                         let statusText = "Waiting for evaluation";
 
                         if(projectDate < today) {
-
                             statusClass = "status-btn-finished";
                             statusText = "Evaluation completed";
-
                         }
 
                         const dateSet = project.date ? true : false;
                         const timeSet = project.time ? true : false;
                         const roomSet = project.room ? true : false;
 
-                        let scheduleHTML = `
-
-                            <div class="schedule-item">
-                                <div class="schedule-side">
-                        `;
+                        scheduleHTML += `
+                    <div class="schedule-item">
+                        <div class="schedule-side">
+                `;
 
                         if(!dateSet && !timeSet && !roomSet) {
-
                             scheduleHTML += `
-                                 <div class="schedule-warning">⚠️ Awaiting reschedule of presentation</div>`;
-
+                         <div class="schedule-warning">⚠️ Awaiting reschedule of presentation</div>`;
                         } else {
-
                             scheduleHTML += `
-                                  <div class="schedule-datetime-box">
-                                        <div class="schedule-date">${project.date || ""}</div>
-                                        <div class="schedule-time">${project.time || ""}</div>
-                                    </div>
+                          <div class="schedule-datetime-box">
+                                <div class="schedule-date">${project.date || ""}</div>
+                                <div class="schedule-time">${project.time || ""}</div>
+                            </div>
 
-                                    <div class="schedule-location">
-                                        <span class="schedule-room">Room: ${project.room || ""}</span>
-                                    </div>
-
-
-                            `;
+                            <div class="schedule-location">
+                                <span class="schedule-room">Room: ${project.room || ""}</span>
+                            </div>
+                    `;
                         }
 
                         scheduleHTML += `
+                        </div>
+                        <div class="schedule-main">
+                            <div class="schedule-header">
+                                <div class="schedule-header-tags">
+                                    <span class="tag tag-${roleTag.toLowerCase()}">${roleTag}</span>
+                                    <span class="tag tag-proposal">Proposal</span>
+                                    <span class="tag tag-${project.program.toLowerCase()}">${project.program.toUpperCase()}</span>
                                 </div>
-                                <div class="schedule-main">
-                                    <div class="schedule-header">
-                                        <div class="schedule-header-tags">
-                                            <span class="tag tag-${roleTag.toLowerCase()}">${roleTag}</span>
-                                            <span class="tag tag-proposal">Proposal</span>
-                                            <span class="tag tag-${project.program.toLowerCase()}">${project.program.toUpperCase()}</span>
-                                        </div>
-                                        <div class="status-btn ${statusClass}">${statusText}</div>
-                                    </div>
-
-                                    <div class="schedule-content">
-                                        <div class="schedule-title">${project.projectTitle}</div>
-                                        <span class="schedule-project-subtitle">${cleanId}</span>
-                                    </div>
-                                </div>
+                                <div class="status-btn ${statusClass}">${statusText}</div>
                             </div>
 
-                    `;
-                        container.innerHTML += scheduleHTML;
+                            <div class="schedule-content">
+                                <div class="schedule-title">${project.projectTitle}</div>
+                                <span class="schedule-project-subtitle">${cleanId}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                    });
 
-                    })
-
+                    // Set the entire HTML content at once AFTER the loop
+                    container.innerHTML = scheduleHTML;
                 }
             })
-
             .catch(error => {
                 console.error('Error fetching data:', error);
-
             });
-
     }
 
 
@@ -694,7 +832,9 @@
 <script>
     // ฟังก์ชันสำหรับดึงข้อมูลและอัปเดต timeline
     function fetchImportantDates() {
-        fetch("http://localhost:8080/api/important-dates")
+        const semesterYear = document.getElementById("semester-selector").value;
+
+        fetch(`http://localhost:8080/api/important-dates?year=${semesterYear}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -702,6 +842,8 @@
                 return response.json();
             })
             .then(data => {
+                console.log("😈😈😈")
+                console.log(data);
                 updateTimeline(data);
             })
             .catch(error => {
@@ -767,8 +909,6 @@
         });
     }
 
-
-
     // ฟังก์ชันช่วยในการจัดรูปแบบวันที่
     function formatDate(dateString) {
         const date = new Date(dateString);
@@ -790,103 +930,6 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <!-- ---------- For Grade Bar Chart -------------- -->
-<!--<script>-->
-<!--    let gradeChart = null; // เก็บอ็อบเจ็กต์ Chart.js-->
-
-<!--    async function fetchGradeDistribution() {-->
-<!--        try {-->
-<!--            const semesterYear = new Date().getFullYear();-->
-<!--            const activeTab = "All";-->
-<!--            const evaType = "Proposal Evaluation";-->
-
-<!--            console.log(`Fetching data for: ${activeTab} program, ${semesterYear} year, ${evaType}`);-->
-
-<!--            const response = await fetch(`http://localhost:8080/api/grading-graph-instructor?program=${activeTab}&year=${semesterYear}&evaType=${evaType}`);-->
-<!--            const data = await response.json();-->
-<!--            updateChart(data, evaType);-->
-
-<!--        } catch (error) {-->
-<!--            console.error("Error fetching grade distribution:", error);-->
-<!--        }-->
-<!--    }-->
-
-<!--    function updateChart(gradeData, evaType) {-->
-<!--        console.log("👁️‍🗨️ Update Grade Bar Chart: ");-->
-<!--        console.log(gradeData);-->
-<!--        console.log(evaType)-->
-
-<!--        const ctx = document.getElementById("gradeBarChart").getContext("2d");-->
-<!--        const chartContainer = document.querySelector(".chart-container");-->
-<!--        console.log(chartContainer);-->
-
-<!--        // ตรวจสอบว่ามีข้อความเดิมอยู่หรือไม่-->
-<!--        let noGradeMessage = document.getElementById("noGradeMessage");-->
-
-<!--        if (evaType === "Poster Exhibition") {-->
-<!--            document.getElementById("gradeBarChart").style.display = "none";-->
-
-<!--            if (!noGradeMessage) {-->
-<!--                noGradeMessage = document.createElement("div");-->
-<!--                noGradeMessage.id = "noGradeMessage";-->
-<!--                noGradeMessage.classList.add("no-grade-message");-->
-<!--                noGradeMessage.textContent = "Poster Exhibition ไม่มีการประเมินเกรด";-->
-<!--                chartContainer.appendChild(noGradeMessage);-->
-<!--            }-->
-
-<!--            return;-->
-<!--        } else {-->
-<!--            document.getElementById("gradeBarChart").style.display = "block";-->
-<!--            console.log("Update Chart")-->
-<!--            if (noGradeMessage) {-->
-<!--                noGradeMessage.remove();-->
-<!--            }-->
-<!--        }-->
-
-<!--        if (gradeChart) {-->
-<!--            gradeChart.destroy();-->
-<!--        }-->
-
-<!--        const gradeOrder = ["A", "B+", "B", "C+", "C", "D+", "D", "F", "I"];-->
-<!--        const chartData = gradeOrder.map(grade => gradeData[grade] || 0);-->
-
-<!--        gradeChart = new Chart(ctx, {-->
-<!--            type: "bar",-->
-<!--            data: {-->
-<!--                labels: gradeOrder,-->
-<!--                datasets: [{-->
-<!--                    label: "จำนวนนักเรียน",-->
-<!--                    data: chartData,-->
-<!--                    backgroundColor: [-->
-<!--                        "#4CAF50", "#8BC34A", "#CDDC39",-->
-<!--                        "#FFEB3B", "#FFC107", "#FF9800",-->
-<!--                        "#FF5722", "#F44336", "#9E9E9E"-->
-<!--                    ],-->
-<!--                    borderColor: "#444",-->
-<!--                    borderWidth: 1-->
-<!--                }]-->
-<!--            },-->
-<!--            options: {-->
-<!--                responsive: true,-->
-<!--                maintainAspectRatio: false,-->
-<!--                plugins: {-->
-<!--                    legend: { display: false },-->
-<!--                    tooltip: {-->
-<!--                        callbacks: {-->
-<!--                            label: (tooltipItem) => `${tooltipItem.raw} คน`-->
-<!--                        }-->
-<!--                    }-->
-<!--                },-->
-<!--                scales: {-->
-<!--                    x: { grid: { display: false } },-->
-<!--                    y: {-->
-<!--                        beginAtZero: true,-->
-<!--                        title: { display: true, text: "จำนวนนักเรียน" }-->
-<!--                    }-->
-<!--                }-->
-<!--            }-->
-<!--        });-->
-<!--    }-->
-<!--</script>-->
 <script>
     let gradeChart = null; // เก็บอ็อบเจ็กต์ Chart.js
     let currentEvaType = "Proposal Evaluation"; // ค่าเริ่มต้น
@@ -905,7 +948,10 @@
 
     async function fetchGradeDistribution() {
         try {
-            const semesterYear = new Date().getFullYear();
+            // const semesterYear = new Date().getFullYear();
+            const semesterYear = document.getElementById("semester-selector").value;
+            console.log("💡💡💡semester ของ grade: "+semesterYear);
+
             const activeTab = "All";
 
             console.log(`Fetching data for: ${activeTab} program, ${semesterYear} year, ${currentEvaType}`);
@@ -998,6 +1044,5 @@
     // เรียกฟังก์ชันครั้งแรกเมื่อโหลดหน้าเว็บ
     document.addEventListener("DOMContentLoaded", fetchGradeDistribution);
 </script>
-
 
 
