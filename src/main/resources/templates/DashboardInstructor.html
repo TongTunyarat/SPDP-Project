@@ -237,7 +237,7 @@
             Dashboard
 
             <div class="semester-container">
-                <select id="semester-selector" onchange="fetchGradeDistribution(); fetchImportantDates(); fetchProjectByInstructor(); dashboardProposal(); dashboardPoster(); dashboardDefense(); getProjectProposal();"></select>
+                <select id="semester-selector" onchange="fetchData(); fetchGradeDistribution(); fetchImportantDates(); fetchProjectByInstructor(); dashboardProposal(); dashboardPoster(); dashboardDefense(); getProjectProposal();"></select>
             </div>
 
         </div>
@@ -540,6 +540,8 @@
             await dashboardProposal();
             await dashboardPoster();
             await dashboardDefense();
+
+            await fetchData();
 
         } catch (error) {
             console.error("Error fetching academic years:", error);
