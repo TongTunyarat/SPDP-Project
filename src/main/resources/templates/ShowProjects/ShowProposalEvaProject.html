@@ -456,7 +456,7 @@
         semesterSelector.innerHTML = ""; // เคลียร์ค่าก่อนเติมใหม่
 
         const currentYear = new Date().getFullYear();
-        const yearOptions = [currentYear, currentYear - 1]; // เพิ่มตัวเลือกปีนี้และปีที่แล้ว
+        const yearOptions = [currentYear]; // เพิ่มตัวเลือกปีนี้และปีที่แล้ว
 
         // เติมตัวเลือกใน dropdown สำหรับปี
         yearOptions.forEach(year => {
@@ -471,7 +471,7 @@
         semesters.forEach(semester => {
             const option = document.createElement("option");
             option.value = semester;
-            option.textContent = `Semester ${semester}`;
+            option.textContent = `🗓︎ ${semester}`;
             semesterSelector.appendChild(option);
         });
 

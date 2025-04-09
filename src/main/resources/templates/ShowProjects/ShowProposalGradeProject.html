@@ -288,46 +288,6 @@
                 </tbody>
             </table>
         </div>
-
-    <div class="table-container">
-      <h1>Projects</h1>
-      <div class="filter-controls">
-        <label id="program-select"><strong>Program:</strong>
-          <select id="program-select-box" name="program">
-            <option value="all" selected>ALL</option>
-            <option value="ict">ICT</option>
-            <option value="dst">DST</option>
-          </select>
-        </label>
-        <label id="role-select"><strong>Role:</strong>
-          <select id="role-select-box" name="role">
-            <option value="all" selected>ALL</option>
-            <option value="advisor">Advisor</option>
-            <option value="committee">Committee</option>
-          </select>
-        </label>
-        <input id="search-keyword" type="text" placeholder="Search" />
-      </div>
-
-      <table id="result-table">
-        <thead>
-        <tr>
-          <th>Project ID</th>
-          <th>Project Name</th>
-          <th>Role</th>
-          <th>Student ID</th>
-          <th>Student Names</th>
-          <th>Evaluation</th>
-          <th style="text-align: center">Grade Evaluation</th>
-          <th>Grade</th>
-          <th>Actions</th>
-        </tr>
-        </thead>
-        <tbody id="filter-results">
-        <!-- Record Result -->
-
-        </tbody>
-      </table>
     </div>
 
 </div>
@@ -448,7 +408,7 @@
         semesterSelector.innerHTML = ""; // เคลียร์ค่าก่อนเติมใหม่
 
         const currentYear = new Date().getFullYear();
-        const yearOptions = [currentYear, currentYear - 1]; // เพิ่มตัวเลือกปีนี้และปีที่แล้ว
+        const yearOptions = [currentYear]; // เพิ่มตัวเลือกปีนี้และปีที่แล้ว
 
         // เติมตัวเลือกใน dropdown สำหรับปี
         yearOptions.forEach(year => {
@@ -463,7 +423,7 @@
         semesters.forEach(semester => {
             const option = document.createElement("option");
             option.value = semester;
-            option.textContent = `Semester ${semester}`;
+            option.textContent = `🗓︎ ${semester}`;
             semesterSelector.appendChild(option);
         });
 
@@ -489,27 +449,6 @@
         let tableBody = document.querySelector("tbody");
         tableBody.innerHTML = "";  // เคลียร์ข้อมูลเก่า
 
-        // status
-        const evaluationStatus = project.allEvaluationsComplete
-                ? `<td>
-                        <div class="status-icon completed">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                             <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                           </svg>
-                        </div>
-                         </td>`
-
-                : `<td>
-                        <div class="status-icon pending">
-                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                             <circle cx="12" cy="12" r="10"></circle>
-                             <polyline points="12 6 12 12 16 14"></polyline>
-                           </svg>
-                           </div>
-                         </td>`;
-
-
         try {
             data.forEach(project => {
                 console.log("Process project: " + project);
@@ -524,8 +463,23 @@
 
                 // status
                 const evaluationStatus = project.allEvaluationsComplete
-                    ? `<td class="evaluation completed" title="Complete Evaluation"><i class="fa-solid fa-check"></i></td>`
-                    : `<td class="evaluation uncompleted" title="Incomplete Evaluation"><i class="fa-solid fa-spinner"></i></td>`
+                    ? `<td>
+                        <div class="status-icon completed">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                             <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                           </svg>
+                        </div>
+                         </td>`
+
+                    : `<td>
+                        <div class="status-icon pending">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                             <circle cx="12" cy="12" r="10"></circle>
+                             <polyline points="12 6 12 12 16 14"></polyline>
+                           </svg>
+                           </div>
+                         </td>`;
 
                 let maxInstructor = project.students[0].instructorEvaluation.totalInstructors;
                 let completeEva = Math.min(...project.students.map(student => student.instructorEvaluation.completedInstructors));

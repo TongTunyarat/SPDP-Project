@@ -457,23 +457,13 @@
         const semesterSelector = document.getElementById('semester-selector');
         semesterSelector.innerHTML = ""; // เคลียร์ค่าก่อนเติมใหม่
 
-        const currentYear = new Date().getFullYear();
-        const yearOptions = [currentYear, currentYear - 1]; // เพิ่มตัวเลือกปีนี้และปีที่แล้ว
-
-        // เติมตัวเลือกใน dropdown สำหรับปี
-        yearOptions.forEach(year => {
-            const option = document.createElement("option");
-            option.value = year;
-            option.textContent = `🗓︎ ${year}`;
-            semesterSelector.appendChild(option);
-        });
 
         // เติมตัวเลือก semester จากข้อมูล API
         const semesters = [...new Set(projectData.map(project => project.semester))]; // ดึงค่า semester ที่ไม่ซ้ำจากข้อมูล
         semesters.forEach(semester => {
             const option = document.createElement("option");
             option.value = semester;
-            option.textContent = `Semester ${semester}`;
+            option.textContent = `🗓︎ ${semester}`;
             semesterSelector.appendChild(option);
         });
 
