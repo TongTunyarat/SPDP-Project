@@ -465,7 +465,9 @@
         semesters.forEach(semester => {
             const option = document.createElement("option");
             option.value = semester;
+
             option.textContent = `🗓 ${semester}`;
+
             semesterSelector.appendChild(option);
         });
 
