@@ -156,8 +156,10 @@ public class StatisticsController {
     }
 
     @GetMapping("/api/important-dates")
-    public ResponseEntity<List<ScoringPeriods>> getImportantDates() {
-        List<ScoringPeriods> importantDates = statisticsService.getAllScoringPeriods();
+    public ResponseEntity<List<ScoringPeriods>> getImportantDates(
+            @RequestParam String year
+    ) {
+        List<ScoringPeriods> importantDates = statisticsService.getAllScoringPeriods(year);
         return ResponseEntity.ok(importantDates);
     }
 

@@ -71,7 +71,7 @@ public class ProposalGradeController {
     public List<InstructorProjectListDTO> getInstructorProject(String projectId) {
         List<ProjectInstructorRole> projectInstructorRoleList = proposalGradeService.getInstructorProject(projectId);
         return projectInstructorRoleList.stream()
-                .filter(instructorRole -> "Committee".equals(instructorRole.getRole())||"Advisor".equals(instructorRole.getRole()))
+                .filter(instructorRole -> "Advisor".equals(instructorRole.getRole())||"Committee".equals(instructorRole.getRole()))
                 .map(instructor ->
                         new InstructorProjectListDTO(
                                 instructor.getInstructorId(),
@@ -97,7 +97,8 @@ public class ProposalGradeController {
                                                 evaScore.getCriteria().getCriteriaId(),
                                                 evaScore.getCriteria().getCriteriaName(),
                                                 evaScore.getCriteria().getType(),
-                                                evaScore.getScore().doubleValue()
+                                                evaScore.getScore().doubleValue(),
+                                                evaScore.getProposalEvaluation().getComment()
                                         )).collect(Collectors.toList());
     }
 

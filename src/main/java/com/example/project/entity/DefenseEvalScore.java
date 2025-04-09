@@ -66,4 +66,12 @@ public class DefenseEvalScore {
         this.defenseEvaluation = defenseEvaluation;
         return this;
     }
+
+    @Override
+    public String toString() {
+        return "DefenseEvalScore{" +
+                "evalId='" + evalId + '\'' +
+                ", score=" + score +
+                '}';
+    }
 }

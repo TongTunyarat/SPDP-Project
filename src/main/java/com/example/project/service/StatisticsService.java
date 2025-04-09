@@ -329,9 +329,9 @@ public class StatisticsService {
         return gradeDistribution;
     }
 
-    public List<ScoringPeriods> getAllScoringPeriods() {
-        String currentYear = String.valueOf(LocalDate.now().getYear());
-        return scoringPeriodsRepository.findByYear(currentYear);
+    public List<ScoringPeriods> getAllScoringPeriods(String year) {
+//        String currentYear = String.valueOf(LocalDate.now().getYear());
+        return scoringPeriodsRepository.findByYear(year);
     }
 
     public Map<String, Long> getStudentProposalEvaluationStatus(String evaType, String year, String program) {

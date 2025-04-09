@@ -57,20 +57,19 @@ public class LoginController {
 
 
 
-
     //=========================================== See Result (Not Use) ===================================================
 
-    // เก็บไว้ดู session
-    @GetMapping("/session")
-    @ResponseBody
-    public String checkSession() {
-        try {
-            String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
-            return "Session ID: " + sessionId;
-        } catch (IllegalStateException e) {
-            return "Session ID has been invalidated";
-        }
-    }
+//    // เก็บไว้ดู session
+//    @GetMapping("/session")
+//    @ResponseBody
+//    public String checkSession() {
+//        try {
+//            String sessionId = RequestContextHolder.currentRequestAttributes().getSessionId();
+//            return "Session ID: " + sessionId;
+//        } catch (IllegalStateException e) {
+//            return "Session ID has been invalidated";
+//        }
+//    }
 
 }
 

@@ -21,7 +21,10 @@
         let accessPeriods = {};
 
         console.log('Calling updateLinkStatus function');
-        window.onload = fetchAccessPeriods;
+        // window.onload = fetchAccessPeriods;
+        document.addEventListener('DOMContentLoaded', function() {
+            fetchAccessPeriods();
+        });
         setInterval(updateLinkStatus, 60000);
 
         async function fetchAccessPeriods() {
@@ -223,56 +226,6 @@
             <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Defense Grade</a></li>
         </ul>
     </div>
-<!--    <div class="sidebar">-->
-<!--        <h2>ICT MAHIDOL</h2>-->
-<!--        <ul>-->
-<!--            <h4>-->
-<!--                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"-->
-<!--                     style="fill:#FFFFFF;">-->
-<!--                    <path-->
-<!--                            d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">-->
-<!--                    </path>-->
-<!--                </svg>-->
-<!--                Homepage-->
-<!--            </h4>-->
-<!--            <li><a href="/instructor/view">Dashboard</a></li>-->
-<!--        </ul>-->
-
-<!--        <ul>-->
-<!--            <h4>-->
-<!--                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
-<!--                    <g fill="#ffffff" fill-rule="nonzero">-->
-<!--                        <g transform="scale(5.33333,5.33333)">-->
-<!--                            <path-->
-<!--                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
-<!--                            </path>-->
-<!--                        </g>-->
-<!--                    </g>-->
-<!--                </svg>-->
-<!--                Evaluation (40%)-->
-<!--            </h4>-->
-<!--            <li><a href="/show-proposal-eva-projects">Proposal Evaluation</a></li>-->
-<!--            <li><a href="/show-poster-projects">Poster Evaluation</a></li>-->
-<!--            <li><a href="/show-defense-eva-projects">Defense Evaluation</a></li>-->
-<!--        </ul>-->
-
-<!--        <ul>-->
-<!--            <h4>-->
-<!--                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
-<!--                    <g fill="#ffffff" fill-rule="nonzero">-->
-<!--                        <g transform="scale(5.33333,5.33333)">-->
-<!--                            <path-->
-<!--                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
-<!--                            </path>-->
-<!--                        </g>-->
-<!--                    </g>-->
-<!--                </svg>-->
-<!--                Grades (60%)-->
-<!--            </h4>-->
-<!--            <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>-->
-<!--            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>-->
-<!--        </ul>-->
-<!--    </div>-->
 
     <div class="content">
 
@@ -347,9 +300,9 @@
             <div id="confirmationModal" class="modal" style="display: none;">
                 <div class="modal-content">
                     <span class="close-button" id="closeModal">&times;</span>
-                    <h3>Are you sure you want to submit the scores?</h3>
+                    <h3>Are you sure you want to save the scores?</h3>
                     <div>
-                        <button id="confirmSave" class="confirm-button">Yes, Submit</button>
+                        <button id="confirmSave" class="confirm-button">Yes, Save</button>
                         <button id="cancelSave" class="cancel-button">Cancel</button>
                     </div>
                 </div>
@@ -446,21 +399,56 @@
 
 <!-- ------------ Show Score Criteria ----------------- -->
 <script>
-    // ฟังก์ชันสำหรับตรวจสอบค่าคะแนนที่กรอก
-    function enforceMaxScore(inputElement) {
-        let maxScore = parseInt(inputElement.getAttribute("max"), 10);
-        let currentValue = parseInt(inputElement.value, 10);
-
-        if (currentValue > maxScore) {
-            inputElement.value = maxScore;
-        }
+    // 1. เพิ่ม CSS styles
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add CSS styling for invalid scores
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+    .invalid-score {
+        border: 2px solid #ff0000 !important;
+        background-color: rgba(255, 0, 0, 0.1) !important;
+        color: #ff0000;
     }
 
-    // ฟังก์ชันเพิ่ม Event Listener ให้กับ input
+    .invalid-score:focus {
+        outline-color: #ff0000;
+    }
+`;
+        document.head.appendChild(styleElement);
+
+        fetchData();
+    });
+
+    // ปรับปรุง event listener
     function addInputValidation() {
-        document.querySelectorAll(".present-score-input").forEach(input => {
-            input.addEventListener("input", function () {
-                enforceMaxScore(this);
+        const inputs = document.querySelectorAll(".present-score-input");
+        console.log(`Found ${inputs.length} inputs to validate`);
+
+        inputs.forEach((input, index) => {
+            // ลบ event listeners ที่มีอยู่เดิมทั้งหมด (clone และแทนที่)
+            const newInput = input.cloneNode(true);
+            input.parentNode.replaceChild(newInput, input);
+
+            // เพิ่ม event listener ใหม่
+            newInput.addEventListener("input", function(event) {
+                console.log(`Input #${index} changed: ${this.value}`);
+
+                // ดึงค่า maxScore จาก attribute
+                const maxScore = parseFloat(this.getAttribute("data-max"));
+                let value = parseFloat(this.value);
+
+                // ตรวจสอบค่าและแสดงการแจ้งเตือนเท่านั้น (ไม่เปลี่ยนค่า)
+                if (value > maxScore) {
+                    this.classList.add("invalid-score");
+                    this.title = `Maximum score is ${maxScore}`;
+                } else if (value < 0) {
+                    this.classList.add("invalid-score");
+                    this.title = "Score cannot be negative";
+                } else if (!isNaN(value)) {
+                    this.classList.remove("invalid-score");
+                    this.title = "";
+                }
+
             });
         });
     }
@@ -470,7 +458,6 @@
 
         fetch(url)
             .then(response => {
-                // console.log(response.json());
                 if (!response.ok) {
                     throw new Error('Network response was not ok ' + response.statusText);
                 }
@@ -480,18 +467,14 @@
                 console.log("criteriaPoster Length: "+ data.length);
                 console.log("Show Data criteriaPoster: " + JSON.stringify(data, null, 2));
 
-                displayAppearanceCriteria(data)
-                displayContentsCriteria(data)
-                displayPresentationCriteria(data)
+                displayAppearanceCriteria(data);
+                displayContentsCriteria(data);
+                displayPresentationCriteria(data);
             })
             .catch(error => {
                 console.error('Error fetching data:', error);
             });
     }
-
-    document.addEventListener('DOMContentLoaded', function () {
-        fetchData();
-    });
 
     //================================  displayAppearanceCriteria  ==========================================
     function displayAppearanceCriteria(data) {
@@ -505,16 +488,16 @@
         appearanceCriteria.forEach(criteria => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>
-                    <strong>${criteria.criteriaName}</strong><br>
-                    <span class="subtitle">${criteria.criteriaNameTH}</span>
-                    <span class="max-score">Max Score ${criteria.maxScore}</span>
-                </td>
-                <td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}" data-criteria-id="${criteria.criteriaId}" /></td>
-            `;
+            <td>
+                <strong>${criteria.criteriaName}</strong><br>
+                <span class="subtitle">${criteria.criteriaNameTH}</span>
+                <span class="max-score">Max Score ${criteria.maxScore}</span>
+            </td>
+            <td><input type="number" class="present-score-input" min="0" data-max="${criteria.maxScore}" data-criteria-id="${criteria.criteriaId}" /></td>
+        `;
             tbody.appendChild(row);
         });
-        table.appendChild(tbody)
+        table.appendChild(tbody);
 
         // เพิ่มการตรวจสอบ input
         addInputValidation();
@@ -526,21 +509,21 @@
         table.innerHTML = "";
         const tbody = document.createElement("tbody");
 
-        const appearanceCriteria = data.filter(i => i.type === "Contents");
+        const contentsCriteria = data.filter(i => i.type === "Contents");
 
-        appearanceCriteria.forEach(criteria => {
+        contentsCriteria.forEach(criteria => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>
-                    <strong>${criteria.criteriaName}</strong><br>
-                    <span class="subtitle">${criteria.criteriaNameTH}</span>
-                    <span class="max-score">Max Score ${criteria.maxScore}</span>
-                </td>
-                <td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}" data-criteria-id="${criteria.criteriaId}" /></td>
-            `;
+            <td>
+                <strong>${criteria.criteriaName}</strong><br>
+                <span class="subtitle">${criteria.criteriaNameTH}</span>
+                <span class="max-score">Max Score ${criteria.maxScore}</span>
+            </td>
+            <td><input type="number" class="present-score-input" min="0" data-max="${criteria.maxScore}" data-criteria-id="${criteria.criteriaId}" /></td>
+        `;
             tbody.appendChild(row);
         });
-        table.appendChild(tbody)
+        table.appendChild(tbody);
 
         // เพิ่มการตรวจสอบ input
         addInputValidation();
@@ -553,142 +536,117 @@
 
         const tbody = document.createElement("tbody");
 
-        const appearanceCriteria = data.filter(i => i.type === "Presentation (Verbal)");
+        const presentationCriteria = data.filter(i => i.type === "Presentation (Verbal)");
 
-        appearanceCriteria.forEach(criteria => {
+        presentationCriteria.forEach(criteria => {
             const row = document.createElement("tr");
             row.innerHTML = `
-                <td>
-                    <strong>${criteria.criteriaName}</strong><br>
-                    <span class="subtitle">${criteria.criteriaNameTH}</span>
-                    <span class="max-score">Max Score ${criteria.maxScore}</span>
-                </td>
-                <td><input type="number" class="present-score-input" min="0" max="${criteria.maxScore}" data-criteria-id="${criteria.criteriaId}" /></td>
-            `;
+            <td>
+                <strong>${criteria.criteriaName}</strong><br>
+                <span class="subtitle">${criteria.criteriaNameTH}</span>
+                <span class="max-score">Max Score ${criteria.maxScore}</span>
+            </td>
+            <td><input type="number" class="present-score-input" min="0" data-max="${criteria.maxScore}" data-criteria-id="${criteria.criteriaId}" /></td>
+        `;
             tbody.appendChild(row);
         });
-        table.appendChild(tbody)
+        table.appendChild(tbody);
 
         // เพิ่มการตรวจสอบ input
         addInputValidation();
     }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        fetchData();
+    });
 </script>
 
 
 <!-- -------------- Insert Score to Database -------------- -->
 <script>
-    // document.querySelector('.save-button').addEventListener('click', function(event) {
-    //     event.preventDefault();
-    //
-    //     // แสดง Modal เพื่อให้ผู้ใช้ยืนยัน
-    //     document.getElementById("confirmationModal").style.display = "block";
-    //
-    //     // เมื่อผู้ใช้คลิก "Yes, Submit"
-    //     document.getElementById("confirmSave").addEventListener('click', function() {
-    //         // ปิด Modal
-    //         document.getElementById("confirmationModal").style.display = "none";
-    //
-    //         console.log("Save Process");
-    //
-    //         // projectId ===== //
-    //         var projectId = getProjectIdFromURL();
-    //         console.log("projectId: " + projectId);
-    //
-    //         // student score ===== //
-    //         var studentScores = document.querySelectorAll('.present-score-input'); // ดึงข้อมูลจาก input ในตาราง (scores)
-    //
-    //         var studentData = {};
-    //
-    //         studentScores.forEach((input) => {
-    //             let studentId = input.dataset.studentId; // ดึง studentId
-    //             let scoreCriteriaId = input.getAttribute('data-criteria-id'); // ดึง criteria ID จาก data-attribute
-    //             let score = parseFloat(input.value) || 0;
-    //
-    //             if (!studentData[studentId]) {
-    //                 studentData[studentId] = [];
-    //             }
-    //             studentData[studentId].push({scoreCriteriaId, score});
-    //         });
-    //
-    //         console.log(studentData);
-    //
-    //         // instructorId ===== //
-    //         var instructorId = "";
-    //         fetchInstructorId();
-    //
-    //         function fetchInstructorId() {
-    //             fetch(`http://localhost:8080/get-instructorId?projectId=${projectId}`)
-    //                 .then(response => response.text())
-    //                 .then(data => {
-    //                     instructorId = data;
-    //                     console.log("Instructor Id: " + instructorId);
-    //                     sendEvaluationData();  // Call the function to send data after instructorId is fetched
-    //                 })
-    //                 .catch(error => {
-    //                     console.error('Error fetching instructorId:', error);
-    //                 });
-    //         }
-    //
-    //         function sendEvaluationData() {
-    //             // ส่งข้อมูลไปที่ /saveEvaluation สำหรับแต่ละ student
-    //             for (let studentId in studentData) {
-    //                 let scoreDTOList = studentData[studentId];
-    //
-    //                 console.log(studentId);
-    //                 console.log(JSON.stringify(scoreDTOList));
-    //
-    //                 fetch('http://localhost:8080/savePosterEvaluation?' +
-    //                     new URLSearchParams({
-    //                         instructorId: instructorId,
-    //                         projectId: projectId,
-    //                     }), {
-    //                     method: 'POST',
-    //                     headers: {
-    //                         'Content-Type': 'application/json',
-    //                     },
-    //                     credentials: 'include',
-    //                     body: JSON.stringify(scoreDTOList)
-    //                 })
-    //                     .then(response => {
-    //                         console.log(response.status)
-    //                         if (!response.ok) {
-    //                             return response.text().then(text => {
-    //                                 console.error("Error response from server:", text);
-    //                                 throw new Error(text);
-    //                             });
-    //                         }
-    //                         return response;
-    //                     })
-    //                     .then(data => {
-    //                         console.log(`Evaluation saved successfully:`, data);
-    //                     })
-    //                     .catch(error => {
-    //                         console.error('Error saving evaluation:', error);
-    //                     });
-    //             }
-    //
-    //             // แสดงข้อความ alert ว่าการบันทึกสำเร็จ
-    //             alert('Evaluation saved successfully!');
-    //
-    //             // เปลี่ยน path ไปที่ /show-poster-projects
-    //             window.location.href = '/show-poster-projects';
-    //         }
-    //     });
-    //
-    //     // เมื่อผู้ใช้คลิก "Cancel"
-    //     document.getElementById("cancelSave").addEventListener('click', function() {
-    //         // ปิด Modal
-    //         document.getElementById("confirmationModal").style.display = "none";
-    //     });
-    //
-    //     // เมื่อผู้ใช้คลิกปิด Modal
-    //     document.getElementById("closeModal").addEventListener('click', function() {
-    //         document.getElementById("confirmationModal").style.display = "none";
-    //     });
-    // });
+    // Function to check for invalid scores
+    function checkForInvalidScores() {
+        const invalidInputs = document.querySelectorAll('.invalid-score');
+        const invalidScoreDetails = [];
+
+        invalidInputs.forEach(input => {
+            const criteriaId = input.getAttribute('data-criteria-id');
+            const maxScore = input.getAttribute('data-max');
+            const value = input.value;
+
+            // Find criteria name if available
+            const parentRow = input.closest('tr');
+            let criteriaName = '';
+
+            if (parentRow) {
+                const nameElement = parentRow.querySelector('strong');
+                if (nameElement) {
+                    criteriaName = nameElement.textContent.trim();
+                }
+            }
+
+            invalidScoreDetails.push({
+                criteriaId: criteriaId,
+                name: criteriaName || `Criteria ID: ${criteriaId}`,
+                value: value,
+                maxScore: maxScore
+            });
+        });
+
+        return invalidScoreDetails;
+    }
 
     document.querySelector('.save-button').addEventListener('click', function(event) {
         event.preventDefault();
+
+        // First check for invalid scores
+        const invalidScores = checkForInvalidScores();
+
+        if (invalidScores.length > 0) {
+            // Create and show invalid score alert
+            const invalidScoreAlert = document.createElement('div');
+            invalidScoreAlert.className = 'invalid-score-alert';
+            invalidScoreAlert.style.position = 'fixed';
+            invalidScoreAlert.style.top = '20px';
+            invalidScoreAlert.style.left = '50%';
+            invalidScoreAlert.style.transform = 'translateX(-50%)';
+            invalidScoreAlert.style.backgroundColor = '#f8d7da';
+            invalidScoreAlert.style.color = '#721c24';
+            invalidScoreAlert.style.padding = '15px 20px';
+            invalidScoreAlert.style.borderRadius = '5px';
+            invalidScoreAlert.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
+            invalidScoreAlert.style.zIndex = '1000';
+            invalidScoreAlert.style.maxWidth = '80%';
+
+            let alertContent = '<h3 style="margin-top:0">⚠️ Invalid Scores Detected</h3>';
+            alertContent += '<p>Cannot save evaluation. Please correct the following scores:</p><ul>';
+
+            invalidScores.forEach(item => {
+                alertContent += `<li><strong>${item.name}</strong>: Score ${item.value} exceeds maximum of ${item.maxScore}</li>`;
+            });
+
+            alertContent += '</ul>';
+            alertContent += '<button id="closeInvalidAlert" style="background-color:#dc3545;color:white;border:none;padding:8px 15px;border-radius:4px;cursor:pointer;float:right">ปิด</button>';
+            alertContent += '<div style="clear:both"></div>';
+
+            invalidScoreAlert.innerHTML = alertContent;
+            document.body.appendChild(invalidScoreAlert);
+
+            // Add event listener to close button
+            document.getElementById('closeInvalidAlert').addEventListener('click', function() {
+                invalidScoreAlert.remove();
+            });
+
+            // Automatically remove after 10 seconds
+            setTimeout(() => {
+                if (document.body.contains(invalidScoreAlert)) {
+                    invalidScoreAlert.remove();
+                }
+            }, 10000);
+
+            return; // Stop execution and don't show the confirmation modal
+        }
+
         document.getElementById("confirmationModal").style.display = "block";
 
         document.getElementById("confirmSave").addEventListener('click', function() {

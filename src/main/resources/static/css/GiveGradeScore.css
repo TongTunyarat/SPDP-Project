@@ -75,6 +75,8 @@ h1 {
     box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08), 0px 1px 2px 0px rgba(21, 30, 40, 0.08);
     padding: 20px;
     margin-left: 32px;
+    margin-right: 32px;
+    margin-top: 3rem;
 }
 
 .header-container {
@@ -345,7 +347,7 @@ hr {
     margin: 5% auto;
     padding: 20px;
     border: 1px solid #888;
-    width: 80%;
+    width: 50%;
 }
 
 .close-button {
@@ -379,3 +381,58 @@ button {
     color: white;
     border: none;
 }
+
+#comment-box {
+    margin-top: 10px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-left: 32px;
+    margin-right: 32px;
+}
+
+#comment-box h2 {
+    margin-top: 0;
+    margin-bottom: 10px;
+    font-size: 1.5rem;
+    color: #333;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 8px;
+}
+
+#comment-text {
+    margin: 0;
+    line-height: 1.5;
+    color: #555;
+    font-size: 1.1rem;
+    min-height: 50px;
+    padding: 1rem;
+}
+
+#comment-text:empty:before {
+    content: "No comments yet";
+    color: #aaa;
+    font-style: italic;
+}
+
+.fade-text {
+    color: #000;
+    transition: color 0.4s ease, transform 0.4s ease;
+}
+
+.fade-text.active {
+    color: #888;
+    transform: scale(1.02);
+}
+
+.invalid-score {
+    border: 2px solid red !important;
+    background-color: rgba(255, 0, 0, 0.1) !important;
+    color: red;
+}
+
+.invalid-score:focus {
+    outline-color: red;
+

@@ -126,4 +126,17 @@ public class Criteria {
     public void setCriteriaNameTH(String criteriaNameTH) {
         this.criteriaNameTH = criteriaNameTH;
     }
+
+    @Override
+    public String toString() {
+        return "Criteria{" +
+                "criteriaId='" + criteriaId + '\'' +
+                ", criteriaName='" + criteriaName + '\'' +
+                ", maxScore='" + maxScore + '\'' +
+                ", type='" + type + '\'' +
+                ", weight=" + weight +
+                ", evaluationPhase='" + evaluationPhase + '\'' +
+                ", criteriaNameTH='" + criteriaNameTH + '\'' +
+                '}';
+    }
 }

@@ -19,7 +19,50 @@ body {
     font-size: 250%;
     font-weight: bold;
     height: 100px;
+
+    display: flex;
 }
+
+/* SEMESTER */
+.semester-container {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    gap: 10px;
+    /*width: auto;*/
+    margin-left: 20px;
+    height: 30%;
+}
+
+.semester-container:hover {
+    background: #f8f8f8;
+}
+
+.calendar-icon {
+    font-size: 18px;
+    color: #555;
+}
+
+#semester-selector {
+    border: none;
+    background: transparent;
+    font-size: 18px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    appearance: none;
+    outline: none;
+}
+
+#semester-selector::-ms-expand {
+    display: none;
+}
+
 
 .body-section {
     display: flex;
@@ -130,7 +173,7 @@ body {
 
 .text-centerProgram {
     display: flex;
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     align-items: center;
     margin-top: -2rem;
     padding-left: 1.2rem;
@@ -138,7 +181,7 @@ body {
 
 .text-center {
     display: flex;
-    font-size: 1.5rem;
+    font-size: 1rem;
     align-items: center;
     margin-top: -1.5rem;
     padding-left: 2.5rem;
@@ -146,10 +189,11 @@ body {
 
 .text-footer {
     display: flex;
-    font-size: 1.2rem;
-    padding-left: 1rem;
+    font-size: 1rem;
+    /*padding-left: 1rem;*/
     margin-top: -1.5rem;
 }
+
 
 label {
     font-size: 14px;
