@@ -1,8 +1,6 @@
 package com.example.project.DTO;
 
-import java.math.BigDecimal;
-
-public class DefenseEvaResponseDTO {
+public class DefenseGradeEvaResponseDTO {
     private String evaId;
     private String studentId;
     private String studentName;
@@ -10,8 +8,9 @@ public class DefenseEvaResponseDTO {
     private String criteriaName;
     private String type;
     private Double score;
+    private String comment;
 
-    public DefenseEvaResponseDTO(String evaId, String studentId, String studentName, String criteriaId, String criteriaName, String type, Double score) {
+    public DefenseGradeEvaResponseDTO(String evaId, String studentId, String studentName, String criteriaId, String criteriaName, String type, Double score, String comment) {
         this.evaId = evaId;
         this.studentId = studentId;
         this.studentName = studentName;
@@ -19,6 +18,7 @@ public class DefenseEvaResponseDTO {
         this.criteriaName = criteriaName;
         this.type = type;
         this.score = score;
+        this.comment = comment;
     }
 
     public String getEvaId() {
@@ -77,6 +77,12 @@ public class DefenseEvaResponseDTO {
         this.score = score;
     }
 
+    public String getComment() {
+        return comment;
+    }
 
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
 }
 

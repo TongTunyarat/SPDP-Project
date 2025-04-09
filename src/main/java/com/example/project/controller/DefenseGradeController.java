@@ -3,6 +3,7 @@ package com.example.project.controller;
 import com.example.project.DTO.Criteria.ShowProposalCriteriaDTO;
 import com.example.project.DTO.DefenseEvaRequestDTO;
 import com.example.project.DTO.DefenseEvaResponseDTO;
+import com.example.project.DTO.DefenseGradeEvaResponseDTO;
 import com.example.project.DTO.InstructorProjectListDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.ProjectInstructorRoleRepository;
@@ -86,18 +87,19 @@ public class DefenseGradeController {
     // request and response modal
     @GetMapping("/instructor/GetDefenseEvalScoreModal")
     @ResponseBody
-    public List<DefenseEvaResponseDTO> getFilterDefenseEvaScore(@ModelAttribute DefenseEvaRequestDTO resquestDTO) {
+    public List<DefenseGradeEvaResponseDTO> getFilterDefenseEvaScore(@ModelAttribute DefenseEvaRequestDTO resquestDTO) {
         return defenseGradeService.getFilterDefenseEvaScore(
                         resquestDTO.getProjectId(), resquestDTO.getInstructorName(), resquestDTO.getRole()).stream()
                 .map(evaScore ->
-                        new DefenseEvaResponseDTO(
+                        new DefenseGradeEvaResponseDTO(
                                 evaScore.getEvalId(),
                                 evaScore.getDefenseEvaluation().getStudent().getStudentId(),
                                 evaScore.getDefenseEvaluation().getStudent().getStudentName(),
                                 evaScore.getCriteria().getCriteriaId(),
                                 evaScore.getCriteria().getCriteriaName(),
                                 evaScore.getCriteria().getType(),
-                                evaScore.getScore().doubleValue()
+                                evaScore.getScore().doubleValue(),
+                                evaScore.getDefenseEvaluation().getComment()
                         )).collect(Collectors.toList());
     }
 
