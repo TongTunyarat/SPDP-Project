@@ -224,7 +224,7 @@
                 </g>
             </svg> Grades (60%) </h4>
             <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Proposal Grade</a></li>
-            <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Defense Grade</a></li>
+            <li><a href="/show-defense-grade-projects" data-period="defenseGrade" class="active">Defense Grade</a></li>
         </ul>
     </div>
 <!--    <div class="sidebar">-->
@@ -542,6 +542,12 @@
 
                 const row = document.createElement('tr');
 
+                // ใช้ split เพื่อแยกค่าออกจากโปรแกรม
+                const programParts = project.projectId.split(" ");
+                const programPrefix = programParts[0]; // ค่าก่อนหน้า (DST, ICT, etc.)
+                const projectId = programParts.slice(1).join(" ");
+
+
                 // status
                 const evaluationStatus = project.allEvaluationsComplete
                     ? `<td class="evaluation completed" title="Complete Evaluation"><i class="fa-solid fa-check"></i></td>`
@@ -562,7 +568,7 @@
                 }
 
                 row.innerHTML = `
-                 <td><span class="tag ${project.projectProgram.toLowerCase()}">${project.projectProgram}</span> ${project.projectId}</td>
+                 <td><span class="tag ${project.projectProgram.toLowerCase()}">${programPrefix}</span> ${projectId}</td>
                 <td>${project.projectTitle}</td>
                 <td><span class="role ${project.role.toLowerCase()}">${project.role}</span></td>
                 <td>

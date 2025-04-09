@@ -210,7 +210,7 @@
             </svg> Evaluation (40%) </h4>
             <li><a href="/show-proposal-eva-projects" data-period="proposalEvaluation">Proposal Evaluation</a></li>
             <li><a href="/show-poster-projects" data-period="posterEvaluation">Poster Evaluation</a></li>
-            <li><a href="/show-defense-eva-projects" data-period="defenseEvaluation">Defense Evaluation</a></li>
+            <li><a href="/show-defense-eva-projects" data-period="defenseEvaluation" class="active">Defense Evaluation</a></li>
         </ul>
 
         <ul>
@@ -540,13 +540,19 @@
 
                 const row = document.createElement('tr');
 
+                // ใช้ split เพื่อแยกค่าออกจากโปรแกรม
+                const programParts = project.projectId.split(" ");
+                const programPrefix = programParts[0]; // ค่าก่อนหน้า (DST, ICT, etc.)
+                const projectId = programParts.slice(1).join(" ");
+
+
                 // status
                 const evaluationStatus = project.allEvaluationsComplete
                     ? `<td class="evaluation completed" title="Complete Evaluation"><i class="fa-solid fa-check"></i></td>`
                     : `<td class="evaluation uncompleted" title="Incomplete Evaluation"><i class="fa-solid fa-spinner"></i></td>`;
 
                 row.innerHTML = `
-                 <td><span class="tag ${project.projectProgram.toLowerCase()}">${project.projectProgram}</span> ${project.projectId}</td>
+                 <td><span class="tag ${project.projectProgram.toLowerCase()}">${programPrefix}</span> ${projectId}</td>
                 <td>${project.projectTitle}</td>
                 <td><span class="role ${project.role.toLowerCase()}">${project.role}</span></td>
                 <td>
