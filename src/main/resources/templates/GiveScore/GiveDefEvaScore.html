@@ -948,7 +948,32 @@
             alertContent += '<p>Cannot save evaluation. Please correct the following scores:</p><ul>';
 
             invalidScores.forEach(item => {
-                alertContent += `<li><strong>${item.name}</strong>: Score ${item.value} exceeds maximum of ${item.maxScore}</li>`;
+                // const studentId = item.getAttribute('data-student-id');
+                // const studentName = item.getAttribute('data-student-name');
+                // const maxScore = item.max;
+                // const currentValue = item.value;
+                //
+                // // ดึงชื่อเกณฑ์จาก parent row
+                // const criteriaRow = item.closest('tr');
+                // const criteriaName = criteriaRow ? criteriaRow.querySelector('strong').textContent : 'N/A';
+
+                // ระบุปัญหาของคะแนน
+                let problem = "";
+                if (parseFloat(item.value) > parseFloat(item.maxScore)) {
+                    problem = `Maximum score is (${item.maxScore})`;
+                } else if (parseFloat(item.value) < 0) {
+                    problem = "Score cannot be negative";
+                } else {
+                    problem = "Invalid-score";
+                }
+
+                alertContent += `
+                <li style="margin-bottom: 10px;">
+                    <div><strong>${item.name}</strong></div>
+                    <div style="color: #dc3545;">Score: ${item.value}  <strong>${problem}</strong></div>
+                </li>
+            `;
+
             });
 
             alertContent += '</ul>';
@@ -961,6 +986,12 @@
             // Add event listener to close button
             document.getElementById('closeInvalidAlert').addEventListener('click', function() {
                 invalidScoreAlert.remove();
+
+                // เลื่อนไปยัง input แรกที่มีปัญหา
+                // if (invalidScores.length > 0) {
+                //     invalidScores[0].focus();
+                //     invalidScores[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // }
             });
 
             // Automatically remove after 10 seconds

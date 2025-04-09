@@ -1234,7 +1234,93 @@
 
 
     document.querySelector('.save-button').addEventListener('click', function (event) {
-        console.log("Save Process");
+        console.log("📝 Save Process Started");
+
+        // ตรวจสอบ invalid score ทันที
+        console.log("Checking for invalid scores...");
+        const invalidInputs = document.querySelectorAll('.invalid-score');
+        console.log("Found invalid inputs:", invalidInputs.length);
+
+        if (invalidInputs.length > 0) {
+            console.log("Invalid scores detected! Showing alert...");
+
+            // สร้าง alert แสดงข้อผิดพลาด
+            const alertBox = document.createElement('div');
+            alertBox.className = 'score-error-alert';
+            alertBox.style.position = 'fixed';
+            alertBox.style.top = '20px';
+            alertBox.style.left = '50%';
+            alertBox.style.transform = 'translate(-50%)';
+            alertBox.style.backgroundColor = '#f8d7da';
+            alertBox.style.color = '#721c24';
+            alertBox.style.padding = '15px 20px';
+            alertBox.style.borderRadius = '5px';
+            alertBox.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
+            alertBox.style.zIndex = '1000';
+            alertBox.style.maxWidth = '80%';
+
+            // สร้างเนื้อหา alert
+            let errorContent = '<h3 style="margin-top:0">⚠️ Invalid Scores Detected</h3>';
+            errorContent += '<p>Cannot save evaluation. Please correct the following scores:</p><ul>';
+
+            // แสดงรายการคะแนนที่ไม่ถูกต้อง
+            invalidInputs.forEach(input => {
+                const studentId = input.getAttribute('data-student-id');
+                const studentName = input.getAttribute('data-student-name');
+                const maxScore = input.max;
+                const currentValue = input.value;
+
+                // ดึงชื่อเกณฑ์จาก parent row
+                const criteriaRow = input.closest('tr');
+                const criteriaName = criteriaRow ? criteriaRow.querySelector('strong').textContent : 'N/A';
+
+                // ระบุปัญหาของคะแนน
+                let problem = "";
+                if (parseFloat(currentValue) > parseFloat(maxScore)) {
+                    problem = `Maximum score is (${maxScore})`;
+                } else if (parseFloat(currentValue) < 0) {
+                    problem = "Score cannot be negative";
+                } else {
+                    problem = "Invalid-score";
+                }
+
+                errorContent += `
+                <li style="margin-bottom: 10px;">
+                    <div><strong>${studentName}</strong> (${studentId})</div>
+                    <div>Criteria: ${criteriaName}</div>
+                    <div style="color: #dc3545;">Score: ${currentValue}  <strong>${problem}</strong></div>
+                </li>
+            `;
+
+            });
+
+            errorContent += `
+            </ul>
+            <div style="text-align: center; margin-top: 15px;">
+                <button id="close-error-alert" style="padding: 8px 20px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Close</button>
+            </div>
+        `;
+
+            alertBox.innerHTML = errorContent;
+            document.body.appendChild(alertBox);
+
+            // เมื่อคลิกปุ่มปิด
+            document.getElementById('close-error-alert').addEventListener('click', function() {
+                alertBox.remove();
+
+                // เลื่อนไปยัง input แรกที่มีปัญหา
+                if (invalidInputs.length > 0) {
+                    invalidInputs[0].focus();
+                    invalidInputs[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            });
+
+            return false; // ยกเลิกการดำเนินการต่อ
+        }
+
+        // ถ้าไม่พบ invalid scores ให้ดำเนินการตามปกติ
+        console.log("No invalid scores detected, continuing with save process...");
+
         event.preventDefault();
 
         // Check for zero scores before showing the modal
@@ -1516,11 +1602,8 @@
                     posterScore: 0
                 };
             }
-
         });
-
     });
-
 </script>
 
 

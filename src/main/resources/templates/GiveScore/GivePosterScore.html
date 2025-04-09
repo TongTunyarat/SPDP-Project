@@ -622,7 +622,23 @@
             alertContent += '<p>Cannot save evaluation. Please correct the following scores:</p><ul>';
 
             invalidScores.forEach(item => {
-                alertContent += `<li><strong>${item.name}</strong>: Score ${item.value} exceeds maximum of ${item.maxScore}</li>`;
+                // ระบุปัญหาของคะแนน
+                let problem = "";
+                if (parseFloat(item.value) > parseFloat(item.maxScore)) {
+                    problem = `Maximum score is (${item.maxScore})`;
+                } else if (parseFloat(item.value) < 0) {
+                    problem = "Score cannot be negative";
+                } else {
+                    problem = "Invalid-score";
+                }
+
+                alertContent += `
+                <li style="margin-bottom: 10px;">
+                    <div><strong>${item.name}</strong></div>
+                    <div style="color: #dc3545;">Score: ${item.value}  <strong>${problem}</strong></div>
+                </li>
+            `;
+
             });
 
             alertContent += '</ul>';
