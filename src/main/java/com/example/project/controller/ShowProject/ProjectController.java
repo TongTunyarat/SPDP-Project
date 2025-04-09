@@ -117,6 +117,8 @@ public class ProjectController {
 
                     // eva by projectId
                     String projectId = i.getProjectIdRole().getProjectId();
+                    String year = i.getProjectIdRole().getSemester();
+
                     List<ProposalEvaluation> proposalEvaluationList = proposalEvaluationRepository.findByProject_ProjectId(projectId);
 
                     // getStudentProjects -> เอา studentProjects (Project Entity) => (StudentProjects Entity)
@@ -155,7 +157,8 @@ public class ProjectController {
                             i.getProjectIdRole().getProjectTitle(),
                             i.getRole(),
                             studentProjectDTOS,
-                            isAllComplete
+                            isAllComplete,
+                            i.getProjectIdRole().getSemester()
                     );
                 })
                 .filter(Objects::nonNull)
@@ -266,7 +269,8 @@ public class ProjectController {
                             i.getProjectIdRole().getProjectTitle(),
                             i.getRole(),
                             studentProjectPropGradeDTOS,
-                            isAllComplete
+                            isAllComplete,
+                            i.getProjectIdRole().getSemester()
                     );
                 })
                 .filter(Objects::nonNull)
@@ -405,7 +409,8 @@ public class ProjectController {
                             i.getProjectIdRole().getProjectTitle(),
                             i.getRole(),
                             studentProjectDefenseDTOS,
-                            isAllComplete
+                            isAllComplete,
+                            i.getProjectIdRole().getSemester()
                     );
                 })
                 .filter(Objects::nonNull)
@@ -542,7 +547,8 @@ public class ProjectController {
                             i.getProjectIdRole().getProjectTitle(),
                             i.getRole(),
                             studentProjectDefenseGradeDTOList,
-                            isAllComplete
+                            isAllComplete,
+                            i.getProjectIdRole().getSemester()
                     );
                 })
                 .filter(Objects::nonNull)
@@ -686,7 +692,8 @@ public class ProjectController {
                             i.getProjectIdRole().getProjectTitle(),
                             i.getRole(),
                             studentProjectPosterDTOS,
-                            isAllComplete
+                            isAllComplete,
+                            i.getProjectIdRole().getSemester()
                     );
                 })
                 .filter(Objects::nonNull)

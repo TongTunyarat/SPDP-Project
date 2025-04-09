@@ -274,6 +274,7 @@ public class UploadFilesService {
         studentProjectRepository.saveAll(studentProjects);  // บันทึก StudentProject
     }
 
+
     // ----------------- ข้างล่างนี้ใช่ได้ ----------------- //
 
 //    public void processCsvFile(MultipartFile file) throws Exception {
@@ -466,6 +467,7 @@ public class UploadFilesService {
                 String projectId = values[0].trim();
                 String projectTitle = values[1].trim();
                 String projectDescription = values[2].trim();
+                String projectCategory = values[3].trim();
 
                 // ตรวจสอบว่า projectId มีค่า ถ้าไม่มีจะข้ามแถวนี้ไป
                 if (projectId.isEmpty()) {
@@ -475,7 +477,7 @@ public class UploadFilesService {
                 // ใช้ค่าจาก projectId เพื่อดึง "program" ซึ่งคือส่วนแรกของ projectId ก่อน SP
                 String program = projectId.split(" ")[0]; // แยกค่าโดยช่องว่างและใช้ส่วนแรก
 
-                Project project = new Project(projectId, program, String.valueOf(currentYear), projectTitle, "Develop", projectDescription, LocalDateTime.now(), LocalDateTime.now(), null, null);
+                Project project = new Project(projectId, program, String.valueOf(currentYear), projectTitle, projectCategory, projectDescription, LocalDateTime.now(), LocalDateTime.now(), null, null);
                 projectRepository.save(project);
             }
         } catch (IOException e) {
@@ -510,8 +512,8 @@ public class UploadFilesService {
                 String[] values = line.split(",");
                 if (values.length < 10) continue;  // ข้ามแถวที่มีข้อมูลไม่ครบ
 
-                String studentId = values[3].trim();  // student_id
-                String studentName = values[4].trim();
+                String studentId = values[4].trim();  // student_id
+                String studentName = values[5].trim();
                 String section = values[6].trim();
                 String track = values[7].trim();
                 String projectId = values[0].trim(); // projectId
@@ -642,10 +644,10 @@ public class UploadFilesService {
                 }
 
                 String projectId = values[0].trim(); // projectId (จะมีชื่ออาจารย์ในแถวนี้)
-                String advisor = values[8].trim();
-                String coAdvisor = values[9].trim();
-                String committee = values[10].trim();
-                String posterCommittee = values[11].trim();
+                String advisor = values[7].trim();
+                String coAdvisor = values[8].trim();
+                String committee = values[9].trim();
+                String posterCommittee = values[10].trim();
 
                 // ถ้าไม่พบ projectId ในแถวนี้, ใช้ projectId จากแถวแรก
                 if (projectId.isEmpty() && currentProjectId != null) {

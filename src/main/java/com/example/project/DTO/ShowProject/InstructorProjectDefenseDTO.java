@@ -9,16 +9,26 @@ public class InstructorProjectDefenseDTO {
     private String projectTitle;
     private String role;
     private List<StudentProjectDefenseDTO> students;
+    private String semester;
 
     private boolean isAllEvaluationsComplete;
 
-    public InstructorProjectDefenseDTO(String projectProgram, String projectId, String projectTitle, String role, List<StudentProjectDefenseDTO> students, boolean isAllEvaluationsComplete) {
+    public InstructorProjectDefenseDTO(String projectProgram, String projectId, String projectTitle, String role, List<StudentProjectDefenseDTO> students, boolean isAllEvaluationsComplete, String semester) {
         this.projectProgram = projectProgram;
         this.projectId = projectId;
         this.projectTitle = projectTitle;
         this.role = role;
         this.students = students;
         this.isAllEvaluationsComplete = isAllEvaluationsComplete;
+        this.semester = semester;
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
     }
 
     public String getProjectProgram() {

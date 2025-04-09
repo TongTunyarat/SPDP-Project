@@ -11,6 +11,8 @@
     <link rel="stylesheet" href="/css/projectDetails.css">
 
     <!-- Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 </head>
@@ -27,11 +29,15 @@
         </form>
 
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">
-                <path
-                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
-                </path>
-            </svg> Homepage </h4>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                     style="fill:#FFFFFF;">
+                    <path
+                            d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+                    </path>
+                </svg>
+                Homepage
+            </h4>
             <li><a href="/admin-dashboard">Dashboard</a></li>
             <li><a href="/admin-proposal-report">Proposal Grade Report</a></li>
             <li><a href="/admin-defense-report">Defense Grade Report</a></li>
@@ -41,24 +47,31 @@
         <h2> Pages </h2>
 
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-                <g fill="#ffffff" fill-rule="nonzero">
-                    <g transform="scale(5.33333,5.33333)">
-                        <path
-                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-                        </path>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
                     </g>
-                </g>
-            </svg>Score Evaluation </h4>
+                </svg>
+                Score Evaluation
+            </h4>
             <li><a href="/scoring-periods">Scoring Period Settings</a></li>
         </ul>
 
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">
-                <path
-                        d="M42 15v-2.5C42 8.916 39.084 6 35.5 6h-23C8.916 6 6 8.916 6 12.5V15H42zM25.5 27H32V33H25.5zM35 27H42V33H35zM6 27H13V33H6zM16 27H22.5V33H16zM35 18H42V24H35zM25.5 18H32V24H25.5zM25.5 36H32V42H25.5zM16 36H22.5V42H16zM35 36v6h.5c3.415 0 6.218-2.649 6.475-6H35zM6.025 36c.257 3.351 3.059 6 6.475 6H13v-6H6.025zM16 18H22.5V24H16zM6 18H13V24H6z">
-                </path>
-            </svg> Manage Schedule </h4>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                     style="fill:#FFFFFF;">
+                    <path
+                            d="M42 15v-2.5C42 8.916 39.084 6 35.5 6h-23C8.916 6 6 8.916 6 12.5V15H42zM25.5 27H32V33H25.5zM35 27H42V33H35zM6 27H13V33H6zM16 27H22.5V33H16zM35 18H42V24H35zM25.5 18H32V24H25.5zM25.5 36H32V42H25.5zM16 36H22.5V42H16zM35 36v6h.5c3.415 0 6.218-2.649 6.475-6H35zM6.025 36c.257 3.351 3.059 6 6.475 6H13v-6H6.025zM16 18H22.5V24H16zM6 18H13V24H6z">
+                    </path>
+                </svg>
+                Manage Schedule
+            </h4>
             <li><a href="/admin/proposalSchedule">Proposal Schedule</a></li>
             <li><a href="/admin/editProposalSchedulePage">Edit Proposal Timing</a></li>
             <li><a href="/admin/defenseSchedule">Defense Schedule</a></li>
@@ -66,11 +79,15 @@
         </ul>
 
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">
-                <path
-                        d="M35.5,8h-3.551C31.697,5.756,29.81,4,27.5,4h-7c-2.31,0-4.197,1.756-4.449,4H12.5C10.019,8,8,10.019,8,12.5v27	c0,2.481,2.019,4.5,4.5,4.5h23c2.481,0,4.5-2.019,4.5-4.5v-27C40,10.019,37.981,8,35.5,8z M20.5,7h7C28.327,7,29,7.673,29,8.5	S28.327,10,27.5,10h-7C19.673,10,19,9.327,19,8.5S19.673,7,20.5,7z M22.5,34h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,34,22.5,34z M22.5,24h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,24,22.5,24z M34.561,34.439c0.586,0.585,0.586,1.536,0,2.121C34.268,36.854,33.884,37,33.5,37	s-0.768-0.146-1.061-0.439L31,35.121l-1.439,1.439C29.268,36.854,28.884,37,28.5,37s-0.768-0.146-1.061-0.439	c-0.586-0.585-0.586-1.536,0-2.121L28.879,33l-1.439-1.439c-0.586-0.585-0.586-1.536,0-2.121c0.586-0.586,1.535-0.586,2.121,0	L31,30.879l1.439-1.439c0.586-0.586,1.535-0.586,2.121,0c0.586,0.585,0.586,1.536,0,2.121L33.121,33L34.561,34.439z M34.561,21.561	l-4,4C30.268,25.854,29.884,26,29.5,26s-0.768-0.146-1.061-0.439l-2-2c-0.586-0.585-0.586-1.536,0-2.121	c0.586-0.586,1.535-0.586,2.121,0l0.939,0.939l2.939-2.939c0.586-0.586,1.535-0.586,2.121,0	C35.146,20.025,35.146,20.975,34.561,21.561z">
-                </path>
-            </svg> Manage Project </h4>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                     style="fill:#FFFFFF;">
+                    <path
+                            d="M35.5,8h-3.551C31.697,5.756,29.81,4,27.5,4h-7c-2.31,0-4.197,1.756-4.449,4H12.5C10.019,8,8,10.019,8,12.5v27	c0,2.481,2.019,4.5,4.5,4.5h23c2.481,0,4.5-2.019,4.5-4.5v-27C40,10.019,37.981,8,35.5,8z M20.5,7h7C28.327,7,29,7.673,29,8.5	S28.327,10,27.5,10h-7C19.673,10,19,9.327,19,8.5S19.673,7,20.5,7z M22.5,34h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,34,22.5,34z M22.5,24h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,24,22.5,24z M34.561,34.439c0.586,0.585,0.586,1.536,0,2.121C34.268,36.854,33.884,37,33.5,37	s-0.768-0.146-1.061-0.439L31,35.121l-1.439,1.439C29.268,36.854,28.884,37,28.5,37s-0.768-0.146-1.061-0.439	c-0.586-0.585-0.586-1.536,0-2.121L28.879,33l-1.439-1.439c-0.586-0.585-0.586-1.536,0-2.121c0.586-0.586,1.535-0.586,2.121,0	L31,30.879l1.439-1.439c0.586-0.586,1.535-0.586,2.121,0c0.586,0.585,0.586,1.536,0,2.121L33.121,33L34.561,34.439z M34.561,21.561	l-4,4C30.268,25.854,29.884,26,29.5,26s-0.768-0.146-1.061-0.439l-2-2c-0.586-0.585-0.586-1.536,0-2.121	c0.586-0.586,1.535-0.586,2.121,0l0.939,0.939l2.939-2.939c0.586-0.586,1.535-0.586,2.121,0	C35.146,20.025,35.146,20.975,34.561,21.561z">
+                    </path>
+                </svg>
+                Manage Project
+            </h4>
             <li><a href="/project-overview">Project Overview</a></li>
             <li><a href="/project-details" class="active">Project Details</a></li>
             <li><a href="/project-committee">Committee</a></li>
@@ -85,15 +102,8 @@
             Project Details
 
             <div class="btn-header">
-                <button id="export-project-excel">Export Project Template </button>
-                <!--                <div class="dropdown" id="template-dropdown">-->
-                <!--                    <button class="template-btn" id="download-template-btn">Download Template</button>-->
-                <!--                    <div class="dropdown-content">-->
-                <!--                        <a href="#" id="export-student">Template Student</a>-->
-                <!--                        <a href="#" id="export-professor">Template Professor</a>-->
-                <!--                        <a href="#" id="export-project">Template Project</a>-->
-                <!--                    </div>-->
-                <!--                </div>-->
+                <button class="export-btn" id="open-export-dialog">Export</button>
+                <button id="export-project-excel">Project Template</button>
                 <input type="file" id="upload-file" accept=".csv, .xlsx, .xls" style="display: none;"/>
                 <button id="upload-btn">Upload Files</button>
                 <button class="addProject-btn"><a href="/project-add-new-project"> + Add Projects </a></button>
@@ -270,12 +280,93 @@
             </div>
         </div>
 
+        <!-- Overlay / PopUp Dialog -->
+        <div id="export-dialog" class="export-dialog">
+            <h3>Select Columns to Export</h3>
+
+            <!-- Column Options -->
+            <div class="column-options">
+                <div class="select-all-option">
+                    <input type="checkbox" id="select-all">
+                    <label for="select-all">Select All</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="projectId" checked>
+                    <label for="projectId">Project ID</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="projectTitle" checked>
+                    <label for="projectTitle">Project Title</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="projectDescription" checked>
+                    <label for="projectDescription">Project Description</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="advisor" checked>
+                    <label for="advisor">Advisor</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="studentId" checked>
+                    <label for="studentId">Student ID</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="studentName" checked>
+                    <label for="studentName">Student Name</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="program" checked>
+                    <label for="program">Program</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="section" checked>
+                    <label for="section">Section</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="track" checked>
+                    <label for="track">Track</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="committee1" checked>
+                    <label for="committee1">Committee 1</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="committee2" checked>
+                    <label for="committee2">Committee 2</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="committee3" checked>
+                    <label for="committee3">Committee 3</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="posterCommittee1" checked>
+                    <label for="posterCommittee1">Poster Committee 1</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="posterCommittee2" checked>
+                    <label for="posterCommittee2">Poster Committee 2</label>
+                </div>
+                <div class="column-option">
+                    <input type="checkbox" id="posterCommittee3" checked>
+                    <label for="posterCommittee3">Poster Committee 3</label>
+                </div>
+            </div>
+
+            <!-- Export Actions -->
+            <div class="export-actions">
+                <button class="cancel-button" id="cancel-btn">Cancel</button>
+                <button class="export-button" id="confirm-btn">Export</button>
+            </div>
+        </div>
+
+        <!-- Overlay -->
+        <div id="export-overlay" class="export-overlay" style="display:none;"></div>
+
 
     </div>
 </div>
 </body>
 
-</html>
 
 <script>
 
@@ -466,7 +557,10 @@
                     validateAndShowPreview(jsonData);  // แสดง Preview
                 } else if (file.name.endsWith(".xlsx")) {
                     // ถ้าไฟล์ Excel
-                    handleExcelFile(fileContent);
+                    // handleExcelFile(fileContent);
+                    validateAndShowPreview({ error: "Unsupported file type. Please upload a CSV file." });
+                } else {
+                    validateAndShowPreview({ error: "Unsupported file type. Please upload a CSV file." });
                 }
             };
 
@@ -493,10 +587,10 @@
             const projectId = currentLine[0].trim();  // Project ID
             const projectTitle = currentLine[1].trim();  // Project Title
             const projectDescription = currentLine[2].trim();  // Project Description
-            const advisor = currentLine[10].trim();  // Advisor
-            const coAdvisor = currentLine[11].trim();  // Co-Advisor
-            const committee = currentLine[12].trim();  // Committee
-            const posterCommittee = currentLine[13].trim();  // Poster Committee
+            const advisor = currentLine[7].trim();  // Advisor
+            const coAdvisor = currentLine[8].trim();  // Co-Advisor
+            const committee = currentLine[9].trim();  // Committee
+            const posterCommittee = currentLine[10].trim();  // Poster Committee
 
             // ถ้ามี projectId (หมายความว่าเป็นข้อมูลที่เกี่ยวข้องกับโครงการ)
             if (projectId) {
@@ -505,7 +599,7 @@
                     projectId: projectId,
                     projectTitle: projectTitle,
                     projectDescription: projectDescription,
-                    program: currentLine[5].trim(),  // Program
+                    program: currentLine[6].trim(),  // Program
                     professorList: [],
                     studentList: [],
                 };
@@ -561,6 +655,12 @@
         previewContent.innerHTML = ''; // เคลียร์ข้อมูลเก่า
 
         console.log("Validating data:", jsonData);  // พิมพ์ข้อมูลที่กำลังตรวจสอบ
+
+        if (jsonData.error) {
+            // ถ้ามีข้อผิดพลาดจากการอัปโหลดไฟล์
+            previewContent.innerHTML = `<p style="color: red;">${jsonData.error}</p>`;
+            return;
+        }
 
         // เช็คว่ามีข้อมูลหรือไม่
         if (!jsonData || jsonData.length === 0) {
@@ -919,107 +1019,302 @@
 
 </script>
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.2/xlsx.full.min.js"></script>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
 <script>
 
-    // -------------------- Export Template -------------------- //
-    // ฟังก์ชันสำหรับ Export Project Template แบบ Excel (รองรับการ merge cells)
-    function exportExcel() {
-        const data = [
-            ["Senior Project 2024: Advisor and Member Sign up sheet", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-            ["Please find an advisor before June 30, 2024", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-            ["Link to view advisor profile ", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-            ["https://docs.google.com/presentation/d/1ZSTVEGbVxQWv4Iwm_YjGeuSOXbBbUnf21tdpeUr0Ivk/edit?fbclid=IwAR10E-OcoQ6euV1cwN3YLiD0mUSDnR87uyy6CPPNjnf2pKfotQn78kdaSiQ#slide=id.g111612b1a81_0_844", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
-            ["Project ID", "Project Title", "Project Description", "Student ID", "Student Name", "Program", "Section", "Track", "Advisor", "Co-advisor", "Committee", "Poster Committee"],
-            ["XXX SP20XX-XX", "XXXXX", "XXXXXX", "6487XXX", "MR. XXX XXX", "XX", "XX", "XX", "Aj. XXXX", "Aj. XXXX", "Aj. XXXX", "Aj. XXXX"]
-            // Add more rows as needed
+    // เปิด Dialog เมื่อกดปุ่ม Export
+    document.getElementById('open-export-dialog').addEventListener('click', () => {
+        // แสดง Dialog และ Overlay
+        document.getElementById('export-dialog').style.display = 'block';
+        document.getElementById('export-overlay').style.display = 'block';
+    });
+
+    // ปิด Dialog และ Overlay เมื่อกดปุ่ม Cancel
+    document.getElementById('cancel-btn').addEventListener('click', () => {
+        // ซ่อน Dialog และ Overlay
+        document.getElementById('export-dialog').style.display = 'none';
+        document.getElementById('export-overlay').style.display = 'none';
+    });
+
+
+    // ฟังก์ชันเมื่อผู้ใช้เลือกคอลัมน์และกด Export
+    document.getElementById('confirm-btn').addEventListener('click', () => {
+        const selectedColumns = [];
+
+        // ตรวจสอบว่าคอลัมน์ไหนถูกเลือกบ้าง
+        const columns = [
+            'projectId', 'projectTitle', 'projectDescription', 'advisor', 'co-advisor',
+            'studentId', 'studentName', 'program', 'section', 'track',
+
         ];
 
-        const wb = XLSX.utils.book_new();
-        const ws = XLSX.utils.aoa_to_sheet(data);
-
-        // Set column widths
-        ws['!cols'] = [
-            {wch: 15},   // A - Project ID
-            {wch: 25},   // B - Project Title
-            {wch: 30},   // C - Project Description
-            {wch: 15},   // D - Student ID
-            {wch: 25},   // E - Student Name
-            {wch: 10},   // F - Program
-            {wch: 8},    // G - Section
-            {wch: 10},   // H - Track
-            {wch: 20},   // I - Advisor
-            {wch: 20},   // J - Co-advisor
-            {wch: 20},   // K - Committee
-            {wch: 20},   // L - Poster Committee
-        ];
-
-        // Merge cells for headers
-        const merges = [
-            {s: {r: 0, c: 0}, e: {r: 0, c: 15}}, // Header row
-            {s: {r: 1, c: 0}, e: {r: 1, c: 15}}, // Sub-header row
-            {s: {r: 2, c: 0}, e: {r: 2, c: 15}}, // Link row
-            {s: {r: 3, c: 0}, e: {r: 3, c: 15}}, // URL row
-        ];
-
-        // Apply merges to the sheet
-        ws["!merges"] = merges;
-
-        // Define header style with color (green)
-        const headerStyle = {
-            font: {bold: true, color: {rgb: "FFFFFF"}},
-            alignment: {horizontal: "center", vertical: "center"},
-            fill: {fgColor: {rgb: "4CAF50"}}, // Green background color
-        };
-
-        // Apply style to header row
-        const headerRow = 4;
-        for (let col = 0; col < 12; col++) {
-            const cellRef = XLSX.utils.encode_cell({r: headerRow, c: col});
-            if (!ws[cellRef].s) ws[cellRef].s = {};
-            Object.assign(ws[cellRef].s, headerStyle);
-        }
-
-        // Define style for data rows (light green background for readability)
-        const dataRowStyle = {
-            fill: {fgColor: {rgb: "C8E6C9"}}, // Light green background
-        };
-
-        // Apply style to data rows
-        for (let row = 5; row < data.length; row++) {
-            for (let col = 0; col < 12; col++) {
-                const cellRef = XLSX.utils.encode_cell({r: row, c: col});
-                if (!ws[cellRef].s) ws[cellRef].s = {};
-                Object.assign(ws[cellRef].s, dataRowStyle);
+        columns.forEach(col => {
+            const checkbox = document.getElementById(col);
+            if (checkbox.checked) {
+                selectedColumns.push(col);
             }
-        }
+        });
 
-        // Add the data sheet to the workbook
-        XLSX.utils.book_append_sheet(wb, ws, "Project List");
+        // ซ่อน Dialog และ Overlay หลังจากกด Export
+        document.getElementById('export-dialog').style.display = 'none';
+        document.getElementById('export-overlay').style.display = 'none';
 
-        // Export the Excel file
-        XLSX.writeFile(wb, "2024_ICT_SP_Project_List.xlsx");
+        // เรียกฟังก์ชัน exportToExcel พร้อมกับ selectedColumns
+        exportToExcel(selectedColumns);
+    });
+
+    // ฟังก์ชัน Select All
+    document.getElementById('select-all').addEventListener('change', (e) => {
+        const checkboxes = document.querySelectorAll('.column-option input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = e.target.checked;
+        });
+    });
+
+    function exportToExcel() {
+        console.log("Export button clicked");
+
+        // ดึงข้อมูลโปรเจกต์จาก API
+        fetch("http://localhost:8080/admin/projectOverview")
+            .then(response => response.json())
+            .then(data => {
+                console.log("Fetched Data:", data); // ตรวจสอบข้อมูลที่ดึงมา
+
+                if (!data || data.length === 0) {
+                    console.warn("No data available to export.");
+                    return;
+                }
+
+                const rows = [];
+                const headers = [];
+                const selectedColumns = getSelectedColumns();  // ฟังก์ชันที่ดึงค่าคอลัมน์ที่เลือก
+
+                // ตรวจสอบว่าเลือกคอลัมน์ไหนบ้าง
+                if (selectedColumns.includes("Project ID")) headers.push("Project ID");
+                if (selectedColumns.includes("Project Title")) headers.push("Project Title");
+                if (selectedColumns.includes("Project Description")) headers.push("Project Description");
+                if (selectedColumns.includes("Advisor")) headers.push("Advisor");
+                if (selectedColumns.includes("Student ID")) headers.push("Student ID");
+                if (selectedColumns.includes("Student Name")) headers.push("Student Name");
+                if (selectedColumns.includes("Program")) headers.push("Program");
+                if (selectedColumns.includes("Section")) headers.push("Section");
+                if (selectedColumns.includes("Track")) headers.push("Track");
+
+                // สร้างข้อมูลสำหรับแต่ละโปรเจกต์
+                data.forEach(project => {
+                    project.studentList.forEach(student => {
+                        const row = [];
+                        if (selectedColumns.includes("Project ID")) row.push(project.projectId || "N/A");
+                        if (selectedColumns.includes("Project Title")) row.push(project.projectTitle || "N/A");
+                        if (selectedColumns.includes("Project Description")) row.push(project.projectDescription || "N/A");
+                        if (selectedColumns.includes("Advisor")) row.push(project.professorList.find(p => p.role === "Advisor")?.professorName || "N/A");
+                        if (selectedColumns.includes("Student ID")) row.push(student.studentId || "N/A");
+                        if (selectedColumns.includes("Student Name")) row.push(student.studentName || "N/A");
+                        if (selectedColumns.includes("Program")) row.push(project.program || "N/A");
+                        if (selectedColumns.includes("Section")) row.push(student.section || "N/A");
+                        if (selectedColumns.includes("Track")) row.push(student.track || "-");
+
+                        rows.push(row);
+                    });
+                });
+
+                // สร้างไฟล์ Excel ด้วยข้อมูลที่ได้
+                const wb = new ExcelJS.Workbook(); // สร้าง workbook ใหม่
+                const ws = wb.addWorksheet('Project Overview'); // สร้าง worksheet ใหม่
+
+                // กำหนด Header Row
+                const headerRow = ws.getRow(1);
+                headerRow.values = headers; // กำหนดค่าให้กับ Header Row
+                headerRow.font = {bold: true, color: {argb: 'FFFFFF'}}; // ฟอนต์หนาและสีขาว
+                headerRow.alignment = {vertical: 'middle', horizontal: 'center'}; // จัดกลาง
+
+                // กำหนดสีใน Header
+                headers.forEach((col, index) => {
+                    const cell = headerRow.getCell(index + 1); // เลือกคอลัมน์ใน Header
+                    cell.fill = {
+                        type: 'pattern',
+                        pattern: 'solid',
+                        fgColor: {argb: '4472C4'} // สีน้ำเงินเข้ม
+                    };
+                });
+
+                // กำหนดค่าใน Rows ที่เหลือ
+                rows.forEach((rowData, index) => {
+                    const row = ws.addRow(rowData);
+                    row.alignment = {vertical: 'middle'}; // จัดตำแหน่งข้อมูลในแถว
+
+                    // เพิ่มสีพื้นหลังให้แต่ละแถว (แถวคี่จะเป็นสีขาว และแถวคู่จะเป็นสี E9EFF7)
+                    row.eachCell((cell, colNumber) => {
+                        cell.fill = {
+                            type: 'pattern',
+                            pattern: 'solid',
+                            fgColor: {argb: index % 2 === 0 ? 'E9EFF7' : 'FFFFFF'} // สีแถวคี่และคู่
+                        };
+
+                        // ใส่เส้นขอบให้เซลล์
+                        cell.border = {
+                            top: {style: 'thin'},
+                            left: {style: 'thin'},
+                            bottom: {style: 'thin'},
+                            right: {style: 'thin'}
+                        };
+                    });
+                });
+
+                // ปรับความกว้างคอลัมน์
+                ws.columns = headers.map(() => ({width: 20}));
+
+                // สร้างไฟล์ Excel และดาวน์โหลด
+                wb.xlsx.writeBuffer().then(buffer => {
+                    const blob = new Blob([buffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = "Project_Details.xlsx";
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                });
+            })
+            .catch(error => console.error("Error exporting Excel:", error));
+    }
+
+    function getSelectedColumns() {
+        // ฟังก์ชันนี้จะดึงข้อมูลจาก checkbox ว่าคอลัมน์ไหนถูกเลือก
+        const selectedColumns = [];
+        if (document.getElementById("projectId").checked) selectedColumns.push("Project ID");
+        if (document.getElementById("projectTitle").checked) selectedColumns.push("Project Title");
+        if (document.getElementById("projectDescription").checked) selectedColumns.push("Project Description");
+        if (document.getElementById("advisor").checked) selectedColumns.push("Advisor");
+        if (document.getElementById("studentId").checked) selectedColumns.push("Student ID");
+        if (document.getElementById("studentName").checked) selectedColumns.push("Student Name");
+        if (document.getElementById("program").checked) selectedColumns.push("Program");
+        if (document.getElementById("section").checked) selectedColumns.push("Section");
+        if (document.getElementById("track").checked) selectedColumns.push("Track");
+
+        return selectedColumns;
+    }
+
+
+    function exportTemplate() {
+
+        // ข้อมูลที่ใช้ในการแสดงใน Excel
+        const data = [
+            ["XXX SP20XX-XX", "XXXXXX", "XXXXXX", "648XXXX", "MR.XXXX", "XX", "Aj. XXXX", "Aj. XXXX", "Aj. XXXX", "Aj. XXXX"],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+            ["", "", "", "", "", "", "", "", "", "", "", "", "", "", ""],
+        ];
+
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet("Project List");
+
+        // กำหนดความกว้างของคอลัมน์
+        ws.columns = [
+            {width: 15},   // A - Project ID
+            {width: 25},   // B - Project Title
+            {width: 30},   // C - Project Description
+            {width: 15},   // D - Project Category
+            {width: 15},   // D - Student ID
+            {width: 25},   // E - Student Name
+            {width: 10},   // F - Program
+            {width: 20},   // I - Advisor
+            {width: 20},   // J - Co-advisor
+            {width: 20},   // K - Committee
+            {width: 20},   // L - Poster Committee
+        ];
+
+        // Merge Cells
+        ws.mergeCells('A1:K1'); // Header row
+        ws.mergeCells('A2:K2'); // Sub-header row
+        ws.mergeCells('A3:K3'); // Link row
+        ws.mergeCells('A4:K4'); // URL row
+        ws.mergeCells('A5:K5'); // Column header row
+
+        // กำหนดค่าของ Header Row (แถวที่ 1-4 ใน Excel)
+        // แถวที่ 1
+        ws.getCell('A1').value = "Senior Project 2024: Advisor and Member Sign up sheet";
+        ws.getCell('A1').font = {bold: true, size: 14, color: {argb: '000000'}};
+        ws.getCell('A1').alignment = {horizontal: 'center', vertical: 'middle'};
+        ws.getCell('A1').fill = {type: 'pattern', pattern: 'solid', fgColor: {argb: 'FFFFFF'}};
+
+        // แถวที่ 2
+        ws.getCell('A2').value = "Please find an advisor before June 30, 2024";
+        ws.getCell('A2').font = {size: 12, color: {argb: '4D93D9'}};
+        ws.getCell('A2').alignment = {horizontal: 'center', vertical: 'middle'};
+        ws.getCell('A2').fill = {type: 'pattern', pattern: 'solid', fgColor: {argb: 'FFFFFF'}};
+
+        // แถวที่ 3
+        ws.getCell('A3').value = "Link to view advisor profile ";
+        ws.getCell('A3').font = {bold: true, size: 12, color: {argb: '000000'}};
+        ws.getCell('A3').alignment = {horizontal: 'center', vertical: 'middle'};
+        ws.getCell('A3').fill = {type: 'pattern', pattern: 'solid', fgColor: {argb: 'FFFFFF'}};
+
+        // แถวที่ 4
+        ws.getCell('A4').value = "https://docs.google.com/presentation/d/1ZSTVEGbVxQWv4Iwm_YjGeuSOXbBbUnf21tdpeUr0Ivk/edit?fbclid=IwAR10E-OcoQ6euV1cwN3YLiD0mUSDnR87uyy6CPPNjnf2pKfotQn78kdaSiQ#slide=id.g111612b1a81_0_844";
+        ws.getCell('A4').font = {size: 10, color: {argb: '000000'}};
+        ws.getCell('A4').alignment = {horizontal: 'center', vertical: 'middle'};
+        ws.getCell('A4').fill = {type: 'pattern', pattern: 'solid', fgColor: {argb: 'FFFFFF'}};
+
+        // กำหนดค่าของ Header Row (แถวที่ 5 ใน Excel)
+        const headerRow = ws.getRow(5);
+        headerRow.values = ["Project ID", "Project Title", "Project Description", "Project Category", "Student ID", "Student Name", "Program", "Advisor", "Co-advisor", "Committee", "Poster Committee"];
+        headerRow.font = {bold: true, size: 11, color: {argb: '000000'}};
+        headerRow.alignment = {vertical: 'middle', horizontal: 'center'};
+        headerRow.fill = {type: 'pattern', pattern: 'solid', fgColor: {argb: 'B5E6A2'}};
+
+        // เพิ่ม Border ให้กับ Header Row
+        headerRow.eachCell((cell, colNumber) => {
+            cell.border = {
+                top: {style: 'thin', color: {argb: '000000'}},
+                left: {style: 'thin', color: {argb: '000000'}},
+                bottom: {style: 'thin', color: {argb: '000000'}},
+                right: {style: 'thin', color: {argb: '000000'}}
+            };
+        });
+
+        // กำหนดสไตล์สำหรับข้อมูลแถว (พื้นหลังสีเขียวอ่อน)
+        const dataRowStyle = {
+            fill: {fgColor: {argb: 'C8E6C9'}}, // สีพื้นหลังเขียวอ่อน
+            border: {
+                top: {style: 'thin', color: {argb: '000000'}},
+                left: {style: 'thin', color: {argb: '000000'}},
+                bottom: {style: 'thin', color: {argb: '000000'}},
+                right: {style: 'thin', color: {argb: '000000'}}
+            }
+        };
+
+        // ใส่ข้อมูลในแถวที่ 6 เป็นต้นไป
+        data.forEach((row, rowIndex) => {
+            const currentRow = ws.addRow(row);
+            if (rowIndex >= 5) {
+                currentRow.eachCell((cell, colNumber) => {
+                    if (!cell.s) cell.s = {}; // สร้าง object หากยังไม่มี
+                    Object.assign(cell.s, dataRowStyle); // เพิ่มสไตล์ให้กับแถวข้อมูล
+                });
+            }
+        });
+
+        // สร้างไฟล์และดาวน์โหลด
+        wb.xlsx.writeBuffer().then(buffer => {
+            const blob = new Blob([buffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = 'Project_Template.xlsx';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        });
 
         console.log("Excel file exported successfully.");
     }
 
-    // Add event listener for Export button
-    document.getElementById("export-project-excel").addEventListener("click", () => {
-        exportExcel();
-    });
-
-
-    // // เพิ่ม event listener สำหรับปุ่มที่คุณต้องการให้ดาวน์โหลดไฟล์
-    // document.getElementById("export-project-excel").addEventListener("click", function() {
-    //     // กำหนดเส้นทางที่ถูกต้องของไฟล์ในโปรเจกต์
-    //     const fileUrl = '/static/css/TemplateProject.xlsx'; // Path ของไฟล์ Template
-    //
-    //     // สร้างลิงก์ดาวน์โหลด
-    //     const link = document.createElement('a');
-    //     link.href = fileUrl;
-    //     link.download = 'TemplateProject.xlsx'; // กำหนดชื่อไฟล์ที่จะดาวน์โหลด
-    //     link.click(); // เริ่มดาวน์โหลดไฟล์
-    // });
+    // เพิ่ม event listener ให้ปุ่ม Export
+    document.getElementById("export-project-excel").addEventListener("click", exportTemplate);
 
 </script>
+
+</html>
+
+

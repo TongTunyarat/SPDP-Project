@@ -6,6 +6,7 @@ public class StudentProjectPropGradeDTO {
     private String status;
     private String gradeResult;
     private boolean isEvaluationComplete;
+    private String semester;
     private InstructorEvaluationStatusDTO instructorEvaluation;
 
     public StudentProjectPropGradeDTO(String studentId, String studentName, String status, boolean isEvaluationComplete, InstructorEvaluationStatusDTO instructorEvaluation, String gradeResult) {
@@ -13,8 +14,17 @@ public class StudentProjectPropGradeDTO {
         this.studentName = studentName;
         this.status = status;
         this.gradeResult = gradeResult;
+        this.semester = semester;
         this.isEvaluationComplete = isEvaluationComplete;
         this.instructorEvaluation = instructorEvaluation;
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
     }
 
     public String getStudentId() {
