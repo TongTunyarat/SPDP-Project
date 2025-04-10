@@ -531,10 +531,10 @@
         const defaultYear = currentMonth <= 6 ? currentYear - 1 : currentYear;
 
         // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
-        if (semesters.includes(defaultYear.toString())) {
+        if (data.includes(defaultYear.toString())) {
             semesterSelector.value = defaultYear.toString();
         } else {
-            semesterSelector.value = "all";  // ตั้งค่า default เป็น "all"
+            semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
         }
     }
 
@@ -591,7 +591,7 @@
 
                 // สร้างข้อมูลของแถว
                 row.innerHTML = `
-                <td><span class="tag ${project.projectProgram.toLowerCase()}">${programPrefix}</span> ${projectId}</td>
+                <td><span class="tag ${project.projectProgram.toLowerCase()}">${project.projectProgram}</span> ${projectId}</td>
                 <td>${project.projectTitle}</td>
                 <td><span class="role ${project.role.toLowerCase()}">${project.role}</span></td>
                 <td>
