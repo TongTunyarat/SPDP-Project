@@ -522,7 +522,10 @@
     // 🔵 แสดงตารางคะแนนปกติ (ถ้ามีคะแนน)
     async function displayScoreData(defenseScoresData, posterScoresData, tableBody, projectId) {
         const studentScoresMap = {};
-        let posterCategories = { appearance: [], contents: [], verbal: [] };
+        let posterCategories = { appearance: 0, contents: 0, verbal: 0 };
+        let posterAppearanceCount = 0;
+        let posterContentsCount = 0;
+        let posterVerbalCount = 0;
 
         // จัดกลุ่มข้อมูลตาม studentId จากคะแนน Defense
         defenseScoresData.forEach(score => {
@@ -533,19 +536,19 @@
                 studentScoresMap[studentId] = {
                     studentName: studentName,
                     presentationScores: {
-                        "Quality of Work": [],
-                        "Level of Progress": [],
-                        "Presentation Language": [],
-                        "Question & Answer": []
+                        "Quality of Work": 0,
+                        "Level of Progress": 0,
+                        "Presentation Language": 0,
+                        "Question & Answer": 0
                     },
                     documentScores: {
                         completenessScores: [],
                         timelinessScores: []
                     },
                     posterScores: {
-                        appearance: [],
-                        contents: [],
-                        verbal: []
+                        appearance: 0,
+                        contents: 0,
+                        verbal: 0
                     }
                 };
             }
@@ -554,7 +557,7 @@
 
             // Group and store scores for each CriteriaName under Presentation
             if (["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"].includes(score.criteriaName)) {
-                studentScoresMap[studentId].presentationScores[score.criteriaName].push(scoreValue);
+                studentScoresMap[studentId].presentationScores[score.criteriaName] += scoreValue;  // Sum score
             }
 
             // Group and store scores for Document (Completeness, Timeliness)
@@ -568,40 +571,49 @@
         // คำนวณคะแนน Poster จากข้อมูลทั้งหมดในโปรเจกต์
         posterScoresData.forEach(score => {
             if (score.criteriaName === "Poster is well organized, readable, easy to follow and has a logical, clear progression of ideas, methods, and") {
-                posterCategories.appearance.push(score.score);
+                posterCategories.appearance += score.score;  // Sum score
+                posterAppearanceCount += 1;  // Count entries
             } else if (["English usage", "Problem statements and objectives are stated clearly", "Research methodology or development framework are stated clearly", "Level of difficulty (technical value)", "Level of progress is suitable with the timeline given"].includes(score.criteriaName)) {
-                posterCategories.contents.push(score.score);
+                posterCategories.contents += score.score;  // Sum score
+                posterContentsCount += 1;  // Count entries
             } else if (["Presenters speak clearly and effectively", "Presenters respond to questions effectively"].includes(score.criteriaName)) {
-                posterCategories.verbal.push(score.score);
+                posterCategories.verbal += score.score;  // Sum score
+                posterVerbalCount += 1;  // Count entries
             }
         });
 
-        const appearanceAvg = calculateCategoryAvg(posterCategories.appearance);
-        const contentsAvg = calculateCategoryAvg(posterCategories.contents);
-        const verbalAvg = calculateCategoryAvg(posterCategories.verbal);
+        // คำนวณค่าเฉลี่ยของแต่ละ category
+        const appearanceAvg = posterAppearanceCount > 0 ? (posterCategories.appearance / posterAppearanceCount).toFixed(2) : 0;
+        const contentsAvg = posterContentsCount > 0 ? (posterCategories.contents / posterContentsCount).toFixed(2) : 0;
+        const verbalAvg = posterVerbalCount > 0 ? (posterCategories.verbal / posterVerbalCount).toFixed(2) : 0;
 
         // คำนวณคะแนน Poster ที่เหมือนกันสำหรับทุกคนในโปรเจกต์
         const posterSum = parseFloat(appearanceAvg) + parseFloat(contentsAvg) + parseFloat(verbalAvg);
         const posterScore = posterSum > 0 ? ((posterSum * 10) / 40).toFixed(2) : "-";
 
-        // คำนวณคะแนนและแสดงผล
+        // นำคะแนน Poster ที่คำนวณแล้วไปใช้สำหรับทุกนักศึกษา
         for (const studentId in studentScoresMap) {
             const studentData = studentScoresMap[studentId];
             const { studentName, presentationScores, documentScores } = studentData;
 
-            // **คำนวณคะแนน Presentation**
+            // **คำนวณคะแนน Presentation** (เหมือนเดิม)
             let totalPresentationScore = 0;
-
             for (const criteriaName in presentationScores) {
-                const scores = presentationScores[criteriaName];
-                const criteriaSum = scores.reduce((sum, score) => sum + score, 0);
-                const criteriaScore = scores.length > 0 ? ((criteriaSum * 5) / 30).toFixed(2) : "-";
-                const criteriaFinalScore = criteriaScore !== "-" ? Math.min(parseFloat(criteriaScore), 20).toFixed(2) : "-";
-                totalPresentationScore += criteriaFinalScore !== "-" ? parseFloat(criteriaFinalScore) : 0;
+                const sumScore = presentationScores[criteriaName];
+                const numEntries = defenseScoresData.filter(s => s.criteriaName === criteriaName && s.studentId === studentId).length;
+
+                // ดึง maxScore และ weight
+                const score = defenseScoresData.find(s => s.studentId === studentId && s.criteriaName === criteriaName); // ค้นหาข้อมูลของแต่ละ criteria
+                const maxScore = score ? parseFloat(score.maxScore) : 5;  // ตรวจสอบค่า maxScore ว่ามีหรือไม่
+                const weight = score ? parseFloat(score.criteriaWeight) : 0.0;  // คูณด้วย 100 เพื่อให้เป็นเปอร์เซ็นต์ หากไม่มีให้ใช้ค่า default 100
+
+                // คำนวณ weightedScore ตามสูตรที่ระบุ
+                const weightedScore = ((sumScore / numEntries) / maxScore) * (weight * 100);
+                totalPresentationScore += weightedScore;
             }
             const presentationScore = totalPresentationScore > 0 ? totalPresentationScore.toFixed(2) : "-";
 
-            // **คำนวณคะแนน Document**
+            // **คำนวณคะแนน Document** (เหมือนเดิม)
             let totalDocumentScore = 0;
 
             // คำนวณคะแนนสำหรับ Completeness
