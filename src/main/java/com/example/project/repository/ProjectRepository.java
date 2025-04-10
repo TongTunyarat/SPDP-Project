@@ -1,18 +1,14 @@
 package com.example.project.repository;
 
 
-import com.example.project.DTO.FilterResponseDTO;
 import com.example.project.DTO.projectManagement.ProjectDTO;
-import com.example.project.DTO.projectManagement.StudentProjectDTO;
 import com.example.project.entity.Project;
-import com.example.project.entity.ProposalSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, String> {
@@ -69,6 +65,9 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
     List<Project> findBySemesterAndProjectInstructorRoles_Instructor_Account_Username(String semester, String username);
 
     List<Project> findBySemesterAndProgramAndProjectInstructorRoles_Instructor_Account_Username(String param, String year, String username);
+
+    @Query("SELECT MAX(p.projectId) FROM Project p WHERE p.program = :program AND p.projectId LIKE CONCAT(:program, ' SP%')")
+    String findLatestProjectIdByProgram(@Param("program") String program);
 
 }
 
