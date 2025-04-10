@@ -1550,30 +1550,30 @@
                       );
 
                       if (isBreakTimeSlot) {
-
-                        let hasProjectAfterBreak = false;
-
-                        for(let i = index + 1; i < allTimeSlots.length; i++) {
-
-                          const futureTimeSlot = allTimeSlots[i];
-
-                          // อันนี้มันจะเป็นข้อมูลด้านใน
-                          const futureSlotInfo = timeSlotMap[futureTimeSlot];
-
-                          const isFutureBreak = Object.values(futureSlotInfo).some(
-                                  project => project && project.status === "Break"
-                          );
-
-                          if(isFutureBreak) continue;
-
-                          hasProjectAfterBreak = rooms.some(room => futureSlotInfo[room] !== undefined);
-                          break
-                        }
-
-                        if(!hasProjectAfterBreak) {
-                          console.log("❌ ไม่มีโปรเจกต์หลัง Break " + timeSlot + " จึงไม่แสดง");
-                          return;
-                        }
+                      //
+                      //   let hasProjectAfterBreak = false;
+                      //
+                      //   for(let i = index + 1; i < allTimeSlots.length; i++) {
+                      //
+                      //     const futureTimeSlot = allTimeSlots[i];
+                      //
+                      //     // อันนี้มันจะเป็นข้อมูลด้านใน
+                      //     const futureSlotInfo = timeSlotMap[futureTimeSlot];
+                      //
+                      //     const isFutureBreak = Object.values(futureSlotInfo).some(
+                      //             project => project && project.status === "Break"
+                      //     );
+                      //
+                      //     if(isFutureBreak) continue;
+                      //
+                      //     hasProjectAfterBreak = rooms.some(room => futureSlotInfo[room] !== undefined);
+                      //     break
+                      //   }
+                      //
+                      //   if(!hasProjectAfterBreak) {
+                      //     console.log("❌ ไม่มีโปรเจกต์หลัง Break " + timeSlot + " จึงไม่แสดง");
+                      //     return;
+                      //   }
 
                         const breakRow = document.createElement("tr");
                         breakRow.className = "break-row";
