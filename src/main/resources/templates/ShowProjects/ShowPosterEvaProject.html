@@ -388,7 +388,7 @@
         // ตั้งค่า event listeners สำหรับแต่ละฟิลด์ฟิลเตอร์ เพื่อดูการเปลี่ยนแปลง
         document.getElementById('program-select-box').addEventListener('change', debounce(applyFilters, 100));
         document.getElementById('role-select-box').addEventListener('change', debounce(applyFilters, 100));
-        document.getElementById('search-keyword').addEventListener('input', debounce(applyFilters, 100)); // เพิ่มการค้นหาคำ
+        // document.getElementById('search-keyword').addEventListener('input', debounce(applyFilters, 100)); // เพิ่มการค้นหาคำ
     });
 
     function debounce(func, delay) {
