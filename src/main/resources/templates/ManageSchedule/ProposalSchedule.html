@@ -1100,14 +1100,37 @@
 
                       console.log("sortTimeSlots: " + sortTimeSlots);
 
-                      sortTimeSlots.forEach(timeSlot => {
+                      sortTimeSlots.forEach((timeSlot, index) => {
                         const slotInfo = timeSlots[timeSlot];
 
                         // console.log("slotInfo: " + slotInfo);
 
+                        // ข้ามถ้าไม่มี pj, break
+                        let hasAnyProject = false;
+
                         if(slotInfo.isBreak) {
 
-                          console.log("✅ เข้า Break ");
+                          console.log("✅ เข้า Break " + timeSlot);
+
+                          let hasProjectAfterBreak = false;
+
+                          for(let i = index + 1; i < sortTimeSlots.length; i++) {
+
+                            const futureTimeSlot = sortTimeSlots[i];
+
+                            // อันนี้มันจะเป็นข้อมูลด้านใน
+                            const futureSlotInfo = timeSlots[futureTimeSlot];
+
+                            if(futureSlotInfo.isBreak) continue;
+
+                            hasProjectAfterBreak = rooms.some(room => futureSlotInfo[room] !== undefined);
+                            break
+                          }
+
+                          if(!hasProjectAfterBreak) {
+                            console.log("❌ ไม่มีโปรเจกต์หลัง Break " + timeSlot + " จึงไม่แสดง");
+                            return;
+                          }
 
                           const breakRow = document.createElement("tr");
                           breakRow.className = "break-row";
@@ -1120,6 +1143,12 @@
                           breakRow.appendChild(breakCell);
                           tableBody.appendChild(breakRow);
                         } else {
+
+                          hasAnyProject = rooms.some(room => slotInfo[room] !== undefined);
+
+                          if(!hasAnyProject) {
+                            return;
+                          }
 
                           console.log("👀👀timeSlot: " + timeSlot);
 
@@ -1144,7 +1173,6 @@
                               const instructorUsernames = project.instructorUsernames;
 
                               cell.innerHTML = `
-
                                 <div class="slot-box ${project.status === "Non-Active" ? "non-active" : ''}"><br><div class="project-id">${project.projectId}</div><br><div class="instructors"></div>
 <!--                                  <svg id="icon-edit" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">-->
 <!--                                    <path d="M16.4612 1.53747C15.2966 0.372875 13.4084 0.372933 12.2439 1.5376L2.28549 11.4971C1.94688 11.8358 1.70888 12.2617 1.59797 12.7276L0.684976 16.5621C0.634709 16.7733 0.697568 16.9954 0.851034 17.1489C1.00451 17.3023 1.22661 17.3652 1.43774 17.3149L5.27212 16.402C5.73812 16.291 6.16418 16.0529 6.50289 15.7141L14.8342 7.38187C15.3994 7.95171 15.398 8.87187 14.8299 9.43996L13.3437 10.9261C13.0996 11.1702 13.0996 11.5659 13.3437 11.81C13.5878 12.054 13.9835 12.054 14.2276 11.81L15.7138 10.3238C16.77 9.26762 16.7715 7.55596 15.7181 6.49793L16.4613 5.75457C17.6257 4.59 17.6257 2.70198 16.4612 1.53747ZM13.1278 2.42143C13.8041 1.74497 14.9009 1.74493 15.5773 2.42136C16.2536 3.09772 16.2537 4.19432 15.5774 4.87074L5.61896 14.8303C5.44383 15.0055 5.22353 15.1285 4.98259 15.186L2.13623 15.8636L2.81398 13.0171C2.87132 12.7763 2.99437 12.556 3.16943 12.381L13.1278 2.42143Z" fill="#878D96"/>-->
@@ -1263,6 +1291,7 @@
       }
 
     });
+
 
     // ดึงข้อมูลวันที่
     function getScheduleDate(data) {
