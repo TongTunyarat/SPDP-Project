@@ -11,19 +11,40 @@ public class ProposalEvalScoreDTO {
     private String projectId;
     private String criteriaId;
     private String criteriaName;
+    private Float criteriaWeight;
     private Double score;
+    private String maxScore;
 
-    public ProposalEvalScoreDTO(String proposalEvalScoreId, String studentId, String studentName, String projectId, String criteriaId, String criteriaName, Double score) {
+    public ProposalEvalScoreDTO(String proposalEvalScoreId, String studentId, String studentName, String projectId, String criteriaId, String criteriaName, Float criteriaWeight, Double score, String maxScore) {
         this.proposalEvalScoreId = proposalEvalScoreId;
         this.studentId = studentId;
         this.studentName = studentName;
         this.projectId = projectId;
         this.criteriaId = criteriaId;
         this.criteriaName = criteriaName;
+        this.criteriaWeight = criteriaWeight;
         this.score = score;
+        this.maxScore = maxScore;
     }
 
-    // Getters and Setters
+// Getters and Setters
+
+
+    public Float getCriteriaWeight() {
+        return criteriaWeight;
+    }
+
+    public void setCriteriaWeight(Float criteriaWeight) {
+        this.criteriaWeight = criteriaWeight;
+    }
+
+    public String getMaxScore() {
+        return maxScore;
+    }
+
+    public void setMaxScore(String maxScore) {
+        this.maxScore = maxScore;
+    }
 
     public String getProposalEvalScoreId() {
         return proposalEvalScoreId;

@@ -111,23 +111,33 @@ public class ProposalEvaluationController {
         List<ProposalEvalScore> proposalEvalScoreList = proposalEvaluationService.getProposalEvalScoresByProjectId(projectId);
 
         return proposalEvalScoreList.stream()
-                .map(score -> new ProposalEvalScoreDTO(
-                        score.getEvaId(),
-                        score.getProposalEvaluation().getStudent().getStudentId(),
-                        score.getProposalEvaluation().getStudent().getStudentName(),
-                        score.getProposalEvaluation().getProject().getProjectId(),
-                        score.getCriteria().getCriteriaId(),
-                        score.getCriteria().getCriteriaName(),
-                        score.getScore() != null ? score.getScore().doubleValue() : 0.0
+                .map(score -> {
 
-                )).collect(Collectors.toList());
+                    // ดึงคะแนนจาก score
+                    Double scoreValue = score.getScore() != null ? score.getScore().doubleValue() : 0.0;
+
+
+                    // สร้างและส่ง ProposalEvalScoreDTO โดยส่ง weight เป็น String
+                    return new ProposalEvalScoreDTO(
+                            score.getEvaId(),
+                            score.getProposalEvaluation().getStudent().getStudentId(),
+                            score.getProposalEvaluation().getStudent().getStudentName(),
+                            score.getProposalEvaluation().getProject().getProjectId(),
+                            score.getCriteria().getCriteriaId(),
+                            score.getCriteria().getCriteriaName(),
+                            score.getCriteria().getWeight(),  // ส่งคะแนนจริง
+                            scoreValue,
+                            score.getCriteria().getMaxScore()// ส่ง weight ในรูปแบบ String
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/showStudentDetails")
     @ResponseBody
     public List<StudentProjectDTO> getStudentDetails(@RequestParam String projectId) {
         List<StudentProject> studentProjectList = projectService.getStudentDetails(projectId);
-                return studentProjectList.stream()
+        return studentProjectList.stream()
                 .map(studentProject -> new StudentProjectDTO(
                         studentProject.getStudent().getStudentId(),
                         studentProject.getStudent().getStudentName(),
@@ -156,9 +166,9 @@ public class ProposalEvaluationController {
 }
 
 
-    //=========================================== NOT USE ===================================================
+//=========================================== NOT USE ===================================================
 
-    // get student criteria
+// get student criteria
 //    @GetMapping("/studentProposalCriteria")
 //    @ResponseBody
 //    public ResponseEntity<?> getStudentCriteria(@RequestParam String projectId) {
@@ -172,34 +182,9 @@ public class ProposalEvaluationController {
 //    }
 
 
+//=========================================== NOT USE ===================================================
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    //=========================================== NOT USE ===================================================
-
-    // get all criteria
+// get all criteria
 //    @GetMapping("/instructor/criteriaProposal")
 //    @ResponseBody
 //    public List<Criteria> getProposalCriteria(){
