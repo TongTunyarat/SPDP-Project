@@ -21,7 +21,7 @@
 
         console.log('Calling updateLinkStatus function');
         // window.onload = fetchAccessPeriods;
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             fetchAccessPeriods();
         });
         setInterval(updateLinkStatus, 60000);
@@ -139,7 +139,7 @@
                 const periodKey = link.getAttribute('data-period');
                 const period = accessPeriods[periodKey];
                 console.log("periodKey:", periodKey); // ตรวจสอบว่า periodKey ถูกต้อง
-                console.log("period: ",period)
+                console.log("period: ", period)
 
                 if (period) {
                     const startTime = period.start ? new Date(period.start) : null;
@@ -187,42 +187,51 @@
     <div class="sidebar">
         <h2>ICT MAHIDOL</h2>
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
                      style="fill:#FFFFFF;">
-                <path
-                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
-                </path>
-            </svg> Homepage </h4>
+                    <path
+                            d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+                    </path>
+                </svg>
+                Homepage
+            </h4>
             <li><a href="/instructor/view">Dashboard</a></li>
         </ul>
 
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-                <g fill="#ffffff" fill-rule="nonzero">
-                    <g transform="scale(5.33333,5.33333)">
-                        <path
-                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-                        </path>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
                     </g>
-                </g>
-            </svg> Evaluation (40%) </h4>
+                </svg>
+                Evaluation (40%)
+            </h4>
             <li><a href="/show-proposal-eva-projects" data-period="proposalEvaluation">Proposal Evaluation</a></li>
             <li><a href="/show-poster-projects" data-period="posterEvaluation">Poster Evaluation</a></li>
             <li><a href="/show-defense-eva-projects" data-period="defenseEvaluation">Defense Evaluation</a></li>
         </ul>
 
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-                <g fill="#ffffff" fill-rule="nonzero">
-                    <g transform="scale(5.33333,5.33333)">
-                        <path
-                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-                        </path>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
                     </g>
-                </g>
-            </svg> Grades (60%) </h4>
+                </svg>
+                Grades (60%)
+            </h4>
             <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Proposal Grade</a></li>
-            <li><a href="/show-defense-grade-projects" data-period="defenseGrade"  class="active">Defense Grade</a></li>
+            <li><a href="/show-defense-grade-projects" data-period="defenseGrade" class="active">Defense Grade</a></li>
         </ul>
     </div>
 
@@ -424,7 +433,7 @@
 
     async function fetchAndDisplayScores(projectId) {
         // const url1 = `http://localhost:8080/instructor/showGradeScoreDefense?projectId=${encodeURIComponent(projectId)}`;
-        const url1 = `http://localhost:8080/instructor/showScoreProposal?projectId=${encodeURIComponent(projectId)}`;
+        const url1 = `http://localhost:8080/instructor/showScoreDefense?projectId=${encodeURIComponent(projectId)}`;
         const url2 = `http://localhost:8080/instructor/showScorePoster?projectId=${encodeURIComponent(projectId)}`;
         const tableBody = document.getElementById('student-score');
         tableBody.innerHTML = ""; // ล้างข้อมูลตารางก่อน
@@ -529,8 +538,8 @@
                         "Question & Answer": []
                     },
                     documentScores: {
-                        "Completeness": [],
-                        "Timeliness": []
+                        completenessScores: [],
+                        timelinessScores: []
                     },
                     posterScores: {
                         appearance: [],
@@ -540,50 +549,69 @@
                 };
             }
 
+            const scoreValue = score.score;
+
             // Group and store scores for each CriteriaName under Presentation
             if (["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"].includes(score.criteriaName)) {
-                studentScoresMap[studentId].presentationScores[score.criteriaName].push(score.score);
+                studentScoresMap[studentId].presentationScores[score.criteriaName].push(scoreValue);
             }
 
             // Group and store scores for Document (Completeness, Timeliness)
             if (score.criteriaName === "Completeness") {
-                studentScoresMap[studentId].documentScores.Completeness.push(score.score);
+                studentScoresMap[studentId].documentScores.completenessScores.push(scoreValue);
             } else if (score.criteriaName === "Timeliness") {
-                studentScoresMap[studentId].documentScores.Timeliness.push(score.score);
+                studentScoresMap[studentId].documentScores.timelinessScores.push(scoreValue);
             }
         });
 
         // คำนวณคะแนนและแสดงผล
-        for (const [studentId, studentData] of Object.entries(studentScoresMap)) {
+        for (const studentId in studentScoresMap) {
+            const studentData = studentScoresMap[studentId];
             const { studentName, presentationScores, documentScores, posterScores } = studentData;
 
             // **คำนวณคะแนน Presentation**
             let totalPresentationScore = 0;
-            for (const criteria of ["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"]) {
-                const scores = presentationScores[criteria];
+
+            for (const criteriaName in presentationScores) {
+                const scores = presentationScores[criteriaName];
                 const criteriaSum = scores.reduce((sum, score) => sum + score, 0);
-                const criteriaScore = scores.length > 0 ? ((criteriaSum * 5) / 30).toFixed(2) : "-";
-                const criteriaFinalScore = criteriaScore !== "-" ? Math.min(parseFloat(criteriaScore), 20).toFixed(2) : "-";
-                totalPresentationScore += criteriaFinalScore !== "-" ? parseFloat(criteriaFinalScore) : 0;
+                const criteriaScore = scores.length > 0 ? ((criteriaSum * 5) / 30).toFixed(2) : "0";  // เปลี่ยน "-" เป็น "0"
+                const criteriaFinalScore = criteriaScore !== "0" ? Math.min(parseFloat(criteriaScore), 20).toFixed(2) : "0";  // เปลี่ยน "-" เป็น "0"
+                totalPresentationScore += parseFloat(criteriaFinalScore);
             }
-            const presentationScore = totalPresentationScore > 0 ? totalPresentationScore.toFixed(2) : "-";
+            const presentationScore = totalPresentationScore > 0 ? totalPresentationScore.toFixed(2) : "0";  // เปลี่ยน "-" เป็น "0"
 
             // **คำนวณคะแนน Document**
             let totalDocumentScore = 0;
 
-            // คำนวณคะแนนสำหรับ Completeness
-            const documentCompletenessSum = documentScores.Completeness.reduce((sum, score) => sum + score, 0);
-            const documentCompletenessScore = documentScores.Completeness.length > 0 ? ((documentCompletenessSum * 7) / 30).toFixed(2) : "-";
-            totalDocumentScore += documentCompletenessScore !== "-" ? parseFloat(documentCompletenessScore) : 0;
+            // คำนวณคะแนนสำหรับ Completeness (Document)
+            if (documentScores.completenessScores.length > 0) {
+                const completenessAvg = documentScores.completenessScores.reduce((sum, score) => sum + score, 0) / documentScores.completenessScores.length;
+                const completenessMaxScore = 10;
+                const completenessWeight = 7;
 
-            // คำนวณคะแนนสำหรับ Timeliness
-            const documentTimelinessSum = documentScores.Timeliness.reduce((sum, score) => sum + score, 0);
-            const documentTimelinessScore = documentScores.Timeliness.length > 0 ? ((documentTimelinessSum * 3) / 30).toFixed(2) : "-";
-            totalDocumentScore += documentTimelinessScore !== "-" ? parseFloat(documentTimelinessScore) : 0;
+                const completenessScore = (completenessAvg / completenessMaxScore) * completenessWeight;
+                totalDocumentScore += completenessScore;
+            }
 
-            const documentScore = totalDocumentScore > 0 ? totalDocumentScore.toFixed(2) : "-";
+            // คำนวณคะแนนสำหรับ Timeliness (Document)
+            if (documentScores.timelinessScores.length > 0) {
+                const timelinessAvg = documentScores.timelinessScores.reduce((sum, score) => sum + score, 0) / documentScores.timelinessScores.length;
+                const timelinessMaxScore = 10;
+                const timelinessWeight = 3;
+
+                const timelinessScore = (timelinessAvg / timelinessMaxScore) * timelinessWeight;
+                totalDocumentScore += timelinessScore;
+            }
+
+            // คะแนน Document จะไม่เกิน 10%
+            totalDocumentScore = Math.min(totalDocumentScore, 10.0);
+            const documentScore = totalDocumentScore > 0 ? totalDocumentScore.toFixed(2) : "0";  // เปลี่ยน "-" เป็น "0"
 
             // **คำนวณคะแนน Poster**
+            let totalPosterScore = 0;
+
+            // คำนวณคะแนน Poster โดยการหาค่าเฉลี่ยจากหมวดหมู่ต่าง ๆ
             const posterCategories = { appearance: [], contents: [], verbal: [] };
 
             posterData.forEach(score => {
@@ -596,28 +624,38 @@
                 }
             });
 
+            // คำนวณค่าเฉลี่ยของแต่ละหมวดหมู่
             const appearanceAvg = calculateCategoryAvg(posterCategories.appearance);
             const contentsAvg = calculateCategoryAvg(posterCategories.contents);
             const verbalAvg = calculateCategoryAvg(posterCategories.verbal);
 
-            const posterSum = parseFloat(appearanceAvg) + parseFloat(contentsAvg) + parseFloat(verbalAvg);
-            const posterScore = posterSum > 0 ? ((posterSum * 10) / 40).toFixed(2) : "-";
+            // รวมค่าเฉลี่ยของทุกหมวดหมู่
+            totalPosterScore = parseFloat(appearanceAvg) + parseFloat(contentsAvg) + parseFloat(verbalAvg);
 
-            // **คำนวณคะแนนรวม**
-            const resultScore = (presentationScore !== "-" && documentScore !== "-" && posterScore !== "-")
+            const posterScore = totalPosterScore > 0 ? totalPosterScore.toFixed(2) : "0";  // เปลี่ยน "-" เป็น "0"
+
+            // **คำนวณคะแนนรวม (Total Score)**
+            const resultScore = (presentationScore !== "0" && documentScore !== "0" && posterScore !== "0")
                 ? (parseFloat(presentationScore) + parseFloat(documentScore) + parseFloat(posterScore)).toFixed(2)
-                : "-";
+                : "0";  // เปลี่ยน "-" เป็น "0"
 
             // แสดงผลข้อมูล
             const row = document.createElement('tr');
             row.innerHTML = `
-        <td>${studentName}</td>
-        <td>${presentationScore}</td>
-        <td>${documentScore}</td>
-        <td>${posterScore}</td>
-        <td>${resultScore}</td>
-    `;
+            <td>${studentName}</td>
+            <td>${presentationScore}</td>
+            <td>${documentScore}</td>
+            <td>${posterScore}</td>
+            <td>${resultScore}</td>
+        `;
             tableBody.appendChild(row);
+
+            // ปริ้นคะแนนของนักศึกษาแต่ละคนใน console
+            console.log(`Student: ${studentName}`);
+            console.log(`Total Presentation Score: ${presentationScore}`);
+            console.log(`Total Document Score: ${documentScore}`);
+            console.log(`Total Poster Score: ${posterScore}`);
+            console.log(`Total Score: ${resultScore}`);
         }
     }
 
@@ -627,6 +665,8 @@
         const sum = scores.reduce((acc, score) => acc + score, 0);
         return (sum / scores.length).toFixed(2);
     }
+
+
 
 
 </script>
@@ -712,7 +752,6 @@
 
         const thead = document.createElement("thead");
         const rowHeader = document.createElement("tr");
-
 
 
         rowHeader.innerHTML = `
@@ -878,7 +917,7 @@
 
             clearExistingScore(modal);
 
-            if(scoreData.length > 0) {
+            if (scoreData.length > 0) {
 
                 const commentText = scoreData[0].comment;
                 const commentBox = modal.querySelector('#comment-text');
@@ -1202,7 +1241,7 @@
         inputs.forEach(input => {
             const studentId = input.getAttribute('data-student-id');
             if (!studentMap.has(studentId)) {
-                studentMap.set(studentId, { total: 0, count: 0 });
+                studentMap.set(studentId, {total: 0, count: 0});
             }
 
             const scoreValue = parseFloat(input.value) || 0;
@@ -1227,7 +1266,7 @@
                     }
                 }
 
-                zeroScoreStudents.push({ id: studentId, name: studentName });
+                zeroScoreStudents.push({id: studentId, name: studentName});
             }
         }
 
@@ -1307,13 +1346,13 @@
             document.body.appendChild(alertBox);
 
             // เมื่อคลิกปุ่มปิด
-            document.getElementById('close-error-alert').addEventListener('click', function() {
+            document.getElementById('close-error-alert').addEventListener('click', function () {
                 alertBox.remove();
 
                 // เลื่อนไปยัง input แรกที่มีปัญหา
                 if (invalidInputs.length > 0) {
                     invalidInputs[0].focus();
-                    invalidInputs[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    invalidInputs[0].scrollIntoView({behavior: 'smooth', block: 'center'});
                 }
             });
 
@@ -1336,7 +1375,7 @@
             const grade = studentElement ? studentElement.querySelector('.grade').textContent.trim() : '';
 
             if (grade === 'I') {
-                iGradeStudents.push({ id: studentId });
+                iGradeStudents.push({id: studentId});
             }
         });
 
@@ -1546,7 +1585,7 @@
                         }
 
                         // แสดงแจ้งเตือนก่อน แล้วค่อยเปลี่ยนหน้า
-                        showNotification("Evaluation saved successfully!", function() {
+                        showNotification("Evaluation saved successfully!", function () {
                             loadEvaluationData(projectId);
                             window.location.href = "/show-defense-grade-projects";
                         });

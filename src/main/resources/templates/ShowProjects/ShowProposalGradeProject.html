@@ -367,9 +367,15 @@
     function applyFilters() {
         const programFilter = document.getElementById('program-select-box')?.value;
         const roleFilter = document.getElementById('role-select-box')?.value;
+        const searchTerm = document.getElementById('search-keyword')?.value.toLowerCase();  // ค่าค้นหา
+        const semesterSelector = document.getElementById('semester-selector');
+        const selectedSemester = semesterSelector.value;  // ค่า semester ที่เลือก
 
-        // กรองข้อมูลที่ต้องการ
-        const filteredData = projectData.filter(project => {
+        // กรองข้อมูลตาม semester ที่เลือกก่อน
+        let filteredData = projectData.filter(project => project.semester.toString() === selectedSemester);
+
+        // กรองข้อมูลตาม program, role, และ searchTerm
+        filteredData = filteredData.filter(project => {
             let matches = true;
 
             // กรองโปรแกรม
@@ -394,6 +400,14 @@
         displayResults(filteredData);
     }
 
+    document.getElementById('semester-selector').addEventListener('change', function () {
+        if (this.value === 'all') {
+            filterBySemester();
+        } else {
+            filterBySemester();
+        }
+    });
+
     // ตัวแปรที่ใช้เก็บข้อมูลที่ได้รับจาก API
     let projectData = [];
 
@@ -401,21 +415,14 @@
     async function fetchProjectData() {
         try {
             const response = await fetch('http://localhost:8080/instructor/projectPropGradeList');
+
             // ตรวจสอบว่า response ถูกต้องและมีข้อมูล
             if (!response.ok) {
                 console.error("Failed to fetch project data. Status: " + response.status);
                 return;  // หากไม่สามารถดึงข้อมูลได้ให้หยุด
             }
 
-            const data = await response.json();
-
-            // ตรวจสอบว่า data มีข้อมูลโปรเจกต์หรือไม่
-            if (!data || data.length === 0) {
-                console.error("No project data received.");
-                return;  // หากไม่มีข้อมูลให้หยุดการทำงาน
-            }
-
-            projectData = data;  // เก็บข้อมูลโปรเจกต์
+            projectData = await response.json();  // เก็บข้อมูลโปรเจกต์
 
             // เรียกใช้ฟังก์ชันเพื่ออัปเดต dropdown และแสดงข้อมูลที่กรอง
             updateSemesterDropdown();
@@ -454,14 +461,12 @@
     function updateSemesterDropdown(semesters) {
         // ตรวจสอบว่า semesters มีค่าหรือไม่
         if (!Array.isArray(semesters) || semesters.length === 0) {
-            console.error("Invalid semesters data received.");
             return; // หากข้อมูลไม่ถูกต้อง ให้หยุดการทำงาน
         }
 
         const semesterSelector = document.getElementById('semester-selector');
         semesterSelector.innerHTML = ""; // เคลียร์ค่าก่อนเติมใหม่
 
-        // เติมตัวเลือก semester จากข้อมูลที่ได้รับจาก API
         semesters.forEach(semester => {
             const option = document.createElement("option");
             option.value = semester;
@@ -552,7 +557,7 @@
                 }
 
                 row.innerHTML = `
-                 <td><span class="tag ${project.projectProgram.toLowerCase()}">${programPrefix}</span> ${projectId}</td>
+                <td><span class="tag ${project.projectProgram.toLowerCase()}">${project.projectProgram}</span> ${projectId}</td>
                 <td>${project.projectTitle}</td>
                 <td><span class="role ${project.role.toLowerCase()}">${project.role}</span></td>
                 <td>
