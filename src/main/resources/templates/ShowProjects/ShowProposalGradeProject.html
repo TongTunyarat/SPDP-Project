@@ -401,7 +401,20 @@
     async function fetchProjectData() {
         try {
             const response = await fetch('http://localhost:8080/instructor/projectPropGradeList');
+            // ตรวจสอบว่า response ถูกต้องและมีข้อมูล
+            if (!response.ok) {
+                console.error("Failed to fetch project data. Status: " + response.status);
+                return;  // หากไม่สามารถดึงข้อมูลได้ให้หยุด
+            }
+
             const data = await response.json();
+
+            // ตรวจสอบว่า data มีข้อมูลโปรเจกต์หรือไม่
+            if (!data || data.length === 0) {
+                console.error("No project data received.");
+                return;  // หากไม่มีข้อมูลให้หยุดการทำงาน
+            }
+
             projectData = data;  // เก็บข้อมูลโปรเจกต์
 
             // เรียกใช้ฟังก์ชันเพื่ออัปเดต dropdown และแสดงข้อมูลที่กรอง
@@ -412,13 +425,43 @@
         }
     }
 
+    async function fetchSemesterData() {
+        try {
+            const response = await fetch('http://localhost:8080/instructor/projectSemesterList');
+
+            // ตรวจสอบว่า response ถูกต้อง
+            if (!response.ok) {
+                console.error("Failed to fetch semester data. Status: " + response.status);
+                return;  // หากไม่สามารถดึงข้อมูลได้ให้หยุด
+            }
+
+            const semesters = await response.json();  // ดึงข้อมูล semester จาก API
+            console.log(semesters)
+
+            // ตรวจสอบว่า semesters เป็น array และมีข้อมูล
+            if (!Array.isArray(semesters) || semesters.length === 0) {
+                console.error("No semester data received or invalid format.");
+                return;  // หากไม่มีข้อมูลหรือข้อมูลไม่ถูกต้อง
+            }
+
+            updateSemesterDropdown(semesters);  // เรียกฟังก์ชันเพื่ออัปเดต dropdown
+        } catch (error) {
+            console.error("Error fetching semester data:", error);
+        }
+    }
+
     // ฟังก์ชันอัปเดต dropdown สำหรับเลือกปี
-    function updateSemesterDropdown() {
+    function updateSemesterDropdown(semesters) {
+        // ตรวจสอบว่า semesters มีค่าหรือไม่
+        if (!Array.isArray(semesters) || semesters.length === 0) {
+            console.error("Invalid semesters data received.");
+            return; // หากข้อมูลไม่ถูกต้อง ให้หยุดการทำงาน
+        }
+
         const semesterSelector = document.getElementById('semester-selector');
         semesterSelector.innerHTML = ""; // เคลียร์ค่าก่อนเติมใหม่
 
-        // เติมตัวเลือก semester จากข้อมูล API
-        const semesters = [...new Set(projectData.map(project => project.semester))]; // ดึงค่า semester ที่ไม่ซ้ำจากข้อมูล
+        // เติมตัวเลือก semester จากข้อมูลที่ได้รับจาก API
         semesters.forEach(semester => {
             const option = document.createElement("option");
             option.value = semester;
@@ -426,9 +469,20 @@
             semesterSelector.appendChild(option);
         });
 
-        // ตั้งค่า default เป็น semester ที่พบในข้อมูล
-        const defaultSemester = semesters.length > 0 ? semesters[0] : "1";  // หากมีค่า semester ให้เลือกตัวแรก
-        semesterSelector.value = defaultSemester;
+        // ตรวจสอบเดือนปัจจุบัน
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth() + 1; // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
+
+        // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
+        const defaultYear = currentMonth <= 6 ? currentYear - 1 : currentYear;
+
+        // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
+        if (semesters.includes(defaultYear.toString())) {
+            semesterSelector.value = defaultYear.toString();
+        } else {
+            semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+        }
     }
 
     // ฟังก์ชันกรองข้อมูลตาม semester ที่เลือก
@@ -442,6 +496,10 @@
         // แสดงข้อมูลที่กรองแล้ว
         displayResults(filteredData);
     }
+
+    // เรียกใช้ฟังก์ชัน fetchProjectData และ fetchSemesterData
+    fetchProjectData();
+    fetchSemesterData();
 
 
     function displayResults(data) {

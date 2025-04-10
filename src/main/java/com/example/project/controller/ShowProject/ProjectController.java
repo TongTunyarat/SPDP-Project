@@ -23,10 +23,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.swing.text.html.Option;
 import java.math.BigDecimal;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -64,6 +61,9 @@ public class ProjectController {
 
     @Autowired
     private PosterEvaRepository posterEvaRepository;
+
+    @Autowired
+    private ProjectRepository projectRepository;
 
     @Autowired
     private ProjectInstructorRoleRepository projectInstructorRoleRepository;
@@ -794,6 +794,30 @@ public class ProjectController {
 
         // ส่งข้อมูลกลับเป็น JSON
         return project;
+    }
+
+    @GetMapping("/instructor/projectSemesterList")
+    @ResponseBody
+    public List<String> getAllSemesters() {
+        // ดึงข้อมูลโปรเจกต์ทั้งหมดจากฐานข้อมูล
+        List<Project> projects = projectRepository.findAll();  // ดึงข้อมูลโปรเจกต์ทั้งหมด
+        Set<String> semesters = new HashSet<>();  // ใช้ Set เพื่อเก็บค่า semester ที่ไม่ซ้ำ
+
+        // ดึงค่า semester จากแต่ละโปรเจกต์และเพิ่มลงใน Set
+        for (Project project : projects) {
+            String semester = project.getSemester();
+            if (semester != null && !semester.trim().isEmpty()) {
+                semesters.add(semester.trim());  // ใช้ trim() เพื่อลบช่องว่างออก
+            }
+        }
+
+        // แปลง Set กลับเป็น List
+        List<String> sortedSemesters = new ArrayList<>(semesters);
+
+        // เรียงลำดับ semester (ตัวอย่างนี้ใช้เรียงจากมากไปน้อยตามปี)
+        sortedSemesters.sort((s1, s2) -> Integer.compare(Integer.parseInt(s2), Integer.parseInt(s1)));  // เรียงจากมากไปน้อย
+
+        return sortedSemesters;  // ส่งค่า semester ที่ไม่ซ้ำและเรียงลำดับ
     }
 
 

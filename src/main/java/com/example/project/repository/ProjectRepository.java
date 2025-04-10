@@ -69,6 +69,10 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
     @Query("SELECT MAX(p.projectId) FROM Project p WHERE p.program = :program AND p.projectId LIKE CONCAT(:program, ' SP%')")
     String findLatestProjectIdByProgram(@Param("program") String program);
 
+    // เพิ่มฟังก์ชันที่ดึงข้อมูลโปรเจกต์ทั้งหมดได้
+    List<Project> findAll();
+
+
 }
 
 
