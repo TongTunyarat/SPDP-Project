@@ -531,7 +531,8 @@
             } else {
                 // ✅ มีคะแนน → แสดงผลปกติ
                 tableBody.innerHTML = "";
-                displayScoreData(scoreData, tableBody);
+                const professorCount = getProfessorCount(scoreData); // คำนวณจำนวน professorId ที่ไม่ซ้ำ
+                displayScoreData(scoreData, tableBody, professorCount);
             }
         } catch (error) {
             console.error('Error fetching or displaying score proposal:', error);
@@ -584,6 +585,30 @@
         }
     }
 
+    // ฟังก์ชันคำนวณจำนวน professorId ที่ไม่ซ้ำสำหรับแต่ละ criteriaId
+    function getProfessorCount(scoreData) {
+        const professorMap = new Map();
+
+        scoreData.forEach(score => {
+            const key = score.criteriaId;
+            const professorId = score.professorId;
+
+            if (!professorMap.has(key)) {
+                professorMap.set(key, new Set());
+            }
+
+            professorMap.get(key).add(professorId);
+        });
+
+        // นับจำนวน professors ที่ไม่ซ้ำสำหรับแต่ละ criteriaId
+        const professorCount = {};
+        professorMap.forEach((professorSet, criteriaId) => {
+            professorCount[criteriaId] = professorSet.size;
+        });
+
+        return professorCount;
+    }
+
     function displayScoreData(scoreData, tableBody) {
         const studentScoresMap = {};
 
@@ -612,10 +637,7 @@
                 };
             }
 
-            // ดึง maxScore และ weight จากข้อมูลที่ส่งมา
-            const maxScore = score.maxScore ? parseFloat(score.maxScore) : 10.0;  // ใช้ maxScore ที่ดึงมา ถ้าไม่มีให้ใช้ค่า default
-            const weight = score.criteriaWeight ? parseFloat(score.criteriaWeight) * 100 : 100;  // คูณด้วย 100 เพื่อให้เป็นเปอร์เซ็นต์ หากไม่มีให้ใช้ค่า default 100
-            const scoreValue = score.score;  // คะแนนที่ได้รับ
+            const scoreValue = score.score;
 
             // คำนวณคะแนนสำหรับ Presentation
             if (["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"].includes(score.criteriaName)) {
@@ -641,7 +663,13 @@
 
             for (const criteriaName in presentationScores) {
                 const sumScore = presentationScores[criteriaName];
-                const numEntries = scoreData.filter(s => s.criteriaName === criteriaName && s.studentId === studentId).length;
+
+                // คำนวณจำนวน professorId ที่ไม่ซ้ำกันสำหรับ criteria นี้
+                const professorIds = [...new Set(scoreData
+                    .filter(s => s.criteriaName === criteriaName && s.studentId === studentId)
+                    .map(s => s.professorId))];  // ใช้ Set เพื่อดึงค่า professorId ที่ไม่ซ้ำกัน
+
+                const numProfessors = professorIds.length > 0 ? professorIds.length : 1;  // ถ้าไม่มีข้อมูล professor ก็ใช้ 1 แทน
 
                 // ดึง maxScore และ weight
                 const score = scoreData.find(s => s.studentId === studentId && s.criteriaName === criteriaName); // ค้นหาข้อมูลของแต่ละ criteria
@@ -649,12 +677,11 @@
                 const weight = score ? parseFloat(score.criteriaWeight) : 0.0;  // คูณด้วย 100 เพื่อให้เป็นเปอร์เซ็นต์ หากไม่มีให้ใช้ค่า default 100
 
                 // คำนวณ weightedScore ตามสูตรที่ระบุ
-                const weightedScore = ((sumScore / numEntries) / maxScore) * (weight * 100);
+                const weightedScore = ((sumScore / numProfessors) / maxScore) * (weight * 100);
                 totalPresentationScore += weightedScore;
             }
 
             studentData.totalPresentationScore = totalPresentationScore;
-            console.log(`Student: ${studentName}` + "\n " + `Total Presentation Score: ${totalPresentationScore.toFixed(2)}`);
 
             // คำนวณคะแนนสำหรับ Document (ใช้ for-loop)
             let totalDocumentScore = 0;
@@ -662,7 +689,7 @@
             // คำนวณสำหรับ Quality (Document)
             if (documentScores.qualityScores.length > 0) {
                 const sumQualityScore = documentScores.qualityScores.reduce((sum, score) => sum + score, 0);
-                const numQualityEntries = documentScores.qualityScores.length;
+                const numQualityEntries = documentScores.qualityScores.length; // ใช้ความยาวจริงของ qualityScores
                 const qualityMaxScore = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Quality")?.maxScore || 10.0;
                 const qualityWeight = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Quality")?.criteriaWeight || 0.15;
 
@@ -678,31 +705,26 @@
             }
 
             studentData.totalDocumentScore = totalDocumentScore;
-            console.log(`Student: ${studentName}` + "\n " + `Total Document Score: ${totalDocumentScore.toFixed(2)}`);
 
             // คำนวณคะแนนรวม (Result Score)
             const rawTotalScore = totalPresentationScore + totalDocumentScore;
 
-            // ✅ คำนวณคะแนนรวมไม่เกิน 40%
             const totalScore = Math.min(rawTotalScore, 40.0); // ทำให้คะแนนรวมไม่เกิน 40%
 
             studentData.resultScore = totalScore;
-            console.log(`Student: ${studentName}` + "\n " + `Total Score: ${totalScore.toFixed(2)}`);
 
             // แสดงผลข้อมูล
             const row = document.createElement('tr');
             row.innerHTML = `
-        <td>${studentName}</td>
-        <td>${totalPresentationScore.toFixed(2)}</td>
-        <td>${totalDocumentScore.toFixed(2)}</td>
-        <td>${totalScore.toFixed(2)}</td>  <!-- ใช้ totalScore ที่ถูกจำกัดแล้ว -->
+            <td>${studentName}</td>
+            <td>${totalPresentationScore.toFixed(2)}</td>
+            <td>${totalDocumentScore.toFixed(2)}</td>
+            <td>${totalScore.toFixed(2)}</td>
         `;
             tableBody.appendChild(row);
-
-            // ปริ้นคะแนนของนักศึกษาแต่ละคนใน console
-            console.log(`Student: ${studentName}` + "\n " + `Total Presentation Score: ${totalPresentationScore.toFixed(2)}` + " \n" + `Total Document Score: ${totalDocumentScore.toFixed(2)}` +" \n" +`Total Score: ${totalScore.toFixed(2)}`);
         }
     }
+
 
 
 

@@ -16,8 +16,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -104,7 +103,45 @@ public class ProposalEvaluationController {
     }
 
 
-    // get score DTO
+//    // get score DTO
+//    @GetMapping("/showScoreProposal")
+//    @ResponseBody
+//    public List<ProposalEvalScoreDTO> getScoreProposal(@RequestParam String projectId) {
+//        // ดึงข้อมูล ProposalEvalScore ตาม projectId
+//        List<ProposalEvalScore> proposalEvalScoreList = proposalEvaluationService.getProposalEvalScoresByProjectId(projectId);
+//
+//        // ดึงข้อมูล StudentProject ตาม projectId
+//        List<StudentProject> studentProjectList = proposalEvaluationService.getStudentCriteria(projectId);
+//
+//        // สร้าง Set ของ StudentId ที่มี status เป็น "Active"
+//        Set<String> activeStudentIds = studentProjectList.stream()
+//                .filter(studentProject -> "Active".equals(studentProject.getStatus()))  // กรองเฉพาะ status เป็น "Active"
+//                .map(studentProject -> studentProject.getStudent().getStudentId())  // ดึง StudentId
+//                .collect(Collectors.toSet());
+//
+//        return proposalEvalScoreList.stream()
+//                .filter(score -> activeStudentIds.contains(score.getProposalEvaluation().getStudent().getStudentId()))  // กรอง ProposalEvalScore ที่มี StudentId ตรงกับ activeStudentIds
+//                .map(score -> {
+//                    // ดึงคะแนนจาก score
+//                    Double scoreValue = score.getScore() != null ? score.getScore().doubleValue() : 0.0;
+//
+//                    // สร้างและส่ง ProposalEvalScoreDTO โดยส่ง weight เป็น String
+//                    return new ProposalEvalScoreDTO(
+//                            score.getEvaId(),
+//                            score.getProposalEvaluation().getStudent().getStudentId(),
+//                            score.getProposalEvaluation().getStudent().getStudentName(),
+//                            score.getProposalEvaluation().getProject().getProjectId(),
+//                            score.getCriteria().getCriteriaId(),
+//                            score.getCriteria().getCriteriaName(),
+//                            score.getCriteria().getWeight(),  // ส่งคะแนนจริง
+//                            scoreValue,
+//                            score.getCriteria().getMaxScore(), // ส่ง weight ในรูปแบบ String
+//                            score.getProposalEvaluation().getProjectInstructorRole().getInstructorId()
+//                    );
+//                })
+//                .collect(Collectors.toList());
+//    }
+
     @GetMapping("/showScoreProposal")
     @ResponseBody
     public List<ProposalEvalScoreDTO> getScoreProposal(@RequestParam String projectId) {
@@ -120,27 +157,54 @@ public class ProposalEvaluationController {
                 .map(studentProject -> studentProject.getStudent().getStudentId())  // ดึง StudentId
                 .collect(Collectors.toSet());
 
-        return proposalEvalScoreList.stream()
-                .filter(score -> activeStudentIds.contains(score.getProposalEvaluation().getStudent().getStudentId()))  // กรอง ProposalEvalScore ที่มี StudentId ตรงกับ activeStudentIds
+        // สร้าง Map ที่ใช้เก็บ professorId ที่ไม่ซ้ำกัน สำหรับแต่ละ studentId และ criteriaId
+        Map<String, Map<String, Set<String>>> studentProfessorMap = new HashMap<>();
+
+        // กรอง ProposalEvalScore ที่มี StudentId ตรงกับ activeStudentIds
+        List<ProposalEvalScoreDTO> proposalEvalScoreDTOList = proposalEvalScoreList.stream()
+                .filter(score -> activeStudentIds.contains(score.getProposalEvaluation().getStudent().getStudentId()))
                 .map(score -> {
                     // ดึงคะแนนจาก score
                     Double scoreValue = score.getScore() != null ? score.getScore().doubleValue() : 0.0;
 
-                    // สร้างและส่ง ProposalEvalScoreDTO โดยส่ง weight เป็น String
+                    // ดึงข้อมูล professorId และ criteriaId
+                    String studentId = score.getProposalEvaluation().getStudent().getStudentId();
+                    String criteriaId = score.getCriteria().getCriteriaId();
+                    String professorId = score.getProposalEvaluation().getProjectInstructorRole().getInstructorId();
+
+                    // เพิ่ม professorId ลงใน Set ของ professorId สำหรับ criteriaId และ studentId
+                    studentProfessorMap
+                            .computeIfAbsent(studentId, k -> new HashMap<>())
+                            .computeIfAbsent(criteriaId, k -> new HashSet<>())
+                            .add(professorId);
+
+                    // สร้างและส่ง ProposalEvalScoreDTO โดยส่งข้อมูลที่จำเป็น
                     return new ProposalEvalScoreDTO(
                             score.getEvaId(),
-                            score.getProposalEvaluation().getStudent().getStudentId(),
+                            studentId,
                             score.getProposalEvaluation().getStudent().getStudentName(),
                             score.getProposalEvaluation().getProject().getProjectId(),
-                            score.getCriteria().getCriteriaId(),
+                            criteriaId,
                             score.getCriteria().getCriteriaName(),
-                            score.getCriteria().getWeight(),  // ส่งคะแนนจริง
+                            score.getCriteria().getWeight(),
                             scoreValue,
-                            score.getCriteria().getMaxScore() // ส่ง weight ในรูปแบบ String
+                            score.getCriteria().getMaxScore(),
+                            professorId
                     );
                 })
                 .collect(Collectors.toList());
+
+        // นับจำนวน professorId ที่ไม่ซ้ำกันสำหรับแต่ละ studentId และ criteriaId
+        studentProfessorMap.forEach((studentId, criteriaMap) -> {
+            criteriaMap.forEach((criteriaId, professorSet) -> {
+                System.out.println("StudentId: " + studentId + ", CriteriaId: " + criteriaId + ", Number of Professors: " + professorSet.size());
+            });
+        });
+
+        // ส่งข้อมูลทั้งหมดไปยังหน้า HTML
+        return proposalEvalScoreDTOList;
     }
+
 
 
     @GetMapping("/showStudentDetails")
