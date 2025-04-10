@@ -834,22 +834,22 @@
         const scoreInputs = document.querySelectorAll('.present-score-input');
         scoreInputs.forEach(input => {
             input.addEventListener('change', () => {
-                validateScore(input);
+                // validateScore(input);
                 updateTotalScore();
             });
         });
     }
 
     // Validate score input
-    function validateScore(input) {
-        const maxScore = parseInt(input.getAttribute('max'));
-        let value = parseFloat(input.value) || 0;
-
-        if (value < 0) value = 0;
-        if (value > maxScore) value = maxScore;
-
-        input.value = value;
-    }
+    // function validateScore(input) {
+    //     const maxScore = parseInt(input.getAttribute('data-max'));
+    //     let value = parseFloat(input.value) || 0;
+    //
+    //     if (value < 0) value = 0;
+    //     if (value > maxScore) value = maxScore;
+    //
+    //     input.value = value;
+    // }
 
     // Fetch instructor ID
     async function fetchInstructorId(projectId) {
@@ -997,11 +997,11 @@
         const cardContainer = document.querySelector('#card-container');
         cardContainer.innerHTML = "";
 
-        const maxScore = calculateMaxScore();
-        let totalScore = calculateTotalScore();
+        const maxScore = calculateMaxScore().toFixed(2);
+        let totalScore = calculateTotalScore().toFixed(2);
 
         // ป้องกัน totalScore ไม่ให้เกิน maxScore และให้ทศนิยมไม่เกิน 2 จุด
-        totalScore = Math.min(totalScore, maxScore).toFixed(2);
+        // totalScore = Math.min(totalScore, maxScore).toFixed(2);
 
         console.log(`📊 Adjusted Score: ${totalScore} / ${maxScore}`);
 
@@ -1032,7 +1032,7 @@
         const maxScore = calculateMaxScore();
 
         // ป้องกัน totalScore ไม่ให้เกิน maxScore
-        totalScore = Math.min(totalScore, maxScore);
+        // totalScore = Math.min(totalScore, maxScore);
 
 
         let scoreDisplay = document.querySelector('.card-score-result[data-type="poster"] .score');
@@ -1054,7 +1054,7 @@
         let total = 0;
         document.querySelectorAll('.present-score-input').forEach(input => {
             let value = parseFloat(input.value);
-            // console.log(`➕ Adding: ${value || 0}`);
+            console.log(`➕ Adding: ${value || 0}`);
             total += value || 0;
         });
         // return Math.round(total);
@@ -1064,13 +1064,14 @@
     function calculateMaxScore() {
         let maxScore = 0;
         document.querySelectorAll('.present-score-input').forEach(input => {
-            let max = parseFloat(input.max);
-            // console.log(`🛠️ Max Score Found: ${max || 0}`);
+            // console.log(input);
+            // Use getAttribute or dataset to access data attributes
+            let max = parseFloat(input.getAttribute('data-max')) || parseFloat(input.dataset.max);
+            console.log(`🛠️ Max Score Found: ${max || 0}`);
             maxScore += max || 0;
         });
         return maxScore;
     }
-
 </script>
 
 
