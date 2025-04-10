@@ -163,7 +163,7 @@ public class ProposalScheduleService {
         if (availableSlots.size() < requiredSlots) {
 
             System.out.println("❌ Not enough time slots available");
-//            return new ScheduleProposalResponseDTO("error", "Not enough time slots available");
+            return new ScheduleProposalResponseDTO("error", "Not enough time slots available");
         }
 
         // sort project ตาม instructor
@@ -236,11 +236,11 @@ public class ProposalScheduleService {
         }
 
         //❗️❗️❗️❗️❗️ ห้ามลบ
-        try {
-            saveProposalSchedule(scheduledAssignments);
-        } catch (Exception e) {
-            return new ScheduleProposalResponseDTO("error", "Failed to generate schedule");
-        }
+//        try {
+//            saveProposalSchedule(scheduledAssignments);
+//        } catch (Exception e) {
+//            return new ScheduleProposalResponseDTO("error", "Failed to generate schedule");
+//        }
 
         return new ScheduleProposalResponseDTO("success", "finished generate schedule", scheduledAssignments, timeSlotDTOList);
     }
