@@ -1597,52 +1597,52 @@
                     .catch(error => console.error('⚠️ Error saving evaluations:', error));
             }
 
-            function getResultScore(studentName) {
-                const table = document.querySelector('#student-score');
-                if (!table) {
-                    console.warn('⚠️ Table not found');
-                    return {defenseScore: 0, posterScore: 0};
-                }
-
-                const rows = table.querySelectorAll('tr');
-                console.log("🧑‍🎓 Checking score for: " + studentName);
-
-                for (const row of rows) {
-                    const nameCell = row.cells[0]; // Column for student name
-                    if (!nameCell) continue;
-
-                    // Check if studentName matches the one in the first column
-                    if (nameCell.textContent.trim() === studentName) {
-                        const defenseScoreCell1 = row.cells[1]; // Column 2 (defenseScore - part 1)
-                        const defenseScoreCell2 = row.cells[2]; // Column 3 (defenseScore - part 2)
-                        const posterScoreCell = row.cells[3]; // Column 4 (posterScore)
-
-                        if (defenseScoreCell1 && defenseScoreCell2 && posterScoreCell) {
-                            // Calculate defenseScore by adding values from columns 2 and 3
-                            const defenseScore = (parseFloat(defenseScoreCell1.textContent.trim()) || 0) +
-                                (parseFloat(defenseScoreCell2.textContent.trim()) || 0);
-
-                            // Get posterScore from column 4
-                            const posterScore = parseFloat(posterScoreCell.textContent.trim()) || 0;
-
-                            console.log(`✅ Found scores for ${studentName}: defenseScore = ${defenseScore}, posterScore = ${posterScore}`);
-
-                            // Return the result
-                            return {
-                                defenseScore: defenseScore,
-                                posterScore: posterScore
-                            };
-                        }
-                    }
-                }
-
-                // In case no scores are found in the table
-                console.warn(`⚠️ No scores found for ${studentName}`);
-                return {
-                    defenseScore: 0,
-                    posterScore: 0
-                };
-            }
+            // function getResultScore(studentName) {
+            //     const table = document.querySelector('#student-score');
+            //     if (!table) {
+            //         console.warn('⚠️ Table not found');
+            //         return {defenseScore: 0, posterScore: 0};
+            //     }
+            //
+            //     const rows = table.querySelectorAll('tr');
+            //     console.log("🧑‍🎓 Checking score for: " + studentName);
+            //
+            //     for (const row of rows) {
+            //         const nameCell = row.cells[0]; // Column for student name
+            //         if (!nameCell) continue;
+            //
+            //         // Check if studentName matches the one in the first column
+            //         if (nameCell.textContent.trim() === studentName) {
+            //             const defenseScoreCell1 = row.cells[1]; // Column 2 (defenseScore - part 1)
+            //             const defenseScoreCell2 = row.cells[2]; // Column 3 (defenseScore - part 2)
+            //             const posterScoreCell = row.cells[3]; // Column 4 (posterScore)
+            //
+            //             if (defenseScoreCell1 && defenseScoreCell2 && posterScoreCell) {
+            //                 // Calculate defenseScore by adding values from columns 2 and 3
+            //                 const defenseScore = (parseFloat(defenseScoreCell1.textContent.trim()) || 0) +
+            //                     (parseFloat(defenseScoreCell2.textContent.trim()) || 0);
+            //
+            //                 // Get posterScore from column 4
+            //                 const posterScore = parseFloat(posterScoreCell.textContent.trim()) || 0;
+            //
+            //                 console.log(`✅ Found scores for ${studentName}: defenseScore = ${defenseScore}, posterScore = ${posterScore}`);
+            //
+            //                 // Return the result
+            //                 return {
+            //                     defenseScore: defenseScore,
+            //                     posterScore: posterScore
+            //                 };
+            //             }
+            //         }
+            //     }
+            //
+            //     // In case no scores are found in the table
+            //     console.warn(`⚠️ No scores found for ${studentName}`);
+            //     return {
+            //         defenseScore: 0,
+            //         posterScore: 0
+            //     };
+            // }
         });
     });
 </script>
@@ -1785,7 +1785,96 @@
 
 
 <script>
+    function getResultScore(studentName) {
+        const table = document.querySelector('#student-score');
+        if (!table) {
+            console.warn('⚠️ Table not found');
+            return {defenseScore: 0, posterScore: 0};
+        }
+
+        const rows = table.querySelectorAll('tr');
+        console.log("🧑‍🎓 Checking score for: " + studentName);
+
+        for (const row of rows) {
+            const nameCell = row.cells[0]; // Column for student name
+            if (!nameCell) continue;
+
+            // Check if studentName matches the one in the first column
+            if (nameCell.textContent.trim() === studentName) {
+                const defenseScoreCell1 = row.cells[1]; // Column 2 (defenseScore - part 1)
+                const defenseScoreCell2 = row.cells[2]; // Column 3 (defenseScore - part 2)
+                const posterScoreCell = row.cells[3]; // Column 4 (posterScore)
+
+                if (defenseScoreCell1 && defenseScoreCell2 && posterScoreCell) {
+                    // Calculate defenseScore by adding values from columns 2 and 3
+                    const defenseScore = (parseFloat(defenseScoreCell1.textContent.trim()) || 0) +
+                        (parseFloat(defenseScoreCell2.textContent.trim()) || 0);
+
+                    // Get posterScore from column 4
+                    const posterScore = parseFloat(posterScoreCell.textContent.trim()) || 0;
+
+                    console.log(`✅ Found scores for ${studentName}: defenseScore = ${defenseScore}, posterScore = ${posterScore}`);
+
+                    // Return the result
+                    return {
+                        defenseScore: defenseScore,
+                        posterScore: posterScore
+                    };
+                }
+            }
+        }
+
+        // In case no scores are found in the table
+        console.warn(`⚠️ No scores found for ${studentName}`);
+        return {
+            defenseScore: 0,
+            posterScore: 0
+        };
+    }
+
     function getResultScoreFromTable(studentName) {
+        // const table = document.querySelector('#student-score');
+        // if (!table) {
+        //     console.warn('⚠️ Table not found');
+        //     return 0;
+        // }
+        //
+        // const rows = table.querySelectorAll('tr');
+        // console.log("🧑‍🎓 Checking score for: " + studentName);
+        //
+        // for (const row of rows) {
+        //     const nameCell = row.cells[0]; // คอลัมน์ชื่อ
+        //     if (!nameCell) continue;
+        //
+        //     const currentStudentName = nameCell.textContent.trim(); // ดึงชื่อจากตารางโดยตรง
+        //
+        //     // ถ้าชื่อไม่ตรงก็ข้ามไป
+        //     if (currentStudentName !== studentName) continue;
+        //
+        //     // เช็คคอลัมน์คะแนน 1-3 (คอลัมน์ที่ 1-3)
+        //     for (let i = 1; i <= 3; i++) {
+        //         const scoreCell = row.cells[i];
+        //         const score = parseFloat(scoreCell.textContent.trim());
+        //
+        //         if (score === 0) {
+        //             console.warn(`⚠️ Zero score detected in column ${i} for ${studentName}`);
+        //             // console.log("😎😎😎 result score: "+row.cells[4]);
+        //             return parseFloat(row.cells[4].textContent.trim())
+        //             // return 'I'; // ถ้าพบคะแนนเป็น 0 ในคอลัมน์ใดๆ ก็ return 'I'
+        //         }
+        //     }
+        //
+        //     // ถ้าพบคะแนนทั้งหมดไม่มีค่า 0, ก็คำนวณคะแนนจาก Result Column (คอลัมน์ที่ 4)
+        //     const resultCell = row.cells[4]; // คอลัมน์คะแนน Result
+        //     if (resultCell) {
+        //         const resultScore = parseFloat(resultCell.textContent.trim()); // แปลงค่าเป็น float
+        //         console.log(`✅ Found score for ${studentName}: ${resultScore}`);
+        //         return resultScore;
+        //     }
+        // }
+        //
+        // console.warn(`⚠️ No score found for student: ${studentName}`);
+        // return 0;
         const table = document.querySelector('#student-score');
         if (!table) {
             console.warn('⚠️ Table not found');
@@ -1800,27 +1889,10 @@
             if (!nameCell) continue;
 
             const currentStudentName = nameCell.textContent.trim(); // ดึงชื่อจากตารางโดยตรง
+            const resultCell = row.cells[3]; // คอลัมน์คะแนน Result
 
-            // ถ้าชื่อไม่ตรงก็ข้ามไป
-            if (currentStudentName !== studentName) continue;
-
-            // เช็คคอลัมน์คะแนน 1-3 (คอลัมน์ที่ 1-3)
-            for (let i = 1; i <= 3; i++) {
-                const scoreCell = row.cells[i];
-                const score = parseFloat(scoreCell.textContent.trim());
-
-                if (score === 0) {
-                    console.warn(`⚠️ Zero score detected in column ${i} for ${studentName}`);
-                    // console.log("😎😎😎 result score: "+row.cells[4]);
-                    return parseFloat(row.cells[4].textContent.trim())
-                    // return 'I'; // ถ้าพบคะแนนเป็น 0 ในคอลัมน์ใดๆ ก็ return 'I'
-                }
-            }
-
-            // ถ้าพบคะแนนทั้งหมดไม่มีค่า 0, ก็คำนวณคะแนนจาก Result Column (คอลัมน์ที่ 4)
-            const resultCell = row.cells[4]; // คอลัมน์คะแนน Result
-            if (resultCell) {
-                const resultScore = parseFloat(resultCell.textContent.trim()); // แปลงค่าเป็น float
+            if (resultCell && currentStudentName === studentName) {
+                const resultScore = parseFloat(resultCell.textContent) || 0;
                 console.log(`✅ Found score for ${studentName}: ${resultScore}`);
                 return resultScore;
             }
@@ -1850,7 +1922,7 @@
     }
 
     function checkForInvalidScores(row, studentName) {
-        for (let i = 1; i <= 3; i++) {
+        for (let i = 1; i <= 4; i++) {
             const scoreCell = row.cells[i];
             const scoreText = scoreCell.textContent.trim();
 
@@ -1944,8 +2016,8 @@
 
                 console.log("🪄 studentId: " + studentId);
                 console.log("🪄 studentName: " + studentName);
-                console.log("🪄 resultScore: " + resultScore);
-                console.log("🪄 inputScore: " + inputScore);
+                // console.log("🪄 resultScore: " + resultScore);
+                // console.log("🪄 inputScore: " + inputScore);
                 console.log("🪄 totalScore: " + totalScore);
                 console.log("🪄 grade: " + grade);
 
