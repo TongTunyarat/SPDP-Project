@@ -529,10 +529,14 @@
                         "Question & Answer": []
                     },
                     documentScores: {
-                        "Quality": [],
-                        "Timeliness": null
+                        "Completeness": [],
+                        "Timeliness": []
                     },
-                    posterScores: []
+                    posterScores: {
+                        appearance: [],
+                        contents: [],
+                        verbal: []
+                    }
                 };
             }
 
@@ -541,22 +545,20 @@
                 studentScoresMap[studentId].presentationScores[score.criteriaName].push(score.score);
             }
 
-            // Group and store scores for Document (Quality and Timeliness)
-            if (score.criteriaName === "Quality") {
-                studentScoresMap[studentId].documentScores.Quality.push(score.score);
+            // Group and store scores for Document (Completeness, Timeliness)
+            if (score.criteriaName === "Completeness") {
+                studentScoresMap[studentId].documentScores.Completeness.push(score.score);
             } else if (score.criteriaName === "Timeliness") {
-                studentScoresMap[studentId].documentScores.Timeliness = score.score;
+                studentScoresMap[studentId].documentScores.Timeliness.push(score.score);
             }
         });
 
         // คำนวณคะแนนและแสดงผล
         for (const [studentId, studentData] of Object.entries(studentScoresMap)) {
-            const { studentName, presentationScores, documentScores } = studentData;
+            const { studentName, presentationScores, documentScores, posterScores } = studentData;
 
-            // **คำนวณคะแนน Presentation (20%)**
+            // **คำนวณคะแนน Presentation**
             let totalPresentationScore = 0;
-
-            // คำนวณคะแนนสำหรับแต่ละ CriteriaName
             for (const criteria of ["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"]) {
                 const scores = presentationScores[criteria];
                 const criteriaSum = scores.reduce((sum, score) => sum + score, 0);
@@ -564,44 +566,44 @@
                 const criteriaFinalScore = criteriaScore !== "-" ? Math.min(parseFloat(criteriaScore), 20).toFixed(2) : "-";
                 totalPresentationScore += criteriaFinalScore !== "-" ? parseFloat(criteriaFinalScore) : 0;
             }
-
             const presentationScore = totalPresentationScore > 0 ? totalPresentationScore.toFixed(2) : "-";
 
-            // **คำนวณคะแนน Document (10%)**
+            // **คำนวณคะแนน Document**
             let totalDocumentScore = 0;
 
-            // คำนวณคะแนนสำหรับ Document Quality
-            const documentQualitySum = documentScores.Quality.reduce((sum, score) => sum + score, 0);
-            const documentQualityScore = documentScores.Quality.length > 0 ? ((documentQualitySum * 7) / 30).toFixed(2) : "-";
-            totalDocumentScore += documentQualityScore !== "-" ? parseFloat(documentQualityScore) : 0;
+            // คำนวณคะแนนสำหรับ Completeness
+            const documentCompletenessSum = documentScores.Completeness.reduce((sum, score) => sum + score, 0);
+            const documentCompletenessScore = documentScores.Completeness.length > 0 ? ((documentCompletenessSum * 7) / 30).toFixed(2) : "-";
+            totalDocumentScore += documentCompletenessScore !== "-" ? parseFloat(documentCompletenessScore) : 0;
 
-            // คำนวณคะแนนสำหรับ Document Timeliness
-            const documentTimelinessScore = documentScores.Timeliness !== null ? documentScores.Timeliness.toFixed(2) : "-";
+            // คำนวณคะแนนสำหรับ Timeliness
+            const documentTimelinessSum = documentScores.Timeliness.reduce((sum, score) => sum + score, 0);
+            const documentTimelinessScore = documentScores.Timeliness.length > 0 ? ((documentTimelinessSum * 3) / 30).toFixed(2) : "-";
             totalDocumentScore += documentTimelinessScore !== "-" ? parseFloat(documentTimelinessScore) : 0;
 
             const documentScore = totalDocumentScore > 0 ? totalDocumentScore.toFixed(2) : "-";
 
-            // **คำนวณคะแนน Poster (10%)**
-            const posterScores = { appearance: [], contents: [], verbal: [] };
+            // **คำนวณคะแนน Poster**
+            const posterCategories = { appearance: [], contents: [], verbal: [] };
+
             posterData.forEach(score => {
-                if (score.criteriaName === "Poster is well organized, readable, easy to follow and has a logical, clear progression of ideas, methods, and results.") {
-                    posterScores.appearance.push(score.score);
-                } else if (["Language usage", "Problem statements and objectives are stated clearly", "Research methodology or development framework are stated clearly", "Level of difficulty (technical value)", "Level of progress is suitable with the timeline given"].includes(score.criteriaName)) {
-                    posterScores.contents.push(score.score);
+                if (score.criteriaName === "Poster is well organized, readable, easy to follow and has a logical, clear progression of ideas, methods, and") {
+                    posterCategories.appearance.push(score.score);
+                } else if (["English usage", "Problem statements and objectives are stated clearly", "Research methodology or development framework are stated clearly", "Level of difficulty (technical value)", "Level of progress is suitable with the timeline given"].includes(score.criteriaName)) {
+                    posterCategories.contents.push(score.score);
                 } else if (["Presenters speak clearly and effectively", "Presenters respond to questions effectively"].includes(score.criteriaName)) {
-                    posterScores.verbal.push(score.score);
+                    posterCategories.verbal.push(score.score);
                 }
             });
 
-            // คำนวณคะแนน Poster
-            const appearanceAvg = calculateCategoryAvg(posterScores.appearance);
-            const contentsAvg = calculateCategoryAvg(posterScores.contents);
-            const verbalAvg = calculateCategoryAvg(posterScores.verbal);
+            const appearanceAvg = calculateCategoryAvg(posterCategories.appearance);
+            const contentsAvg = calculateCategoryAvg(posterCategories.contents);
+            const verbalAvg = calculateCategoryAvg(posterCategories.verbal);
 
             const posterSum = parseFloat(appearanceAvg) + parseFloat(contentsAvg) + parseFloat(verbalAvg);
             const posterScore = posterSum > 0 ? ((posterSum * 10) / 40).toFixed(2) : "-";
 
-            // **คำนวณคะแนนรวม (40%)**
+            // **คำนวณคะแนนรวม**
             const resultScore = (presentationScore !== "-" && documentScore !== "-" && posterScore !== "-")
                 ? (parseFloat(presentationScore) + parseFloat(documentScore) + parseFloat(posterScore)).toFixed(2)
                 : "-";
@@ -609,12 +611,12 @@
             // แสดงผลข้อมูล
             const row = document.createElement('tr');
             row.innerHTML = `
-            <td>${studentName}</td>
-            <td>${presentationScore}</td>
-            <td>${documentScore}</td>
-            <td>${posterScore}</td>
-            <td>${resultScore}</td>
-        `;
+        <td>${studentName}</td>
+        <td>${presentationScore}</td>
+        <td>${documentScore}</td>
+        <td>${posterScore}</td>
+        <td>${resultScore}</td>
+    `;
             tableBody.appendChild(row);
         }
     }
@@ -760,10 +762,10 @@
         rowHeader.innerHTML = `
                <th></th>
                 ${students.map(student => {
-                    const nameParts = student.studentName.split(' '); // แยกชื่อกับนามสกุล
-                    const lastNameAbbr = nameParts[1] ? nameParts[1].slice(0, 3) + '.' : ''; // ตัดเหลือ 3 ตัว + จุด
-                    return `<th>${student.studentId} ${nameParts[0]} ${lastNameAbbr}</th>`;
-                }).join('')}
+            const nameParts = student.studentName.split(' '); // แยกชื่อกับนามสกุล
+            const lastNameAbbr = nameParts[1] ? nameParts[1].slice(0, 3) + '.' : ''; // ตัดเหลือ 3 ตัว + จุด
+            return `<th>${student.studentId} ${nameParts[0]} ${lastNameAbbr}</th>`;
+        }).join('')}
         `;
         thead.appendChild(rowHeader);
         table.appendChild(thead);
@@ -1745,7 +1747,7 @@
 
         // ดึงรายชื่ออาจารย์ของโปรเจคก่อน
         const instructors = await projectInstructor(getProjectIdFromURL());
-      
+
         console.log('📚 Instructors:', instructors);
 
         // Check if any score from any instructor is 0 or null

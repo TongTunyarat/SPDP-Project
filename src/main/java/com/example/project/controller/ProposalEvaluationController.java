@@ -7,6 +7,7 @@ import com.example.project.DTO.Criteria.StudentCriteriaDTO;
 import com.example.project.DTO.StudentProjectDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.ProjectInstructorRoleRepository;
+import com.example.project.service.ProjectInstructorRoleService;
 import com.example.project.service.ProjectService;
 import com.example.project.service.ProposalEvaluationService;
 import com.example.project.service.ProposalGradeService;
@@ -45,6 +46,8 @@ public class ProposalEvaluationController {
 
     @Autowired
     private ProjectService projectService;
+    @Autowired
+    private ProjectInstructorRoleService projectInstructorRoleService;
 
     // get criteria DTO
     @GetMapping("/criteriaProposal")

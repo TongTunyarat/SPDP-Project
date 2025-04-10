@@ -574,68 +574,86 @@
         }
     }
 
-
     // 🔵 แสดงตารางคะแนนปกติ (ถ้ามีคะแนน)
     function displayScoreData(scoreData, tableBody) {
         const studentScoresMap = {};
 
+        // จัดกลุ่มข้อมูลตาม studentId
         scoreData.forEach(score => {
             const studentId = score.studentId;
             if (!studentScoresMap[studentId]) {
                 studentScoresMap[studentId] = {
                     studentName: score.studentName,
-                    presentationScores: [],
+                    presentationScores: {
+                        "Quality of Work": [],
+                        "Level of Progress": [],
+                        "Presentation Language": [],
+                        "Question & Answer": []
+                    },
                     documentScores: {
                         qualityScores: [],
-                        timeliness: null
+                        timelinessScores: [] // เปลี่ยนเป็น timelinessScores เพื่อรองรับหลายค่า
                     }
                 };
             }
 
             // Group and store scores
             if (["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"].includes(score.criteriaName)) {
-                studentScoresMap[studentId].presentationScores.push(score.score);
+                studentScoresMap[studentId].presentationScores[score.criteriaName].push(score.score);
             }
 
             if (score.criteriaName === "Quality") {
                 studentScoresMap[studentId].documentScores.qualityScores.push(score.score);
             } else if (score.criteriaName === "Timeliness") {
-                studentScoresMap[studentId].documentScores.timeliness = score.score;
+                studentScoresMap[studentId].documentScores.timelinessScores.push(score.score); // เก็บหลายค่า
             }
         });
 
         Object.values(studentScoresMap).forEach(studentData => {
             const { studentName, presentationScores, documentScores } = studentData;
 
+            // คำนวณคะแนนสำหรับแต่ละ Criteria
+
+            // 1. Quality of Work
+            const qualityOfWorkSum = presentationScores["Quality of Work"].reduce((sum, score) => sum + score, 0);
+            let qualityOfWorkScore = (qualityOfWorkSum * 5) / 30;
+
+            // 2. Level of Progress
+            const levelOfProgressSum = presentationScores["Level of Progress"].reduce((sum, score) => sum + score, 0);
+            let levelOfProgressScore = (levelOfProgressSum * 5) / 30;
+
+            // 3. Presentation Language
+            const presentationLanguageSum = presentationScores["Presentation Language"].reduce((sum, score) => sum + score, 0);
+            let presentationLanguageScore = (presentationLanguageSum * 5) / 30;
+
+            // 4. Question & Answer
+            const questionAndAnswerSum = presentationScores["Question & Answer"].reduce((sum, score) => sum + score, 0);
+            let questionAndAnswerScore = (questionAndAnswerSum * 5) / 30;
+
+            // 5. Quality (Document)
+            const qualitySum = documentScores.qualityScores.reduce((sum, score) => sum + score, 0);
+            let qualityDocumentScore = (qualitySum * 15) / 30;
+
+            // 6. Timeliness (ต้องคำนวณหลายค่าด้วย)
+            const timelinessSum = documentScores.timelinessScores.reduce((sum, score) => sum + score, 0);
+            let timelinessScore = (timelinessSum * 5) / 30;
+
             // คำนวณคะแนน Presentation
-            const presentationSum = presentationScores.reduce((sum, score) => sum + score, 0);
-            let presentationScore = presentationScores.length > 0 ? ((presentationSum * 5) / 30).toFixed(2) : "-";
-            if (presentationScore !== "-") {
-                presentationScore = Math.min(parseFloat(presentationScore), 20).toFixed(2);
-            }
+            const presentationScore = qualityOfWorkScore + levelOfProgressScore + presentationLanguageScore + questionAndAnswerScore;
 
             // คำนวณคะแนน Document
-            const documentQualitySum = documentScores.qualityScores.reduce((sum, score) => sum + score, 0);
-            let documentQualityScore = documentScores.qualityScores.length > 0 ? ((documentQualitySum * 15) / 30).toFixed(2) : "-";
-            let documentScore = (documentQualityScore !== "-" && documentScores.timeliness !== null)
-                ? (parseFloat(documentQualityScore) + documentScores.timeliness).toFixed(2)
-                : "-";
-            if (documentScore !== "-") {
-                documentScore = Math.min(parseFloat(documentScore), 20).toFixed(2);
-            }
+            const documentScore = qualityDocumentScore + timelinessScore;
 
-            // คำนวณคะแนนรวม
-            const resultScore = (presentationScore !== "-" && documentScore !== "-")
-                ? (parseFloat(presentationScore) + parseFloat(documentScore)).toFixed(2)
-                : "-";
+            // คำนวณคะแนนรวม (Result Score)
+            const resultScore = presentationScore + documentScore;
 
             // แสดงผลข้อมูล
             const row = document.createElement('tr');
             row.innerHTML = `
             <td>${studentName}</td>
-            <td>${presentationScore}</td>
-            <td>${documentScore}</td>
-            <td>${resultScore}</td>
+            <td>${presentationScore.toFixed(2)}</td>
+            <td>${documentScore.toFixed(2)}</td>
+            <td>${resultScore.toFixed(2)}</td>
         `;
             tableBody.appendChild(row);
         });
