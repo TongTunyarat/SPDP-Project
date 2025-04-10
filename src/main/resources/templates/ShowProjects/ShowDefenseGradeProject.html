@@ -452,15 +452,7 @@
                 return;  // หากไม่สามารถดึงข้อมูลได้ให้หยุด
             }
 
-            const data = await response.json();
-
-            // ตรวจสอบว่า data มีข้อมูลโปรเจกต์หรือไม่
-            if (!data || data.length === 0) {
-                console.error("No project data received.");
-                return;  // หากไม่มีข้อมูลให้หยุดการทำงาน
-            }
-
-            projectData = data;  // เก็บข้อมูลโปรเจกต์
+            projectData = await response.json();  // เก็บข้อมูลโปรเจกต์
 
             // เรียกใช้ฟังก์ชันเพื่ออัปเดต dropdown และแสดงข้อมูลที่กรอง
             updateSemesterDropdown();
