@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static java.util.Locale.filter;
+
 @Controller
 public class PosterEvaluationController {
     //=========================================== USE ===================================================
@@ -81,10 +83,8 @@ public class PosterEvaluationController {
         // ดึงข้อมูล ProposalEvalScore ตาม projectId
         List<ProposalEvalScore> proposalEvalScoreList = proposalEvaluationService.getProposalEvalScoresByProjectId(projectId);
 
-
         return posterEvaluationList.stream()
                 .map(score -> {
-
                     // ดึงคะแนนจาก score
                     Double scoreValue = (double) score.getScore();
 

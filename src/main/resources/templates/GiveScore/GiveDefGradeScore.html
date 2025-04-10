@@ -586,8 +586,8 @@
             // คำนวณคะแนนสำหรับ Completeness (Document)
             if (documentScores.completenessScores.length > 0) {
                 const completenessAvg = documentScores.completenessScores.reduce((sum, score) => sum + score, 0) / documentScores.completenessScores.length;
-                const completenessMaxScore = 30; // Maximum score for Completeness
-                const completenessWeight = 7; // Weight for Completeness
+                const completenessMaxScore = 10;
+                const completenessWeight = 7;
 
                 const completenessScore = (completenessAvg / completenessMaxScore) * completenessWeight;
                 totalDocumentScore += completenessScore;

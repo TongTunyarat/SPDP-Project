@@ -522,11 +522,12 @@
         const defaultYear = currentMonth <= 6 ? currentYear - 1 : currentYear;
 
         // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
-        if (data.includes(defaultYear.toString())) {
+        if (semesters.includes(defaultYear.toString())) {
             semesterSelector.value = defaultYear.toString();
         } else {
-            semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+            semesterSelector.selectedIndex = 1; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
         }
+
     }
 
     // ฟังก์ชันกรองข้อมูลตาม semester ที่เลือก

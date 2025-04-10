@@ -148,6 +148,7 @@ public class ProposalEvaluationController {
     public List<StudentProjectDTO> getStudentDetails(@RequestParam String projectId) {
         List<StudentProject> studentProjectList = projectService.getStudentDetails(projectId);
         return studentProjectList.stream()
+                .filter(studentProject -> "Active".equals(studentProject.getStatus()))
                 .map(studentProject -> new StudentProjectDTO(
                         studentProject.getStudent().getStudentId(),
                         studentProject.getStudent().getStudentName(),
