@@ -8,6 +8,7 @@ import com.example.project.entity.StudentProject;
 import com.example.project.repository.ScoringPeriodsRepository;
 import com.example.project.service.DashboardCardService;
 import com.example.project.service.ProjectService;
+import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -57,14 +58,21 @@ public class DashboardController {
     // Period
     @GetMapping("/api/period")
     public ResponseEntity<?> getScoringPeriod() {
-        String currentYear = String.valueOf(LocalDate.now().getYear());
-        List<ScoringPeriods> response = scoringPeriodsRepository.findByYear(currentYear);
+        LocalDate currentDate = LocalDate.now();
+        int currentYear = currentDate.getYear();
+        int currentMonth = currentDate.getMonthValue(); // 1-12 (มกราคม = 1)
 
-        if (response == null) {
-            return ResponseEntity.notFound().build(); // Handle case when no data is found
+        // ถ้าเดือน <= 6 (มกราคม - มิถุนายน) ใช้ปีปัจจุบัน -1, ถ้า ก.ค. เป็นต้นไปใช้ปีปัจจุบัน
+        String defaultYear = String.valueOf(currentMonth <= 6 ? currentYear - 1 : currentYear);
+
+        List<ScoringPeriods> response = scoringPeriodsRepository.findByYear(defaultYear);
+
+        if (response == null || response.isEmpty()) {
+            return ResponseEntity.notFound().build(); // ถ้าไม่พบข้อมูล
         }
         return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/api/grading-graph-instructor")
     public ResponseEntity<?> getGradingStatistics(
