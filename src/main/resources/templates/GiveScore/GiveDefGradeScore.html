@@ -588,7 +588,7 @@
             if (documentScores.completenessScores.length > 0) {
                 const completenessAvg = documentScores.completenessScores.reduce((sum, score) => sum + score, 0) / documentScores.completenessScores.length;
                 const completenessMaxScore = 10;
-                const completenessWeight = 0.07;
+                const completenessWeight = 7;
 
                 const completenessScore = (completenessAvg / completenessMaxScore) * completenessWeight;
                 totalDocumentScore += completenessScore;
@@ -597,7 +597,11 @@
             // คำนวณคะแนนสำหรับ Timeliness (Document)
             if (documentScores.timelinessScores.length > 0) {
                 const timelinessAvg = documentScores.timelinessScores.reduce((sum, score) => sum + score, 0) / documentScores.timelinessScores.length;
-                totalDocumentScore += timelinessAvg;
+                const timelinessMaxScore = 10;
+                const timelinessWeight = 3;
+
+                const timelinessScore = (timelinessAvg / timelinessMaxScore) * timelinessWeight;
+                totalDocumentScore += timelinessScore;
             }
 
             // คะแนน Document จะไม่เกิน 10%
