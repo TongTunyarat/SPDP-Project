@@ -586,19 +586,24 @@
             // คำนวณคะแนนสำหรับ Completeness (Document)
             if (documentScores.completenessScores.length > 0) {
                 const completenessAvg = documentScores.completenessScores.reduce((sum, score) => sum + score, 0) / documentScores.completenessScores.length;
+                console.log("Completeness Avg" + completenessAvg)
                 const completenessMaxScore = 10;
                 const completenessWeight = 7;
 
                 const completenessScore = (completenessAvg / completenessMaxScore) * completenessWeight;
+                console.log("completeness Score" + completenessScore)
+
                 totalDocumentScore += completenessScore;
+                console.log("Total completenessScore Score" + totalDocumentScore)
             }
 
             // คำนวณคะแนนสำหรับ Timeliness (Document)
             if (documentScores.timelinessScores.length > 0) {
                 const timelinessAvg = documentScores.timelinessScores.reduce((sum, score) => sum + score, 0) / documentScores.timelinessScores.length;
-                const timelinessWeight = 3; // Weight for Timeliness
+                console.log("Timeliness Score" + timelinessAvg)
 
-                totalDocumentScore += timelinessAvg * timelinessWeight;
+                totalDocumentScore += timelinessAvg
+                console.log("Total timelinessAvg Score" + totalDocumentScore)
             }
 
             // คะแนน Document จะไม่เกิน 10%
