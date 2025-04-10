@@ -89,7 +89,7 @@
             <span id="date-time"></span>
 
             <div class="semester-container">
-                <select id="semester-selector" onchange="fetchGradingStatistics(); fetchProposalData(); fetchDefenseData(); fetchPosterData(); fetchGradeDistribution(); fetchEvaluationStatus(); fetchTeacherScoringData();"></select>
+                <select id="semester-selector" onchange="fetchGradingStatistics(); fetchImportantDates(); fetchProposalData(); fetchDefenseData(); fetchPosterData(); fetchGradeDistribution(); fetchEvaluationStatus(); fetchTeacherScoringData();"></select>
             </div>
 
             <!--    TAB: Proposal & Poster &  Defense   -->
@@ -295,6 +295,7 @@
 
             // เรียก fetchGradingStatistics เพื่อส่งค่า initial ปีไป
             await fetchGradingStatistics();
+            await fetchImportantDates();
             await fetchProposalData();
             await fetchDefenseData();
             await fetchPosterData();
@@ -726,7 +727,9 @@
 <script>
     // ฟังก์ชันสำหรับดึงข้อมูลและอัปเดต timeline
     function fetchImportantDates() {
-        fetch("http://localhost:8080/api/important-dates")
+        const semesterYear = document.getElementById("semester-selector").value;
+
+        fetch(`http://localhost:8080/api/important-dates?year=${semesterYear}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -756,9 +759,13 @@
         const today = new Date();
         const currentYear = today.getFullYear();
 
+        let hasItems = false; // ตัวแปรเช็คว่ามีข้อมูลไหม
+
         scoringPeriods.forEach(period => {
             const endDate = new Date(period.endDate);
             if (endDate.getFullYear() !== currentYear) return;
+
+            hasItems = true; // ถ้าเข้าเงื่อนไข แปลว่ามีข้อมูล
 
             const daysRemaining = Math.max(0, Math.ceil((endDate - today) / (1000 * 60 * 60 * 24)));
 
@@ -779,7 +786,7 @@
             } else if (daysRemaining >= 30) {
                 statusClass = "timeline-chill";
             } else if (daysRemaining < 30) {
-                statusClass = "timeline-lessthan1m"
+                statusClass = "timeline-lessthan1m";
             }
 
             if (statusClass) timelineItem.classList.add(statusClass);
@@ -797,6 +804,22 @@
 
             timelineContainer.appendChild(timelineItem);
         });
+
+        // ถ้าไม่มีรายการเลย
+        if (!hasItems) {
+            const emptyMessage = document.createElement("div");
+            emptyMessage.classList.add("timeline-empty");
+            emptyMessage.innerHTML = `
+<!--            <div class="timeline-icon">-->
+<!--                <i class="fa-solid fa-calendar-xmark"></i>-->
+<!--            </div>-->
+            <div class="timeline-content">
+                <i class="fa-solid fa-calendar-xmark"></i>
+                <div class="timeline-title">ไม่พบข้อมูลกำหนดการในขณะนี้</div>
+            </div>
+        `;
+            timelineContainer.appendChild(emptyMessage);
+        }
     }
 
 

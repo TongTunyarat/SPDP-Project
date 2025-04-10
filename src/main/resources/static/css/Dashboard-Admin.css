@@ -627,3 +627,11 @@ body {
 .custom-dropdown.open .dropdown-options {
     display: block;
 }
+
+.timeline-empty {
+    text-align: center;
+    color: #888;
+    padding: 20px;
+    font-size: 1.2rem;
+    margin-top: 25%;
+}
