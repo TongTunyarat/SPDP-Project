@@ -90,6 +90,37 @@ public class DefenseEvaluationController {
                         )).collect(Collectors.toList());
     }
 
+
+    //     get score DTO
+    @GetMapping("/instructor/showScoreDefense")
+    @ResponseBody
+    public List<DefenseEvaScoreDTO> getScoreProposal(@RequestParam String projectId) {
+        // ดึงข้อมูล ProposalEvalScore ตาม projectId
+        List<DefenseEvalScore> defenseEvalScoreList = defenseEvaluationService.getDefenseEvalScoresByProjectId(projectId);
+
+        return defenseEvalScoreList.stream()
+                .map(score -> {
+
+                    // ดึงคะแนนจาก score
+                    Double scoreValue = score.getScore() != null ? score.getScore().doubleValue() : 0.0;
+
+
+                    // สร้างและส่ง ProposalEvalScoreDTO โดยส่ง weight เป็น String
+                    return new DefenseEvaScoreDTO(
+                            score.getEvalId(),
+                            score.getDefenseEvaluation().getStudent().getStudentId(),
+                            score.getDefenseEvaluation().getStudent().getStudentName(),
+                            score.getDefenseEvaluation().getProjectId().getProjectId(),
+                            score.getCriteria().getCriteriaId(),
+                            score.getCriteria().getCriteriaName(),
+                            score.getCriteria().getWeight(),  // ส่งคะแนนจริง
+                            scoreValue,
+                            score.getCriteria().getMaxScore()// ส่ง weight ในรูปแบบ String
+                    );
+                })
+                .collect(Collectors.toList());
+    }
+
 //    @GetMapping("/instructor/showScoreDefense")
 //    @ResponseBody
 //    public List<DefenseEvaScoreDTO> getScoreDefense(@RequestParam String projectId) {

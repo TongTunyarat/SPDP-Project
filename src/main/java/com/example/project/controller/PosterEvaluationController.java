@@ -7,8 +7,10 @@ import com.example.project.entity.Criteria;
 import com.example.project.entity.PosterEvaluation;
 import com.example.project.entity.PosterEvaluationScore;
 import com.example.project.entity.ProposalEvalScore;
+import com.example.project.repository.CriteriaRepository;
 import com.example.project.repository.PosterEvaScoreRepository;
 import com.example.project.service.PosterEvaluationService;
+import com.example.project.service.ProposalEvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -41,6 +43,10 @@ public class PosterEvaluationController {
     private PosterEvaluationService posterEvaluationService;
     @Autowired
     private PosterEvaScoreRepository posterEvaScoreRepository;
+    @Autowired
+    private CriteriaRepository criteriaRepository;
+    @Autowired
+    private ProposalEvaluationService proposalEvaluationService;
 
     public PosterEvaluationController(PosterEvaluationService posterEvaluationService, PosterEvaScoreRepository posterEvaScoreRepository) {
         this.posterEvaluationService = posterEvaluationService;
@@ -72,15 +78,27 @@ public class PosterEvaluationController {
         // ดึงข้อมูล ProposalEvalScore ตาม projectId
         List<PosterEvaluationScore> posterEvaluationList = posterEvaluationService.getPosterEvalScoresByProjectId(projectId);
 
-        return posterEvaluationList.stream()
-                .map(score -> new PosterEvaScoreDTO(
-                        score.getPosterEvaId(),
-                        score.getPosterEvaluation().getProjectIdPoster().getProjectId(),
-                        score.getCriteriaPoster().getCriteriaId(),
-                        score.getCriteriaPoster().getCriteriaName(),
-                        score.getScore()
+        // ดึงข้อมูล ProposalEvalScore ตาม projectId
+        List<ProposalEvalScore> proposalEvalScoreList = proposalEvaluationService.getProposalEvalScoresByProjectId(projectId);
 
-                )).collect(Collectors.toList());
+
+        return posterEvaluationList.stream()
+                .map(score -> {
+
+                    // ดึงคะแนนจาก score
+                    Double scoreValue = (double) score.getScore();
+
+                    return new PosterEvaScoreDTO(
+                            score.getPosterEvaId(),
+                            score.getPosterEvaluation().getPosterId(),
+                            score.getCriteriaPoster().getCriteriaId(),
+                            score.getCriteriaPoster().getCriteriaName(),
+                            scoreValue,
+                            score.getCriteriaPoster().getWeight(),
+                            score.getCriteriaPoster().getMaxScore()
+                    );
+
+                }).collect(Collectors.toList());
     }
 
 }

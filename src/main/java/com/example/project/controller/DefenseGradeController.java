@@ -112,16 +112,15 @@ public class DefenseGradeController {
     @ResponseBody
     public List<DefenseEvaResponseDTO> getScoreDefense(@RequestParam String projectId) {
         // ดึงข้อมูล DefenseEvalScore ตาม projectId
-        List<DefenseEvaResponseDTO> defenseEvalScoreList = defenseGradeService.getDefenseEvalScoresByProjectId(projectId);
+        List<DefenseEvalScore> defenseEvalScoreList = defenseGradeService.getDefenseEvalScoresByProjectId(projectId);
 
         return defenseEvalScoreList.stream()
                 .map(score -> new DefenseEvaResponseDTO(
-                        score.getEvaId(),
-                        score.getStudentId(),
-                        score.getStudentName(),
-                        score.getCriteriaId(),
-                        score.getCriteriaName(),
-                        score.getType(),
+                        score.getDefenseEvaluation().getDefenseEvaId(),
+                        score.getDefenseEvaluation().getStudent().getStudentId(),
+                        score.getDefenseEvaluation().getStudent().getStudentName(),
+                        score.getCriteria().getCriteriaId(),
+                        score.getCriteria().getCriteriaName(),
                         score.getScore()
                 ))
                 .collect(Collectors.toList());

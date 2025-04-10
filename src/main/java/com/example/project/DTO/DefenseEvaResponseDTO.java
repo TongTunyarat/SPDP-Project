@@ -21,6 +21,9 @@ public class DefenseEvaResponseDTO {
         this.score = score;
     }
 
+    public DefenseEvaResponseDTO(String defenseEvaId, String studentId, String studentName, String criteriaId, String criteriaName, BigDecimal score) {
+    }
+
     public String getEvaId() {
         return evaId;
     }
