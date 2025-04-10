@@ -135,10 +135,18 @@ public class ProposalScheduleService {
         LocalTime startTimeConvert = LocalTime.parse(startTime,timeFormatter);
         LocalTime endTimeConvert = LocalTime.parse(endTime,timeFormatter);
 
-//        System.out.println("🔖 Room Numbers:");
-//        for (String room: roomNumbers) {
-//            System.out.println("🙊Room List: "+ room);
-//        }
+        System.out.println("🔖 Room Numbers:");
+
+        for (String room: roomNumbers) {
+            System.out.println("🙊Room List: "+ room);
+        }
+
+        roomNumbers.sort(Comparator.naturalOrder());
+
+        for (String room: roomNumbers) {
+            System.out.println("Room Sort: "+ room);
+        }
+
 
         //create time slots
         List<Pair<LocalDateTime, LocalDateTime>> allTimeSlots = generateTimeSlots(startDateConvert, endDateConvert, startTimeConvert, endTimeConvert);
@@ -155,7 +163,7 @@ public class ProposalScheduleService {
         if (availableSlots.size() < requiredSlots) {
 
             System.out.println("❌ Not enough time slots available");
-//            return new ScheduleProposalResponseDTO("error", "Not enough time slots available");
+            return new ScheduleProposalResponseDTO("error", "Not enough time slots available");
         }
 
         // sort project ตาม instructor
@@ -228,11 +236,11 @@ public class ProposalScheduleService {
         }
 
         //❗️❗️❗️❗️❗️ ห้ามลบ
-        try {
-            saveProposalSchedule(scheduledAssignments);
-        } catch (Exception e) {
-            return new ScheduleProposalResponseDTO("error", "Failed to generate schedule");
-        }
+//        try {
+//            saveProposalSchedule(scheduledAssignments);
+//        } catch (Exception e) {
+//            return new ScheduleProposalResponseDTO("error", "Failed to generate schedule");
+//        }
 
         return new ScheduleProposalResponseDTO("success", "finished generate schedule", scheduledAssignments, timeSlotDTOList);
     }

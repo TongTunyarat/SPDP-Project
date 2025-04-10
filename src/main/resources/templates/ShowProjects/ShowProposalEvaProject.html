@@ -525,7 +525,9 @@
         if (semesters.includes(defaultYear.toString())) {
             semesterSelector.value = defaultYear.toString();
         } else {
+
             semesterSelector.selectedIndex = 1; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+
         }
 
     }
@@ -619,4 +621,3 @@
     document.getElementById('semester-selector').addEventListener('change', filterBySemester);
 
 </script>
-

@@ -20,250 +20,250 @@
 
 <body>
 
-    <!-- Slide bar-->
-    <div class="sidebar">
-      <h2>ICT MAHIDOL</h2>
+<!-- Slide bar-->
+<div class="sidebar">
+  <h2>ICT MAHIDOL</h2>
 
-      <form th:action="@{/logout}" method="post" class="logout-container">
-        <!--        ค่าที่ใช้สำหรับป้องกัน Cross-Site Request Forgery (CSRF)-->
-        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
-        <button type="submit" class="logout-button"><i class="fas fa-sign-out-alt"></i></button>
-      </form>
+  <form th:action="@{/logout}" method="post" class="logout-container">
+    <!--        ค่าที่ใช้สำหรับป้องกัน Cross-Site Request Forgery (CSRF)-->
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <button type="submit" class="logout-button"><i class="fas fa-sign-out-alt"></i></button>
+  </form>
 
-      <ul>
-        <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">
+  <ul>
+    <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">
+      <path
+              d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+      </path>
+    </svg> Homepage </h4>
+    <li><a href="/admin-dashboard">Dashboard</a></li>
+    <li><a href="/admin-proposal-report">Proposal Grade Report</a></li>
+    <li><a href="/admin-defense-report">Defense Grade Report</a></li>
+    <li><a href="/admin-eva-traking">Evaluation Tracking</a></li>
+  </ul>
+
+  <h2> Pages </h2>
+
+  <ul>
+    <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+      <g fill="#ffffff" fill-rule="nonzero">
+        <g transform="scale(5.33333,5.33333)">
           <path
-                  d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+                  d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
           </path>
-        </svg> Homepage </h4>
-        <li><a href="/admin-dashboard">Dashboard</a></li>
-        <li><a href="/admin-proposal-report">Proposal Grade Report</a></li>
-        <li><a href="/admin-defense-report">Defense Grade Report</a></li>
-        <li><a href="/admin-eva-traking">Evaluation Tracking</a></li>
-      </ul>
+        </g>
+      </g>
+    </svg>Score Evaluation </h4>
+    <li><a href="/scoring-periods">Scoring Period Settings</a></li>
+  </ul>
 
-      <h2> Pages </h2>
+  <ul>
+    <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">
+      <path
+              d="M42 15v-2.5C42 8.916 39.084 6 35.5 6h-23C8.916 6 6 8.916 6 12.5V15H42zM25.5 27H32V33H25.5zM35 27H42V33H35zM6 27H13V33H6zM16 27H22.5V33H16zM35 18H42V24H35zM25.5 18H32V24H25.5zM25.5 36H32V42H25.5zM16 36H22.5V42H16zM35 36v6h.5c3.415 0 6.218-2.649 6.475-6H35zM6.025 36c.257 3.351 3.059 6 6.475 6H13v-6H6.025zM16 18H22.5V24H16zM6 18H13V24H6z">
+      </path>
+    </svg> Manage Schedule </h4>
+    <li><a href="/admin/proposalSchedule" class="active">Proposal Schedule</a></li>
+    <li><a href="/admin/editProposalSchedulePage">Edit Proposal Timing</a></li>
+    <li><a href="/admin/defenseSchedule">Defense Schedule</a></li>
+    <li><a href="#">Edit Defense Timing</a></li>
+  </ul>
 
-      <ul>
-        <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-          <g fill="#ffffff" fill-rule="nonzero">
-            <g transform="scale(5.33333,5.33333)">
-              <path
-                      d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-              </path>
-            </g>
-          </g>
-        </svg>Score Evaluation </h4>
-        <li><a href="/scoring-periods">Scoring Period Settings</a></li>
-      </ul>
-
-      <ul>
-        <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">
-          <path
-                  d="M42 15v-2.5C42 8.916 39.084 6 35.5 6h-23C8.916 6 6 8.916 6 12.5V15H42zM25.5 27H32V33H25.5zM35 27H42V33H35zM6 27H13V33H6zM16 27H22.5V33H16zM35 18H42V24H35zM25.5 18H32V24H25.5zM25.5 36H32V42H25.5zM16 36H22.5V42H16zM35 36v6h.5c3.415 0 6.218-2.649 6.475-6H35zM6.025 36c.257 3.351 3.059 6 6.475 6H13v-6H6.025zM16 18H22.5V24H16zM6 18H13V24H6z">
-          </path>
-        </svg> Manage Schedule </h4>
-        <li><a href="/admin/proposalSchedule" class="active">Proposal Schedule</a></li>
-        <li><a href="/admin/editProposalSchedulePage">Edit Proposal Timing</a></li>
-        <li><a href="/admin/defenseSchedule">Defense Schedule</a></li>
-        <li><a href="#">Edit Defense Timing</a></li>
-      </ul>
-
-      <ul>
-        <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">
-          <path
-                  d="M35.5,8h-3.551C31.697,5.756,29.81,4,27.5,4h-7c-2.31,0-4.197,1.756-4.449,4H12.5C10.019,8,8,10.019,8,12.5v27	c0,2.481,2.019,4.5,4.5,4.5h23c2.481,0,4.5-2.019,4.5-4.5v-27C40,10.019,37.981,8,35.5,8z M20.5,7h7C28.327,7,29,7.673,29,8.5	S28.327,10,27.5,10h-7C19.673,10,19,9.327,19,8.5S19.673,7,20.5,7z M22.5,34h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,34,22.5,34z M22.5,24h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,24,22.5,24z M34.561,34.439c0.586,0.585,0.586,1.536,0,2.121C34.268,36.854,33.884,37,33.5,37	s-0.768-0.146-1.061-0.439L31,35.121l-1.439,1.439C29.268,36.854,28.884,37,28.5,37s-0.768-0.146-1.061-0.439	c-0.586-0.585-0.586-1.536,0-2.121L28.879,33l-1.439-1.439c-0.586-0.585-0.586-1.536,0-2.121c0.586-0.586,1.535-0.586,2.121,0	L31,30.879l1.439-1.439c0.586-0.586,1.535-0.586,2.121,0c0.586,0.585,0.586,1.536,0,2.121L33.121,33L34.561,34.439z M34.561,21.561	l-4,4C30.268,25.854,29.884,26,29.5,26s-0.768-0.146-1.061-0.439l-2-2c-0.586-0.585-0.586-1.536,0-2.121	c0.586-0.586,1.535-0.586,2.121,0l0.939,0.939l2.939-2.939c0.586-0.586,1.535-0.586,2.121,0	C35.146,20.025,35.146,20.975,34.561,21.561z">
-          </path>
-        </svg> Manage Project </h4>
-        <li><a href="/project-overview">Project Overview</a></li>
-        <li><a href="/project-details">Project Details</a></li>
-        <li><a href="/project-committee">Committee</a></li>
-        <li><a href="/project-poster-committee">Poster Committee</a></li>
-      </ul>
-    </div>
+  <ul>
+    <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">
+      <path
+              d="M35.5,8h-3.551C31.697,5.756,29.81,4,27.5,4h-7c-2.31,0-4.197,1.756-4.449,4H12.5C10.019,8,8,10.019,8,12.5v27	c0,2.481,2.019,4.5,4.5,4.5h23c2.481,0,4.5-2.019,4.5-4.5v-27C40,10.019,37.981,8,35.5,8z M20.5,7h7C28.327,7,29,7.673,29,8.5	S28.327,10,27.5,10h-7C19.673,10,19,9.327,19,8.5S19.673,7,20.5,7z M22.5,34h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,34,22.5,34z M22.5,24h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,24,22.5,24z M34.561,34.439c0.586,0.585,0.586,1.536,0,2.121C34.268,36.854,33.884,37,33.5,37	s-0.768-0.146-1.061-0.439L31,35.121l-1.439,1.439C29.268,36.854,28.884,37,28.5,37s-0.768-0.146-1.061-0.439	c-0.586-0.585-0.586-1.536,0-2.121L28.879,33l-1.439-1.439c-0.586-0.585-0.586-1.536,0-2.121c0.586-0.586,1.535-0.586,2.121,0	L31,30.879l1.439-1.439c0.586-0.586,1.535-0.586,2.121,0c0.586,0.585,0.586,1.536,0,2.121L33.121,33L34.561,34.439z M34.561,21.561	l-4,4C30.268,25.854,29.884,26,29.5,26s-0.768-0.146-1.061-0.439l-2-2c-0.586-0.585-0.586-1.536,0-2.121	c0.586-0.586,1.535-0.586,2.121,0l0.939,0.939l2.939-2.939c0.586-0.586,1.535-0.586,2.121,0	C35.146,20.025,35.146,20.975,34.561,21.561z">
+      </path>
+    </svg> Manage Project </h4>
+    <li><a href="/project-overview">Project Overview</a></li>
+    <li><a href="/project-details">Project Details</a></li>
+    <li><a href="/project-committee">Committee</a></li>
+    <li><a href="/project-poster-committee">Poster Committee</a></li>
+  </ul>
+</div>
 
 
 
-    <div class="content">
-      <div class="header-section">
-        <div class="title-group">
-          Manage Proposal Schedule
+<div class="content">
+  <div class="header-section">
+    <div class="title-group">
+      Manage Proposal Schedule
 
-          <div class="program-selector" id="program-selector">
-            <i class="far fa-calendar"></i>
-            <span class="selected-program" id="program-text">DST</span>
-            <i class="fas fa-chevron-down dropdown-arrow"></i>
+      <div class="program-selector" id="program-selector">
+        <i class="far fa-calendar"></i>
+        <span class="selected-program" id="program-text">DST</span>
+        <i class="fas fa-chevron-down dropdown-arrow"></i>
 
-            <div class="dropdown-options" id="dropdown-options">
-              <div class="dropdown-option" data-value="DST">DST</div>
-              <div class="dropdown-option" data-value="ICT">ICT</div>
-            </div>
-
-          </div>
+        <div class="dropdown-options" id="dropdown-options">
+          <div class="dropdown-option" data-value="DST">DST</div>
+          <div class="dropdown-option" data-value="ICT">ICT</div>
         </div>
-        <button class="set-btn" id="openModal">Setting</button>
-      </div>
-
-      <!-- ===================================================================  Modal =================================================================== -->
-      <div class="modal" id="settingModal">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h4 class="modal-title">Setting</h4>
-          </div>
-
-          <div class="modal-body">
-            <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-<!--            <p>CSRF Token: <span th:text="${_csrf.token}">ไม่มีค่า</span></p>-->
-            <label>Start Date:</label>
-            <input type="date" class="custom-input" id="start-date"/><br>
-
-            <label>End Date:</label>
-            <input type="date" class="custom-input" id="end-date"/><br>
-
-            <label>Time Start :</label>
-            <input type="time" class="custom-input"><br>
-
-            <label>End Start :</label>
-            <input type="time" class="custom-input"><br>
-
-            <label>Room: </label>
-            <div class="dropdown">
-
-              <button id="selected-label" onclick="toggleDropdown()">
-                <span id="selected-text">Select Room </span>
-                <i class="fa fa-caret-down"></i>
-              </button>
-
-              <div class="dropdown-content upward" id="dropdown-content">
-
-                <div class="dropdown-header">
-                  <div id="back-button" onclick="backToFloors()">
-                    <span style="font-size: 20px">&larr;</span>
-                  </div>
-                  <h4 id="floor-title">Select Floor</h4>
-                </div>
-
-                <div id="search-container">
-                    <input type="text" id="search" placeholder="Search room" onkeyup="filterRooms()">
-                </div>
-
-                <div id="select-all-container">
-                  <label><input type="checkbox" id="select-all" onclick="selectAll()"> Select All</label><br>
-                </div>
-
-                  <div id="room-list"></div>
-
-              </div>
-            </div><br>
-
-            <div class="modal-footer">
-              <button id="saveBtn">Save</button>
-              <button id="cancelBtn">Cancel</button>
-            </div>
-          </div>
-
-<!--          https://codepen.io/AdamDipinto/pen/ewKxwE-->
-          <div class="modal-loader-overlay" id="modalLoaderOverlay" style="display:none;">
-            <div class="loader-center">
-              <div class="loader">
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-                <span></span>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-
-
-<!--      ===================================================================  Schedule =================================================================== */-->
-      <div class="schedule"></div>
-      <div class="button-container">
-        <button class="preview-block" onclick="openPreview()">Preview</button>
-        <script>
-          //https://www.w3schools.com/jsref/met_win_open.asp
-          function openPreview(){
-            window.open('/admin/previewProposalSchedulePage', '_blank');
-          }
-        </script>
-        <button class="export-block">Export</button>
-
-        <script>
-
-          document.querySelector(".export-block").addEventListener("click", function() {
-
-            let program = document.getElementById("program-text").textContent.trim();
-
-            document.getElementById("modalLoaderOverlay").style.display = "flex";
-            console.log("Loader should be visible now");
-
-            fetch(`/admin/exportProposalSchedule?program=${encodeURIComponent(program)}`, {
-              method: "GET",
-            })
-                    .then(response => {
-                      if (!response.ok){
-
-                      throw new Error('Network response was not ok ' + response.statusText);
-
-                      }
-
-                      const filename = response.headers.get('content-disposition')
-                              .split('filename=')[1]
-                              // เอา " ออกจาชื่อ
-                              .replace(/"/g, '');
-
-                      // blob -> Binary Large Object
-                      return response.blob().then(blob => {
-                        return {blob, filename};
-                      });
-
-                    })
-                    .then(data => {
-
-                      // https://stackoverflow.com/questions/19327749/javascript-blob-filename-without-link
-
-                      // temp url
-                      const url = window.URL.createObjectURL(data.blob);
-
-                      // <a href="https://example.com">Website</a>
-                      const a = document.createElement("a");
-
-                      a.style.display = "none";
-                      a.href = url;
-                      a.download = data.filename;
-
-                      document.body.appendChild(a);
-                      a.click();
-
-                      window.URL.revokeObjectURL(url);
-
-                      document.getElementById("modalLoaderOverlay").style.display = "none";
-
-                      Swal.fire({
-                        icon: "success",
-                        title: "Export schedule successfully.",
-                        showConfirmButton: false,
-                        timer: 2000
-                      });
-                    })
-                    .catch(error => {
-                              console.error("Error exporting schedule:", error);
-                              Swal.fire({
-                                icon: "error",
-                                title: "Oops...",
-                                text: "Something went wrong!",
-                              });
-                            }
-                    );
-          });
-
-        </script>
 
       </div>
     </div>
+    <button class="set-btn" id="openModal">Setting</button>
+  </div>
+
+  <!-- ===================================================================  Modal =================================================================== -->
+  <div class="modal" id="settingModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">Setting</h4>
+      </div>
+
+      <div class="modal-body">
+        <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <!--            <p>CSRF Token: <span th:text="${_csrf.token}">ไม่มีค่า</span></p>-->
+        <label>Start Date:</label>
+        <input type="date" class="custom-input" id="start-date"/><br>
+
+        <label>End Date:</label>
+        <input type="date" class="custom-input" id="end-date"/><br>
+
+        <label>Time Start :</label>
+        <input type="time" class="custom-input"><br>
+
+        <label>End Start :</label>
+        <input type="time" class="custom-input"><br>
+
+        <label>Room: </label>
+        <div class="dropdown">
+
+          <button id="selected-label" onclick="toggleDropdown()">
+            <span id="selected-text">Select Room </span>
+            <i class="fa fa-caret-down"></i>
+          </button>
+
+          <div class="dropdown-content upward" id="dropdown-content">
+
+            <div class="dropdown-header">
+              <div id="back-button" onclick="backToFloors()">
+                <span style="font-size: 20px">&larr;</span>
+              </div>
+              <h4 id="floor-title">Select Floor</h4>
+            </div>
+
+            <div id="search-container">
+              <input type="text" id="search" placeholder="Search room" onkeyup="filterRooms()">
+            </div>
+
+            <div id="select-all-container">
+              <label><input type="checkbox" id="select-all" onclick="selectAll()"> Select All</label><br>
+            </div>
+
+            <div id="room-list"></div>
+
+          </div>
+        </div><br>
+
+        <div class="modal-footer">
+          <button id="saveBtn">Save</button>
+          <button id="cancelBtn">Cancel</button>
+        </div>
+      </div>
+
+      <!--          https://codepen.io/AdamDipinto/pen/ewKxwE-->
+      <div class="modal-loader-overlay" id="modalLoaderOverlay" style="display:none;">
+        <div class="loader-center">
+          <div class="loader">
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+
+  <!--      ===================================================================  Schedule =================================================================== */-->
+  <div class="schedule"></div>
+  <div class="button-container">
+    <button class="preview-block" onclick="openPreview()">Preview</button>
+    <script>
+      //https://www.w3schools.com/jsref/met_win_open.asp
+      function openPreview(){
+        window.open('/admin/previewProposalSchedulePage', '_blank');
+      }
+    </script>
+    <button class="export-block">Export</button>
+
+    <script>
+
+      document.querySelector(".export-block").addEventListener("click", function() {
+
+        let program = document.getElementById("program-text").textContent.trim();
+
+        document.getElementById("modalLoaderOverlay").style.display = "flex";
+        console.log("Loader should be visible now");
+
+        fetch(`/admin/exportProposalSchedule?program=${encodeURIComponent(program)}`, {
+          method: "GET",
+        })
+                .then(response => {
+                  if (!response.ok){
+
+                    throw new Error('Network response was not ok ' + response.statusText);
+
+                  }
+
+                  const filename = response.headers.get('content-disposition')
+                          .split('filename=')[1]
+                          // เอา " ออกจาชื่อ
+                          .replace(/"/g, '');
+
+                  // blob -> Binary Large Object
+                  return response.blob().then(blob => {
+                    return {blob, filename};
+                  });
+
+                })
+                .then(data => {
+
+                  // https://stackoverflow.com/questions/19327749/javascript-blob-filename-without-link
+
+                  // temp url
+                  const url = window.URL.createObjectURL(data.blob);
+
+                  // <a href="https://example.com">Website</a>
+                  const a = document.createElement("a");
+
+                  a.style.display = "none";
+                  a.href = url;
+                  a.download = data.filename;
+
+                  document.body.appendChild(a);
+                  a.click();
+
+                  window.URL.revokeObjectURL(url);
+
+                  document.getElementById("modalLoaderOverlay").style.display = "none";
+
+                  Swal.fire({
+                    icon: "success",
+                    title: "Export schedule successfully.",
+                    showConfirmButton: false,
+                    timer: 2000
+                  });
+                })
+                .catch(error => {
+                          console.error("Error exporting schedule:", error);
+                          Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Something went wrong!",
+                          });
+                        }
+                );
+      });
+
+    </script>
+
+  </div>
+</div>
 
 <!--    <div class="slot-box ${project.status === "Non-Active" ? "non-active" : (project.status === 'Edit-Active' ? 'edit-active' : '')}"><br><div class="project-id">${project.projectId}</div><br><div class="instructors"></div>-->
 
@@ -307,535 +307,572 @@
 
 <script>
 
-    function fetchData() {
-        let url = 'http://localhost:8080/admin/roomFloorSetting';
+  function fetchData() {
+    let url = 'http://localhost:8080/admin/roomFloorSetting';
 
-        fetch(url)
-                .then(response => {
-                  // console.log(response.json());
-                  if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
-                  }
-                  return response.json();
-                })
-                .then(data => {
-                  // console.log("🐍 Data Length: " + data.length);
-                  // console.log("Show Data: " + JSON.stringify(data, null, 2));
+    fetch(url)
+            .then(response => {
+              // console.log(response.json());
+              if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+              }
+              return response.json();
+            })
+            .then(data => {
+              // console.log("🐍 Data Length: " + data.length);
+              // console.log("Show Data: " + JSON.stringify(data, null, 2));
 
-                  rooms.length = 0;
+              rooms.length = 0;
 
-                  for(const key in data) {
+              for(const key in data) {
 
-                      rooms.push({
-                        name: key,
-                        floor: data[key]
-                      });
-
-                  }
-
-                  // console.log("🐍 rooms: " + rooms);
-
-                  // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_localecompare2
-                  rooms.sort((a, b) => {
-
-                    if(a.floor !== b.floor) {
-
-                      return a.floor.localeCompare(b.floor);
-                    }
-
-                    return a.name.localeCompare(b.name);
-
-                  });
-
-                  // rooms.forEach(room => {
-                  //   console.log("Room: " + room.name + ", Floor: " + room.floor);
-                  // })
-
-                  const dropdown = document.getElementById("dropdown-content");
-                  if (dropdown.style.display === "block") {
-
-                    showFloors();
-
-                  }
-
-                })
-                .catch(error => {
-                  console.error('Error fetching data:', error);
-                  document.getElementById('filter-results').innerHTML = "ไม่พบข้อมูลห้อง";
+                rooms.push({
+                  name: key,
+                  floor: data[key]
                 });
-      }
 
-    document.addEventListener('DOMContentLoaded', function () {
-      console.log("🚀 Load Page");
-        getScheduleData();
-        fetchData();
+              }
+
+              // console.log("🐍 rooms: " + rooms);
+
+              // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_localecompare2
+              rooms.sort((a, b) => {
+
+                if(a.floor !== b.floor) {
+
+                  return a.floor.localeCompare(b.floor);
+                }
+
+                return a.name.localeCompare(b.name);
+
+              });
+
+              // rooms.forEach(room => {
+              //   console.log("Room: " + room.name + ", Floor: " + room.floor);
+              // })
+
+              const dropdown = document.getElementById("dropdown-content");
+              if (dropdown.style.display === "block") {
+
+                showFloors();
+
+              }
+
+            })
+            .catch(error => {
+              console.error('Error fetching data:', error);
+              document.getElementById('filter-results').innerHTML = "ไม่พบข้อมูลห้อง";
+            });
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    console.log("🚀 Load Page");
+    getScheduleData();
+    fetchData();
+  });
+
+
+  // open modal
+  document.getElementById("openModal").addEventListener("click", function() {
+    console.log("📌 Open modal");
+    document.getElementById("settingModal").style.display = "block";
+  });
+
+  // close modal
+  function closeModal() {
+    console.log("❌ Close Modal");
+    document.getElementById("settingModal").style.display = "none";
+
+    document.querySelectorAll("input[type='date']").forEach(input => {
+      input.value = "";
+      input.removeAttribute("min");
+      input.removeAttribute("max");
     });
 
+    document.querySelector("input[type='time']").value = "";
+    document.querySelectorAll("input[type='time']")[1].value = "";
 
-    // open modal
-    document.getElementById("openModal").addEventListener("click", function() {
-      console.log("📌 Open modal");
-      document.getElementById("settingModal").style.display = "block";
-    });
+    document.getElementById("selected-text").textContent = "Select Room";
+    selectedRooms.clear();
+    const checkboxes = document.querySelectorAll("#room-list input[type=checkbox]");
+    checkboxes.forEach(cb => {
 
-    // close modal
-    function closeModal() {
-      console.log("❌ Close Modal");
-      document.getElementById("settingModal").style.display = "none";
-
-      document.querySelectorAll("input[type='date']").forEach(input => {
-        input.value = "";
-        input.removeAttribute("min");
-        input.removeAttribute("max");
-      });
-
-      document.querySelector("input[type='time']").value = "";
-      document.querySelectorAll("input[type='time']")[1].value = "";
-
-      document.getElementById("selected-text").textContent = "Select Room";
-      selectedRooms.clear();
-      const checkboxes = document.querySelectorAll("#room-list input[type=checkbox]");
-      checkboxes.forEach(cb => {
-
-        cb.checked = false;
-
-      });
-
-      let selectAllCheckbox = document.getElementById("select-all");
-
-      if(selectAllCheckbox) {
-
-        selectAllCheckbox.checked = false;
-
-      }
-    }
-
-    document.getElementById("cancelBtn").addEventListener("click", closeModal);
-
-
-    // click out modal
-    // https://stackoverflow.com/questions/45393553/window-onclick-functionevent-only-works-for-first-item
-    window.onclick = function(event) {
-      let modal = document.getElementById("settingModal");
-
-      if (event.target === modal) {
-        // console.log("👀 Event: " + event.target);
-        // console.dir(event.target);
-        // console.log("🙂 Modal: " + modal);
-        // console.dir(modal);
-        console.log("⛔ คลิกนอก Modal -> ปิด Modal");
-        closeModal();
-      }
-
-    };
-
-    // date (https://stackoverflow.com/questions/20491326/start-and-end-date-validation-in-html5)
-    const startDate = document.querySelector("#start-date");
-    const endDate = document.querySelector("#end-date");
-
-    startDate.addEventListener('change', function () {
-
-      if (startDate.value) {
-        endDate.min = startDate.value
-      }
-
-    }, false);
-
-    endDate.addEventListener('change', function () {
-
-      if (endDate.value) {
-        startDate.max = endDate.value
-      }
-
-    }, false);
-
-    // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_onblur (blur)
-    endDate.addEventListener('blur', function () {
-
-      if (endDate.value && startDate.value && endDate.value < startDate.value) {
-        Swal.fire({
-          icon: "error",
-          title: "Sorry!",
-          text: "End date cannot be earlier than the Start date.",
-          draggable: true,
-          confirmButtonColor: "#dc3360"
-        });
-
-        endDate.value = "";
-        endDate.min = "";
-      }
+      cb.checked = false;
 
     });
 
-    startDate.addEventListener('blur', function () {
+    let selectAllCheckbox = document.getElementById("select-all");
 
-      if (startDate.value && endDate.value && startDate.value > endDate.value) {
-        Swal.fire({
-          icon: "error",
-          title: "Sorry!",
-          text: "Start date cannot be more than End date",
-          draggable: true,
-          confirmButtonColor: "#dc3360"
-        });
+    if(selectAllCheckbox) {
 
-        startDate.value = "";
-        startDate.max = "";
-      }
-
-    });
-
-
-    // room
-    const rooms = []; // Object {name, floor}
-    let selectedRooms = new Set();
-    let selectedFloor = null;
-
-    function getFloors() {
-
-      const flors = new Set();
-      rooms.forEach(room => flors.add(room.floor));
-
-      return Array.from(flors).sort();
-    }
-
-    function toggleDropdown() {
-      let dropdown = document.getElementById("dropdown-content");
-      let isVisible = dropdown.style.display === "block";
-      console.log(`${isVisible}`);
-
-      dropdown.style.display = isVisible ? "none" : "block";
-      console.log(`📂 Dropdown ${isVisible ? "close" : "open"}`);
-
-      if (!isVisible) {
-
-        showFloors();
-
-      }
+      selectAllCheckbox.checked = false;
 
     }
+  }
 
-    function showFloors() {
+  document.getElementById("cancelBtn").addEventListener("click", closeModal);
 
-      let roomList = document.getElementById("room-list");
-      roomList.innerHTML = "";
 
-      // set
-      document.getElementById("search-container").style.display = "none";
-      document.getElementById("back-button").style.display = "none";
-      document.getElementById("floor-title").textContent = "Select Floor";
-      document.getElementById("select-all-container").style.display = "none";
+  // click out modal
+  // https://stackoverflow.com/questions/45393553/window-onclick-functionevent-only-works-for-first-item
+  window.onclick = function(event) {
+    let modal = document.getElementById("settingModal");
 
-      const floors = getFloors();
+    if (event.target === modal) {
+      // console.log("👀 Event: " + event.target);
+      // console.dir(event.target);
+      // console.log("🙂 Modal: " + modal);
+      // console.dir(modal);
+      console.log("⛔ คลิกนอก Modal -> ปิด Modal");
+      closeModal();
+    }
 
-      console.log("🏢 แสดงรายการชั้น:", floors);
+  };
 
-      floors.forEach(floor => {
+  // date (https://stackoverflow.com/questions/20491326/start-and-end-date-validation-in-html5)
+  const startDate = document.querySelector("#start-date");
+  const endDate = document.querySelector("#end-date");
 
-        let floorItem = document.createElement("div");
-        floorItem.classList.add("floor-item");
-        floorItem.textContent = `Floor ${floor}`;
+  startDate.addEventListener('change', function () {
 
-        // เก็บค่า room ในเเต่ละชั้น
-        const selectedInFloor = Array.from(selectedRooms).filter(roomName => {
+    if (startDate.value) {
+      endDate.min = startDate.value
+    }
 
-          const roomObj = rooms.find(r => r.name === roomName);
+  }, false);
 
-          return roomObj && roomObj.floor === floor;
-        });
+  endDate.addEventListener('change', function () {
 
-        if(selectedInFloor.length > 0) {
+    if (endDate.value) {
+      startDate.max = endDate.value
+    }
 
-          let countBadge = document.createElement("span");
+  }, false);
 
-          countBadge.classList.add("count-badge");
-          // นับจน.
-          countBadge.textContent = selectedInFloor.length;
-          floorItem.appendChild(countBadge);
+  // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_onblur (blur)
+  endDate.addEventListener('blur', function () {
 
-        }
-
-        floorItem.onclick = function () {
-
-          selectedFloor = floor;
-          showRoomsByFloor(floor);
-
-        };
-
-        roomList.appendChild(floorItem);
-
+    if (endDate.value && startDate.value && endDate.value < startDate.value) {
+      Swal.fire({
+        icon: "error",
+        title: "Sorry!",
+        text: "End date cannot be earlier than the Start date.",
+        draggable: true,
+        confirmButtonColor: "#dc3360"
       });
 
-      updateSelectedCount();
-
+      endDate.value = "";
+      endDate.min = "";
     }
 
-    // กรอง room เเต่ละชั้นเพื่อไป create
-    function showRoomsByFloor(floor) {
+  });
 
-      let roomList = document.getElementById("room-list");
-      roomList.innerHTML = "";
+  startDate.addEventListener('blur', function () {
 
-      document.getElementById("search-container").style.display = "block";
-      document.getElementById("back-button").style.display = "flex";
-      document.getElementById("floor-title").textContent = `Floor ${floor}`;
-      document.getElementById("select-all-container").style.display = "block";
-      document.getElementById("dropdown-content").style.display = "block";
-
-      console.log(`🏢 แสดงห้องในชั้น ${floor}`);
-
-      const roomsInFloor = rooms.filter(room => room.floor === floor)
-              .map(room => room.name);
-
-      createRooms(roomsInFloor);
-
-    }
-
-    function filterRooms() {
-
-      console.log("Floor:", selectedFloor)
-
-      if(!selectedFloor) return;
-
-      // change
-      let searchValue = document.getElementById("search").value.toLowerCase();
-      console.log(`🔎 Find: ${searchValue}`);
-
-      let filteredRooms = rooms.filter(room => room.name.toLowerCase().includes(searchValue) && room.floor === selectedFloor)
-              .map(room => room.name);
-      console.log("📋 Result:", filteredRooms);
-
-      createRooms(filteredRooms); // หลังค้นหา
-    }
-
-    function createRooms(roomNames = []) {
-      document.getElementById("select-all-container").style.display = "block";
-
-      let roomList = document.getElementById("room-list");
-      roomList.innerHTML = ""; // clear
-
-      console.log("🔄 Load new room");
-      console.log("🔍 Room:", roomNames);
-
-      // if(roomNames.length === 0 && selectedFloor) {
-      //   roomNames = rooms.filter(room => room.floor === selectedFloor)
-      //           .map(room => room.name);
-      // }
-
-      if (roomNames.length === 0) {
-
-        let noResult = document.createElement("div");
-        noResult.textContent = "Room not found.";
-        noResult.style.color = "#888";
-        noResult.style.padding = "1rem";
-        roomList.appendChild(noResult);
-        updateSelectedCount();
-        document.getElementById("select-all-container").style.display = "none";
-
-        return;
-      }
-
-      roomNames.forEach(room => {
-
-        let label = document.createElement("label");
-        label.classList.add("room-label");
-        let checkbox = document.createElement("input");
-
-        checkbox.type = "checkbox";
-        checkbox.value = room;
-        checkbox.checked = selectedRooms.has(room);
-
-        checkbox.onchange = function () {
-          if (checkbox.checked) {
-            selectedRooms.add(room);
-            console.log(`✅ Select room: ${room}`);
-          } else {
-            selectedRooms.delete(room);
-            console.log(`❌ Delete room: ${room}`);
-          }
-          updateSelectedCount();
-        };
-
-        label.appendChild(checkbox);
-        label.appendChild(document.createTextNode(` ${room}`));
-        roomList.appendChild(label);
-        // roomList.appendChild(document.createElement("br"));
+    if (startDate.value && endDate.value && startDate.value > endDate.value) {
+      Swal.fire({
+        icon: "error",
+        title: "Sorry!",
+        text: "Start date cannot be more than End date",
+        draggable: true,
+        confirmButtonColor: "#dc3360"
       });
 
-      updateSelectedCount();
-      updateSelectAllCheckbox();
+      startDate.value = "";
+      startDate.max = "";
     }
 
-    function selectAll() {
-      let selectAllCheckbox = document.getElementById("select-all");
-      let checkboxes = document.querySelectorAll("#room-list input[type=checkbox]");
-      // keep true, false;
-      let isChecked = selectAllCheckbox.checked;
-
-      console.log(isChecked ? "🔘 Select all" : "⭕ Cancle all");
-
-      checkboxes.forEach(cb => {
-        cb.checked = isChecked;
-
-        if (isChecked) {
-          selectedRooms.add(cb.value);
-        } else {
-          selectedRooms.delete(cb.value);
-        }
-
-      });
-
-      updateSelectedCount();
-    }
-
-    function updateSelectAllCheckbox() {
-      const checkboxes = document.querySelectorAll("#room-list input[type=checkbox]");
-      const total = checkboxes.length;
-      const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
-
-      document.getElementById("select-all").checked = total > 0 && total === checked;
-    }
+  });
 
 
-    function updateSelectedCount() {
-      let count = selectedRooms.size;
+  // room
+  const rooms = []; // Object {name, floor}
+  let selectedRooms = new Set();
+  let selectedFloor = null;
 
-        if (count > 0) {
-          document.getElementById("selected-text").textContent = `${count} Selected`;
-        } else {
-          document.getElementById("selected-text").textContent = "Select Room";
-        }
+  function getFloors() {
 
-      console.log(`📊 Count room: ${count}`);
-      console.log("📋 List room:", [...selectedRooms]);
-    }
+    const flors = new Set();
+    rooms.forEach(room => flors.add(room.floor));
 
-    function backToFloors() {
+    return Array.from(flors).sort();
+  }
 
-      selectedFloor = null;
+  function toggleDropdown() {
+    let dropdown = document.getElementById("dropdown-content");
+    let isVisible = dropdown.style.display === "block";
+    console.log(`${isVisible}`);
+
+    dropdown.style.display = isVisible ? "none" : "block";
+    console.log(`📂 Dropdown ${isVisible ? "close" : "open"}`);
+
+    if (!isVisible) {
+
       showFloors();
 
     }
 
+  }
 
-    // close dropdown room
-    document.addEventListener("click", function(event) {
+  function showFloors() {
 
-      if (!event.target.closest(".dropdown") && !event.target.closest(".floor-item")) {
-        document.getElementById("dropdown-content").style.display = "none";
-        // console.log("📌 คลิกข้างนอก -> ปิด Dropdown");
+    let roomList = document.getElementById("room-list");
+    roomList.innerHTML = "";
+
+    // set
+    document.getElementById("search-container").style.display = "none";
+    document.getElementById("back-button").style.display = "none";
+    document.getElementById("floor-title").textContent = "Select Floor";
+    document.getElementById("select-all-container").style.display = "none";
+
+    const floors = getFloors();
+
+    console.log("🏢 แสดงรายการชั้น:", floors);
+
+    floors.forEach(floor => {
+
+      let floorItem = document.createElement("div");
+      floorItem.classList.add("floor-item");
+      floorItem.textContent = `Floor ${floor}`;
+
+      // เก็บค่า room ในเเต่ละชั้น
+      const selectedInFloor = Array.from(selectedRooms).filter(roomName => {
+
+        const roomObj = rooms.find(r => r.name === roomName);
+
+        return roomObj && roomObj.floor === floor;
+      });
+
+      if(selectedInFloor.length > 0) {
+
+        let countBadge = document.createElement("span");
+
+        countBadge.classList.add("count-badge");
+        // นับจน.
+        countBadge.textContent = selectedInFloor.length;
+        floorItem.appendChild(countBadge);
+
+      }
+
+      floorItem.onclick = function () {
+
+        selectedFloor = floor;
+        showRoomsByFloor(floor);
+
+      };
+
+      roomList.appendChild(floorItem);
+
+    });
+
+    updateSelectedCount();
+
+  }
+
+  // กรอง room เเต่ละชั้นเพื่อไป create
+  function showRoomsByFloor(floor) {
+
+    let roomList = document.getElementById("room-list");
+    roomList.innerHTML = "";
+
+    document.getElementById("search-container").style.display = "block";
+    document.getElementById("back-button").style.display = "flex";
+    document.getElementById("floor-title").textContent = `Floor ${floor}`;
+    document.getElementById("select-all-container").style.display = "block";
+    document.getElementById("dropdown-content").style.display = "block";
+
+    console.log(`🏢 แสดงห้องในชั้น ${floor}`);
+
+    const roomsInFloor = rooms.filter(room => room.floor === floor)
+            .map(room => room.name);
+
+    createRooms(roomsInFloor);
+
+  }
+
+  function filterRooms() {
+
+    console.log("Floor:", selectedFloor)
+
+    if(!selectedFloor) return;
+
+    // change
+    let searchValue = document.getElementById("search").value.toLowerCase();
+    console.log(`🔎 Find: ${searchValue}`);
+
+    let filteredRooms = rooms.filter(room => room.name.toLowerCase().includes(searchValue) && room.floor === selectedFloor)
+            .map(room => room.name);
+    console.log("📋 Result:", filteredRooms);
+
+    createRooms(filteredRooms); // หลังค้นหา
+  }
+
+  function createRooms(roomNames = []) {
+    document.getElementById("select-all-container").style.display = "block";
+
+    let roomList = document.getElementById("room-list");
+    roomList.innerHTML = ""; // clear
+
+    console.log("🔄 Load new room");
+    console.log("🔍 Room:", roomNames);
+
+    // if(roomNames.length === 0 && selectedFloor) {
+    //   roomNames = rooms.filter(room => room.floor === selectedFloor)
+    //           .map(room => room.name);
+    // }
+
+    if (roomNames.length === 0) {
+
+      let noResult = document.createElement("div");
+      noResult.textContent = "Room not found.";
+      noResult.style.color = "#888";
+      noResult.style.padding = "1rem";
+      roomList.appendChild(noResult);
+      updateSelectedCount();
+      document.getElementById("select-all-container").style.display = "none";
+
+      return;
+    }
+
+    roomNames.forEach(room => {
+
+      let label = document.createElement("label");
+      label.classList.add("room-label");
+      let checkbox = document.createElement("input");
+
+      checkbox.type = "checkbox";
+      checkbox.value = room;
+      checkbox.checked = selectedRooms.has(room);
+
+      checkbox.onchange = function () {
+        if (checkbox.checked) {
+          selectedRooms.add(room);
+          console.log(`✅ Select room: ${room}`);
+        } else {
+          selectedRooms.delete(room);
+          console.log(`❌ Delete room: ${room}`);
+        }
+        updateSelectedCount();
+      };
+
+      label.appendChild(checkbox);
+      label.appendChild(document.createTextNode(` ${room}`));
+      roomList.appendChild(label);
+      // roomList.appendChild(document.createElement("br"));
+    });
+
+    updateSelectedCount();
+    updateSelectAllCheckbox();
+  }
+
+  function selectAll() {
+    let selectAllCheckbox = document.getElementById("select-all");
+    let checkboxes = document.querySelectorAll("#room-list input[type=checkbox]");
+    // keep true, false;
+    let isChecked = selectAllCheckbox.checked;
+
+    console.log(isChecked ? "🔘 Select all" : "⭕ Cancle all");
+
+    checkboxes.forEach(cb => {
+      cb.checked = isChecked;
+
+      if (isChecked) {
+        selectedRooms.add(cb.value);
+      } else {
+        selectedRooms.delete(cb.value);
       }
 
     });
 
+    updateSelectedCount();
+  }
+
+  function updateSelectAllCheckbox() {
+    const checkboxes = document.querySelectorAll("#room-list input[type=checkbox]");
+    const total = checkboxes.length;
+    const checked = Array.from(checkboxes).filter(cb => cb.checked).length;
+
+    document.getElementById("select-all").checked = total > 0 && total === checked;
+  }
 
 
-    <!-- ===================================================================  Generate =================================================================== -->
+  function updateSelectedCount() {
+    let count = selectedRooms.size;
 
-
-    function getCsrfToken() {
-
-      let tokenInput = document.getElementById("csrfToken");
-
-      if (tokenInput && tokenInput.value) {
-        return tokenInput.value;
-      }
-
-      console.error("⛔ CSRF token not found.");
-      return "dummy-token";
+    if (count > 0) {
+      document.getElementById("selected-text").textContent = `${count} Selected`;
+    } else {
+      document.getElementById("selected-text").textContent = "Select Room";
     }
 
+    console.log(`📊 Count room: ${count}`);
+    console.log("📋 List room:", [...selectedRooms]);
+  }
+
+  function backToFloors() {
+
+    selectedFloor = null;
+    showFloors();
+
+  }
 
 
-    // send value to controlller
-    document.getElementById("saveBtn").addEventListener("click", function () {
-      let startDateInput = document.querySelector("input[type='date']");
-      let endDateInput = document.querySelectorAll("input[type='date']")[1];
-      let startTimeInput = document.querySelector("input[type='time']");
-      let endTimeInput = document.querySelectorAll("input[type='time']")[1];
-      let program = document.getElementById("program-text").textContent;
+  // close dropdown room
+  document.addEventListener("click", function(event) {
 
-      // console.log("startDateInput:", startDateInput);
-      // console.log("endDateInput:", endDateInput);
-      // console.log("startTimeInput:", startTimeInput);
-      // console.log("endTimeInput:", endTimeInput);
-      // console.log("program:", program);
+    if (!event.target.closest(".dropdown") && !event.target.closest(".floor-item")) {
+      document.getElementById("dropdown-content").style.display = "none";
+      // console.log("📌 คลิกข้างนอก -> ปิด Dropdown");
+    }
+
+  });
 
 
-      let startDate = startDateInput.value;
-      let endDate = endDateInput.value;
-      let startTime = startTimeInput.value;
-      let endTime = endTimeInput.value;
-      let selectedRoom = [...selectedRooms];
-      let programData = program;
 
-      let startDateTime = new Date(`${startDate}T${startTime}`)
-      let endDateTime = new Date(`${endDate}T${endTime}`)
+  <!-- ===================================================================  Generate =================================================================== -->
 
-      if (!startDate || !endDate || !startTime || !endTime || selectedRoom.length === 0) {
-        Swal.fire({
-          icon: "warning",
-          title: "Oops...",
-          text: "Please fill in all information.",
-          draggable: true,
-          confirmButtonColor: "#dc7633"
-        });
-        return;
+
+  function getCsrfToken() {
+
+    let tokenInput = document.getElementById("csrfToken");
+
+    if (tokenInput && tokenInput.value) {
+      return tokenInput.value;
+    }
+
+    console.error("⛔ CSRF token not found.");
+    return "dummy-token";
+  }
+
+
+
+  // send value to controlller
+  document.getElementById("saveBtn").addEventListener("click", function () {
+    let startDateInput = document.querySelector("input[type='date']");
+    let endDateInput = document.querySelectorAll("input[type='date']")[1];
+    let startTimeInput = document.querySelector("input[type='time']");
+    let endTimeInput = document.querySelectorAll("input[type='time']")[1];
+    let program = document.getElementById("program-text").textContent;
+
+    // console.log("startDateInput:", startDateInput);
+    // console.log("endDateInput:", endDateInput);
+    // console.log("startTimeInput:", startTimeInput);
+    // console.log("endTimeInput:", endTimeInput);
+    // console.log("program:", program);
+
+
+    let startDate = startDateInput.value;
+    let endDate = endDateInput.value;
+    let startTime = startTimeInput.value;
+    let endTime = endTimeInput.value;
+    let selectedRoom = [...selectedRooms];
+    let programData = program;
+
+    let startDateTime = new Date(`${startDate}T${startTime}`)
+    let endDateTime = new Date(`${endDate}T${endTime}`)
+
+    if (!startDate || !endDate || !startTime || !endTime || selectedRoom.length === 0) {
+      Swal.fire({
+        icon: "warning",
+        title: "Oops...",
+        text: "Please fill in all information.",
+        draggable: true,
+        confirmButtonColor: "#dc7633"
+      });
+      return;
+    }
+
+    if(startDateTime >= endDateTime) {
+      Swal.fire({
+        icon: "warning",
+        title: "Oops...",
+        text: "Start time must be before end time.",
+        draggable: true,
+        confirmButtonColor: "#dc7633"
+      });
+      return;
+    }
+
+    let csrfToken = getCsrfToken();
+    console.log("👀 CSRF Token: ", csrfToken);
+
+    if (!csrfToken || csrfToken === "dummy-token") {
+      alert("CSRF Token Invalid❗️");
+      return;
+    }
+
+    //check exits
+    fetch(`http://localhost:8080/admin/checkExitsSchedule?program=${encodeURIComponent(programData)}`, {
+
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
       }
+    })
+            .then(response => response.json())
+            .then(data => {
 
-      if(startDateTime >= endDateTime) {
-        Swal.fire({
-          icon: "warning",
-          title: "Oops...",
-          text: "Start time must be before end time.",
-          draggable: true,
-          confirmButtonColor: "#dc7633"
-        });
-        return;
-      }
+              const exists = data.checkEexti;
+              console.log("Schedule exists:", exists);
 
-      let csrfToken = getCsrfToken();
-      console.log("👀 CSRF Token: ", csrfToken);
+              if (exists) {
 
-      if (!csrfToken || csrfToken === "dummy-token") {
-        alert("CSRF Token Invalid❗️");
-        return;
-      }
+                Swal.fire({
+                  icon: "warning",
+                  title: "Existing Schedules Found",
+                  text: "Projects from this program already have proposal schedules. Please delete existing schedules first.",
+                  showConfirmButton: true,
+                  confirmButtonColor: "#3085d6",
+                  confirmButtonText: "Delete",
+                  showCancelButton: true,
+                  cancelButtonText: "Cancel",
+                  cancelButtonColor: "#d33"
+                }) .then((result) => {
 
-      //check exits
-      fetch(`http://localhost:8080/admin/checkExitsSchedule?program=${encodeURIComponent(programData)}`, {
+                  if (result.isConfirmed) {
+                    deleteAllSchedule();
+                  }
+
+                });
+              } else {
+                saveScheduleData();
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Error checking existing schedules!",
+              });
+            });
+
+    function deleteAllSchedule() {
+
+      fetch(`http://localhost:8080/admin/deleteAllExitsSchedule?program=${encodeURIComponent(programData)}`, {
 
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
         }
       })
+
               .then(response => response.json())
               .then(data => {
+                const statusDeleteAll = data.deleteStatus;
+                console.log("Schedule success delete:", statusDeleteAll);
 
-                const exists = data.checkEexti;
-                console.log("Schedule exists:", exists);
-
-                if (exists) {
+                if (statusDeleteAll) {
+                  const schedule = document.querySelector(".schedule");
+                  const table = document.querySelector("table");
+                  schedule.innerHTML = "";
 
                   Swal.fire({
-                    icon: "warning",
-                    title: "Existing Schedules Found",
-                    text: "Projects from this program already have proposal schedules. Please delete existing schedules first.",
-                    showConfirmButton: true,
-                    confirmButtonColor: "#3085d6",
-                    confirmButtonText: "Delete",
-                    showCancelButton: true,
-                    cancelButtonText: "Cancel",
-                    cancelButtonColor: "#d33"
-                  }) .then((result) => {
-
-                    if (result.isConfirmed) {
-                      deleteAllSchedule();
-                    }
-
+                    icon: "success",
+                    title: "Delete successfully.",
+                    showConfirmButton: false,
+                    timer: 2000
                   });
-                } else {
-                  saveScheduleData();
                 }
               })
               .catch(error => {
@@ -843,202 +880,190 @@
                 Swal.fire({
                   icon: "error",
                   title: "Oops...",
-                  text: "Error checking existing schedules!",
+                  text: "Failed to delete schedules!",
                 });
               });
+    }
 
-      function deleteAllSchedule() {
+    function saveScheduleData() {
+      let settingData = {
+        startDate: startDate,
+        endDate: endDate,
+        startTime: startTime,
+        endTime: endTime,
+        rooms: selectedRoom,
+        program: programData
+      };
 
-        fetch(`http://localhost:8080/admin/deleteAllExitsSchedule?program=${encodeURIComponent(programData)}`, {
+      console.log("📤 settingData: ", settingData);
 
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json'
-          }
-        })
+      document.getElementById("modalLoaderOverlay").style.display = "flex";
 
-           .then(response => response.json())
-           .then(data => {
-             const statusDeleteAll = data.deleteStatus;
-             console.log("Schedule success delete:", statusDeleteAll);
+      fetch('http://localhost:8080/admin/bookingSave', {
 
-             if (statusDeleteAll) {
-               const schedule = document.querySelector(".schedule");
-               const table = document.querySelector("table");
-               schedule.innerHTML = "";
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRF-TOKEN': csrfToken
+        },
+        body: JSON.stringify(settingData)
 
-               Swal.fire({
-                 icon: "success",
-                 title: "Delete successfully.",
-                 showConfirmButton: false,
-                 timer: 2000
-               });
-             }
-           })
-           .catch(error => {
-                console.error('Error:', error);
-                Swal.fire({
-               icon: "error",
-               title: "Oops...",
-               text: "Failed to delete schedules!",
-           });
-        });
-      }
+      })
+              .then(response =>
+                      response.json()
+              )
+              .then(data => {
 
-      function saveScheduleData() {
-        let settingData = {
-          startDate: startDate,
-          endDate: endDate,
-          startTime: startTime,
-          endTime: endTime,
-          rooms: selectedRoom,
-          program: programData
-        };
+                console.log('🌼 Data:', data);
 
-        console.log("📤 settingData: ", settingData);
+                if (data.status === "error") {
 
-        document.getElementById("modalLoaderOverlay").style.display = "flex";
+                  document.getElementById("modalLoaderOverlay").style.display = "none";
 
-        fetch('http://localhost:8080/admin/bookingSave', {
+                  Swal.fire({
+                    icon: "error",
+                    title: "Error",
+                    text: data.message,
+                    showConfirmButton: false,
+                    showCancelButton: true,
+                    cancelButtonText: "Cancel",
+                    cancelButtonColor: "#d33"
+                  });
+                } else {
+                  const projectId = data.scheduledAssignments[0]?.projectId;
+                  console.log('🌾 projectId: ', projectId);
 
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': csrfToken
-          },
-          body: JSON.stringify(settingData)
+                  // ====================================== call list date =====================================
+                  const getDate = getScheduleDate(data);
+                  // console.log("🗓️ List of Date: " +  getScheduleDate(data));
 
-        })
-                .then(response =>
-                        response.json()
-                )
-                .then(data => {
+                  const getDateFormat = formatDate(getDate).sort((a, b) => new Date(a) - new Date(b));
+                  console.log("🗓️ List of Date: " +  formatDate(getDate));
 
-                  console.log('🌼 Data:', data);
+                  const schedule = document.querySelector(".schedule");
+                  schedule.innerHTML = ""
 
-                  if (data.status === "error") {
+                  const backgroundSchedule = document.createElement("div");
+                  backgroundSchedule.className = "background-schedule";
 
-                    document.getElementById("modalLoaderOverlay").style.display = "none";
+                  const scheduleContainer = document.createElement("div");
+                  scheduleContainer.className = "schedule-contanier";
 
-                    Swal.fire({
-                      icon: "error",
-                      title: "Error",
-                      text: data.message,
-                      showConfirmButton: false,
-                      showCancelButton: true,
-                      cancelButtonText: "Cancel",
-                      cancelButtonColor: "#d33"
-                    });
-                  } else {
-                    const projectId = data.scheduledAssignments[0]?.projectId;
-                    console.log('🌾 projectId: ', projectId);
+                  const scheduleHeader = document.createElement("div");
+                  scheduleHeader.className = "shedule-header";
 
-                    // ====================================== call list date =====================================
-                    const getDate = getScheduleDate(data);
-                    // console.log("🗓️ List of Date: " +  getScheduleDate(data));
+                  const prevButton = document.createElement("button");
+                  prevButton.className = "nav-button pre-button";
+                  prevButton.textContent = "❮";
 
-                    const getDateFormat = formatDate(getDate).sort((a, b) => new Date(a) - new Date(b));
-                    console.log("🗓️ List of Date: " +  formatDate(getDate));
+                  const dateTitle = document.createElement("h2");
+                  dateTitle.className = "date-title";
 
-                    const schedule = document.querySelector(".schedule");
-                    schedule.innerHTML = ""
+                  const nextButton = document.createElement("button");
+                  nextButton.className = "nav-button next-button";
+                  nextButton.textContent = "❯";
 
-                    const backgroundSchedule = document.createElement("div");
-                    backgroundSchedule.className = "background-schedule";
+                  scheduleHeader.appendChild(prevButton);
+                  scheduleHeader.appendChild(dateTitle);
+                  scheduleHeader.appendChild(nextButton);
 
-                    const scheduleContainer = document.createElement("div");
-                    scheduleContainer.className = "schedule-contanier";
+                  backgroundSchedule.appendChild(scheduleHeader);
 
-                    const scheduleHeader = document.createElement("div");
-                    scheduleHeader.className = "shedule-header";
+                  // ====================================== room =====================================
 
-                    const prevButton = document.createElement("button");
-                    prevButton.className = "nav-button pre-button";
-                    prevButton.textContent = "❮";
+                  const scheduleTable = document.createElement("div");
+                  scheduleTable.className = "schedule-table";
 
-                    const dateTitle = document.createElement("h2");
-                    dateTitle.className = "date-title";
+                  const table = document.createElement("table");
+                  const thead = document.createElement("thead");
+                  const rowHeader = document.createElement("tr");
+                  const timeHeader = document.createElement("th");
 
-                    const nextButton = document.createElement("button");
-                    nextButton.className = "nav-button next-button";
-                    nextButton.textContent = "❯";
+                  timeHeader.textContent = "Time";
+                  timeHeader.className = "time-column";
+                  rowHeader.appendChild(timeHeader);
 
-                    scheduleHeader.appendChild(prevButton);
-                    scheduleHeader.appendChild(dateTitle);
-                    scheduleHeader.appendChild(nextButton);
+                  const rooms = [...new Set(data.scheduledAssignments.map(proj => proj.roomNumber))];
+                  console.log("☄️ Room: "+rooms);
 
-                    backgroundSchedule.appendChild(scheduleHeader);
+                  rooms.forEach(room => {
+                    const th = document.createElement("th");
+                    th.textContent = room;
+                    console.log("room: "+room);
+                    rowHeader.appendChild(th);
+                  });
 
-                    // ====================================== room =====================================
+                  thead.appendChild(rowHeader);
+                  table.appendChild(thead);
 
-                    const scheduleTable = document.createElement("div");
-                    scheduleTable.className = "schedule-table";
+                  let tableBody = document.createElement("tbody");
 
-                    const table = document.createElement("table");
-                    const thead = document.createElement("thead");
-                    const rowHeader = document.createElement("tr");
-                    const timeHeader = document.createElement("th");
+                  let currentDateIndex = 0;
 
-                    timeHeader.textContent = "Time";
-                    timeHeader.className = "time-column";
-                    rowHeader.appendChild(timeHeader);
+                  function updateScheduleDisplay() {
 
-                    const rooms = [...new Set(data.scheduledAssignments.map(proj => proj.roomNumber))];
-                    console.log("☄️ Room: "+rooms);
+                    if (getDateFormat.length === 0) return;
 
-                    rooms.forEach(room => {
-                      const th = document.createElement("th");
-                      th.textContent = room;
-                      console.log("room: "+room);
-                      rowHeader.appendChild(th);
+                    // เลือกวันที่จาก list
+                    const currentDate = getDateFormat[currentDateIndex];
+                    dateTitle.textContent = currentDate;
+
+                    prevButton.disabled = currentDateIndex === 0;
+                    nextButton.disabled = currentDateIndex === getDateFormat.length - 1;
+
+                    tableBody.innerHTML = "";
+
+                    console.log("currentDate: "+currentDate);
+
+                    // select pj ที่ตรงกับ วันที่
+                    const assignProjectDay = data.scheduledAssignments.filter(project => {
+
+                      const projectDate = new Date(project.startTime).toLocaleDateString();
+                      const currentDateObj = new Date(Date.parse(currentDate));
+                      const selectDate = currentDateObj.toLocaleDateString();
+                      console.log("currentDateObj: "+currentDateObj);
+                      console.log("selectDate: "+selectDate);
+                      return projectDate === selectDate;
                     });
 
-                    thead.appendChild(rowHeader);
-                    table.appendChild(thead);
+                    console.log("assignProjectDay: "+assignProjectDay);
 
-                    let tableBody = document.createElement("tbody");
+                    // list ของ time, room, project
+                    const timeSlots = {};
 
-                    let currentDateIndex = 0;
+                    // สร้างเวลาใน schedule
+                    assignProjectDay.forEach(project => {
 
-                    function updateScheduleDisplay() {
+                      const startTime = new Date(project.startTime);
+                      const endTime = new Date(project.endTime);
 
-                      if (getDateFormat.length === 0) return;
+                      const timeSlot = `${startTime.getHours()}:${String(startTime.getMinutes()).padStart(2, '0')} - ${endTime.getHours()}:${String(endTime.getMinutes()).padStart(2, '0')}`;
+                      console.log("🕰️timeSlot: "+timeSlot);
 
-                      // เลือกวันที่จาก list
-                      const currentDate = getDateFormat[currentDateIndex];
-                      dateTitle.textContent = currentDate;
+                      if (!timeSlots[timeSlot]) {
+                        timeSlots[timeSlot] = {
+                          isBreak: false,
+                          breakLabel: "",
+                          project: {}
+                        };
+                        console.log("creat time slots: "+ timeSlots);
+                      }
 
-                      prevButton.disabled = currentDateIndex === 0;
-                      nextButton.disabled = currentDateIndex === getDateFormat.length - 1;
+                      timeSlots[timeSlot][project.roomNumber] = project;
+                      console.log("time slots: " + JSON.stringify(timeSlots, null, 2));
+                    });
 
-                      tableBody.innerHTML = "";
+                    // เอา allTimeSlots มาทั้งหมดเพื่อหา break
+                    if(data.allTimeSlots) {
 
-                      console.log("currentDate: "+currentDate);
+                      data.allTimeSlots.forEach(timeSlotDTO => {
 
-                      // select pj ที่ตรงกับ วันที่
-                      const assignProjectDay = data.scheduledAssignments.filter(project => {
+                        console.log("📌timeSlotDTO: " + timeSlotDTO);
 
-                        const projectDate = new Date(project.startTime).toLocaleDateString();
-                        const currentDateObj = new Date(Date.parse(currentDate));
-                        const selectDate = currentDateObj.toLocaleDateString();
-                        console.log("currentDateObj: "+currentDateObj);
-                        console.log("selectDate: "+selectDate);
-                        return projectDate === selectDate;
-                      });
-
-                      console.log("assignProjectDay: "+assignProjectDay);
-
-                      // list ของ time, room, project
-                      const timeSlots = {};
-
-                      // สร้างเวลาใน schedule
-                      assignProjectDay.forEach(project => {
-
-                        const startTime = new Date(project.startTime);
-                        const endTime = new Date(project.endTime);
+                        const startTime = new Date(timeSlotDTO.startTime);
+                        const endTime = new Date(timeSlotDTO.endTime);
 
                         const timeSlot = `${startTime.getHours()}:${String(startTime.getMinutes()).padStart(2, '0')} - ${endTime.getHours()}:${String(endTime.getMinutes()).padStart(2, '0')}`;
-                        console.log("🕰️timeSlot: "+timeSlot);
 
                         if (!timeSlots[timeSlot]) {
                           timeSlots[timeSlot] = {
@@ -1046,105 +1071,108 @@
                             breakLabel: "",
                             project: {}
                           };
-                          console.log("creat time slots: "+ timeSlots);
                         }
 
-                        timeSlots[timeSlot][project.roomNumber] = project;
-                        console.log("time slots: " + JSON.stringify(timeSlots, null, 2));
-                      });
+                        timeSlots[timeSlot].isBreak = timeSlotDTO.break;
+                        timeSlots[timeSlot].breakLabel = timeSlotDTO.breakLabel;
 
-                      // เอา allTimeSlots มาทั้งหมดเพื่อหา break
-                      if(data.allTimeSlots) {
-
-                        data.allTimeSlots.forEach(timeSlotDTO => {
-
-                          console.log("📌timeSlotDTO: " + timeSlotDTO);
-
-                          const startTime = new Date(timeSlotDTO.startTime);
-                          const endTime = new Date(timeSlotDTO.endTime);
-
-                          const timeSlot = `${startTime.getHours()}:${String(startTime.getMinutes()).padStart(2, '0')} - ${endTime.getHours()}:${String(endTime.getMinutes()).padStart(2, '0')}`;
-
-                          if (!timeSlots[timeSlot]) {
-                            timeSlots[timeSlot] = {
-                              isBreak: false,
-                              breakLabel: "",
-                              project: {}
-                            };
-                          }
-
-                          timeSlots[timeSlot].isBreak = timeSlotDTO.break;
-                          timeSlots[timeSlot].breakLabel = timeSlotDTO.breakLabel;
-
-                        })
-                      }
-
-                      // sort time
-                      const sortTimeSlots =  Object.keys(timeSlots).sort((a, b) => {
-
-                        // console.log("🙊 Check sort time: "+a + " AND "+ b);
-
-                        const [hoursA, minutesA] = a.split(' - ')[0].split(':').map(Number);
-                        // console.log([hoursA, minutesA]);
-                        const [hoursB, minutesB] = b.split(' - ')[0].split(':').map(Number);
-                        // console.log([hoursB, minutesB]);
-
-
-                        const totalMinutesA = hoursA * 60 + minutesA;
-                        const totalMinutesB = hoursB * 60 + minutesB;
-                        // console.log("totalMinutesA: "+ totalMinutesA);
-                        // console.log("totalMinutesB: "+ totalMinutesB);
-
-                        return totalMinutesA - totalMinutesB;
                       })
+                    }
 
-                      console.log("sortTimeSlots: " + sortTimeSlots);
+                    // sort time
+                    const sortTimeSlots =  Object.keys(timeSlots).sort((a, b) => {
 
-                      sortTimeSlots.forEach(timeSlot => {
-                        const slotInfo = timeSlots[timeSlot];
+                      // console.log("🙊 Check sort time: "+a + " AND "+ b);
 
-                        // console.log("slotInfo: " + slotInfo);
+                      const [hoursA, minutesA] = a.split(' - ')[0].split(':').map(Number);
+                      // console.log([hoursA, minutesA]);
+                      const [hoursB, minutesB] = b.split(' - ')[0].split(':').map(Number);
+                      // console.log([hoursB, minutesB]);
 
-                        if(slotInfo.isBreak) {
 
-                          console.log("✅ เข้า Break ");
+                      const totalMinutesA = hoursA * 60 + minutesA;
+                      const totalMinutesB = hoursB * 60 + minutesB;
+                      // console.log("totalMinutesA: "+ totalMinutesA);
+                      // console.log("totalMinutesB: "+ totalMinutesB);
 
-                          const breakRow = document.createElement("tr");
-                          breakRow.className = "break-row";
+                      return totalMinutesA - totalMinutesB;
+                    })
 
-                          const breakCell = document.createElement("td");
-                          breakCell.colSpan = rooms.length + 1;
-                          // breakCell.className = "break-slot";
-                          breakCell.textContent = `${slotInfo.breakLabel} (${timeSlot})`
+                    console.log("sortTimeSlots: " + sortTimeSlots);
 
-                          breakRow.appendChild(breakCell);
-                          tableBody.appendChild(breakRow);
-                        } else {
+                    sortTimeSlots.forEach((timeSlot, index) => {
+                      const slotInfo = timeSlots[timeSlot];
 
-                          console.log("👀👀timeSlot: " + timeSlot);
+                      // console.log("slotInfo: " + slotInfo);
 
-                          const row = document.createElement("tr");
+                      // ข้ามถ้าไม่มี pj, break
+                      let hasAnyProject = false;
 
-                          // คอล timeslot ก่อน
-                          const timeCell = document.createElement("td");
-                          timeCell.className = "time-slot";
-                          timeCell.textContent = timeSlot;
-                          row.appendChild(timeCell);
+                      if(slotInfo.isBreak) {
 
-                          rooms.forEach(room => {
-                            console.log("room: " + room);
+                        console.log("✅ เข้า Break " + timeSlot);
 
-                            const cell = document.createElement("td");
-                            const project = timeSlots[timeSlot][room];
-                            console.log("project: " + project);
+                        let hasProjectAfterBreak = false;
 
-                            // ถ้ามี project ใน timeSlot ที่ loop
-                            if (project) {
+                        for(let i = index + 1; i < sortTimeSlots.length; i++) {
 
-                              const instructorUsernames = project.instructorUsernames;
+                          const futureTimeSlot = sortTimeSlots[i];
 
-                              cell.innerHTML = `
+                          // อันนี้มันจะเป็นข้อมูลด้านใน
+                          const futureSlotInfo = timeSlots[futureTimeSlot];
 
+                          if(futureSlotInfo.isBreak) continue;
+
+                          hasProjectAfterBreak = rooms.some(room => futureSlotInfo[room] !== undefined);
+                          break
+                        }
+
+                        if(!hasProjectAfterBreak) {
+                          console.log("❌ ไม่มีโปรเจกต์หลัง Break " + timeSlot + " จึงไม่แสดง");
+                          return;
+                        }
+
+                        const breakRow = document.createElement("tr");
+                        breakRow.className = "break-row";
+
+                        const breakCell = document.createElement("td");
+                        breakCell.colSpan = rooms.length + 1;
+                        // breakCell.className = "break-slot";
+                        breakCell.textContent = `${slotInfo.breakLabel} (${timeSlot})`
+
+                        breakRow.appendChild(breakCell);
+                        tableBody.appendChild(breakRow);
+                      } else {
+
+                        hasAnyProject = rooms.some(room => slotInfo[room] !== undefined);
+
+                        if(!hasAnyProject) {
+                          return;
+                        }
+
+                        console.log("👀👀timeSlot: " + timeSlot);
+
+                        const row = document.createElement("tr");
+
+                        // คอล timeslot ก่อน
+                        const timeCell = document.createElement("td");
+                        timeCell.className = "time-slot";
+                        timeCell.textContent = timeSlot;
+                        row.appendChild(timeCell);
+
+                        rooms.forEach(room => {
+                          console.log("room: " + room);
+
+                          const cell = document.createElement("td");
+                          const project = timeSlots[timeSlot][room];
+                          console.log("project: " + project);
+
+                          // ถ้ามี project ใน timeSlot ที่ loop
+                          if (project) {
+
+                            const instructorUsernames = project.instructorUsernames;
+
+                            cell.innerHTML = `
                                 <div class="slot-box ${project.status === "Non-Active" ? "non-active" : ''}"><br><div class="project-id">${project.projectId}</div><br><div class="instructors"></div>
 <!--                                  <svg id="icon-edit" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">-->
 <!--                                    <path d="M16.4612 1.53747C15.2966 0.372875 13.4084 0.372933 12.2439 1.5376L2.28549 11.4971C1.94688 11.8358 1.70888 12.2617 1.59797 12.7276L0.684976 16.5621C0.634709 16.7733 0.697568 16.9954 0.851034 17.1489C1.00451 17.3023 1.22661 17.3652 1.43774 17.3149L5.27212 16.402C5.73812 16.291 6.16418 16.0529 6.50289 15.7141L14.8342 7.38187C15.3994 7.95171 15.398 8.87187 14.8299 9.43996L13.3437 10.9261C13.0996 11.1702 13.0996 11.5659 13.3437 11.81C13.5878 12.054 13.9835 12.054 14.2276 11.81L15.7138 10.3238C16.77 9.26762 16.7715 7.55596 15.7181 6.49793L16.4613 5.75457C17.6257 4.59 17.6257 2.70198 16.4612 1.53747ZM13.1278 2.42143C13.8041 1.74497 14.9009 1.74493 15.5773 2.42136C16.2536 3.09772 16.2537 4.19432 15.5774 4.87074L5.61896 14.8303C5.44383 15.0055 5.22353 15.1285 4.98259 15.186L2.13623 15.8636L2.81398 13.0171C2.87132 12.7763 2.99437 12.556 3.16943 12.381L13.1278 2.42143Z" fill="#878D96"/>-->
@@ -1158,410 +1186,438 @@
                                </div>
                                 `;
 
-                              let instructorList = '';
+                            let instructorList = '';
 
-                              if(instructorUsernames) {
-                                 instructorList = instructorUsernames.map(name => `${name}`).join(', ');
-                              } else {
-                                instructorList = 'No instructors available';
-                              }
-
-                              const instructorDiv = cell.querySelector(".instructors");
-                              instructorDiv.innerHTML = instructorList;
+                            if(instructorUsernames) {
+                              instructorList = instructorUsernames.map(name => `${name}`).join(', ');
+                            } else {
+                              instructorList = 'No instructors available';
                             }
-                            row.appendChild(cell);
-                          });
-                          tableBody.appendChild(row);
-                        }
-                      });
 
-                      table.appendChild(tableBody);
-                      scheduleTable.appendChild(table);
-                      backgroundSchedule.appendChild(scheduleTable);
-                      schedule.appendChild(backgroundSchedule);
+                            const instructorDiv = cell.querySelector(".instructors");
+                            instructorDiv.innerHTML = instructorList;
+                          }
+                          row.appendChild(cell);
+                        });
+                        tableBody.appendChild(row);
+                      }
+                    });
 
-                      document.getElementById("modalLoaderOverlay").style.display = "none";
+                    table.appendChild(tableBody);
+                    scheduleTable.appendChild(table);
+                    backgroundSchedule.appendChild(scheduleTable);
+                    schedule.appendChild(backgroundSchedule);
+
+                    document.getElementById("modalLoaderOverlay").style.display = "none";
+                  }
+
+                  updateScheduleDisplay();
+
+                  prevButton.addEventListener("click", () => {
+
+                    if(currentDateIndex > 0) {
+                      currentDateIndex --;
+                      updateScheduleDisplay();
                     }
 
-                    updateScheduleDisplay();
+                  })
 
-                    prevButton.addEventListener("click", () => {
+                  nextButton.addEventListener("click", () => {
 
-                      if(currentDateIndex > 0) {
-                        currentDateIndex --;
-                        updateScheduleDisplay();
-                      }
-
-                    })
-
-                    nextButton.addEventListener("click", () => {
-
-                      if(currentDateIndex < getDateFormat.length -1 ) {
-                        currentDateIndex ++;
-                        updateScheduleDisplay();
-                      }
-                    })
-
-                    Swal.fire({
-                      icon: "success",
-                      title: "Data saved successfully.",
-                      showConfirmButton: false,
-                      timer: 2000
-                    });
-
-                    document.getElementById("settingModal").style.display = "none";
-
-                    // document.querySelector("input[type='date']").value = "";
-                    // document.querySelector("input[type='date']").removeAttribute("min");
-                    // document.querySelector("input[type='date']").removeAttribute("max");
-
-                    // document.querySelectorAll("input[type='date']")[1].value = "";
-                    // document.querySelector("input[type='date']")[1].removeAttribute("min");
-                    // document.querySelector("input[type='date']")[1].removeAttribute("max");
-
-                    document.querySelectorAll("input[type='date']").forEach(input => {
-
-                      input.value = "";
-                      input.removeAttribute("min");
-                      input.removeAttribute("max");
-
-                    });
-
-                    document.querySelector("input[type='time']").value = "";
-                    document.querySelectorAll("input[type='time']")[1].value = "";
-
-                    document.getElementById("selected-text").textContent = "Select Room";
-                    selectedRooms.clear();
-
-                    const checkboxes = document.querySelectorAll("#room-list input[type=checkbox]");
-                    checkboxes.forEach(cb => {
-
-                      cb.checked = false;
-
-                    });
-
-                    let selectAllCheckbox = document.getElementById("select-all");
-
-                    if(selectAllCheckbox) {
-
-                      selectAllCheckbox.checked = false;
-
+                    if(currentDateIndex < getDateFormat.length -1 ) {
+                      currentDateIndex ++;
+                      updateScheduleDisplay();
                     }
+                  })
+
+                  Swal.fire({
+                    icon: "success",
+                    title: "Data saved successfully.",
+                    showConfirmButton: false,
+                    timer: 2000
+                  });
+
+                  document.getElementById("settingModal").style.display = "none";
+
+                  // document.querySelector("input[type='date']").value = "";
+                  // document.querySelector("input[type='date']").removeAttribute("min");
+                  // document.querySelector("input[type='date']").removeAttribute("max");
+
+                  // document.querySelectorAll("input[type='date']")[1].value = "";
+                  // document.querySelector("input[type='date']")[1].removeAttribute("min");
+                  // document.querySelector("input[type='date']")[1].removeAttribute("max");
+
+                  document.querySelectorAll("input[type='date']").forEach(input => {
+
+                    input.value = "";
+                    input.removeAttribute("min");
+                    input.removeAttribute("max");
+
+                  });
+
+                  document.querySelector("input[type='time']").value = "";
+                  document.querySelectorAll("input[type='time']")[1].value = "";
+
+                  document.getElementById("selected-text").textContent = "Select Room";
+                  selectedRooms.clear();
+
+                  const checkboxes = document.querySelectorAll("#room-list input[type=checkbox]");
+                  checkboxes.forEach(cb => {
+
+                    cb.checked = false;
+
+                  });
+
+                  let selectAllCheckbox = document.getElementById("select-all");
+
+                  if(selectAllCheckbox) {
+
+                    selectAllCheckbox.checked = false;
 
                   }
 
-                }).catch(error => {
+                }
 
-                  console.error('Error:', error);
-                  document.getElementById("modalLoaderOverlay").style.display = "none";
-                  Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Something went wrong!",
-                  });
+              }).catch(error => {
+
+        console.error('Error:', error);
+        document.getElementById("modalLoaderOverlay").style.display = "none";
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong!",
         });
+      });
+    }
+
+  });
+
+
+  // ดึงข้อมูลวันที่
+  function getScheduleDate(data) {
+
+    const dateSet = new Set();
+
+    data.scheduledAssignments.forEach(project => {
+
+      if(project.startTime) {
+
+        const dateString = project.startTime.split("T")[0];
+
+        dateSet.add(dateString);
       }
+    });
+
+    const sortDate = Array.from(dateSet).sort();
+
+    //https://www.w3schools.com/js/js_date_formats.asp
+    return sortDate.map(dateStr => new Date(dateStr))
+  }
+
+  // change format
+  function formatDate(formatDate) {
+
+    const collectDate = [];
+
+    formatDate.forEach(getDay => {
+
+      const dateObj = new Date(getDay);
+
+      //https://stackoverflow.com/questions/3552461/how-do-i-format-a-date-in-javascript/60881661
+      let nameDay = dateObj.toLocaleDateString('en-us', {weekday: 'long'})
+      let month = dateObj.toLocaleDateString('en-us', {month: 'long'})
+      let date = dateObj.toLocaleDateString('en-us', {day: 'numeric'})
+      let year = dateObj.toLocaleDateString('en-us', {year: 'numeric'})
+
+      const FormattedDate = `${nameDay}, ${month} ${date}, ${year}`
+
+      collectDate.push(FormattedDate);
 
     });
 
-    // ดึงข้อมูลวันที่
-    function getScheduleDate(data) {
-
-      const dateSet = new Set();
-
-      data.scheduledAssignments.forEach(project => {
-
-        if(project.startTime) {
-
-          const dateString = project.startTime.split("T")[0];
-
-          dateSet.add(dateString);
-        }
-      });
-
-      const sortDate = Array.from(dateSet).sort();
-
-      //https://www.w3schools.com/js/js_date_formats.asp
-      return sortDate.map(dateStr => new Date(dateStr))
-    }
-
-    // change format
-    function formatDate(formatDate) {
-
-      const collectDate = [];
-
-      formatDate.forEach(getDay => {
-
-        const dateObj = new Date(getDay);
-
-        //https://stackoverflow.com/questions/3552461/how-do-i-format-a-date-in-javascript/60881661
-        let nameDay = dateObj.toLocaleDateString('en-us', {weekday: 'long'})
-        let month = dateObj.toLocaleDateString('en-us', {month: 'long'})
-        let date = dateObj.toLocaleDateString('en-us', {day: 'numeric'})
-        let year = dateObj.toLocaleDateString('en-us', {year: 'numeric'})
-
-        const FormattedDate = `${nameDay}, ${month} ${date}, ${year}`
-
-        collectDate.push(FormattedDate);
-
-      });
-
-      return collectDate;
-    }
+    return collectDate;
+  }
 
 
-    <!-- ===================================================================  Get Schedule =================================================================== -->
+  <!-- ===================================================================  Get Schedule =================================================================== -->
 
-    function getScheduleData() {
-      let program = document.getElementById("program-text").textContent;
+  function getScheduleData() {
+    let program = document.getElementById("program-text").textContent;
 
-      fetch(`http://localhost:8080/admin/getAllProposalSchedule?program=${encodeURIComponent(program)}`, {
+    fetch(`http://localhost:8080/admin/getAllProposalSchedule?program=${encodeURIComponent(program)}`, {
 
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-      }).then(response => {
-          // console.log(response.json());
-          if (!response.ok) {
-            throw new Error('Network response was not ok ' + response.statusText);
-            alert('Network response was not ok ' + response.statusText);
-          }
-          return response.json();
-        })
-                .then(data => {
-                  // console.log("Show Data: " + JSON.stringify(data, null, 2));
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }).then(response => {
+      // console.log(response.json());
+      if (!response.ok) {
+        throw new Error('Network response was not ok ' + response.statusText);
+        alert('Network response was not ok ' + response.statusText);
+      }
+      return response.json();
+    })
+            .then(data => {
+              // console.log("Show Data: " + JSON.stringify(data, null, 2));
 
-                  if(JSON.stringify(data) === "{}") {
+              if(JSON.stringify(data) === "{}") {
 
-                    const schedule = document.querySelector(".schedule");
-                    schedule.innerHTML = "";
+                const schedule = document.querySelector(".schedule");
+                schedule.innerHTML = "";
 
-                    const backgroundSchedule = document.createElement("div");
-                    backgroundSchedule.className = "background-schedule";
+                const backgroundSchedule = document.createElement("div");
+                backgroundSchedule.className = "background-schedule";
 
-                    const emptyScheduleImage = document.createElement("img");
-                    emptyScheduleImage.className = "empty-state-image";
-                    emptyScheduleImage.src = "/css/warning_schedule-Photoroom.png"
+                const emptyScheduleImage = document.createElement("img");
+                emptyScheduleImage.className = "empty-state-image";
+                emptyScheduleImage.src = "/css/warning_schedule-Photoroom.png"
 
-                    backgroundSchedule.appendChild(emptyScheduleImage);
+                backgroundSchedule.appendChild(emptyScheduleImage);
 
-                    schedule.appendChild(backgroundSchedule);
+                schedule.appendChild(backgroundSchedule);
+              } else {
+
+                let rooms = new Set();
+                let dates = new Set();
+
+                for(const date in data) {
+                  const timeSlots =  data[date];
+                  dates.add(date);
+
+                  for(const timeSlot in timeSlots) {
+                    const  project = timeSlots[timeSlot];
+
+                    for(const i of project) {
+                      rooms.add(i.roomNumber);
+                    }
+                  }
+                }
+
+                rooms.delete("noRoom")
+
+                console.log("⭐️ Room: " + Array.from(rooms));
+
+                let myRooms = [];
+
+                //https://www.geeksforgeeks.org/how-to-sort-a-set-in-javascript/
+                myRooms = Array.from(rooms)
+                myRooms.sort()
+                console.log("Room sort: " + myRooms);
+
+                myDate = Array.from(dates)
+                myDate.sort()
+                console.log("Room sort: " + myDate);
+
+                // ====================================== call list date =====================================
+
+                const getDateFormat = formatDate(myDate).sort((a, b) => new Date(a) - new Date(b));
+                console.log("🗓️ List of Date: " +  getDateFormat);
+
+                const schedule = document.querySelector(".schedule");
+                schedule.innerHTML = ""
+
+                const backgroundSchedule = document.createElement("div");
+                backgroundSchedule.className = "background-schedule";
+
+                const scheduleContainer = document.createElement("div");
+                scheduleContainer.className = "schedule-contanier";
+
+                const scheduleHeader = document.createElement("div");
+                scheduleHeader.className = "shedule-header";
+
+                const prevButton = document.createElement("button");
+                prevButton.className = "nav-button pre-button";
+                prevButton.textContent = "❮";
+
+                const dateTitle = document.createElement("h2");
+                dateTitle.className = "date-title";
+
+                const nextButton = document.createElement("button");
+                nextButton.className = "nav-button next-button";
+                nextButton.textContent = "❯";
+
+                scheduleHeader.appendChild(prevButton);
+                scheduleHeader.appendChild(dateTitle);
+                scheduleHeader.appendChild(nextButton);
+
+                backgroundSchedule.appendChild(scheduleHeader);
+
+                // ====================================== room =====================================
+
+                const scheduleTable = document.createElement("div");
+                scheduleTable.className = "schedule-table";
+
+                const table = document.createElement("table");
+                const thead = document.createElement("thead");
+                const rowHeader = document.createElement("tr");
+                const timeHeader = document.createElement("th");
+
+                timeHeader.textContent = "Time";
+                timeHeader.className = "time-column";
+                rowHeader.appendChild(timeHeader);
+
+                myRooms.forEach(room => {
+                  const th = document.createElement("th");
+                  th.textContent = room;
+                  console.log("-_- room: "+room);
+                  rowHeader.appendChild(th);
+                });
+
+                thead.appendChild(rowHeader);
+                table.appendChild(thead);
+
+                let tableBody = document.createElement("tbody");
+
+                let currentDateIndex = 0;
+
+                function updateScheduleDisplay() {
+
+                  if (getDateFormat.length === 0) return;
+
+                  // เลือกวันที่จาก list
+                  const currentDate = getDateFormat[currentDateIndex];
+                  dateTitle.textContent = currentDate;
+
+                  prevButton.disabled = currentDateIndex === 0;
+                  nextButton.disabled = currentDateIndex === getDateFormat.length - 1;
+
+                  tableBody.innerHTML = "";
+
+                  console.log("currentDate: " + currentDate);
+
+                  const currentDateObj = new Date(currentDate);
+                  console.log("currentDateObj: " + currentDateObj);
+
+                  const currentDateStr = currentDateObj.toLocaleDateString("en-CA");
+                  console.log("currentDateStr: " + currentDateStr);
+
+                  // select pj ที่ตรงกับ วันที่  [ "2025-03-06", { "(13:00, 13:25)": [ {...} ] } ],
+                  const assignProjectDay = Object.entries(data).filter(([dateKey]) => dateKey === currentDateStr)
+                          .flatMap(([dateKey, timeSlots]) =>
+                                  Object.entries(timeSlots).map(([timeKey, projects]) => ({
+                                    [timeKey]: projects.map(project => ({ ...project }))
+                                  }))
+                          );
+
+                  // console.log("assignProjectDay: "+assignProjectDay);
+
+                  // for(const project of assignProjectDay) {
+                  //   console.log("project: ",project);
+                  // }
+
+                  if (assignProjectDay.length === 0) {
+                    const noDataRow = document.createElement("tr");
+                    const noDataCell = document.createElement("td");
+                    noDataCell.colSpan = myRooms.length + 1; // +1 for time slot column
+                    noDataCell.textContent = "No schedule available for this date";
+                    noDataCell.style.textAlign = "center";
+                    noDataCell.style.padding = "20px";
+                    noDataRow.appendChild(noDataCell);
+                    tableBody.appendChild(noDataRow);
                   } else {
 
-                    let rooms = new Set();
-                    let dates = new Set();
+                    // list ของ time, room, project
+                    const timeSlotMap = {};
+                    assignProjectDay.forEach(projectObj => {
+                      // console.log("🤯 Loop");
 
-                    for(const date in data) {
-                      const timeSlots =  data[date];
-                      dates.add(date);
+                      const timeSlotKey = Object.keys(projectObj)[0];
+                      // console.log("timeSlotKey: ",timeSlotKey);
+                      const projects = projectObj[timeSlotKey];
+                      // console.log("projects: ",projects);
 
-                      for(const timeSlot in timeSlots) {
-                        const  project = timeSlots[timeSlot];
-
-                        for(const i of project) {
-                          rooms.add(i.roomNumber);
-                        }
+                      // create time
+                      if(!timeSlotMap[timeSlotKey]) {
+                        timeSlotMap[timeSlotKey] = {};
                       }
-                    }
 
-                    rooms.delete("noRoom")
-
-                    console.log("⭐️ Room: " + Array.from(rooms));
-
-                    let myRooms = [];
-
-                    //https://www.geeksforgeeks.org/how-to-sort-a-set-in-javascript/
-                    myRooms = Array.from(rooms)
-                    myRooms.sort()
-                    console.log("Room sort: " + myRooms);
-
-                    myDate = Array.from(dates)
-                    myDate.sort()
-                    console.log("Room sort: " + myDate);
-
-                    // ====================================== call list date =====================================
-
-                    const getDateFormat = formatDate(myDate).sort((a, b) => new Date(a) - new Date(b));
-                    console.log("🗓️ List of Date: " +  getDateFormat);
-
-                    const schedule = document.querySelector(".schedule");
-                    schedule.innerHTML = ""
-
-                    const backgroundSchedule = document.createElement("div");
-                    backgroundSchedule.className = "background-schedule";
-
-                    const scheduleContainer = document.createElement("div");
-                    scheduleContainer.className = "schedule-contanier";
-
-                    const scheduleHeader = document.createElement("div");
-                    scheduleHeader.className = "shedule-header";
-
-                    const prevButton = document.createElement("button");
-                    prevButton.className = "nav-button pre-button";
-                    prevButton.textContent = "❮";
-
-                    const dateTitle = document.createElement("h2");
-                    dateTitle.className = "date-title";
-
-                    const nextButton = document.createElement("button");
-                    nextButton.className = "nav-button next-button";
-                    nextButton.textContent = "❯";
-
-                    scheduleHeader.appendChild(prevButton);
-                    scheduleHeader.appendChild(dateTitle);
-                    scheduleHeader.appendChild(nextButton);
-
-                    backgroundSchedule.appendChild(scheduleHeader);
-
-                    // ====================================== room =====================================
-
-                     const scheduleTable = document.createElement("div");
-                    scheduleTable.className = "schedule-table";
-
-                    const table = document.createElement("table");
-                    const thead = document.createElement("thead");
-                    const rowHeader = document.createElement("tr");
-                    const timeHeader = document.createElement("th");
-
-                    timeHeader.textContent = "Time";
-                    timeHeader.className = "time-column";
-                    rowHeader.appendChild(timeHeader);
-
-                    myRooms.forEach(room => {
-                      const th = document.createElement("th");
-                      th.textContent = room;
-                      console.log("-_- room: "+room);
-                      rowHeader.appendChild(th);
+                      projects.forEach(project => {
+                        if(project.roomNumber) {
+                          timeSlotMap[timeSlotKey][project.roomNumber] = project;
+                          console.log("time slots: " + JSON.stringify(timeSlotMap, null, 2));
+                        }
+                      });
                     });
 
-                    thead.appendChild(rowHeader);
-                    table.appendChild(thead);
+                    Object.keys(timeSlotMap).forEach((timeSlot, index) => {
+                      console.log("👀👀timeSlot: " + timeSlot);
 
-                    let tableBody = document.createElement("tbody");
+                      const allTimeSlots = Object.keys(timeSlotMap);
 
-                    let currentDateIndex = 0;
+                      const isBreakTimeSlot = Object.values(timeSlotMap[timeSlot]).some(
+                              project => project && project.status === "Break"
+                      );
 
-                    function updateScheduleDisplay() {
+                      if (isBreakTimeSlot) {
 
-                      if (getDateFormat.length === 0) return;
+                        let hasProjectAfterBreak = false;
 
-                      // เลือกวันที่จาก list
-                      const currentDate = getDateFormat[currentDateIndex];
-                      dateTitle.textContent = currentDate;
+                        for(let i = index + 1; i < allTimeSlots.length; i++) {
 
-                      prevButton.disabled = currentDateIndex === 0;
-                      nextButton.disabled = currentDateIndex === getDateFormat.length - 1;
+                          const futureTimeSlot = allTimeSlots[i];
 
-                      tableBody.innerHTML = "";
+                          // อันนี้มันจะเป็นข้อมูลด้านใน
+                          const futureSlotInfo = timeSlotMap[futureTimeSlot];
 
-                      console.log("currentDate: " + currentDate);
-
-                      const currentDateObj = new Date(currentDate);
-                      console.log("currentDateObj: " + currentDateObj);
-
-                      const currentDateStr = currentDateObj.toLocaleDateString("en-CA");
-                      console.log("currentDateStr: " + currentDateStr);
-
-                      // select pj ที่ตรงกับ วันที่  [ "2025-03-06", { "(13:00, 13:25)": [ {...} ] } ],
-                      const assignProjectDay = Object.entries(data).filter(([dateKey]) => dateKey === currentDateStr)
-                              .flatMap(([dateKey, timeSlots]) =>
-                                      Object.entries(timeSlots).map(([timeKey, projects]) => ({
-                                        [timeKey]: projects.map(project => ({ ...project }))
-                                      }))
-                              );
-
-                      // console.log("assignProjectDay: "+assignProjectDay);
-
-                      // for(const project of assignProjectDay) {
-                      //   console.log("project: ",project);
-                      // }
-
-                      if (assignProjectDay.length === 0) {
-                        const noDataRow = document.createElement("tr");
-                        const noDataCell = document.createElement("td");
-                        noDataCell.colSpan = myRooms.length + 1; // +1 for time slot column
-                        noDataCell.textContent = "No schedule available for this date";
-                        noDataCell.style.textAlign = "center";
-                        noDataCell.style.padding = "20px";
-                        noDataRow.appendChild(noDataCell);
-                        tableBody.appendChild(noDataRow);
-                      } else {
-
-                        // list ของ time, room, project
-                        const timeSlotMap = {};
-                        assignProjectDay.forEach(projectObj => {
-                          // console.log("🤯 Loop");
-
-                          const timeSlotKey = Object.keys(projectObj)[0];
-                          // console.log("timeSlotKey: ",timeSlotKey);
-                          const projects = projectObj[timeSlotKey];
-                          // console.log("projects: ",projects);
-
-                          // create time
-                          if(!timeSlotMap[timeSlotKey]) {
-                            timeSlotMap[timeSlotKey] = {};
-                          }
-
-                          projects.forEach(project => {
-                            if(project.roomNumber) {
-                              timeSlotMap[timeSlotKey][project.roomNumber] = project;
-                              console.log("time slots: " + JSON.stringify(timeSlotMap, null, 2));
-                            }
-                          });
-                        });
-
-                        Object.keys(timeSlotMap).forEach(timeSlot => {
-                          console.log("👀👀timeSlot: " + timeSlot);
-
-                          const isBreakTimeSlot = Object.values(timeSlotMap[timeSlot]).some(
+                          const isFutureBreak = Object.values(futureSlotInfo).some(
                                   project => project && project.status === "Break"
                           );
 
-                          if (isBreakTimeSlot) {
-                            const breakRow = document.createElement("tr");
-                            breakRow.className = "break-row";
+                          if(isFutureBreak) continue;
 
-                            const breakCell = document.createElement("td");
-                            breakCell.colSpan = myRooms.length + 1;
-                            breakCell.className = "break-slot";
+                          hasProjectAfterBreak = rooms.some(room => futureSlotInfo[room] !== undefined);
+                          break
+                        }
 
-                            const match = timeSlot.match(/\((\d{2}:\d{2}), (\d{2}:\d{2})\)/);
-                            const startTime = match[1];
-                            const endTime = match[2];
+                        if(!hasProjectAfterBreak) {
+                          console.log("❌ ไม่มีโปรเจกต์หลัง Break " + timeSlot + " จึงไม่แสดง");
+                          return;
+                        }
 
-                            breakCell.textContent = `Take a Break (${startTime} - ${endTime})`;
+                        const breakRow = document.createElement("tr");
+                        breakRow.className = "break-row";
 
-                            breakRow.appendChild(breakCell);
-                            tableBody.appendChild(breakRow);
-                          } else {
+                        const breakCell = document.createElement("td");
+                        breakCell.colSpan = myRooms.length + 1;
+                        breakCell.className = "break-slot";
 
-                          const row = document.createElement("tr");
+                        const match = timeSlot.match(/\((\d{2}:\d{2}), (\d{2}:\d{2})\)/);
+                        const startTime = match[1];
+                        const endTime = match[2];
 
-                            const match = timeSlot.match(/\((\d{2}:\d{2}), (\d{2}:\d{2})\)/);
-                            const startTime = match[1];
-                            const endTime = match[2];
+                        breakCell.textContent = `Take a Break (${startTime} - ${endTime})`;
 
-                          // คอล timeslot ก่อน
-                          const timeCell = document.createElement("td");
-                          timeCell.className = "time-slot";
-                          timeCell.textContent = `${startTime} - ${endTime}`;
-                          row.appendChild(timeCell);
+                        breakRow.appendChild(breakCell);
+                        tableBody.appendChild(breakRow);
+                      } else {
 
-                          myRooms.forEach(room => {
+                        const row = document.createElement("tr");
 
-                            console.log("room: " + room);
+                        const match = timeSlot.match(/\((\d{2}:\d{2}), (\d{2}:\d{2})\)/);
+                        const startTime = match[1];
+                        const endTime = match[2];
 
-                            const cell = document.createElement("td");
-                            const project = timeSlotMap[timeSlot][room];
-                            console.log("project: " + project);
+                        // คอล timeslot ก่อน
+                        const timeCell = document.createElement("td");
+                        timeCell.className = "time-slot";
+                        timeCell.textContent = `${startTime} - ${endTime}`;
+                        row.appendChild(timeCell);
 
-                            // ถ้ามี project ใน timeSlot ที่ loop
-                            if (project) {
+                        myRooms.forEach(room => {
 
-                              const instructorUsernames = project.instructors;
+                          console.log("room: " + room);
 
-                              cell.innerHTML = `
+                          const cell = document.createElement("td");
+                          const project = timeSlotMap[timeSlot][room];
+                          console.log("project: " + project);
+
+                          // ถ้ามี project ใน timeSlot ที่ loop
+                          if (project) {
+
+                            const instructorUsernames = project.instructors;
+
+                            cell.innerHTML = `
 
                                      <div class="slot-box ${project.status === "Non-Active" ? "non-active" : (project.status === 'Edit-Active' ? 'edit-active' : '')}"><br><div class="project-id">${project.projectId}</div><br><div class="instructors"></div>
                                         <!-- <svg id="icon-edit" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">-->
@@ -1576,184 +1632,184 @@
                                      </div>
                                 `;
 
-                              let instructorList = '';
+                            let instructorList = '';
 
-                              if(instructorUsernames) {
-                                instructorList = instructorUsernames.map(name => `${name}`).join(', ');
-                              } else {
-                                instructorList = 'No instructors available';
-                              }
-
-                              const instructorDiv = cell.querySelector(".instructors");
-                              instructorDiv.innerHTML = instructorList;
+                            if(instructorUsernames) {
+                              instructorList = instructorUsernames.map(name => `${name}`).join(', ');
+                            } else {
+                              instructorList = 'No instructors available';
                             }
 
-                            row.appendChild(cell);
-                          });
+                            const instructorDiv = cell.querySelector(".instructors");
+                            instructorDiv.innerHTML = instructorList;
+                          }
 
-                          tableBody.appendChild(row);}
+                          row.appendChild(cell);
                         });
-                      }
-                      table.appendChild(tableBody);
-                      scheduleTable.appendChild(table);
-                      backgroundSchedule.appendChild(scheduleTable);
-                      schedule.appendChild(backgroundSchedule);
-                    }
 
+                        tableBody.appendChild(row);}
+                    });
+                  }
+                  table.appendChild(tableBody);
+                  scheduleTable.appendChild(table);
+                  backgroundSchedule.appendChild(scheduleTable);
+                  schedule.appendChild(backgroundSchedule);
+                }
+
+                updateScheduleDisplay();
+
+                prevButton.addEventListener("click", () => {
+
+                  if(currentDateIndex > 0) {
+                    currentDateIndex --;
                     updateScheduleDisplay();
+                  }
 
-                    prevButton.addEventListener("click", () => {
+                })
 
-                      if(currentDateIndex > 0) {
-                        currentDateIndex --;
-                        updateScheduleDisplay();
-                      }
+                nextButton.addEventListener("click", () => {
 
-                    })
-
-                    nextButton.addEventListener("click", () => {
-
-                      if(currentDateIndex < getDateFormat.length -1 ) {
-                        currentDateIndex ++;
-                        updateScheduleDisplay();
-                      }
-                    })
-
+                  if(currentDateIndex < getDateFormat.length -1 ) {
+                    currentDateIndex ++;
+                    updateScheduleDisplay();
                   }
                 })
-                .catch(error => {
-                  console.error('Error fetching data:', error);
 
-                  Swal.fire({
-                    icon: "error",
-                    title: "Oops...",
-                    text: "Something went wrong!",
-                  });
-                });
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching data:', error);
+
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
+              });
+            });
+
+  }
+
+
+  // toggle program
+
+  const selector = document.getElementById('program-selector');
+  const selectedProgram = document.getElementById('program-text');
+  const dropdownOptions = document.getElementById('dropdown-options');
+  const options = document.querySelectorAll('.dropdown-option');
+
+  selector.addEventListener('click', () => {
+
+    let isVisible = dropdownOptions.style.display === "block";
+
+    dropdownOptions.style.display = isVisible ? "none" : "block";
+
+    selector.classList.toggle('active');
+  })
+
+  options.forEach(option => {
+
+    option.addEventListener('click', (e) => {
+      e.stopPropagation();
+
+      const newValue = option.dataset.value;
+
+      selectedProgram.textContent = newValue;
+
+      selector.classList.remove('active');
+      dropdownOptions.style.display = "none";
+
+      getScheduleData()
+
+      console.log('Selected program:', newValue);
+
+    });
+  });
+
+  document.addEventListener('click', (e) => {
+    if(!selector.contains(e.target)) {
+
+      selector.classList.remove('active');
+      dropdownOptions.style.display = "none";
+    }
+  })
+
+  // ====================================== click delete =====================================
+
+  document.addEventListener('click', (e) => {
+    const deleteButton = e.target.closest('.icon-delete');
+
+    if(deleteButton) {
+
+      const slotBox = deleteButton.closest('.slot-box');
+      const id = slotBox.querySelector('#hiddenInfo');
+      console.log("❗️Do you want to delete project id " + id.value);
+
+      Swal.fire({
+        icon: "warning",
+        title: "Are you sure ?",
+        text: "Delete the schedule for project: " + id.value,
+        showConfirmButton: true,
+        confirmButtonColor: "#3085d6",
+        confirmButtonText: "Delete",
+        showCancelButton: true,
+        cancelButtonText: "Cancel",
+        cancelButtonColor: "#d33"
+      }).then((result) => {
+
+        if (result.isConfirmed) {
+          deleteScheduleProject(id.value)
+        }
+      })
 
     }
+  })
 
+  function deleteScheduleProject(projectId) {
 
-    // toggle program
+    fetch(`http://localhost:8080/admin/deleteProjectById?projectId=${encodeURIComponent(projectId)}`, {
 
-    const selector = document.getElementById('program-selector');
-    const selectedProgram = document.getElementById('program-text');
-    const dropdownOptions = document.getElementById('dropdown-options');
-    const options = document.querySelectorAll('.dropdown-option');
-
-    selector.addEventListener('click', () => {
-
-      let isVisible = dropdownOptions.style.display === "block";
-
-      dropdownOptions.style.display = isVisible ? "none" : "block";
-
-      selector.classList.toggle('active');
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
-
-    options.forEach(option => {
-
-      option.addEventListener('click', (e) => {
-        e.stopPropagation();
-
-        const newValue = option.dataset.value;
-
-        selectedProgram.textContent = newValue;
-
-        selector.classList.remove('active');
-        dropdownOptions.style.display = "none";
-
-        getScheduleData()
-
-        console.log('Selected program:', newValue);
-
-      });
-    });
-
-    document.addEventListener('click', (e) => {
-      if(!selector.contains(e.target)) {
-
-        selector.classList.remove('active');
-        dropdownOptions.style.display = "none";
-      }
-    })
-
-    // ====================================== click delete =====================================
-
-    document.addEventListener('click', (e) => {
-      const deleteButton = e.target.closest('.icon-delete');
-
-      if(deleteButton) {
-
-        const slotBox = deleteButton.closest('.slot-box');
-        const id = slotBox.querySelector('#hiddenInfo');
-        console.log("❗️Do you want to delete project id " + id.value);
-
-        Swal.fire({
-          icon: "warning",
-          title: "Are you sure ?",
-          text: "Delete the schedule for project: " + id.value,
-          showConfirmButton: true,
-          confirmButtonColor: "#3085d6",
-          confirmButtonText: "Delete",
-          showCancelButton: true,
-          cancelButtonText: "Cancel",
-          cancelButtonColor: "#d33"
-        }).then((result) => {
-
-          if (result.isConfirmed) {
-            deleteScheduleProject(id.value)
-          }
-        })
-
-      }
-    })
-
-    function deleteScheduleProject(projectId) {
-
-      fetch(`http://localhost:8080/admin/deleteProjectById?projectId=${encodeURIComponent(projectId)}`, {
-
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      })
-              .then(response => {
-                // console.log(response.json());
-                if (!response.ok) {
-                  throw new Error('Network response was not ok ' + response.statusText);
-                  alert('Network response was not ok ' + response.statusText);
-                }
-                return response.json();
-              })
-              .then(data => {
-                console.log("Deleted Project Status:", data);
-                const statusDeleteProject = data.deleteProjectByIdStatus;
-                console.log("deleteProjectByIdStatus:", statusDeleteProject);
+            .then(response => {
+              // console.log(response.json());
+              if (!response.ok) {
+                throw new Error('Network response was not ok ' + response.statusText);
+                alert('Network response was not ok ' + response.statusText);
+              }
+              return response.json();
+            })
+            .then(data => {
+              console.log("Deleted Project Status:", data);
+              const statusDeleteProject = data.deleteProjectByIdStatus;
+              console.log("deleteProjectByIdStatus:", statusDeleteProject);
 
 
-                if (statusDeleteProject) {
-
-                  Swal.fire({
-                    icon: "success",
-                    title: "Delete schedule project successfully.",
-                    showConfirmButton: false,
-                    timer: 2000
-                  });
-
-                  getScheduleData();
-
-                }
-              })
-              .catch(error => {
-                console.error('Error fetching data:', error);
+              if (statusDeleteProject) {
 
                 Swal.fire({
-                  icon: "error",
-                  title: "Oops...",
-                  text: "Something went wrong!",
+                  icon: "success",
+                  title: "Delete schedule project successfully.",
+                  showConfirmButton: false,
+                  timer: 2000
                 });
+
+                getScheduleData();
+
+              }
+            })
+            .catch(error => {
+              console.error('Error fetching data:', error);
+
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong!",
               });
-    }
+            });
+  }
 
 
 </script>
