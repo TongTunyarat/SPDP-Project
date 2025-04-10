@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -103,19 +104,27 @@ public class ProposalEvaluationController {
     }
 
 
-    //     get score DTO
+    // get score DTO
     @GetMapping("/showScoreProposal")
     @ResponseBody
     public List<ProposalEvalScoreDTO> getScoreProposal(@RequestParam String projectId) {
         // ดึงข้อมูล ProposalEvalScore ตาม projectId
         List<ProposalEvalScore> proposalEvalScoreList = proposalEvaluationService.getProposalEvalScoresByProjectId(projectId);
 
-        return proposalEvalScoreList.stream()
-                .map(score -> {
+        // ดึงข้อมูล StudentProject ตาม projectId
+        List<StudentProject> studentProjectList = proposalEvaluationService.getStudentCriteria(projectId);
 
+        // สร้าง Set ของ StudentId ที่มี status เป็น "Active"
+        Set<String> activeStudentIds = studentProjectList.stream()
+                .filter(studentProject -> "Active".equals(studentProject.getStatus()))  // กรองเฉพาะ status เป็น "Active"
+                .map(studentProject -> studentProject.getStudent().getStudentId())  // ดึง StudentId
+                .collect(Collectors.toSet());
+
+        return proposalEvalScoreList.stream()
+                .filter(score -> activeStudentIds.contains(score.getProposalEvaluation().getStudent().getStudentId()))  // กรอง ProposalEvalScore ที่มี StudentId ตรงกับ activeStudentIds
+                .map(score -> {
                     // ดึงคะแนนจาก score
                     Double scoreValue = score.getScore() != null ? score.getScore().doubleValue() : 0.0;
-
 
                     // สร้างและส่ง ProposalEvalScoreDTO โดยส่ง weight เป็น String
                     return new ProposalEvalScoreDTO(
@@ -127,11 +136,12 @@ public class ProposalEvaluationController {
                             score.getCriteria().getCriteriaName(),
                             score.getCriteria().getWeight(),  // ส่งคะแนนจริง
                             scoreValue,
-                            score.getCriteria().getMaxScore()// ส่ง weight ในรูปแบบ String
+                            score.getCriteria().getMaxScore() // ส่ง weight ในรูปแบบ String
                     );
                 })
                 .collect(Collectors.toList());
     }
+
 
     @GetMapping("/showStudentDetails")
     @ResponseBody
