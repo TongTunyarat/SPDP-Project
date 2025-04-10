@@ -217,9 +217,12 @@
                         </g>
                     </g>
 
-                </svg> Evaluation (40%) </h4>
+                </svg>
+                Evaluation (40%)
+            </h4>
 
-            <li><a href="/show-proposal-eva-projects" data-period="proposalEvaluation" class="active">Proposal Evaluation</a></li>
+            <li><a href="/show-proposal-eva-projects" data-period="proposalEvaluation" class="active">Proposal
+                Evaluation</a></li>
             <li><a href="/show-poster-projects" data-period="posterEvaluation">Poster Evaluation</a></li>
             <li><a href="/show-defense-eva-projects" data-period="defenseEvaluation">Defense Evaluation</a></li>
         </ul>
@@ -405,9 +408,14 @@
         const programFilter = document.getElementById('program-select-box')?.value;
         const roleFilter = document.getElementById('role-select-box')?.value;
         const searchTerm = document.getElementById('search-keyword')?.value.toLowerCase();  // ค่าค้นหา
+        const semesterSelector = document.getElementById('semester-selector');
+        const selectedSemester = semesterSelector.value;  // ค่า semester ที่เลือก
 
-        // กรองข้อมูลที่ต้องการ
-        const filteredData = projectData.filter(project => {
+        // กรองข้อมูลตาม semester ที่เลือกก่อน
+        let filteredData = projectData.filter(project => project.semester.toString() === selectedSemester);
+
+        // กรองข้อมูลตาม program, role, และ searchTerm
+        filteredData = filteredData.filter(project => {
             let matches = true;
 
             // กรองโปรแกรม
@@ -431,6 +439,14 @@
         // แสดงผลข้อมูลที่กรองแล้ว
         displayResults(filteredData);
     }
+
+    document.getElementById('semester-selector').addEventListener('change', function () {
+        if (this.value === 'all') {
+            filterBySemester();
+        } else {
+            filterBySemester();
+        }
+    });
 
     // ตัวแปรที่ใช้เก็บข้อมูลที่ได้รับจาก API
     let projectData = [];
@@ -499,7 +515,6 @@
         const semesterSelector = document.getElementById('semester-selector');
         semesterSelector.innerHTML = ""; // เคลียร์ค่าก่อนเติมใหม่
 
-        // เติมตัวเลือก semester จากข้อมูลที่ได้รับจาก API
         semesters.forEach(semester => {
             const option = document.createElement("option");
             option.value = semester;
@@ -519,7 +534,7 @@
         if (semesters.includes(defaultYear.toString())) {
             semesterSelector.value = defaultYear.toString();
         } else {
-            semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+            semesterSelector.value = "all";  // ตั้งค่า default เป็น "all"
         }
     }
 
@@ -531,8 +546,8 @@
         // กรองข้อมูลตาม semester ที่เลือก
         const filteredData = projectData.filter(project => project.semester.toString() === selectedSemester);
 
-        // แสดงข้อมูลที่กรองแล้ว
-        displayResults(filteredData);
+        // เรียก applyFilters เพื่อกรองตาม filter อื่น ๆ
+        applyFilters(filteredData);
     }
 
     // เรียกใช้ฟังก์ชัน fetchProjectData และ fetchSemesterData
