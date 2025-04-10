@@ -575,11 +575,11 @@
             for (const criteriaName in presentationScores) {
                 const scores = presentationScores[criteriaName];
                 const criteriaSum = scores.reduce((sum, score) => sum + score, 0);
-                const criteriaScore = scores.length > 0 ? ((criteriaSum * 5) / 30).toFixed(2) : "-";
-                const criteriaFinalScore = criteriaScore !== "-" ? Math.min(parseFloat(criteriaScore), 20).toFixed(2) : "-";
-                totalPresentationScore += criteriaFinalScore !== "-" ? parseFloat(criteriaFinalScore) : 0;
+                const criteriaScore = scores.length > 0 ? ((criteriaSum * 5) / 30).toFixed(2) : "0";  // เปลี่ยน "-" เป็น "0"
+                const criteriaFinalScore = criteriaScore !== "0" ? Math.min(parseFloat(criteriaScore), 20).toFixed(2) : "0";  // เปลี่ยน "-" เป็น "0"
+                totalPresentationScore += parseFloat(criteriaFinalScore);
             }
-            const presentationScore = totalPresentationScore > 0 ? totalPresentationScore.toFixed(2) : "-";
+            const presentationScore = totalPresentationScore > 0 ? totalPresentationScore.toFixed(2) : "0";  // เปลี่ยน "-" เป็น "0"
 
             // **คำนวณคะแนน Document**
             let totalDocumentScore = 0;
@@ -606,7 +606,7 @@
 
             // คะแนน Document จะไม่เกิน 10%
             totalDocumentScore = Math.min(totalDocumentScore, 10.0);
-            const documentScore = totalDocumentScore > 0 ? totalDocumentScore.toFixed(2) : "-";
+            const documentScore = totalDocumentScore > 0 ? totalDocumentScore.toFixed(2) : "0";  // เปลี่ยน "-" เป็น "0"
 
             // **คำนวณคะแนน Poster**
             let totalPosterScore = 0;
@@ -632,22 +632,22 @@
             // รวมค่าเฉลี่ยของทุกหมวดหมู่
             totalPosterScore = parseFloat(appearanceAvg) + parseFloat(contentsAvg) + parseFloat(verbalAvg);
 
-            const posterScore = totalPosterScore > 0 ? totalPosterScore.toFixed(2) : "-";
+            const posterScore = totalPosterScore > 0 ? totalPosterScore.toFixed(2) : "0";  // เปลี่ยน "-" เป็น "0"
 
             // **คำนวณคะแนนรวม (Total Score)**
-            const resultScore = (presentationScore !== "-" && documentScore !== "-" && posterScore !== "-")
+            const resultScore = (presentationScore !== "0" && documentScore !== "0" && posterScore !== "0")
                 ? (parseFloat(presentationScore) + parseFloat(documentScore) + parseFloat(posterScore)).toFixed(2)
-                : "-";
+                : "0";  // เปลี่ยน "-" เป็น "0"
 
             // แสดงผลข้อมูล
             const row = document.createElement('tr');
             row.innerHTML = `
-        <td>${studentName}</td>
-        <td>${presentationScore}</td>
-        <td>${documentScore}</td>
-        <td>${posterScore}</td>
-        <td>${resultScore}</td>
-    `;
+            <td>${studentName}</td>
+            <td>${presentationScore}</td>
+            <td>${documentScore}</td>
+            <td>${posterScore}</td>
+            <td>${resultScore}</td>
+        `;
             tableBody.appendChild(row);
 
             // ปริ้นคะแนนของนักศึกษาแต่ละคนใน console
@@ -665,7 +665,6 @@
         const sum = scores.reduce((acc, score) => acc + score, 0);
         return (sum / scores.length).toFixed(2);
     }
-
 
 
 
