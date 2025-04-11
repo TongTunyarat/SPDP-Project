@@ -1889,7 +1889,7 @@
             if (!nameCell) continue;
 
             const currentStudentName = nameCell.textContent.trim(); // ดึงชื่อจากตารางโดยตรง
-            const resultCell = row.cells[3]; // คอลัมน์คะแนน Result
+            const resultCell = row.cells[4]; // คอลัมน์คะแนน Result
 
             if (resultCell && currentStudentName === studentName) {
                 const resultScore = parseFloat(resultCell.textContent) || 0;
