@@ -35,6 +35,14 @@ body {
     font-weight: 500;
     box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08),
     0px 1px 2px 0px rgba(21, 30, 40, 0.08);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-header button:hover {
+    background-color: #624BFF; /* เปลี่ยนสีพื้นหลังเมื่อ hover */
+    color: white; /* เปลี่ยนสีตัวอักษรเมื่อ hover */
+    transform: scale(1.05); /* ขยายขนาดปุ่มเล็กน้อย */
+    box-shadow: 0px 4px 6px rgba(13, 23, 33, 0.1), 0px 2px 4px rgba(21, 30, 40, 0.12); /* เพิ่มความเข้มของเงา */
 }
 
 .btn-footer {
@@ -73,56 +81,18 @@ table {
     border-collapse: collapse;
 }
 
-th, td {
+th,
+td {
     padding: 12px;
-    text-align: center;
+    text-align: left;
     border-bottom: 1px solid #ddd;
 }
 
-/* แถบหัวข้อหลัก Committee */
-.header-row {
+thead th {
+    text-align: center;
     background-color: #f4f4f4;
-    border-bottom: none; /* เอาเส้นระหว่างหัวข้อหลักกับ Sub-column ออก */
 }
 
-/* Sub-column ของ Committee */
-.sub-header-row th {
-    border-top: none; /* เอาเส้นบนของ Sub-column ออก */
-}
-
-.advisor-header {
-    background-color: #FCB6B7;
-    color: black;
-}
-
-.committee1-header {
-    background-color: #F9FFA1;
-    color: black;
-}
-
-.committee2-header {
-    background-color: #B0E4FF;
-    color: black;
-}
-
-.committee3-header {
-    background-color: #B4D2FF;
-    color: black;
-}
-
-.committee4-header {
-    background-color: #CCF4DD;
-    color: black;
-}
-
-.committee5-header {
-    background-color: #FCB6CE;
-    color: black;
-}
-
-
-
-/* ป้ายสี (Tags) */
 .tag {
     display: inline-block;
     padding: 4px 8px;
@@ -141,19 +111,27 @@ th, td {
     color: black;
 }
 
-/* ปุ่มไอคอน */
-.action-buttons {
-    gap: 10px;
+td:nth-child(1) {
+    max-width: 150px;
+    word-wrap: break-word; /* ป้องกันการล้นของข้อความ */
+    white-space: normal; /* อนุญาตให้แบ่งบรรทัดได้ */
 }
 
-.icon-btn {
-    border: none;
-    background: none;
-    cursor: pointer;
+td:nth-child(4) {
+    max-width: 150px;
+    word-wrap: break-word;
+    white-space: normal;
 }
 
-.icon-btn i {
-    color: black;
+td:nth-child(5) {
+    max-width: 400px;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+td:nth-child(6) ul, td:nth-child(7) ul {
+    list-style-type: none;
+    padding: 0;
 }
 
 .filter-controls {
@@ -188,25 +166,8 @@ th, td {
     margin-left: auto;
 }
 
-td:nth-child(2) {
-    max-width: 200px;
-    word-wrap: break-word;
-    white-space: normal;
-    text-align: left;
-}
 
-td:nth-child(3) ul li{
-    list-style-type: none;
-    padding: 0;
-}
-
-td:nth-child(7) {
-    max-width: 200px;
-    word-wrap: break-word;
-    white-space: normal;
-}
-
-/* View Button */
+/* Actions Button */
 td form {
     display: inline-flex;
     margin-right: 1px;
@@ -252,3 +213,767 @@ td form {
 }
 
 
+.card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.card-title {
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.card-description {
+    margin-bottom: 20px;
+    margin-left: 10px;
+    font-size: 0.9rem;
+    line-height: 1.5;
+    background-color: #f5f5f5;
+    padding: 12px 15px;
+    border-radius: 4px;
+    /*width: 80%;*/
+}
+
+.project-info {
+    margin-bottom: 20px;
+}
+
+.project-info p {
+    margin-bottom: 8px;
+    font-size: 0.95rem;
+}
+
+.students-section {
+    margin-bottom: 20px;
+}
+
+.section-title {
+    font-weight: bold;
+    margin-bottom: 10px;
+    font-size: 16px;
+}
+
+.student-card {
+    background-color: #f5f5f5;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+}
+
+.student-name {
+    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.student-details {
+    color: #555;
+    font-size: 0.9rem;
+}
+
+.committee-section {
+    margin-bottom: 20px;
+}
+
+.committee-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.committee-item {
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+}
+
+.card-popup {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    overflow: auto; /* ทำให้สามารถ scroll ได้ */
+    z-index: 9999; /* ให้ modal อยู่บนสุด */
+}
+
+.card-header {
+    background: #fff;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+#popup-project-description {
+    margin-top: 15px;
+    font-size: 16px;
+}
+
+.project-info p {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+#student-cards-container, #committee-cards-container {
+    background-color: #fff;
+    padding: 10px;
+    margin-top: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+}
+
+/* ใช้เพื่อจัดให้อาจารย์ที่มี role ต่างๆ แสดงในบรรทัดเดียวกัน */
+.committee-card {
+    margin-bottom: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.committee-card p {
+    margin-right: 20px;  /* เพิ่มระยะห่างระหว่าง Committee และ Poster Committee */
+}
+
+/* Style for modal */
+.modal-details {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* Black with opacity */
+}
+
+.modal-content {
+    background-color: #fff;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 600px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.close-btn {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+#file-preview {
+    margin-top: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+#preview-content {
+    max-height: 200px;
+    overflow-y: auto;
+    max-width: 1200px;
+}
+
+.close-btn {
+    background-color: #f44336; /* สีแดง */
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: all 0.3s ease-in-out;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.close-btn:hover {
+    background-color: #d32f2f; /* สีแดงเข้มขึ้น */
+    transform: scale(1.05);
+}
+
+.dropdown {
+    margin-top: -3px;
+}
+
+/* Hide the dropdown content by default */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+/* Style for the dropdown button */
+.dropdown-btn {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+/* When you hover over the dropdown button */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Style for each link inside the dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    font-size: 14px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color when hovering over the links */
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+.show {
+    display: block;
+}
+
+.template-btn {
+    padding: 10px 20px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
+
+/* ปรับการแสดงผลของ overlay */
+.popup-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* พื้นหลังโปร่งใส */
+    display: flex;
+    justify-content: center;  /* จัดให้ popup อยู่กลางในแนวนอน */
+    align-items: center;      /* จัดให้ popup อยู่กลางในแนวตั้ง */
+    z-index: 9999; /* ทำให้ overlay อยู่ด้านหน้าของเนื้อหาทั้งหมด */
+}
+
+/* ปรับการแสดงผลของ popup content */
+.popup-content {
+    background-color: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    width: 300px; /* ขนาดของ popup */
+    max-width: 90%; /* ทำให้มีความยืดหยุ่นขนาดในอุปกรณ์ที่มีหน้าจอเล็ก */
+    box-sizing: border-box; /* ทำให้ padding ไม่กระทบกับขนาดที่ตั้งไว้ */
+}
+
+/* ปรับปุ่ม */
+.popup-content button {
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #005A5A;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.popup-content button:hover {
+    background-color: #007777;
+}
+
+.popup-content button:focus {
+    outline: none;
+}
+
+/* ปรับรูปแบบของปุ่ม Delete All */
+.deleteAll-btn {
+    background-color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    height: 30px;
+    cursor: pointer;
+    color: #624BFF;
+    font-weight: 500;
+    box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08),
+    0px 1px 2px 0px rgba(21, 30, 40, 0.08);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* การเปลี่ยนสีเมื่อเมาส์ hover */
+.deleteAll-btn:hover {
+    background-color: #624BFF; /* เปลี่ยนสีพื้นหลังเมื่อ hover */
+    color: white; /* เปลี่ยนสีตัวอักษรเมื่อ hover */
+    transform: scale(1.05); /* ขยายขนาดปุ่มเล็กน้อย */
+    box-shadow: 0px 4px 6px rgba(13, 23, 33, 0.1), 0px 2px 4px rgba(21, 30, 40, 0.12); /* เพิ่มความเข้มของเงา */
+}
+
+/* การตั้งค่าเมื่อปุ่มถูกคลิก */
+.deleteAll-btn:active {
+    background-color: #003f7f;  /* สีเมื่อคลิก */
+    transform: scale(1);  /* ทำให้ปุ่มกลับมาเป็นขนาดเดิมเมื่อคลิก */
+}
+
+.addProject-btn a {
+    text-decoration: none;
+}
+
+.addProject-btn a:active {
+    background-color: #624BFF;  /* สีเมื่อคลิก */
+    transform: scale(1);  /* ทำให้ปุ่มกลับมาเป็นขนาดเดิมเมื่อคลิก */
+}
+
+.span-fileType {
+    font-size: 14px; /* ขนาดฟอนต์เล็ก */
+    color: #FF6347; /* สีสำหรับข้อความคำเตือน */
+    left: 0;
+    right: 0;
+}
+
+/* Modal Styles */
+.modal-details {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.4);
+    overflow: auto;
+    font-family: Arial, sans-serif;
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: white;
+    margin: 2% auto;
+    padding: 20px;
+    border-radius: 8px;
+    max-width: 100vh;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    max-height: 80%;
+    overflow-y: auto;
+}
+
+/* Close Button */
+.close-btn {
+    color: #aaa;
+    font-size: 28px;
+    font-weight: bold;
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    cursor: pointer;
+}
+
+.close-btn:hover,
+.close-btn:focus {
+    color: black;
+}
+
+/* Form Styles */
+.form-group {
+    margin-bottom: 15px;
+}
+
+label {
+    font-size: 16px;
+    font-weight: bold;
+    display: block;
+}
+
+input[type="file"],
+select {
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    width: 100%;
+    margin-top: 8px;
+}
+
+#preview-content {
+    margin-top: 20px;
+    width: 100%;
+    height: 100%;
+    overflow-x: auto;
+}
+
+#confirm-upload-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 20%;  /* ทำให้ปุ่มกว้างเต็ม */
+    font-size: 16px;
+    display: none;
+}
+
+#confirm-upload-btn:hover {
+    background-color: #45a049;
+}
+
+/* Preview Table */
+.preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    border: 1px solid #ddd;
+    table-layout: fixed; /* ใช้ table layout fixed เพื่อให้ขนาดตารางไม่เกินขอบ */
+}
+
+.preview-table th,
+.preview-table td {
+    padding: 12px; /* เพิ่มการเว้นช่องว่าง */
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+    word-wrap: break-word;  /* เพื่อไม่ให้คำยาวเกินไปออกจากตาราง */
+}
+
+.preview-table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+}
+
+.preview-table tr:hover {
+    background-color: #f9f9f9;
+}
+
+#preview-content {
+    margin-top: 20px;
+    max-height: 60vh;  /* ให้พื้นที่การแสดงผลสูงสุด 60% ของความสูงหน้าจอ */
+    overflow-y: auto;  /* ให้ scrollbar หากข้อมูลมากเกินไป */
+}
+
+/* ปุ่ม Upload */
+#confirm-upload-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 100%;
+}
+
+#confirm-upload-btn:hover {
+    background-color: #45a049;
+}
+
+/* Column Selection Dialog Styles */
+.export-dialog {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    background-color: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+    width: 450px;
+    font-family: 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.export-dialog h3 {
+    margin-top: 0;
+    margin-bottom: 20px;
+    color: #2c3e50;
+    font-size: 20px;
+    text-align: center;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+/* Program Filter Styles */
+.program-filter {
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #e9ecef;
+}
+
+.filter-label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #2c3e50;
+    margin-bottom: 10px;
+}
+
+.filter-options {
+    display: flex;
+    gap: 10px;
+}
+
+.filter-option {
+    padding: 8px 16px;
+    border-radius: 20px;
+    background-color: #f1f3f5;
+    color: #495057;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.filter-option:hover {
+    background-color: #e9ecef;
+}
+
+.filter-option.selected {
+    background-color: #4472C4;
+    color: white;
+}
+
+/* Column Options Styles */
+.column-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 25px;
+    max-height: 250px;
+    overflow-y: auto;
+    padding-right: 5px;
+}
+
+.column-option {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+}
+
+.column-option:hover {
+    background-color: #f8f9fa;
+}
+
+.column-option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    accent-color: #4472C4;
+    cursor: pointer;
+}
+
+.column-option label {
+    font-size: 16px;
+    color: #495057;
+    cursor: pointer;
+    user-select: none;
+}
+
+.select-all-option {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    border-radius: 6px;
+    background-color: #f8f9fa;
+}
+
+.select-all-option input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-right: 10px;
+    accent-color: #4472C4;
+    cursor: pointer;
+}
+
+.select-all-option label {
+    font-size: 16px;
+    font-weight: 500;
+    color: #2c3e50;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* Button Styles */
+.export-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 15px;
+}
+
+.export-button {
+    background-color: #4472C4;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.export-button:hover {
+    background-color: #3b62b0;
+}
+
+.cancel-button {
+    background-color: #e9ecef;
+    color: #495057;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.cancel-button:hover {
+    background-color: #dee2e6;
+}
+
+/* Overlay */
+.export-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    backdrop-filter: blur(3px);
+}
+
+/* Custom scrollbar */
+.column-options::-webkit-scrollbar {
+    width: 8px;
+}
+
+.column-options::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.column-options::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+.column-options::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* ซ่อน Dialog และ Overlay เมื่อโหลดหน้าเว็บ */
+.export-dialog, .export-overlay {
+    display: none;
+}
+
+.upload-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.file-input-container {
+    border: 2px dashed var(--medium-gray);
+    padding: 2rem;
+    text-align: center;
+    border-radius: 8px;
+    background-color: var(--light-gray);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.file-input-container:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(52, 152, 219, 0.05);
+}
+
+.file-input-container.dragging {
+    border-color: var(--primary-color);
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.file-input-container i {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.file-input-container p {
+    color: var(--dark-gray);
+    margin-bottom: 1rem;
+}
+
+.file-input {
+    display: none;
+}
+
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2980b9;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    --light-gray: #f5f5f5;
+    --medium-gray: #e0e0e0;
+    --dark-gray: #777;
+}
+
+/* แถบหัวข้อหลัก Committee */
+.header-row {
+    background-color: #f4f4f4;
+    border-bottom: none; /* เอาเส้นระหว่างหัวข้อหลักกับ Sub-column ออก */
+}
+
+/* Sub-column ของ Committee */
+.sub-header-row th {
+    border-top: none; /* เอาเส้นบนของ Sub-column ออก */
+}
+
+.advisor-header {
+    background-color: #FCB6B7;
+    color: black;
+}
+
+.committee1-header {
+    background-color: #F9FFA1;
+    color: black;
+}
+
+.committee2-header {
+    background-color: #B0E4FF;
+    color: black;
+}
+
+.committee3-header {
+    background-color: #B4D2FF;
+    color: black;
+}
+
+.committee4-header {
+    background-color: #CCF4DD;
+    color: black;
+}
+
+.committee5-header {
+    background-color: #FCB6CE;
+    color: black;
+}

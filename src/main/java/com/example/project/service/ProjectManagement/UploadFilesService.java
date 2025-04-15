@@ -1,29 +1,21 @@
 package com.example.project.service.ProjectManagement;
 
-import com.alibaba.excel.EasyExcel;
-import com.alibaba.excel.context.AnalysisContext;
-import com.alibaba.excel.read.listener.ReadListener;
-import com.example.project.DTO.projectManagement.ProfessorRoleDTO;
-import com.example.project.DTO.projectManagement.ProjectDetailsResponseDTO;
-import com.example.project.DTO.projectManagement.StudentProjectDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
-import com.opencsv.CSVReader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-import com.example.project.DTO.projectManagement.ExcelDataDTO;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import java.io.InputStreamReader;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -432,189 +424,207 @@ public class UploadFilesService {
 
     // ----------------- Value from Dropdown ----------------- //
     // Main method to process CSV file
-    public void processCsvFile(MultipartFile file, String uploadType) throws Exception {
-        switch (uploadType) {
-            case "projectDetails":
-                processProjectDetails(file);
-                break;
-            case "projectStudent":
-                processProjectStudent(file);
-                break;
-            case "instructor":
-                processProjectInstructor(file);
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid upload type selected");
-        }
-    }
+//    public void processCsvFile(MultipartFile file, String uploadType) throws Exception {
+//        switch (uploadType) {
+//            case "projectDetails":
+//                processProjectAndStudent(file);
+//                break;
+//            case "projectCommittee":
+//                processProjectInstructor(file);
+//                break;
+//            case "projectPosterCommittee":
+//                processProjectInstructor(file);
+//                break;
+//            default:
+//                throw new IllegalArgumentException("Invalid upload type selected");
+//        }
+//    }
 
 
     // ----------------- Function Upload Project Details ----------------- //
-    private void processProjectDetails(MultipartFile file) throws Exception {
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            String line;
-            int rowIndex = 0;
-
-            int currentYear = LocalDate.now().getYear();
-
-            while ((line = br.readLine()) != null) {
-                rowIndex++;
-                if (rowIndex < 9) continue;
-
-                String[] values = line.split(",");
-                if (values.length < 5) continue;
-
-                String projectId = values[0].trim();
-                String projectTitle = values[1].trim();
-                String projectDescription = values[2].trim();
-                String projectCategory = values[3].trim();
-
-                // ตรวจสอบว่า projectId มีค่า ถ้าไม่มีจะข้ามแถวนี้ไป
-                if (projectId.isEmpty()) {
-                    continue;  // ถ้าไม่มี projectId ข้ามแถวนี้ไป
-                }
-
-                // ใช้ค่าจาก projectId เพื่อดึง "program" ซึ่งคือส่วนแรกของ projectId ก่อน SP
-                String program = projectId.split(" ")[0]; // แยกค่าโดยช่องว่างและใช้ส่วนแรก
-
-                Project project = new Project(projectId, program, String.valueOf(currentYear), projectTitle, projectCategory, projectDescription, LocalDateTime.now(), LocalDateTime.now(), null, null);
-                projectRepository.save(project);
-            }
-        } catch (IOException e) {
-            throw new Exception("Error reading CSV file: " + e.getMessage());
-        }
-    }
-
-
-    // ----------------- Function Upload Project Student ----------------- //
-    private void processProjectStudent(MultipartFile file) throws Exception {
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
-            String line;
-            int rowIndex = 0;
-
-            // สร้าง Map เพื่อเก็บข้อมูล projectId และลิสต์ของนักศึกษาที่มี projectId เดียวกัน
-            Map<String, List<StudentProject>> projectStudentMap = new HashMap<>();
-
-            // ตัวแปรเพื่อเก็บข้อมูลของนักศึกษาคนแรกในกลุ่ม
-            String currentProjectId = null;
-            String currentProjectTitle = null;
-            String currentProjectDescription = null;
-
-            // ใช้ฟังก์ชันในการดึงค่า student_pj_id ล่าสุดจากฐานข้อมูล
-            int studentIdCounter = generateNextStudentPjId();  // เรียกฟังก์ชันเพื่อดึงค่ารหัสใหม่
-
-            while ((line = br.readLine()) != null) {
-                rowIndex++;
-
-                // ตรวจสอบว่าแถวมีข้อมูลครบถ้วนหรือไม่
-                if (line.trim().isEmpty()) continue;
-
-                String[] values = line.split(",");
-                if (values.length < 10) continue;  // ข้ามแถวที่มีข้อมูลไม่ครบ
-
-                String studentId = values[4].trim();  // student_id
-                String studentName = values[5].trim();
-                String section = values[6].trim();
-                String track = values[7].trim();
-                String projectId = values[0].trim(); // projectId
-                String projectTitle = values[1].trim(); // projectTitle
-                String projectDescription = values[2].trim(); // projectDescription
-
-                // ข้ามแถวที่ไม่มี studentId หรือ studentName
-                if (studentId.isEmpty() || studentName.isEmpty()) continue;
-
-                Optional<Student> existingStudent = studentRepository.findById(studentId);
-                if (!existingStudent.isPresent()) {
-                    continue;  // ถ้าไม่พบ Student ให้ข้ามแถวนี้ไป
-                }
-
-                // ตรวจสอบว่า projectId, projectTitle, projectDescription เป็นค่าว่าง (สำหรับนักศึกษาคนที่ 2 และ 3), ใช้ค่าจากนักศึกษาคนแรก
-                if (projectId.isEmpty()) {
-                    projectId = currentProjectId; // ใช้ projectId จากคนแรก
-                } else {
-                    currentProjectId = projectId; // เก็บ projectId จากคนแรก
-                }
-
-                if (projectTitle.isEmpty()) {
-                    projectTitle = currentProjectTitle; // ใช้ projectTitle จากคนแรก
-                } else {
-                    currentProjectTitle = projectTitle; // เก็บ projectTitle จากคนแรก
-                }
-
-                if (projectDescription.isEmpty()) {
-                    projectDescription = currentProjectDescription; // ใช้ projectDescription จากคนแรก
-                } else {
-                    currentProjectDescription = projectDescription; // เก็บ projectDescription จากคนแรก
-                }
-
-                // ตรวจสอบว่า projectId มีค่าหรือไม่ก่อนบันทึกลงฐานข้อมูล
-                if (projectId == null || projectId.isEmpty()) {
-                    System.out.println("Skipping row due to missing projectId at row index " + rowIndex);
-                    continue; // ถ้าไม่มี projectId ให้ข้ามแถวนี้ไป
-                }
-
-                // ค้นหา Project ในฐานข้อมูล
-                Optional<Project> existingProject = projectRepository.findById(projectId);
-                if (!existingProject.isPresent()) {
-                    System.out.println("Project with ID " + projectId + " not found in Project entity, skipping row...");
-                    continue;  // ถ้าไม่พบ Project ให้ข้ามแถวนี้ไป
-                }
-
-                // สร้าง StudentProject object
-                StudentProject studentProject = new StudentProject();
-                studentProject.setStudent(existingStudent.get());
-                studentProject.setProject(existingProject.get());
-                studentProject.setStatus("Active");
-
-                // กำหนด student_pj_id ใหม่
-                String newStudentPjId = "SP" + String.format("%03d", studentIdCounter++);  // สร้างรหัสใหม่
-                studentProject.setStudentPjId(newStudentPjId);  // ตั้งค่ารหัสใหม่นี้
-
-                // ตรวจสอบว่า projectId นี้มีนักศึกษากี่คนใน Map
-                if (!projectStudentMap.containsKey(projectId)) {
-                    projectStudentMap.put(projectId, new ArrayList<>());
-                }
-
-                List<StudentProject> studentList = projectStudentMap.get(projectId);
-
-                // ถ้ามี 3 คนแล้ว, ให้ไปเก็บใน projectId ใหม่
-                if (studentList.size() < 3) {
-                    studentList.add(studentProject);
-                } else {
-                    // ถ้ามีแล้ว 3 คน ให้ย้ายไปเก็บใน projectId ใหม่
-                    String nextProjectId = String.valueOf(generateNextStudentPjId());  // ใช้ generateNextStudentPjId สำหรับ projectId ใหม่
-                    projectStudentMap.put(nextProjectId, new ArrayList<>());
-                    projectStudentMap.get(nextProjectId).add(studentProject);
-                }
-            }
-
-            // บันทึกข้อมูลทั้งหมดในฐานข้อมูล
-            if (!projectStudentMap.isEmpty()) {
-                for (Map.Entry<String, List<StudentProject>> entry : projectStudentMap.entrySet()) {
-                    for (StudentProject studentProject : entry.getValue()) {
-                        studentProjectRepository.save(studentProject);
-                    }
-                }
-            }
-
-        } catch (IOException e) {
-            throw new Exception("Error reading CSV file: " + e.getMessage());
-        }
-    }
-
-    // ฟังก์ชันในการดึงรหัส student_pj_id ล่าสุดจากฐานข้อมูล
-    private int generateNextStudentPjId() {
-        String latestId = studentProjectRepository.findLatestStudentPjId();
-
-        // ถ้าไม่พบรหัสล่าสุด (กรณีฐานข้อมูลยังว่างเปล่า)
-        if (latestId == null) {
-            return 61;  // เริ่มต้นที่ SP061
-        }
-
-        // เอารหัสล่าสุดออกมาจาก SPxxxx และเพิ่ม 1
-        String numericPart = latestId.substring(2);  // เอาส่วนเลขออกจาก SPxxxx
-        return Integer.parseInt(numericPart) + 1;  // ส่งกลับค่ารหัสใหม่
-    }
+//    private void processProjectAndStudent(MultipartFile file) throws Exception {
+//        // (โค้ด processProjectAndStudent ที่คุณให้มา)
+//        // ไม่เปลี่ยนแปลง เพราะเป็นส่วนที่ทำการบันทึกลงฐานข้อมูล
+//        try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+//            String line;
+//            int rowIndex = 0;
+//            int currentYear = LocalDate.now().getYear();
+//
+//            // Map สำหรับเก็บเลข sequence สำหรับแต่ละคู่ (program, year)
+//            Map<String, Integer> projectNumberCounters = new HashMap<>();
+//            // Map สำหรับเก็บโปรเจกต์ที่สร้างไว้แล้ว (key: projectId ใหม่)
+//            Map<String, Project> createdProjects = new HashMap<>();
+//            // ตัวแปรสำหรับเก็บโปรเจกต์ปัจจุบันในกลุ่ม (หากแถวต่อมาขาดข้อมูลโปรเจกต์)
+//            String currentProjectId = null;
+//
+//            // ใช้สำหรับสร้างรหัส student_pj_id ใหม่ (ตามลำดับ)
+//            int studentIdCounter = Integer.parseInt(generateNextStudentPjId());
+//
+//            // วนลูปอ่านไฟล์ CSV (สมมุติว่า header อยู่ที่ 8 แถวแรก)
+//            while ((line = br.readLine()) != null) {
+//                rowIndex++;
+//                if (rowIndex < 9) continue; // ข้าม header
+//
+//                if (line.trim().isEmpty()) continue;
+//                String[] values = line.split(",");
+//                if (values.length < 9) {
+//                    System.out.println("Skipping row " + rowIndex + " due to insufficient columns.");
+//                    continue;
+//                }
+//
+//                // อ่านข้อมูลจากไฟล์ตามตำแหน่ง (0-based index)
+//                String fileProjectId = values[1].trim();
+//                String projectTitle = values[2].trim();
+//                String projectDescription = values[3].trim();
+//                String projectCategory = values[4].trim();
+//                String studentId = values[5].trim();
+//                String studentName = values[6].trim();
+//                String program = values[7].trim();
+//                String advisor = values[8].trim();
+//
+//                // ตรวจสอบข้อมูลนักศึกษาจำเป็นต้องมี StudentID และ StudentName
+//                if (studentId.isEmpty() || studentName.isEmpty()) {
+//                    System.out.println("Skipping row " + rowIndex + " due to missing student information.");
+//                    continue;
+//                }
+//
+//                // --------------- Process Project --------------- //
+//                if (!fileProjectId.isEmpty() || !projectTitle.isEmpty() ||
+//                        !projectDescription.isEmpty() || !projectCategory.isEmpty()) {
+//
+//                    // กำหนดเลข sequence ของโปรเจกต์ตามคู่ (program, year)
+//                    String key = program + "_" + currentYear;
+//                    int projectNumberCounter;
+//                    if (projectNumberCounters.containsKey(key)) {
+//                        projectNumberCounter = projectNumberCounters.get(key) + 1;
+//                    } else {
+//                        projectNumberCounter = generateNextProjectNumber(program, String.valueOf(currentYear));
+//                    }
+//                    projectNumberCounters.put(key, projectNumberCounter);
+//
+//                    // สร้าง ProjectId ใหม่ในรูปแบบ "Program SP<Year>-<sequence>"
+//                    String newProjectId = program + " SP" + currentYear + "-" + String.format("%02d", projectNumberCounter);
+//
+//                    // สร้าง Record สำหรับ Project
+//                    Project project = new Project();
+//                    project.setProjectId(newProjectId);
+//                    project.setProgram(program);
+//                    project.setSemester(String.valueOf(currentYear));
+//                    project.setProjectTitle(projectTitle);
+//                    project.setProjectCategory(projectCategory);
+//                    project.setProjectDescription(projectDescription);
+//                    project.setRecordedOn(LocalDateTime.now());
+//                    project.setEditedOn(LocalDateTime.now());
+//
+//                    projectRepository.save(project);
+//                    createdProjects.put(newProjectId, project);
+//                    currentProjectId = newProjectId;
+//                } else {
+//                    if (currentProjectId == null) {
+//                        System.out.println("Skipping row " + rowIndex + " as no project info available.");
+//                        continue;
+//                    }
+//                }
+//
+//                // --------------- Process Student  --------------- //
+//                Optional<Student> optStudent = studentRepository.findById(studentId);
+//                if (optStudent.isPresent()) {
+//                    Student student = optStudent.get();
+//                    if (!student.getStudentName().equals(studentName)) {
+//                        System.out.println("Student info mismatch for ID " + studentId
+//                                + ": Database Name = '" + student.getStudentName()
+//                                + "', File Name = '" + studentName + "'. Skipping row " + rowIndex + ".");
+//                        continue;
+//                    }
+//                } else {
+//                    System.out.println("Student not found for ID " + studentId + " at row " + rowIndex + ". Skipping row.");
+//                    continue;
+//                }
+//
+//                // --------------- Process StudentProject --------------- //
+//                Project project = createdProjects.get(currentProjectId);
+//                if (project == null) {
+//                    Optional<Project> projectOpt = projectRepository.findById(currentProjectId);
+//                    if (projectOpt.isPresent()) {
+//                        project = projectOpt.get();
+//                    } else {
+//                        System.out.println("Skipping row " + rowIndex + " as project not found for ID: " + currentProjectId);
+//                        continue;
+//                    }
+//                }
+//                StudentProject studentProject = new StudentProject();
+//                studentProject.setStudent(optStudent.get());
+//                studentProject.setProject(project);
+//                studentProject.setStatus("Active");
+//                studentProject.setStudentPjId("SP" + String.format("%03d", studentIdCounter++));
+//                studentProjectRepository.save(studentProject);
+//
+//                // --------------- Process Advisor for ProjectInstructorRole --------------- //
+//                if (!advisor.isEmpty()) {
+//                    if (!isValidInstructor(advisor)) {
+//                        System.out.println("Advisor name '" + advisor + "' is invalid at row " + rowIndex + ". Skipping advisor assignment.");
+//                    } else {
+//                        Optional<Instructor> optInstructor = instructorRepository.findByProfessorName(advisor);
+//                        if (!optInstructor.isPresent()) {
+//                            System.out.println("Advisor '" + advisor + "' not found in Instructor entity at row " + rowIndex + ". Skipping advisor assignment.");
+//                        } else {
+//                            Instructor instructor = optInstructor.get();
+//                            if (instructor.getProfessorId() == null) {
+//                                String newProfessorId = generateNextInstructorId();
+//                                instructor.setProfessorId(newProfessorId);
+//                                instructorRepository.save(instructor);
+//                            }
+//                            if (isInstructorAlreadyAssignedToProject(instructor.getProfessorId(), currentProjectId)) {
+//                                System.out.println("Advisor '" + advisor + "' is already assigned to project " + currentProjectId + " at row " + rowIndex + ". Skipping assignment.");
+//                            } else {
+//                                String newInstructorRoleId = generateNextInstructorId();
+//                                ProjectInstructorRole roleRecord = new ProjectInstructorRole();
+//                                roleRecord.setInstructorId(newInstructorRoleId);
+//                                roleRecord.setAssignDate(LocalDateTime.now());
+//                                roleRecord.setRole("Advisor");
+//                                roleRecord.setProjectIdRole(project);
+//                                roleRecord.setInstructor(instructor);
+//                                projectInstructorRoleRepository.save(roleRecord);
+//                            }
+//                        }
+//                    }
+//                }
+//            }
+//        } catch (IOException e) {
+//            throw new Exception("Error reading CSV file: " + e.getMessage());
+//        }
+//    }
+//
+//
+//    // ฟังก์ชันในการดึงรหัส Project ล่าสุด และเพิ่มขึ้นเป็นตัวเลขต่อไป (คืนค่าเป็น int)
+//    private int generateNextProjectNumber(String program, String year) {
+//        String latestProjectId = projectRepository.findLatestProjectIdByProgramAndYear(program, year);
+//        if (latestProjectId == null || latestProjectId.isEmpty()) {
+//            return 1;
+//        }
+//        String[] parts = latestProjectId.split("-");
+//        if (parts.length < 2) {
+//            return 1;
+//        }
+//        try {
+//            int latestNumber = Integer.parseInt(parts[1]);
+//            return latestNumber + 1;
+//        } catch (NumberFormatException ex) {
+//            return 1;
+//        }
+//    }
+//
+//    // ฟังก์ชันในการดึงรหัส student_pj_id ล่าสุดจากฐานข้อมูล และเพิ่มขึ้นในรูปแบบที่มีหลักนำ
+//    private String generateNextStudentPjId() {
+//        String latestId = studentProjectRepository.findLatestStudentPjId();
+//        if (latestId == null || latestId.isEmpty()) {
+//            return "01";
+//        }
+//        String numericPart = latestId.substring(2);
+//        int nextNumber = Integer.parseInt(numericPart) + 1;
+//        int width = numericPart.length();
+//        return String.format("%0" + width + "d", nextNumber);
+//    }
 
 
     // ----------------- Function Upload Instructor Project ----------------- //
@@ -771,6 +781,86 @@ public class UploadFilesService {
     }
 
 
+//    ------- โค้ดนี้น่าจะใช้ในการอัปโหลด Committee and Poster-Committee ได้ ---------
+    // Process Project Advisor (เก็บเฉพาะ Advisor) และอัปโหลดลงใน ProjectInstructorRole
+//    private void processProjectInstructor(MultipartFile file) throws Exception {
+//        try (BufferedReader br = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+//            String line;
+//            int rowIndex = 0;
+//
+//            // Map เพื่อเก็บข้อมูล projectId กับ List ของ Advisor
+//            Map<String, List<String>> projectAdvisorMap = new HashMap<>();
+//
+//            String currentProjectId = null;
+//
+//            while ((line = br.readLine()) != null) {
+//                rowIndex++;
+//
+//                if (line.trim().isEmpty()) {
+//                    System.out.println("Skipping empty line at index " + rowIndex);
+//                    continue;  // ข้ามแถวที่ว่าง
+//                }
+//
+//                String[] values = line.split(",");
+//                // ตรวจสอบให้มีข้อมูลอย่างน้อย 8 คอลัมน์ (ProjectId และ Advisor)
+//                if (values.length < 8) {
+//                    System.out.println("Skipping invalid row at index " + rowIndex + ", not enough columns.");
+//                    continue;  // ข้ามแถวที่มีข้อมูลไม่ครบ
+//                }
+//
+//                // อ่านข้อมูลจากไฟล์
+//                String projectId = values[0].trim(); // projectId จากไฟล์
+//                String advisor = values[7].trim();     // อ่าน Advisor จากไฟล์ (column 8, index 7)
+//
+//                // ถ้า projectId ว่างในแถวนี้ ให้ใช้ projectId จากแถวก่อนหน้า
+//                if (projectId.isEmpty() && currentProjectId != null) {
+//                    projectId = currentProjectId;
+//                } else if (!projectId.isEmpty()) {
+//                    currentProjectId = projectId;
+//                }
+//
+//                // ตรวจสอบว่ามี Project ในฐานข้อมูลหรือไม่
+//                Optional<Project> existingProject = projectRepository.findById(projectId);
+//                if (existingProject.isEmpty()) {
+//                    System.out.println("Project with ID " + projectId + " not found in Project entity, skipping row...");
+//                    continue;  // ไม่พบ Project ให้ข้ามแถว
+//                }
+//
+//                // เก็บข้อมูล Advisor ใน Map (key = projectId)
+//                projectAdvisorMap.putIfAbsent(projectId, new ArrayList<>());
+//                List<String> advisorList = projectAdvisorMap.get(projectId);
+//                if (isValidInstructor(advisor)) {
+//                    advisorList.add(advisor);
+//                }
+//
+//                // ใช้ข้อมูล Advisor จาก Map เพื่อบันทึกลงใน ProjectInstructorRole
+//                for (String advisorName : advisorList) {
+//                    Optional<Instructor> existingInstructor = instructorRepository.findByProfessorName(advisorName);
+//                    if (existingInstructor.isPresent()) {
+//                        Instructor instructor = existingInstructor.get();
+//
+//                        // สร้าง instructorId ใหม่หากยังไม่มี
+//                        if (instructor.getProfessorId() == null) {
+//                            String instructorId = generateNextInstructorId();
+//                            instructor.setProfessorId(instructorId);
+//                        }
+//
+//                        // ตั้ง role เป็น "Advisor" เนื่องจากเราอ่านเฉพาะ Advisor
+//                        String role = "Advisor";
+//
+//                        // ตรวจสอบว่าอาจารย์นี้ได้รับมอบหมายในโปรเจกต์นี้แล้วหรือยัง
+//                        if (!isInstructorAlreadyAssignedToProject(instructor.getProfessorId(), projectId)) {
+//                            saveInstructorRole(existingProject.get(), instructor, role);
+//                        }
+//                    }
+//                }
+//            }
+//        } catch (IOException e) {
+//            throw new Exception("Error reading CSV file: " + e.getMessage());
+//        }
+//    }
+
+
     // -------------------- DELETE PROJECT -------------------- //
 
     @Transactional
@@ -837,5 +927,331 @@ public class UploadFilesService {
 //            errorLogs.add("Error processing Excel: " + e.getMessage());
 //        }
 //    }
+
+    // ----------------- Function Upload Project Details (บันทึกลง DB) ----------------- //
+    public List<String> processProjectAndStudent(MultipartFile file) throws Exception {
+        List<String> warnings = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+            String line;
+            int rowIndex = 0;
+            int currentYear = LocalDate.now().getYear();
+
+            Map<String, Integer> projectNumberCounters = new HashMap<>();
+            Map<String, Project> createdProjects = new HashMap<>();
+            String currentProjectId = null;
+
+            int studentIdCounter = Integer.parseInt(generateNextStudentPjId());
+
+            while ((line = br.readLine()) != null) {
+                rowIndex++;
+                if (rowIndex < 9) continue;
+                if (line.trim().isEmpty()) continue;
+
+                // ใช้ split ด้วย limit -1 เพื่อเก็บ trailing empty columns
+                String[] values = line.split(",", -1);
+                // ถ้าจำนวนคอลัมน์ยังน้อยกว่า 8 ให้เติมค่าว่างเข้าไป
+                if (values.length < 8) {
+                    String[] fullValues = new String[8];
+                    for (int i = 0; i < 8; i++) {
+                        if (i < values.length) {
+                            fullValues[i] = values[i].trim();
+                        } else {
+                            fullValues[i] = "";
+                        }
+                    }
+                    values = fullValues;
+                }
+
+                String fileProjectId = values[0].trim();
+                String projectTitle = values[1].trim();
+                String projectDescription = values[2].trim();
+                String projectCategory = values[3].trim();
+                String studentId = values[4].trim();
+                String studentName = values[5].trim();
+                String program = values[6].trim();
+                String advisor = values[7].trim();
+
+                // เมื่อเจอแถวที่มีข้อมูลโปรเจกต์ใหม่ (fileProjectId มีค่า)
+                if (!fileProjectId.isEmpty()) {
+                    Optional<Project> existingProjectOpt = projectRepository.findByProjectTitleAndProjectDescription(projectTitle, projectDescription);
+                    if (existingProjectOpt.isPresent()) {
+                        System.out.println("Project already exists for title '" + projectTitle
+                                + "' and description '" + projectDescription + "' at row " + rowIndex + ". Skipping project insertion.");
+                        warnings.add("Project '" + projectTitle + "' already exists.");
+                        currentProjectId = existingProjectOpt.get().getProjectId();
+                    } else {
+                        String key = program + "_" + currentYear;
+                        int projectNumberCounter = projectNumberCounters.containsKey(key)
+                                ? projectNumberCounters.get(key) + 1
+                                : generateNextProjectNumber(program, String.valueOf(currentYear));
+                        projectNumberCounters.put(key, projectNumberCounter);
+
+                        String newProjectId = program + " SP" + currentYear + "-" + String.format("%02d", projectNumberCounter);
+                        Project project = new Project();
+                        project.setProjectId(newProjectId);
+                        project.setProgram(program);
+                        project.setSemester(String.valueOf(currentYear));
+                        project.setProjectTitle(projectTitle);
+                        project.setProjectCategory(projectCategory);
+                        project.setProjectDescription(projectDescription);
+                        project.setRecordedOn(LocalDateTime.now());
+                        project.setEditedOn(LocalDateTime.now());
+
+                        projectRepository.save(project);
+                        createdProjects.put(newProjectId, project);
+                        currentProjectId = newProjectId;
+                    }
+                } else {
+                    // ไม่มี fileProjectId -> ใช้โปรเจกต์ล่าสุด
+                    if (currentProjectId == null) {
+                        String msg = "Skipping row " + rowIndex + " as no project info available.";
+                        System.out.println(msg);
+                        warnings.add("Row " + rowIndex + ": No project information available.");
+                        continue;
+                    }
+                }
+
+                // ตรวจสอบว่านักศึกษาสำหรับโปรเจกต์นี้มีอยู่แล้วหรือไม่
+                boolean studentProjectExists = studentProjectRepository.existsByProject_ProjectIdAndStudent_StudentId(currentProjectId, studentId);
+                if (studentProjectExists) {
+                    String msg = "StudentProject already exists for project " + currentProjectId + " and student " + studentId
+                            + " at row " + rowIndex + ". Skipping student-project insertion.";
+                    System.out.println(msg);
+                    warnings.add("Student '" + studentId + "' already exists in Project '" + currentProjectId + "'.");
+                    continue;
+                }
+
+                // ตรวจสอบข้อมูลนักศึกษา
+                Optional<Student> optStudent = studentRepository.findById(studentId);
+                if (optStudent.isPresent()) {
+                    Student student = optStudent.get();
+                    if (!student.getStudentName().equals(studentName)) {
+                        String msg = "Student info mismatch for ID " + studentId
+                                + ": Database Name = '" + student.getStudentName() + "', File Name = '" + studentName + "'. Skipping row " + rowIndex + ".";
+                        System.out.println(msg);
+                        warnings.add("Student information mismatch for ID '" + studentId + "'.");
+                        continue;
+                    }
+                } else {
+                    String msg = "Student not found for ID " + studentId + " at row " + rowIndex + ". Skipping row.";
+                    System.out.println(msg);
+                    warnings.add("Student '" + studentId + "' not found.");
+                    continue;
+                }
+
+                Project project = createdProjects.get(currentProjectId);
+                if (project == null) {
+                    Optional<Project> projectOpt = projectRepository.findById(currentProjectId);
+                    if (projectOpt.isPresent()) {
+                        project = projectOpt.get();
+                    } else {
+                        String msg = "Skipping row " + rowIndex + " as project not found for ID: " + currentProjectId;
+                        System.out.println(msg);
+                        warnings.add("Project not found for ID '" + currentProjectId + "'.");
+                        continue;
+                    }
+                }
+
+                StudentProject studentProject = new StudentProject();
+                studentProject.setStudent(optStudent.get());
+                studentProject.setProject(project);
+                studentProject.setStatus("Active");
+                studentProject.setStudentPjId("SP" + String.format("%03d", studentIdCounter++));
+                studentProjectRepository.save(studentProject);
+
+                if (!advisor.isEmpty()) {
+                    if (!isValidInstructor(advisor)) {
+                        String msg = "Advisor name '" + advisor + "' is invalid at row " + rowIndex + ". Skipping advisor assignment.";
+                        System.out.println(msg);
+                        warnings.add("Invalid advisor '" + advisor + "' for Project '" + currentProjectId + "'.");
+                    } else {
+                        Optional<Instructor> optInstructor = instructorRepository.findByProfessorName(advisor);
+                        if (!optInstructor.isPresent()) {
+                            String msg = "Advisor '" + advisor + "' not found in Instructor entity at row " + rowIndex + ". Skipping advisor assignment.";
+                            System.out.println(msg);
+                            warnings.add("Advisor '" + advisor + "' not found for Project '" + currentProjectId + "'.");
+                        } else {
+                            Instructor instructor = optInstructor.get();
+                            if (instructor.getProfessorId() == null) {
+                                String newProfessorId = generateNextInstructorId();
+                                instructor.setProfessorId(newProfessorId);
+                                instructorRepository.save(instructor);
+                            }
+                            boolean instructorAlreadyAssigned = projectInstructorRoleRepository
+                                    .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorId(currentProjectId, instructor.getProfessorId());
+                            if (instructorAlreadyAssigned) {
+                                String msg = "Advisor '" + advisor + "' is already assigned to project " + currentProjectId
+                                        + " at row " + rowIndex + ". Skipping assignment.";
+                                System.out.println(msg);
+                                warnings.add("Advisor '" + advisor + "' already exists in Project '" + currentProjectId + "'.");
+                            } else {
+                                String newInstructorRoleId = generateNextInstructorId();
+                                ProjectInstructorRole roleRecord = new ProjectInstructorRole();
+                                roleRecord.setInstructorId(newInstructorRoleId);
+                                roleRecord.setAssignDate(LocalDateTime.now());
+                                roleRecord.setRole("Advisor");
+                                roleRecord.setProjectIdRole(project);
+                                roleRecord.setInstructor(instructor);
+                                projectInstructorRoleRepository.save(roleRecord);
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new Exception("Error reading CSV file: " + e.getMessage());
+        }
+        return warnings;
+    }
+
+
+    // ฟังก์ชันในการดึงรหัส Project ล่าสุด และเพิ่มขึ้นเป็นตัวเลขต่อไป (คืนค่าเป็น int)
+    private int generateNextProjectNumber(String program, String year) {
+        String latestProjectId = projectRepository.findLatestProjectIdByProgramAndYear(program, year);
+        if (latestProjectId == null || latestProjectId.isEmpty()) {
+            return 1;
+        }
+        String[] parts = latestProjectId.split("-");
+        if (parts.length < 2) {
+            return 1;
+        }
+        try {
+            int latestNumber = Integer.parseInt(parts[1]);
+            return latestNumber + 1;
+        } catch (NumberFormatException ex) {
+            return 1;
+        }
+    }
+
+    // ฟังก์ชันในการดึงรหัส student_pj_id ล่าสุดจากฐานข้อมูล และเพิ่มขึ้นในรูปแบบที่มีหลักนำ
+    private String generateNextStudentPjId() {
+        String latestId = studentProjectRepository.findLatestStudentPjId();
+        if (latestId == null || latestId.isEmpty()) {
+            return "01";
+        }
+        String numericPart = latestId.substring(2);
+        int nextNumber = Integer.parseInt(numericPart) + 1;
+        int width = numericPart.length();
+        return String.format("%0" + width + "d", nextNumber);
+    }
+
+
+    public List<String> processProjectCommittee(MultipartFile file) throws Exception {
+        List<String> warnings = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+
+            String line;
+            int rowIndex = 0;
+            String currentProjectId = null;  // projectId สำหรับผูก Committee
+
+            // อ่านไฟล์ CSV ทีละบรรทัด (สมมติ header อยู่ที่แถว 1-9)
+            while ((line = br.readLine()) != null) {
+                rowIndex++;
+                if (rowIndex < 10) continue;  // ข้าม header
+                if (line.trim().isEmpty()) continue;
+
+                // ใช้ regex split เพื่อแยกเฉพาะ comma ที่ไม่ได้อยู่ภายใน double quotes
+                String pattern = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+                String[] values = line.split(pattern, -1);
+
+                // หากจำนวนคอลัมน์ที่ได้ไม่ครบ 10 ให้เติมคอลัมน์ด้วยค่า ""
+                if (values.length < 10) {
+                    String[] fullValues = new String[10];
+                    for (int i = 0; i < 10; i++) {
+                        if (i < values.length) {
+                            fullValues[i] = values[i].trim();
+                        } else {
+                            fullValues[i] = "";
+                        }
+                    }
+                    values = fullValues;
+                }
+
+                // ดึงข้อมูลจาก CSV ตามตำแหน่งที่คาดหวัง
+                String fileProjectId = values[0].trim();
+                String committeeName = values[9].trim();
+
+                // --------------------- จัดการ Project ---------------------
+                if (!fileProjectId.isEmpty()) {
+                    Optional<Project> projectOpt = projectRepository.findById(fileProjectId);
+                    if (projectOpt.isPresent()) {
+                        currentProjectId = projectOpt.get().getProjectId();
+                    } else {
+                        System.out.println("Project with ID '" + fileProjectId + "' not found at row " + rowIndex + ".");
+                        warnings.add("Row " + rowIndex + ": Project with ID '" + fileProjectId + "' not found.");
+                        continue;
+                    }
+                } else {
+                    if (currentProjectId == null) {
+                        System.out.println("Row " + rowIndex + " has no project ID provided (no previous project).");
+//                        warnings.add("Row " + rowIndex + ": No project ID provided (no previous project).");
+                        continue;
+                    }
+                    // ใช้ currentProjectId เดิม
+                }
+
+                // --------------------- จัดการ Committee ---------------------
+                if (committeeName.isEmpty()) {
+                    System.out.println("No committee data provided at row " + rowIndex + ".");
+//                    warnings.add("Row " + rowIndex + ": No committee data provided.");
+                    continue;
+                } else {
+                    if (!isValidInstructor(committeeName)) {
+                        System.out.println("Committee name '" + committeeName + "' is invalid at row " + rowIndex + ". Skipping committee assignment.");
+                        warnings.add("Row " + rowIndex + ": Invalid committee '" + committeeName + "' for Project '" + currentProjectId + "'.");
+                        continue;
+                    } else {
+                        Optional<Instructor> optInstructor = instructorRepository.findByProfessorName(committeeName);
+                        if (!optInstructor.isPresent()) {
+                            System.out.println("Committee '" + committeeName + "' not found in Instructor entity at row " + rowIndex + ". Skipping committee assignment.");
+                            warnings.add("Row " + rowIndex + ": Committee '" + committeeName + "' not found for Project '" + currentProjectId + "'.");
+                            continue;
+                        }
+                        Instructor instructor = optInstructor.get();
+
+                        if (instructor.getProfessorId() == null) {
+                            String newProfessorId = generateNextInstructorId();
+                            instructor.setProfessorId(newProfessorId);
+                            instructorRepository.save(instructor);
+                        }
+
+                        boolean committeeAlreadyAssigned = projectInstructorRoleRepository
+                                .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(
+                                        currentProjectId, instructor.getProfessorId(), "Committee");
+                        if (committeeAlreadyAssigned) {
+                            System.out.println("Committee '" + committeeName + "' is already assigned to project " + currentProjectId
+                                    + " at row " + rowIndex + ". Skipping assignment.");
+                            warnings.add("Row " + rowIndex + ": Committee '" + committeeName + "' already exists in Project '" + currentProjectId + "'.");
+                        } else {
+                            String newCommitteeRoleId = generateNextInstructorId();
+                            ProjectInstructorRole roleRecord = new ProjectInstructorRole();
+                            roleRecord.setInstructorId(newCommitteeRoleId);
+                            roleRecord.setAssignDate(LocalDateTime.now());
+                            roleRecord.setRole("Committee");
+
+                            Optional<Project> projOpt = projectRepository.findById(currentProjectId);
+                            if (!projOpt.isPresent()) {
+                                System.out.println("Project not found for ID '" + currentProjectId + "' at row " + rowIndex + ".");
+                                warnings.add("Row " + rowIndex + ": Project not found for ID '" + currentProjectId + "'.");
+                                continue;
+                            }
+                            Project project = projOpt.get();
+                            roleRecord.setProjectIdRole(project);
+                            roleRecord.setInstructor(instructor);
+
+                            projectInstructorRoleRepository.save(roleRecord);
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new Exception("Error reading CSV file: " + e.getMessage());
+        }
+        return warnings;
+    }
+
+
 
 }

@@ -32,4 +32,6 @@ public interface StudentProjectRepository extends JpaRepository<StudentProject, 
 
     int countByProject(Project project);
 
+    boolean existsByProject_ProjectIdAndStudent_StudentId(String projectId, String studentId);
+
 }

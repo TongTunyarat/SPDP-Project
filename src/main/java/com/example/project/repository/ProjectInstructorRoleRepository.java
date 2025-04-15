@@ -40,7 +40,9 @@ public interface ProjectInstructorRoleRepository extends JpaRepository<ProjectIn
 
     List<ProjectInstructorRole> findByProjectIdRole_SemesterAndProjectIdRole_Program(String year, String program);
 
+    boolean existsByProjectIdRole_ProjectIdAndInstructor_ProfessorId(String projectId, String professorId);
 
 
+    boolean existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(String currentProjectId, String professorId, String committee);
 }
 

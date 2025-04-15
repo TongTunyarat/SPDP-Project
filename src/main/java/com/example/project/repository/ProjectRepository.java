@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, String> {
@@ -69,6 +70,14 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
     @Query("SELECT MAX(p.projectId) FROM Project p WHERE p.program = :program AND p.projectId LIKE CONCAT(:program, ' SP%')")
     String findLatestProjectIdByProgram(@Param("program") String program);
 
+    @Query(value = "SELECT project_id FROM project " +
+            "WHERE project_id LIKE CONCAT(:program, ' SP', :year, '-%') " +
+            "ORDER BY CAST(SUBSTRING(project_id, LOCATE('-', project_id) + 1) AS UNSIGNED) DESC " +
+            "LIMIT 1", nativeQuery = true)
+    String findLatestProjectIdByProgramAndYear(@Param("program") String program,
+                                               @Param("year") String year);
+
+    Optional<Project> findByProjectTitleAndProjectDescription(String title, String description);
 }
 
 

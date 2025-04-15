@@ -34,12 +34,21 @@ body {
     font-weight: 500;
     box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08),
     0px 1px 2px 0px rgba(21, 30, 40, 0.08);
+    transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
 .btn-footer {
     display: flex;
     justify-content: flex-end;
 }
+
+.btn-header button:hover {
+    background-color: #624BFF; /* เปลี่ยนสีพื้นหลังเมื่อ hover */
+    color: white; /* เปลี่ยนสีตัวอักษรเมื่อ hover */
+    transform: scale(1.05); /* ขยายขนาดปุ่มเล็กน้อย */
+    box-shadow: 0px 4px 6px rgba(13, 23, 33, 0.1), 0px 2px 4px rgba(21, 30, 40, 0.12); /* เพิ่มความเข้มของเงา */
+}
+
 
 .btn-footer button {
     background-color: white;
@@ -58,13 +67,14 @@ body {
 
 /* Table */
 .table-container {
-    max-width: 1500px;
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
     padding: 20px;
-    margin-top: -60px;
-    margin-left: 32px;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 50px;
 }
 
 table {
@@ -365,6 +375,8 @@ td:nth-child(4) {
     overflow-y: auto;
 }
 
+
+
 .close-btn {
     background-color: #f44336; /* สีแดง */
     color: white;
@@ -588,3 +600,104 @@ td:nth-child(4) {
 .export-dialog, .export-overlay {
     display: none;
 }
+
+
+/* TAB: ICT,DST */
+.tabs {
+    display: flex;
+    background-color: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: -25px 20px 20px;
+}
+
+.tab {
+    /*flex: 1;*/
+    display: flex;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #555;
+    transition: background-color 0.3s, color 0.3s;
+    align-items: center;
+    justify-content: center;
+}
+
+.tab:not(:last-child) {
+    border-right: 1px solid #ddd;
+}
+
+.tab.active {
+    font-weight: bold;
+    background-color: #fff;
+    color: #026e6e;
+    border-bottom: 3px solid #026e6e;
+}
+
+.tab:hover:not(.active) {
+    background-color: #f1f1f1;
+}
+
+
+/* Search */
+.tabs input {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 10px 20px 10px auto;
+}
+
+.tabs input {
+    margin-left: auto;
+}
+
+/* SEMESTER */
+.header-button{
+    display: flex;
+    gap: 10px;
+}
+
+.semester-container {
+    display: flex;
+    align-items: center;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: 0.3s;
+    gap: 8px;
+    height: 30px;
+    width: 100px;
+}
+
+.semester-container:hover {
+    background: #f8f8f8;
+}
+
+.calendar-icon {
+    font-size: 16px;
+    color: #555;
+}
+
+#semester-selector {
+    border: none;
+    background: transparent;
+    font-size: 17px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    appearance: none;
+    outline: none;
+
+    padding: 20px;
+}
+
+#semester-selector::-ms-expand {
+    display: none;
+}
+

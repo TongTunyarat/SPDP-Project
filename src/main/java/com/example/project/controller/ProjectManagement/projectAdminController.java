@@ -114,7 +114,8 @@ public class projectAdminController {
                 professorList,
                 project.getProjectDescription(),
                 project.getProgram(),
-                studentList
+                studentList,
+                project.getProjectCategory()
         );
 
         return ResponseEntity.ok(response);
@@ -160,7 +161,8 @@ public class projectAdminController {
                 professorList,
                 project.getProjectDescription(),
                 project.getProgram(),
-                studentList
+                studentList,
+                project.getProjectCategory()
         );
 
         return response;  // Spring จะทำการแปลง ProjectDetailsDTO เป็น JSON

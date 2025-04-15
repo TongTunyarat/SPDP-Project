@@ -11,19 +11,31 @@ public class ProjectDetailsDTO {
     private String projectDescription;
     private String program;
     private List<StudentProjectDTO> studentList;
+    private String category;
 
     // Constructor
     public ProjectDetailsDTO(String projectId, String projectTitle, List<ProfessorRoleDTO> professorList,
-                             String projectDescription, String program, List<StudentProjectDTO> studentList) {
+                             String projectDescription, String program, List<StudentProjectDTO> studentList, String category) {
         this.projectId = projectId;
         this.projectTitle = projectTitle;
         this.professorList = professorList;  // กำหนดค่าให้กับ professorList
         this.projectDescription = projectDescription;
         this.program = program;
         this.studentList = studentList;
+        this.category = category;
     }
 
     // Getter และ Setter
+
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
     public String getProjectId() {
         return projectId;
     }

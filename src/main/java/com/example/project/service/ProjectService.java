@@ -114,7 +114,8 @@ public class ProjectService {
                     professorList,
                     project.getProjectDescription(),
                     program,  // ส่งโปรแกรม
-                    studentList // ส่งข้อมูลนักศึกษา
+                    studentList, // ส่งข้อมูลนักศึกษา
+                    project.getProjectCategory()
             );
 
             projectDetailsDTOList.add(projectDetailsDTO);

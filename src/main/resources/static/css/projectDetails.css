@@ -92,6 +92,11 @@ th {
     background-color: #f4f4f4;
 }
 
+thead th {
+    text-align: center;
+    background-color: #f4f4f4;
+}
+
 .tag {
     display: inline-block;
     padding: 4px 8px;
@@ -382,6 +387,7 @@ td form {
 #preview-content {
     max-height: 200px;
     overflow-y: auto;
+    max-width: 1200px;
 }
 
 .close-btn {
@@ -553,12 +559,9 @@ td form {
     display: none;
     position: fixed;
     z-index: 1;
-    left: 0;
-    top: 0;
     width: 100%;
     height: 100%;
     background-color: rgba(0, 0, 0, 0.4);
-    padding-top: 60px;
     overflow: auto;
     font-family: Arial, sans-serif;
 }
@@ -569,7 +572,7 @@ td form {
     margin: 2% auto;
     padding: 20px;
     border-radius: 8px;
-    width: 100%; /* ขยายความกว้างของ modal */
+    max-width: 200vh;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     position: relative;
     max-height: 80%;
@@ -614,7 +617,7 @@ select {
 
 #preview-content {
     margin-top: 20px;
-    width: 100%;
+    width: 200vh;
     height: 100%;
     overflow-x: auto;
 }
@@ -833,6 +836,54 @@ select {
     background-color: #3b62b0;
 }
 
+/* Container for dropdown */
+.dropdown-export {
+    position: relative;
+    display: inline-block;
+
+}
+
+/* Button styling */
+.dropbtn {
+    color: white;
+    border: none;
+    cursor: pointer;
+    padding-top: -50px;
+}
+
+/* Dropdown content (ซ่อนโดยค่า default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 250px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* รูปแบบของลิงค์ใน dropdown */
+.dropdown-content a {
+    color: black;
+    text-decoration: none;
+    display: block;
+}
+
+/* เปลี่ยนสีเมื่อ hover */
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+/* เมื่อ hover ที่ container แสดง dropdown */
+.dropdown-export:hover .dropdown-content {
+    display: block;
+}
+
+/* เปลี่ยนสีปุ่มเมื่อ hover */
+.dropdown-export:hover .dropbtn {
+    background-color: #4472C4;
+    color: white;
+}
+
 .cancel-button {
     background-color: #e9ecef;
     color: #495057;
@@ -884,3 +935,57 @@ select {
 .export-dialog, .export-overlay {
     display: none;
 }
+
+.upload-section {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.file-input-container {
+    border: 2px dashed var(--medium-gray);
+    padding: 2rem;
+    text-align: center;
+    border-radius: 8px;
+    background-color: var(--light-gray);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.file-input-container:hover {
+    border-color: var(--primary-color);
+    background-color: rgba(52, 152, 219, 0.05);
+}
+
+.file-input-container.dragging {
+    border-color: var(--primary-color);
+    background-color: rgba(52, 152, 219, 0.1);
+}
+
+.file-input-container i {
+    font-size: 3rem;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+
+.file-input-container p {
+    color: var(--dark-gray);
+    margin-bottom: 1rem;
+}
+
+.file-input {
+    display: none;
+}
+
+:root {
+    --primary-color: #3498db;
+    --secondary-color: #2980b9;
+    --success-color: #27ae60;
+    --warning-color: #f39c12;
+    --danger-color: #e74c3c;
+    --light-gray: #f5f5f5;
+    --medium-gray: #e0e0e0;
+    --dark-gray: #777;
+}
+
