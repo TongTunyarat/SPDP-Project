@@ -11,8 +11,11 @@
     <link rel="stylesheet" href="/CSS/projectCommittee.css">
 
     <!-- Library -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 </head>
 
 <body>
@@ -97,8 +100,16 @@
 
         <div class="header-section">
             Committee
+
             <div class="btn-header">
-                <button id="export-project-excel">Export Project Template</button>
+
+                <div class="dropdown-export">
+                    <button class="dropbtn">Export Project Template</button>
+                    <div class="dropdown-content">
+                        <a href="#" id="export-project-excel">Export Raw Project Template</a>
+                        <a href="#" id="export-project-excel-new">Export Project Template</a>
+                    </div>
+                </div>
                 <input type="file" id="upload-file" accept=".csv, .xlsx, .xls" style="display: none;"/>
                 <button id="upload-btn">Upload Files</button>
             </div>
@@ -120,7 +131,7 @@
                         <th>Project ID</th>
                         <th>Project Name</th>
                         <th>Student ID</th>
-                        <th colspan="3">Committee</th>  <!-- ใช้ colspan รวมเป็นหัวข้อหลัก -->
+                        <th colspan="4">Committee</th>  <!-- ใช้ colspan รวมเป็นหัวข้อหลัก -->
                         <th class="action-header">Action</th>
                     </tr>
                     <tr class="sub-header-row">
@@ -130,6 +141,7 @@
                         <th class="advisor-header">Advisor</th>
                         <th class="committee1-header">Committee 1</th>
                         <th class="committee2-header">Committee 2</th>
+                        <th></th>
                         <th></th>
                     </tr>
                     </thead>
@@ -256,10 +268,9 @@
 
     </div>
 </div>
+</div>
 </body>
-
 </html>
-
 <script>
     document.addEventListener("DOMContentLoaded", function () {
         fetchProjects();
@@ -337,8 +348,8 @@
         const endIndex = startIndex + itemsPerPage;
         const pageData = projectsData.slice(startIndex, endIndex);
 
-        // คำนวณจำนวนคอลัมน์ Committee สูงสุดที่ต้องใช้
-        const maxCommittee = Math.max(...projectsData.map(project => project.professorList.filter(p => p.role === 'Committee').length));
+        // คำนวณจำนวนคอลัมน์ Committee โดยให้ขั้นต่ำ 3 คอลัมน์
+        const maxCommittee = Math.max(3, ...projectsData.map(project => project.professorList.filter(p => p.role === 'Committee').length));
 
         pageData.forEach(project => {
             console.log(project);
@@ -359,15 +370,21 @@
             // ถ้า Committee มีไม่ถึง maxCommittee ให้เติม <td> ว่างให้ครบ
             let emptyColumns = `<td></td>`.repeat(maxCommittee - committees.length);
 
+            // ใช้ split เพื่อแยกค่าออกจากโปรแกรม
+            const programParts = project.projectId.split(" ");
+            const programPrefix = programParts[0]; // ค่าก่อนหน้า (DST, ICT, etc.)
+            const projectId = programParts.slice(1).join(" ");
+
             row.innerHTML = `
-            <td><span class="tag ${projectProgram}">${project.program || "N/A"}</span> ${project.projectId}</td>
+            <td><span class="tag ${projectProgram}">${project.program || "N/A"}</span> ${projectId}</td>
             <td>${project.projectTitle || "N/A"}</td>
             <td>
                 <ul>
                     ${project.studentList.map(student => `<li>${student.studentId}</li>`).join('')}
                 </ul>
             </td>
-            <td>${advisorName}</td>  <!-- แสดง Advisor -->
+            <td>
+            ${advisorName}</td>  <!-- แสดง Advisor -->
             ${committeeColumns}  <!-- แสดง Committee ที่มี -->
             ${emptyColumns}  <!-- เติมช่องว่างให้ครบจำนวน maxCommittee -->
            <td>
@@ -394,8 +411,6 @@
         for (let i = 0; i < maxCommittee; i++) {
             committeeHeaders += `<th class="committee${i + 1}-header">Committee ${i + 1}</th>`;
         }
-
-        committeeHeader.innerHTML = committeeHeaders;
     }
 
     // -------------------- Pagination -------------------- //
@@ -756,6 +771,10 @@
     }
 
 
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+<script>
     function exportTemplate() {
         // ตรวจสอบว่ามีข้อมูลจาก fetch หรือไม่
         if (!projectsData || projectsData.length === 0) {
@@ -776,8 +795,8 @@
                         advisor = prof.professorName;
                     } else if (prof.role === "Co-advisor") {
                         coAdvisor = prof.professorName;
-                    } else if (prof.role === "Poster-Committee") {
-                        posterCommittee = prof.professorName
+                    } else if (prof.role === "Committee") {
+                        committee = prof.professorName
                     }
                 });
             }
@@ -789,14 +808,13 @@
                         project.projectId,
                         project.projectTitle,
                         project.projectDescription,
-                        // เปลี่ยนจาก project.projectCategory เป็น project.category
                         project.category || "",
                         student.studentId,
                         student.studentName,
                         project.program,
                         advisor,
                         coAdvisor,
-                        posterCommittee,
+                        committee,
                         ""
                     ]);
                 });
@@ -812,7 +830,7 @@
                     project.program,
                     advisor,
                     coAdvisor,
-                    posterCommittee,
+                    committee,
                     ""
                 ]);
             }
@@ -933,6 +951,250 @@
 
     // เพิ่ม event listener ให้ปุ่ม Export
     document.getElementById("export-project-excel").addEventListener("click", exportTemplate);
+
+
+    function exportTemplateNew() {
+        // ตรวจสอบว่ามี projectsData จาก fetch หรือไม่
+        if (!projectsData || projectsData.length === 0) {
+            alert("No project data available to export.");
+            return;
+        }
+
+        // เพิ่มคอลัมน์ Poster Committee เข้าไปใน headers
+        const headers = [
+            "Project ID",
+            "Project Title",
+            "Project Description",
+            "Project Category",
+            "Student ID",
+            "Student Name",
+            "Program",
+            "Advisor",
+            "Co-advisor",
+            "Committee",
+            "Poster Committee" // คอลัมน์ใหม่
+        ];
+
+        // สร้าง array สำหรับเก็บ rows ของข้อมูล Excel
+        let dataRows = [];
+        // mapping สำหรับโปรเจกต์: key = projectId, value = { start: index, end: index }
+        let projectMapping = new Map();
+
+        projectsData.forEach(project => {
+            // ------------------- ข้อมูลระดับโปรเจกต์ -------------------
+            let projectId = project.projectId || "";
+            let projectTitle = project.projectTitle || "";
+            let projectDescription = project.projectDescription || "";
+            let projectCategory = project.category || "";
+            let program = project.program || "";
+
+            // ดึงข้อมูล Advisor/Co-advisor
+            let advisor = "";
+            let coAdvisor = "";
+            if (project.professorList && Array.isArray(project.professorList)) {
+                project.professorList.forEach(prof => {
+                    if (prof.role === "Advisor") {
+                        advisor = prof.professorName;
+                    } else if (prof.role === "Co-advisor") {
+                        coAdvisor = prof.professorName;
+                    }
+                });
+            }
+
+            // ------------------- นักศึกษาในโปรเจกต์ -------------------
+            let studentList = [];
+            if (project.studentList && Array.isArray(project.studentList) && project.studentList.length > 0) {
+                studentList = project.studentList.map(student => ({
+                    studentId: student.studentId || "",
+                    studentName: student.studentName || ""
+                }));
+            }
+            // ถ้านศ.มีค่าน้อยกว่า 3 ให้ padding ด้วยค่าว่าง
+            const minRows = 3;
+            while (studentList.length < minRows) {
+                studentList.push({ studentId: "", studentName: "" });
+            }
+            const numRows = studentList.length;
+
+            // ------------------- Committee -------------------
+            // แทนที่จากเดิมที่ใช้ project.committeeList
+            // ให้ filter มาจาก professorList แทน
+            let committees = [];
+            if (project.professorList && Array.isArray(project.professorList)) {
+                committees = project.professorList
+                    .filter(p => p.role === "Committee")
+                    .map(p => p.professorName || "");
+            }
+            // เติม/ตัดให้เท่ากับ numRows
+            while (committees.length < numRows) {
+                committees.push("");
+            }
+            if (committees.length > numRows) {
+                committees = committees.slice(0, numRows);
+            }
+
+            // ------------------- Poster Committee -------------------
+            let posterCommittees = [];
+            if (project.professorList && Array.isArray(project.professorList)) {
+                posterCommittees = project.professorList
+                    .filter(p => p.role === "posterCommittee")
+                    .map(p => p.professorName || "");
+            }
+            while (posterCommittees.length < numRows) {
+                posterCommittees.push("");
+            }
+            if (posterCommittees.length > numRows) {
+                posterCommittees = posterCommittees.slice(0, numRows);
+            }
+
+            // ------------------- เติมข้อมูลลง dataRows -------------------
+            let startIndex = dataRows.length; // จุดเริ่มต้น
+            for (let i = 0; i < numRows; i++) {
+                let row = [
+                    projectId,             // index 0 => Col A
+                    projectTitle,          // index 1 => Col B
+                    projectDescription,    // index 2 => Col C
+                    projectCategory,       // index 3 => Col D
+                    studentList[i].studentId,   // index 4 => Col E
+                    studentList[i].studentName, // index 5 => Col F
+                    program,               // index 6 => Col G
+                    advisor,               // index 7 => Col H
+                    coAdvisor,             // index 8 => Col I
+                    committees[i],         // index 9 => Col J
+                    posterCommittees[i]    // index 10 => Col K (คอลัมน์ใหม่)
+                ];
+                dataRows.push(row);
+            }
+            let endIndex = dataRows.length;
+            projectMapping.set(projectId, { start: startIndex, end: endIndex });
+        });
+
+        // ------------------- สร้าง Workbook, Worksheet ด้วย ExcelJS -------------------
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet("Project Committee Overview");
+
+        // ขยายความกว้างคอลัมน์เป็น 11 คอลัมน์ (A..K)
+        ws.columns = [
+            { width: 15 }, // A: Project ID
+            { width: 25 }, // B: Project Title
+            { width: 30 }, // C: Project Description
+            { width: 15 }, // D: Project Category
+            { width: 15 }, // E: Student ID
+            { width: 25 }, // F: Student Name
+            { width: 10 }, // G: Program
+            { width: 20 }, // H: Advisor
+            { width: 20 }, // I: Co-advisor
+            { width: 20 }, // J: Committee
+            { width: 20 }, // K: Poster Committee (ใหม่)
+        ];
+
+        // Merge cells สำหรับ Header area (แถว 1-4) -> A1:K1, A2:K2, ฯลฯ
+        ws.mergeCells('A1:K1');
+        ws.mergeCells('A2:K2');
+        ws.mergeCells('A3:K3');
+        ws.mergeCells('A4:K4');
+
+        // กำหนดค่า Header area
+        ws.getCell('A1').value = "Senior Project Overview";
+        ws.getCell('A1').font = { bold: true, size: 14, color: { argb: 'FF000000' } };
+        ws.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' };
+
+        ws.getCell('A2').value = "Exported Project Committee Data";
+        ws.getCell('A2').font = { size: 12, color: { argb: 'FF4D93D9' } };
+        ws.getCell('A2').alignment = { horizontal: 'center', vertical: 'middle' };
+
+        ws.getCell('A3').value = "Link to view detailed project information";
+        ws.getCell('A3').font = { bold: true, size: 12, color: { argb: 'FF000000' } };
+        ws.getCell('A3').alignment = { horizontal: 'center', vertical: 'middle' };
+
+        ws.getCell('A4').value = "https://yourprojectlink.example.com";
+        ws.getCell('A4').font = { size: 10, color: { argb: 'FF000000' } };
+        ws.getCell('A4').alignment = { horizontal: 'center', vertical: 'middle' };
+
+        // แถว 5: Header Row ของคอลัมน์
+        const headerRow = ws.getRow(5);
+        headerRow.values = headers;  // 11 คอลัมน์
+        headerRow.font = { bold: true, size: 11, color: { argb: 'FF000000' } };
+        headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
+        headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFB5E6A2' } };
+        headerRow.eachCell(cell => {
+            cell.border = {
+                top: { style: 'thin', color: { argb: 'FF000000' } },
+                left: { style: 'thin', color: { argb: 'FF000000' } },
+                bottom: { style: 'thin', color: { argb: 'FF000000' } },
+                right: { style: 'thin', color: { argb: 'FF000000' } }
+            };
+        });
+
+        // เพิ่มข้อมูล rows ลงใน worksheet (เริ่มแถวที่ 6)
+        dataRows.forEach(rowData => {
+            ws.addRow(rowData);
+        });
+
+        // แปลง projectMapping เป็นหมายเลขแถว
+        projectMapping.forEach((range, projId) => {
+            let startRow = range.start + 6; // แถวเริ่ม
+            let endRow = range.end + 5;     // แถวสุดท้าย (exclusive ของ endIndex จึง -1 +6 = +5)
+
+            // Merge เฉพาะคอลัมน์ Project-level: A(1), B(2), C(3), D(4), G(7), H(8), I(9)
+            // ไม่ merge E(5), F(6) (นักศึกษา), J(10), K(11) (committee, posterCommittee)
+            if (startRow < endRow) {
+                [1, 2, 3, 4, 7, 8, 9].forEach(col => {
+                    ws.mergeCells(startRow, col, endRow, col);
+                });
+            } else if (startRow === endRow) {
+                // หากมีแถวเดียว แต่ต้องการอย่างน้อย 3 แถว => สร้างแถวว่างเพิ่ม
+                let extraRows = 3 - 1; // มี 1 แถวแล้ว => เพิ่ม 2 แถว
+                for (let i = 0; i < extraRows; i++) {
+                    ws.addRow(["","","","","","","","","","",""]);
+                    endRow++;
+                }
+                [1, 2, 3, 4, 7, 8, 9].forEach(col => {
+                    ws.mergeCells(startRow, col, endRow, col);
+                });
+            }
+        });
+
+        // กำหนดสไตล์สำหรับ data rows (พื้นหลังสีเขียวอ่อน)
+        const dataRowStyle = {
+            fill: { fgColor: { argb: 'FFC8E6C9' } },
+            border: {
+                top: { style: 'thin', color: { argb: 'FF000000' } },
+                left: { style: 'thin', color: { argb: 'FF000000' } },
+                bottom: { style: 'thin', color: { argb: 'FF000000' } },
+                right: { style: 'thin', color: { argb: 'FF000000' } }
+            }
+        };
+
+        // Apply style ให้แถวข้อมูล (ตั้งแต่แถว 6 ลงไป)
+        for (let i = 6; i <= ws.rowCount; i++) {
+            let row = ws.getRow(i);
+            row.eachCell(cell => {
+                cell.alignment = { vertical: 'middle', horizontal: 'left' };
+                cell.fill = dataRowStyle.fill;
+                cell.border = dataRowStyle.border;
+            });
+        }
+
+        // สร้างไฟล์ Excel แล้ว trigger ดาวน์โหลด
+        wb.xlsx.writeBuffer()
+            .then(buffer => {
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const url = URL.createObjectURL(blob);
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'ForPosterCommittee_SignUp.xlsx';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            })
+            .catch(error => {
+                console.error("Error generating Excel file:", error);
+            });
+    }
+
+    // ผูก event listener สำหรับ Export แบบใหม่
+    document.getElementById("export-project-excel-new").addEventListener("click", exportTemplateNew);
 
 
 </script>

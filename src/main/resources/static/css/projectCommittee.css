@@ -112,7 +112,13 @@ thead th {
 }
 
 td:nth-child(1) {
-    max-width: 150px;
+    max-width: 100px;
+    word-wrap: break-word; /* ป้องกันการล้นของข้อความ */
+    white-space: normal; /* อนุญาตให้แบ่งบรรทัดได้ */
+}
+
+td:nth-child(2) {
+    max-width: 100px;
     word-wrap: break-word; /* ป้องกันการล้นของข้อความ */
     white-space: normal; /* อนุญาตให้แบ่งบรรทัดได้ */
 }
@@ -129,9 +135,23 @@ td:nth-child(5) {
     white-space: normal;
 }
 
-td:nth-child(6) ul, td:nth-child(7) ul {
+td:nth-child(3) ul {
     list-style-type: none;
     padding: 0;
+}
+
+td:nth-child(1),
+td:nth-child(3),
+td:nth-child(4),
+td:nth-child(5),
+td:nth-child(6),
+td:nth-child(7),
+td:nth-child(8),
+td:nth-child(9){
+    max-width: 100px;
+    word-wrap: break-word; /* ป้องกันการล้นของข้อความ */
+    white-space: normal; /* อนุญาตให้แบ่งบรรทัดได้ */
+    text-align: center;
 }
 
 .filter-controls {
@@ -410,6 +430,26 @@ td form {
 .dropdown {
     margin-top: -3px;
 }
+
+/* Container for dropdown */
+.dropdown-export {
+    position: relative;
+    display: inline-block;
+    margin-top: -3px;
+
+}
+
+/* เมื่อ hover ที่ container แสดง dropdown */
+.dropdown-export:hover .dropdown-content {
+    display: block;
+}
+
+/* เปลี่ยนสีปุ่มเมื่อ hover */
+.dropdown-export:hover .dropbtn {
+    background-color: #4472C4;
+    color: white;
+}
+
 
 /* Hide the dropdown content by default */
 .dropdown-content {

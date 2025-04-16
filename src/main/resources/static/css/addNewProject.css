@@ -203,22 +203,22 @@ h3 {
 /* CSS สำหรับ Popup */
 .delete-popup,
 .save-popup {
-    display: flex;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* ทำให้ popup อยู่ตรงกลางทั้งแนวนอนและแนวตั้ง */
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* โปร่งใส */
-    z-index: 1000;
-    justify-content: center; /* จัดให้ popup อยู่กลางในแนวนอน */
-    align-items: center;     /* จัดให้ popup อยู่กลางในแนวตั้ง */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    z-index: 1000 !important;
+    /* ไม่ใช้ flex */
 }
-
 
 /* CSS สำหรับเนื้อหาภายใน Popup */
 .popup-content {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
     background-color: white;
     padding: 20px;
     border-radius: 5px;
@@ -234,18 +234,17 @@ h3 {
     box-sizing: border-box; /* ให้การคำนวณ padding รวมในขนาดทั้งหมด */
 }
 
-/* ปุ่มยืนยันการลบ */
-#confirmDeleteBtn {
-    background-color: #005A5A;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    margin: 5px;
-    width: 150px;
-    display: inline-block;
+/* ปรับแต่งปุ่ม */
+#confirmSaveBtn,
+#cancelSaveBtn{
+    margin-top: 15px !important;
+    margin-right: 10px !important;
+    padding: 8px 15px !important;
+    cursor: pointer !important;
+    z-index: 1010 !important; /* เพิ่ม z-index ให้ปุ่มมีค่าสูงกว่า overlay */
+    position: relative !important; /* ช่วยให้ z-index ทำงาน */
 }
+
 
 #confirmDeleteBtn:hover {
     background-color: #004141; /* สีเมื่อ hover */
@@ -269,7 +268,8 @@ h3 {
 }
 
 /* ปุ่มยืนยันการบันทึก (Save) */
-#confirmSaveBtn {
+#confirmSaveBtn,
+#confirmDeleteBtn{
     background-color: #005A5A;
     color: white;
     border: none;

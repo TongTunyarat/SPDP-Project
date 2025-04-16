@@ -112,6 +112,30 @@ public class UploadFilesController {
         }
     }
 
+    @PostMapping("/uploadPosterCommitteeFiles")
+    public ResponseEntity<Map<String, Object>> uploadPosterCommitteeFile(@RequestParam("file") MultipartFile file) {
+        try {
+            List<String> warnings = uploadFilesService.processProjectPosterCommittee(file);
+            if (warnings.isEmpty()) {
+                return ResponseEntity.ok(Map.of("message", "File processed successfully"));
+            } else {
+                // รวมรายการ warnings ให้เป็นข้อความสั้น ๆ ด้วยการ join ด้วย " | "
+                String shortMessage = String.join(" | ", warnings);
+                return ResponseEntity.ok(Map.of(
+                        "message", "File processed with warnings",
+                        "warnings", warnings,
+                        "shortMessage", shortMessage
+                ));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "message", "File processing failed",
+                            "errors", List.of(e.getMessage())
+                    ));
+        }
+    }
+
 
 
 

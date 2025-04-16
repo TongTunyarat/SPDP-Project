@@ -37,6 +37,113 @@ body {
     transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
+/* Button Styles */
+.export-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.export-button {
+    background-color: #4472C4;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.export-button:hover {
+    background-color: #3b62b0;
+}
+
+/* Container for dropdown */
+.dropdown-export {
+    position: relative;
+    display: inline-block;
+    margin-top: -3px;
+
+}
+
+/* Dropdown content (ซ่อนโดยค่า default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 250px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+/* รูปแบบของลิงค์ใน dropdown */
+.dropdown-content a {
+    color: black;
+    text-decoration: none;
+    display: block;
+}
+
+/* เปลี่ยนสีเมื่อ hover */
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+/* เมื่อ hover ที่ container แสดง dropdown */
+.dropdown-export:hover .dropdown-content {
+    display: block;
+}
+
+/* เปลี่ยนสีปุ่มเมื่อ hover */
+.dropdown-export:hover .dropbtn {
+    background-color: #4472C4;
+    color: white;
+}
+
+
+/* Hide the dropdown content by default */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+/* Style for the dropdown button */
+.dropdown-btn {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+/* When you hover over the dropdown button */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Style for each link inside the dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    font-size: 14px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color when hovering over the links */
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+.show {
+    display: block;
+}
+
 .btn-footer {
     display: flex;
     justify-content: flex-end;
@@ -409,7 +516,7 @@ td:nth-child(4) {
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     z-index: 10000;
-    width: 450px;
+    width: 80vh;
     font-family: 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 

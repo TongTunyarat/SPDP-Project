@@ -410,9 +410,6 @@ td form {
     transform: scale(1.05);
 }
 
-.dropdown {
-    margin-top: -3px;
-}
 
 /* Hide the dropdown content by default */
 .dropdown-content {
@@ -817,7 +814,7 @@ select {
 .export-actions {
     display: flex;
     justify-content: space-between;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 .export-button {
@@ -840,15 +837,8 @@ select {
 .dropdown-export {
     position: relative;
     display: inline-block;
+    margin-top: -3px;
 
-}
-
-/* Button styling */
-.dropbtn {
-    color: white;
-    border: none;
-    cursor: pointer;
-    padding-top: -50px;
 }
 
 /* Dropdown content (ซ่อนโดยค่า default) */

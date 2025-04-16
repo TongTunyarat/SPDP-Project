@@ -1253,5 +1253,120 @@ public class UploadFilesService {
     }
 
 
+    public List<String> processProjectPosterCommittee(MultipartFile file) throws Exception {
+        List<String> warnings = new ArrayList<>();
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
+
+            String line;
+            int rowIndex = 0;
+            String currentProjectId = null;  // projectId สำหรับผูก posterCommittee
+
+            // อ่านไฟล์ CSV ทีละบรรทัด (สมมติ header อยู่ที่แถว 1-9)
+            while ((line = br.readLine()) != null) {
+                rowIndex++;
+                if (rowIndex < 10) continue;  // ข้าม header
+                if (line.trim().isEmpty()) continue;
+
+                // ใช้ regex split เพื่อแยกเฉพาะ comma ที่ไม่ได้อยู่ภายใน double quotes
+                String pattern = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
+                String[] values = line.split(pattern, -1);
+
+                // ต้องการขั้นต่ำ 11 คอลัมน์ (index 0..10) เพราะ posterCommittee อยู่คอลัมน์ที่ 10
+                if (values.length < 11) {
+                    String[] fullValues = new String[11];
+                    for (int i = 0; i < 11; i++) {
+                        if (i < values.length) {
+                            fullValues[i] = values[i].trim();
+                        } else {
+                            fullValues[i] = "";
+                        }
+                    }
+                    values = fullValues;
+                }
+
+                // ดึงข้อมูลจาก CSV ตามตำแหน่งที่คาดหวัง
+                String fileProjectId = values[0].trim();
+                String posterCommittee = values[10].trim(); // เปลี่ยนจากคอลัมน์ที่ 9 เป็นคอลัมน์ที่ 10
+
+                // --------------------- จัดการ Project ---------------------
+                if (!fileProjectId.isEmpty()) {
+                    Optional<Project> projectOpt = projectRepository.findById(fileProjectId);
+                    if (projectOpt.isPresent()) {
+                        currentProjectId = projectOpt.get().getProjectId();
+                    } else {
+                        System.out.println("Project with ID '" + fileProjectId + "' not found at row " + rowIndex + ".");
+                        warnings.add("Row " + rowIndex + ": Project with ID '" + fileProjectId + "' not found.");
+                        continue;
+                    }
+                } else {
+                    if (currentProjectId == null) {
+                        System.out.println("Row " + rowIndex + " has no project ID provided (no previous project).");
+                        continue;
+                    }
+                    // ใช้ currentProjectId เดิม
+                }
+
+                // --------------------- จัดการ posterCommittee ---------------------
+                if (posterCommittee.isEmpty()) {
+                    System.out.println("No posterCommittee data provided at row " + rowIndex + ".");
+                    continue;
+                } else {
+                    if (!isValidInstructor(posterCommittee)) {
+                        System.out.println("posterCommittee name '" + posterCommittee + "' is invalid at row " + rowIndex + ". Skipping posterCommittee assignment.");
+                        warnings.add("Row " + rowIndex + ": Invalid posterCommittee '" + posterCommittee + "' for Project '" + currentProjectId + "'.");
+                        continue;
+                    } else {
+                        Optional<Instructor> optInstructor = instructorRepository.findByProfessorName(posterCommittee);
+                        if (!optInstructor.isPresent()) {
+                            System.out.println("posterCommittee '" + posterCommittee + "' not found in Instructor entity at row " + rowIndex + ". Skipping posterCommittee assignment.");
+                            warnings.add("Row " + rowIndex + ": posterCommittee '" + posterCommittee + "' not found for Project '" + currentProjectId + "'.");
+                            continue;
+                        }
+                        Instructor instructor = optInstructor.get();
+
+                        if (instructor.getProfessorId() == null) {
+                            String newProfessorId = generateNextInstructorId();
+                            instructor.setProfessorId(newProfessorId);
+                            instructorRepository.save(instructor);
+                        }
+
+                        boolean committeeAlreadyAssigned = projectInstructorRoleRepository
+                                .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(
+                                        currentProjectId, instructor.getProfessorId(), "posterCommittee");
+                        if (committeeAlreadyAssigned) {
+                            System.out.println("posterCommittee '" + posterCommittee + "' is already assigned to project " + currentProjectId
+                                    + " at row " + rowIndex + ". Skipping assignment.");
+                            warnings.add("Row " + rowIndex + ": posterCommittee '" + posterCommittee + "' already exists in Project '" + currentProjectId + "'.");
+                        } else {
+                            String newCommitteeRoleId = generateNextInstructorId();
+                            ProjectInstructorRole roleRecord = new ProjectInstructorRole();
+                            roleRecord.setInstructorId(newCommitteeRoleId);
+                            roleRecord.setAssignDate(LocalDateTime.now());
+                            roleRecord.setRole("Poster-Committee");
+
+                            Optional<Project> projOpt = projectRepository.findById(currentProjectId);
+                            if (!projOpt.isPresent()) {
+                                System.out.println("Project not found for ID '" + currentProjectId + "' at row " + rowIndex + ".");
+                                warnings.add("Row " + rowIndex + ": Project not found for ID '" + currentProjectId + "'.");
+                                continue;
+                            }
+                            Project project = projOpt.get();
+                            roleRecord.setProjectIdRole(project);
+                            roleRecord.setInstructor(instructor);
+
+                            projectInstructorRoleRepository.save(roleRecord);
+                        }
+                    }
+                }
+            }
+        } catch (IOException e) {
+            throw new Exception("Error reading CSV file: " + e.getMessage());
+        }
+        return warnings;
+    }
+
+
+
 
 }

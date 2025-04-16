@@ -113,7 +113,7 @@
                 </div>
                 <input type="file" id="upload-file" accept=".csv, .xlsx, .xls" style="display: none;"/>
                 <button id="upload-btn">Upload Files</button>
-                <button class="addProject-btn"><a href="/project-add-new-project"> + Add Projects </a></button>
+<!--                <button class="addProject-btn"><a href="/project-add-new-project"> + Add Projects </a></button>-->
             </div>
 
         </div>
@@ -458,8 +458,13 @@
             const coadvisor = project.professorList.find(professor => professor.role === "Co-Advisor");
             const coAdvisorName = coadvisor ? coadvisor.professorName : " ";
 
+            // ใช้ split เพื่อแยกค่าออกจากโปรแกรม
+            const programParts = project.projectId.split(" ");
+            const programPrefix = programParts[0]; // ค่าก่อนหน้า (DST, ICT, etc.)
+            const projectId = programParts.slice(1).join(" ");
+
             row.innerHTML = `
-            <td><span class="tag ${projectProgram}">${project.program || "N/A"}</span> ${project.projectId}</td>
+            <td><span class="tag ${projectProgram}">${project.program || "N/A"}</span> ${projectId}</td>
             <td>${professorName}</td>
             <td>${coAdvisorName || " "}</td>
             <td>${project.projectTitle || "N/A"}</td>
@@ -1036,7 +1041,6 @@
                         project.projectId,
                         project.projectTitle,
                         project.projectDescription,
-                        // เปลี่ยนจาก project.projectCategory เป็น project.category
                         project.category || "",
                         student.studentId,
                         student.studentName,
@@ -1393,7 +1397,7 @@
             const url = URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.download = 'ReadyForCommittee.xlsx';
+            link.download = 'ForCommittee_SignUp.xlsx';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
