@@ -12,6 +12,7 @@
 
     <!-- Library -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
 <body>
@@ -498,7 +499,7 @@
     function csvToJson(csv) {
         const lines = csv.split("\n");
         const result = [];
-        // กำหนด currentProject เพื่อเก็บข้อมูลโปรเจกต์ล่าสุด
+
         let currentProject = {
             projectId: "",
             projectTitle: "",
@@ -506,29 +507,45 @@
             projectCategory: "",
             program: "",
             advisor: "",
+            committee: "",
             studentList: []
         };
 
-        // สมมติว่าข้อมูล header อยู่ที่แถว 1-8 (index 0 ถึง 7) ให้เริ่มจากแถวที่ 9 (i = 8)
+        // สมมติว่า header อยู่ที่ 1-8 => เริ่มอ่านแถวที่ 9 (i = 8)
         for (let i = 8; i < lines.length; i++) {
             let line = lines[i].trim();
             if (!line) continue;
+
+            // แยกคอลัมน์ (ช่อง) ด้วย comma แบบง่าย ๆ
             const cells = line.split(",");
-            // หากข้อมูลไม่ครบตามที่ต้องการ (ต้องมีอย่างน้อย 8 ช่อง)
-            if (cells.length < 8) continue;
+
+            // ต้องการคอลัมน์อย่างน้อย 9 ช่อง (index 0..8)
+            // ถ้า < 9 ให้ข้ามแถวนั้น
+            if (cells.length < 9) {
+                continue;
+            }
 
             let projectId = cells[0].trim();
-            let projectTitle = cells[1] ? cells[1].trim() : "";
-            let projectDescription = cells[2] ? cells[2].trim() : "";
-            let projectCategory = cells[3] ? cells[3].trim() : "";
-            let studentId = cells[4] ? cells[4].trim() : "";
-            let studentName = cells[5] ? cells[5].trim() : "";
-            let program = cells[6] ? cells[6].trim() : "";
-            let advisor = cells[7] ? cells[7].trim() : "";
-            let committee = cells[8] ? cells[8].trim() : "";
+            let projectTitle = cells[1].trim();
+            let projectDescription = cells[2].trim();
+            let projectCategory = cells[3].trim();
+            let studentId = cells[4].trim();
+            let studentName = cells[5].trim();
+            let program = cells[6].trim();
+            let advisor = cells[7].trim();
+            let committee = cells[8].trim(); // คอลัมน์ที่ 9
 
-            // หากมีข้อมูลโปรเจกต์ในแถวนี้ (เช็คจากหลายช่อง)
-            if (projectTitle !== "" || projectDescription !== "" || projectCategory !== "" || program !== "" || advisor !== "" || projectId !== "") {
+            // ถ้ามีข้อมูลโปรเจกต์ใหม่ ให้สร้าง currentProject ใหม่
+            // เช็คจาก projectId หรือช่องอื่นที่จำเป็น
+            if (
+                projectId !== "" ||
+                projectTitle !== "" ||
+                projectDescription !== "" ||
+                projectCategory !== "" ||
+                program !== "" ||
+                advisor !== "" ||
+                committee !== ""
+            ) {
                 currentProject = {
                     projectId: projectId,
                     projectTitle: projectTitle,
@@ -541,7 +558,8 @@
                 };
                 result.push(currentProject);
             }
-            // ถ้ามีข้อมูลนักศึกษา ให้นำเข้า studentList ของ currentProject
+
+            // ถ้าพบ studentId หรือ studentName ก็ถือว่ามีข้อมูลนักศึกษา
             if (studentId || studentName) {
                 currentProject.studentList.push({
                     studentId: studentId,
@@ -549,7 +567,14 @@
                 });
             }
         }
+
         return result;
+    }
+
+    function shortenString(str, maxLen) {
+        if (!str) return "";
+        if (str.length <= maxLen) return str;
+        return str.substring(0, maxLen) + "...";
     }
 
 
@@ -569,15 +594,14 @@
 
 
     // ฟังก์ชันสำหรับแสดงพรีวิวของ Project Details
-    async function displayProjectDetailsPreview(data) {
+    function displayProjectDetailsPreview(data) {
         const previewContent = document.getElementById('preview-content');
         previewContent.innerHTML = "";
 
-        // สร้าง table สำหรับแสดง preview
         const table = document.createElement('table');
         table.classList.add('preview-table');
 
-        // สร้าง header row สำหรับ 5 คอลัมน์
+        // สร้าง header row
         const headerRow = document.createElement('tr');
         headerRow.innerHTML = `
         <th>Project ID</th>
@@ -588,18 +612,21 @@
     `;
         table.appendChild(headerRow);
 
-        // สำหรับแต่ละโปรเจกต์ใน data ให้สร้าง row ที่มีข้อมูลตามหัวข้อ
         data.forEach(project => {
             const row = document.createElement('tr');
-            // รวม studentId จาก studentList (ถ้ามี) ด้วย comma
             let studentIDs = "N/A";
             if (project.studentList && project.studentList.length > 0) {
                 studentIDs = project.studentList.map(stu => stu.studentId).join(", ");
             }
 
+            // สมมติว่าคุณอยากตัด projectTitle ให้เหลือ 30 ตัวอักษร
+            // หรือ projectDescription ให้เหลือ 50 ตัว (แล้วแต่)
+            // ตัวอย่างนี้ตัด projectTitle ให้สั้นลง (ถ้าจำเป็น)
+            const shortenedTitle = shortenString(project.projectTitle, 50);
+
             row.innerHTML = `
             <td>${project.projectId || "N/A"}</td>
-            <td>${project.projectTitle || "N/A"}</td>
+            <td title="${project.projectTitle}">${shortenedTitle}</td>
             <td>${studentIDs}</td>
             <td>${project.advisor || "N/A"}</td>
             <td>${project.committee || "N/A"}</td>
@@ -609,13 +636,12 @@
 
         previewContent.appendChild(table);
 
-        // แสดง JSON ที่ได้ (ใน element <pre id="jsonOutput">) หากมี
+        // แสดง JSON (optional)
         const jsonOutput = document.getElementById('jsonOutput');
         if (jsonOutput) {
             jsonOutput.textContent = JSON.stringify(data, null, 2);
         }
     }
-
 
 
     // Event Listener เมื่อเลือกไฟล์
@@ -677,9 +703,15 @@
                 // ตรวจสอบ data.message ก่อน
                 if (data.message === "File processed successfully") {
                     // กรณีอัปโหลดสำเร็จสมบูรณ์
-                    alert(data.message);
-                    location.reload();
-
+                    Swal.fire({
+                        icon: "success",
+                        title: "Data Upload successfully.",
+                        showConfirmButton: true,
+                        timer: 2000
+                    }).then(() => {
+                        // Reload หน้าเมื่อ swal ปิดลงแล้ว
+                        location.reload();
+                    });
                 } else if (data.message === "File processed with warnings") {
                     // ถ้ามี warnings ให้ลองใช้ shortMessage ถ้ามี
                     if (data.shortMessage) {
@@ -792,17 +824,17 @@
 
         // กำหนดความกว้างของคอลัมน์
         ws.columns = [
-            { width: 15 },  // A - Project ID
-            { width: 25 },  // B - Project Title
-            { width: 30 },  // C - Project Description
-            { width: 15 },  // D - Project Category (ใช้ฟิลด์ project.category)
-            { width: 15 },  // E - Student ID
-            { width: 25 },  // F - Student Name
-            { width: 10 },  // G - Program
-            { width: 20 },  // H - Advisor
-            { width: 20 },  // I - Co-advisor
-            { width: 20 },  // J - Committee
-            { width: 20 },  // K - Poster-Committee
+            {width: 15},  // A - Project ID
+            {width: 25},  // B - Project Title
+            {width: 30},  // C - Project Description
+            {width: 15},  // D - Project Category (ใช้ฟิลด์ project.category)
+            {width: 15},  // E - Student ID
+            {width: 25},  // F - Student Name
+            {width: 10},  // G - Program
+            {width: 20},  // H - Advisor
+            {width: 20},  // I - Co-advisor
+            {width: 20},  // J - Committee
+            {width: 20},  // K - Poster-Committee
         ];
 
         // Merge cells สำหรับ Header (แถว 1-4)
@@ -813,23 +845,23 @@
 
         // แถว 1
         ws.getCell('A1').value = "Senior Project Overview";
-        ws.getCell('A1').font = { bold: true, size: 14, color: { argb: 'FF000000' } };
-        ws.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getCell('A1').font = {bold: true, size: 14, color: {argb: 'FF000000'}};
+        ws.getCell('A1').alignment = {horizontal: 'center', vertical: 'middle'};
 
         // แถว 2
         ws.getCell('A2').value = "Exported Project Data";
-        ws.getCell('A2').font = { size: 12, color: { argb: 'FF4D93D9' } };
-        ws.getCell('A2').alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getCell('A2').font = {size: 12, color: {argb: 'FF4D93D9'}};
+        ws.getCell('A2').alignment = {horizontal: 'center', vertical: 'middle'};
 
         // แถว 3
         ws.getCell('A3').value = "Link to view detailed project information";
-        ws.getCell('A3').font = { bold: true, size: 12, color: { argb: 'FF000000' } };
-        ws.getCell('A3').alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getCell('A3').font = {bold: true, size: 12, color: {argb: 'FF000000'}};
+        ws.getCell('A3').alignment = {horizontal: 'center', vertical: 'middle'};
 
         // แถว 4
         ws.getCell('A4').value = "https://yourprojectlink.example.com";
-        ws.getCell('A4').font = { size: 10, color: { argb: 'FF000000' } };
-        ws.getCell('A4').alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getCell('A4').font = {size: 10, color: {argb: 'FF000000'}};
+        ws.getCell('A4').alignment = {horizontal: 'center', vertical: 'middle'};
 
         // แถว 5: Header Row ของคอลัมน์
         const headerRow = ws.getRow(5);
@@ -847,28 +879,28 @@
             "Poster-Committee"
         ];
 
-        headerRow.font = { bold: true, size: 11, color: { argb: 'FF000000' } };
-        headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
-        headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFB5E6A2' } };
+        headerRow.font = {bold: true, size: 11, color: {argb: 'FF000000'}};
+        headerRow.alignment = {vertical: 'middle', horizontal: 'center'};
+        headerRow.fill = {type: 'pattern', pattern: 'solid', fgColor: {argb: 'FFB5E6A2'}};
 
         // เพิ่ม Border ให้กับแต่ละเซลล์ใน header row
         headerRow.eachCell(cell => {
             cell.border = {
-                top: { style: 'thin', color: { argb: 'FF000000' } },
-                left: { style: 'thin', color: { argb: 'FF000000' } },
-                bottom: { style: 'thin', color: { argb: 'FF000000' } },
-                right: { style: 'thin', color: { argb: 'FF000000' } }
+                top: {style: 'thin', color: {argb: 'FF000000'}},
+                left: {style: 'thin', color: {argb: 'FF000000'}},
+                bottom: {style: 'thin', color: {argb: 'FF000000'}},
+                right: {style: 'thin', color: {argb: 'FF000000'}}
             };
         });
 
         // สไตล์สำหรับข้อมูลแถว (พื้นหลังสีเขียวอ่อน)
         const dataRowStyle = {
-            fill: { fgColor: { argb: 'FFC8E6C9' } },
+            fill: {fgColor: {argb: 'FFC8E6C9'}},
             border: {
-                top: { style: 'thin', color: { argb: 'FF000000' } },
-                left: { style: 'thin', color: { argb: 'FF000000' } },
-                bottom: { style: 'thin', color: { argb: 'FF000000' } },
-                right: { style: 'thin', color: { argb: 'FF000000' } }
+                top: {style: 'thin', color: {argb: 'FF000000'}},
+                left: {style: 'thin', color: {argb: 'FF000000'}},
+                bottom: {style: 'thin', color: {argb: 'FF000000'}},
+                right: {style: 'thin', color: {argb: 'FF000000'}}
             }
         };
 
@@ -876,7 +908,7 @@
         dataRows.forEach(rowData => {
             let newRow = ws.addRow(rowData);
             newRow.eachCell(cell => {
-                cell.alignment = { vertical: 'middle', horizontal: 'left' };
+                cell.alignment = {vertical: 'middle', horizontal: 'left'};
                 cell.fill = dataRowStyle.fill;
                 cell.border = dataRowStyle.border;
             });
@@ -885,7 +917,7 @@
         // สร้างไฟล์ Excel แล้ว trigger ดาวน์โหลด
         wb.xlsx.writeBuffer()
             .then(buffer => {
-                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const blob = new Blob([buffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
@@ -901,7 +933,6 @@
 
     // เพิ่ม event listener ให้ปุ่ม Export
     document.getElementById("export-project-excel").addEventListener("click", exportTemplate);
-
 
 
 </script>

@@ -382,6 +382,7 @@ td form {
 
 #preview-content {
     max-height: 200px;
+    width: 200vh;
     overflow-y: auto;
     max-width: 1200px;
 }
@@ -568,7 +569,7 @@ td form {
     margin: 2% auto;
     padding: 20px;
     border-radius: 8px;
-    max-width: 100vh;
+    max-width: 200vh;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     position: relative;
     max-height: 80%;
