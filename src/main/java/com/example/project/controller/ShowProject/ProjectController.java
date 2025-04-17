@@ -510,9 +510,9 @@ public class ProjectController {
                                 InstructorEvaluationDefenseStatusDTO instructorEvaStatus = checkInstructorDefenseEva(
                                         studentProject.getStudent().getStudentId(),
                                         allDefenseCriteria,
-                                        allPosterCriteria,
+//                                        allPosterCriteria,
                                         defenseEvaluationList,
-                                        posterEvaluationList,
+//                                        posterEvaluationList,
                                         projectInstructorRoleList
                                 );
 
@@ -563,7 +563,72 @@ public class ProjectController {
     }
 
     // defense eva status instructor
-    private InstructorEvaluationDefenseStatusDTO checkInstructorDefenseEva(String studentId, List<Criteria> allDefenseCriteria, List<Criteria> allPosterCriteria, List<DefenseEvaluation> defenseEvaluationList, List<PosterEvaluation> posterEvaluationList, List<ProjectInstructorRole> projectInstructorRoleList) {
+//    private InstructorEvaluationDefenseStatusDTO checkInstructorDefenseEva(String studentId, List<Criteria> allDefenseCriteria, List<DefenseEvaluation> defenseEvaluationList, List<ProjectInstructorRole> projectInstructorRoleList) {
+//
+//        // param base on projectId
+//        System.out.println("⭐️Check input: ");
+//        System.out.println("StudentID: " + studentId);
+//        System.out.println("All Criteria: " + allDefenseCriteria.size());
+//        System.out.println("Defense Evaluation List: " + defenseEvaluationList.size());
+//        System.out.println("Project Instructor Roles: " + projectInstructorRoleList.size());
+//
+////        long allInstructor = projectInstructorRoleList.size();
+//
+//        // loop projectInstructorRole
+//        long instructorDefenseSuccessEva = projectInstructorRoleList.stream()
+//                // each instructor
+//                .filter(instructor -> {
+//
+//                    boolean hasDefenseEvaluation = false; // default
+////                    boolean hasPosterEvaluation = false;  // default
+//
+//                    if ("Advisor".equalsIgnoreCase(instructor.getRole()) || "Committee".equalsIgnoreCase(instructor.getRole())) {
+//
+//                        // each eva
+//                        Optional<DefenseEvaluation> instructorDefenseEvaCheck = defenseEvaluationList.stream()
+//                                .filter(e -> e.getStudent().getStudentId().equals(studentId) &&
+//                                        // eva == projectInstructorRole
+//                                        e.getDefenseInstructorId().getInstructorId().equals(instructor.getInstructorId()))
+//                                .findFirst();
+//
+//                        // ให้คะแนนครบทุก criteria & score != null ?
+//                        hasDefenseEvaluation = instructorDefenseEvaCheck.map(defenseEvaluation ->
+//                                allDefenseCriteria.stream().allMatch(criteria ->
+//                                        defenseEvaluation.getDefenseEvalScore().stream()
+//                                                .anyMatch(s -> s.getCriteria().getCriteriaId().equals(criteria.getCriteriaId()) && s.getScore() != null))
+//                        ).orElse(false);
+//
+//                    }
+//
+////                    if ("Poster-Committee".equalsIgnoreCase(instructor.getRole()) || "Committee".equalsIgnoreCase(instructor.getRole())) {
+////
+////                        Optional<PosterEvaluation> instructorPosterCheck = posterEvaluationList.stream()
+////                                .filter(pe -> pe.getInstructorIdPoster().getInstructorId().equals(instructor.getInstructorId()))
+////                                .findFirst();
+////
+////                        // float
+////                        hasPosterEvaluation = instructorPosterCheck.map(posterEvaluation ->
+////                                allPosterCriteria.stream()
+////                                        .allMatch(criteria -> posterEvaluation.getPosterEvaluationScores().stream()
+////                                                .anyMatch(ps -> ps.getCriteriaPoster().getCriteriaId().equals(criteria.getCriteriaId())))
+////                        ).orElse(false);
+////
+////                    }
+//
+//                    return ("Committee".equalsIgnoreCase(instructor.getRole()))
+//                            ? (hasDefenseEvaluation && hasPosterEvaluation)
+//                            : (hasDefenseEvaluation || hasPosterEvaluation);
+//
+//                }).count();
+//
+//        System.out.println("👨‍🏫 Total Instructors Defense: " + allInstructor);
+//        System.out.println("✅ Instructors with complete defense evaluation: " + instructorDefenseSuccessEva);
+//
+//        return new InstructorEvaluationDefenseStatusDTO(allInstructor, instructorDefenseSuccessEva);
+//
+//    }
+
+    private InstructorEvaluationDefenseStatusDTO checkInstructorDefenseEva(String studentId, List<Criteria> allDefenseCriteria, List<DefenseEvaluation> defenseEvaluationList, List<ProjectInstructorRole> projectInstructorRoleList) {
 
         // param base on projectId
         System.out.println("⭐️Check input: ");
@@ -572,18 +637,17 @@ public class ProjectController {
         System.out.println("Defense Evaluation List: " + defenseEvaluationList.size());
         System.out.println("Project Instructor Roles: " + projectInstructorRoleList.size());
 
-        long allInstructor = projectInstructorRoleList.size();
+//        long allInstructor = projectInstructorRoleList.size();
 
+        long allinstructor = projectInstructorRoleList.stream()
+                .filter(role -> ("Advisor".equalsIgnoreCase(role.getRole()) || "Committee".equalsIgnoreCase(role.getRole())))
+                .count();
 
         // loop projectInstructorRole
         long instructorDefenseSuccessEva = projectInstructorRoleList.stream()
                 // each instructor
+                .filter(instructor ->"Advisor".equalsIgnoreCase(instructor.getRole()) || "Committee".equalsIgnoreCase(instructor.getRole()))
                 .filter(instructor -> {
-
-                    boolean hasDefenseEvaluation = false; // default
-                    boolean hasPosterEvaluation = false;  // default
-
-                    if ("Advisor".equalsIgnoreCase(instructor.getRole()) || "Committee".equalsIgnoreCase(instructor.getRole())) {
 
                         // each eva
                         Optional<DefenseEvaluation> instructorDefenseEvaCheck = defenseEvaluationList.stream()
@@ -592,42 +656,35 @@ public class ProjectController {
                                         e.getDefenseInstructorId().getInstructorId().equals(instructor.getInstructorId()))
                                 .findFirst();
 
+                        // not create
+                        if (instructorDefenseEvaCheck.isEmpty()) {
+                            return false;
+                        }
+
+                        // pull instructor have eva
+                        DefenseEvaluation defenselEvaluation = instructorDefenseEvaCheck.get();
+
                         // ให้คะแนนครบทุก criteria & score != null ?
-                        hasDefenseEvaluation = instructorDefenseEvaCheck.map(defenseEvaluation ->
-                                allDefenseCriteria.stream().allMatch(criteria ->
-                                        defenseEvaluation.getDefenseEvalScore().stream()
-                                                .anyMatch(s -> s.getCriteria().getCriteriaId().equals(criteria.getCriteriaId()) && s.getScore() != null))
-                        ).orElse(false);
+                        boolean hasAllScores = allDefenseCriteria.stream()
+                                .allMatch(criteria -> {
+                                    Optional<DefenseEvalScore> score = defenselEvaluation.getDefenseEvalScore().stream()
+                                            .filter(s -> s.getCriteria().getCriteriaId().equals(criteria.getCriteriaId()))
+                                            .findFirst();
 
-                    }
+                                    return score.isPresent() && score.get().getScore() != null;
+                                });
 
-                    if ("Poster-Committee".equalsIgnoreCase(instructor.getRole()) || "Committee".equalsIgnoreCase(instructor.getRole())) {
-
-                        Optional<PosterEvaluation> instructorPosterCheck = posterEvaluationList.stream()
-                                .filter(pe -> pe.getInstructorIdPoster().getInstructorId().equals(instructor.getInstructorId()))
-                                .findFirst();
-
-                        // float
-                        hasPosterEvaluation = instructorPosterCheck.map(posterEvaluation ->
-                                allPosterCriteria.stream()
-                                        .allMatch(criteria -> posterEvaluation.getPosterEvaluationScores().stream()
-                                                .anyMatch(ps -> ps.getCriteriaPoster().getCriteriaId().equals(criteria.getCriteriaId())))
-                        ).orElse(false);
-
-                    }
-
-                    return ("Committee".equalsIgnoreCase(instructor.getRole()))
-                            ? (hasDefenseEvaluation && hasPosterEvaluation)
-                            : (hasDefenseEvaluation || hasPosterEvaluation);
+                    return hasAllScores;
 
                 }).count();
 
-        System.out.println("👨‍🏫 Total Instructors Defense: " + allInstructor);
+        System.out.println("👨‍🏫 Total Instructors Defense: " + allinstructor);
         System.out.println("✅ Instructors with complete defense evaluation: " + instructorDefenseSuccessEva);
 
-        return new InstructorEvaluationDefenseStatusDTO(allInstructor, instructorDefenseSuccessEva);
+        return new InstructorEvaluationDefenseStatusDTO(allinstructor, instructorDefenseSuccessEva);
 
     }
+
 
 
     //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

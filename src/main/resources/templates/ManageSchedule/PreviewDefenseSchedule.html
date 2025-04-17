@@ -20,7 +20,7 @@
 <div class="content">
 
   <div class="header-section">
-    Preview Proposal Schedule
+    Preview Defense Schedule
 
     <div style="display: flex; align-items: center; gap: 10px;">
 
@@ -31,30 +31,87 @@
       <button class="export-block" id="openModal">Export</button>
     </div>
 
-    <div class="modal" id="settingModal">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h4 class="modal-title">Export Type</h4>
-        </div>
+    <script>
 
-        <div class="modal-body">
-          <span>Please select the program you want to export.</span>
-          <div class="program-options">
-            <label><input type="radio" name="program" value="DST"> DST</label><br>
-            <label><input type="radio" name="program" value="ICT"> ICT</label>
-          </div>
-        </div>
+      document.querySelector(".export-block").addEventListener("click", function() {
 
+        document.getElementById("modalLoaderOverlay").style.display = "flex";
+        console.log("Loader should be visible now");
 
-        <div class="modal-footer">
-          <button id="saveBtn">Save</button>
-          <button id="cancelBtn">Cancel</button>
-        </div>
+        const semesterYear = document.getElementById("semester-selector").value;
 
-      </div>
-    </div>
+        fetch(`/admin/exportDefenseSchedule?semesterYear=${encodeURIComponent(semesterYear)}`, {
+          method: "GET",
+        })
+                .then(response => {
+                  if (!response.ok){
+                    document.getElementById("modalLoaderOverlay").style.display = "none";
+
+                    throw new Error('Network response was not ok ' + response.statusText);
+
+                  }
+
+                  const filename = response.headers.get('content-disposition')
+                          .split('filename=')[1]
+                          // เอา " ออกจาชื่อ
+                          .replace(/"/g, '');
+
+                  // blob -> Binary Large Object
+                  return response.blob().then(blob => {
+                    return {blob, filename};
+                  });
+
+                })
+                .then(data => {
+
+                  // https://stackoverflow.com/questions/19327749/javascript-blob-filename-without-link
+
+                  // temp url
+                  const url = window.URL.createObjectURL(data.blob);
+
+                  // <a href="https://example.com">Website</a>
+                  const a = document.createElement("a");
+
+                  a.style.display = "none";
+                  a.href = url;
+                  a.download = data.filename;
+
+                  document.body.appendChild(a);
+                  a.click();
+
+                  window.URL.revokeObjectURL(url);
+
+                  document.getElementById("modalLoaderOverlay").style.display = "none";
+
+                  Swal.fire({
+                    icon: "success",
+                    title: "Export schedule successfully.",
+                    showConfirmButton: false,
+                    timer: 2000
+                  });
+                })
+                .catch(error => {
+                          console.error("Error exporting schedule:", error);
+                          document.getElementById("modalLoaderOverlay").style.display = "none";
+
+                          Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Something went wrong!",
+                          });
+                        }
+                );
+      });
+
+    </script>
 
     <input type="hidden" id="csrfToken" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+    <!--      <div class="btn-header">-->
+    <!--        <button class="template-btn">Template</button>-->
+    <!--        <button class="upload-btn">Upload Files</button>-->
+    <!--        <button class="addProject-btn">+ Add Projects</button>-->
+    <!--      </div>-->
   </div>
 
   <div class="body-section">
@@ -85,6 +142,46 @@
         </tr>
         </thead>
         <tbody id="projectTable">
+        <!--                <tr data-category="ict">-->
+        <!--                  <td>Mon, 21 Apr. 25</td>-->
+        <!--                  <td>16:15 - 17:30</td>-->
+        <!--                  <td>IT321</td>-->
+        <!--                  <td><span class="tag ict">ICT</span></td>-->
+        <!--                  <td>ICT SP2024-01</td>-->
+        <!--                  <td>ASYMBRAINNET</td>-->
+
+        <!--                  <td class="id-cell">-->
+        <!--                    <div class="student-row">6488009</div>-->
+        <!--                    <div class="student-row">6488011</div>-->
+        <!--                    <div class="student-row">6488026</div>-->
+        <!--                  </td>-->
+
+        <!--                  <td class="name-cell">-->
+        <!--                    <div class="student-row">KANATIP BHONGSPRAPAS</div>-->
+        <!--                    <div class="student-row">TAWAN CHAIDEE</div>-->
+        <!--                    <div class="student-row">NETITHORN INAMNUAY</div>-->
+        <!--                  </td>-->
+
+        <!--                  <td class="sec-cell">-->
+        <!--                    <div class="student-row"></div>-->
+        <!--                    <div class="student-row"></div>-->
+        <!--                    <div class="student-row"></div>-->
+        <!--                  </td>-->
+
+        <!--                  <td class="track-cell">-->
+        <!--                    <div class="student-row">1</div>-->
+        <!--                    <div class="student-row">1</div>-->
+        <!--                    <div class="student-row">1</div>-->
+        <!--                  </td>-->
+
+        <!--                  <td>-->
+        <!--                    <div class="advisor-row">Aj.Songsri Tangsripairoj</div>-->
+        <!--                    <div class="advisor-row">Aj.Woraluck Wongse-Ek</div>-->
+        <!--                    <div class="advisor-row">Aj.Sukanya Phongsuphap</div>-->
+        <!--                  </td>-->
+
+        <!--                </tr>-->
+
         <!--<td>-->
         <!--  ${advisor-->
         <!--  ?`-->
@@ -120,43 +217,6 @@
 </html>
 
 <script>
-
-  // open modal
-  document.getElementById("openModal").addEventListener("click", function() {
-    console.log("📌 Open modal");
-    document.getElementById("settingModal").style.display = "block";
-  });
-
-  // close modal
-  function closeModal() {
-    console.log("❌ Close Modal");
-    document.getElementById("settingModal").style.display = "none";
-
-    const selectedProgram = document.querySelectorAll('input[name="program"]:checked');
-    selectedProgram.forEach(cb => {
-
-      cb.checked = false;
-
-    });
-  }
-
-  document.getElementById("cancelBtn").addEventListener("click", closeModal);
-
-  // click out modal
-  // https://stackoverflow.com/questions/45393553/window-onclick-functionevent-only-works-for-first-item
-  window.onclick = function(event) {
-    let modal = document.getElementById("settingModal");
-
-    if (event.target === modal) {
-      // console.log("👀 Event: " + event.target);
-      // console.dir(event.target);
-      // console.log("🙂 Modal: " + modal);
-      // console.dir(modal);
-      console.log("⛔ คลิกนอก Modal -> ปิด Modal");
-      closeModal();
-    }
-
-  };
 
   document.addEventListener("DOMContentLoaded", function () {
     const menuItems = document.querySelectorAll(".sidebar ul li a");
@@ -243,7 +303,8 @@
     document.getElementById("modalLoaderOverlay").style.display = "flex";
     const semesterYear = document.getElementById("semester-selector").value;
 
-    fetch(`http://localhost:8080/admin/getDataPreviewProposalSchedule?semesterYear=${encodeURIComponent(semesterYear)}`, {
+
+    fetch(`http://localhost:8080/admin/getDataPreviewDefenseSchedule?semesterYear=${encodeURIComponent(semesterYear)}`, {
 
       method: 'GET',
       headers: {
@@ -257,16 +318,17 @@
                 tbody.innerHTML = ""
                 return;
 
+
                 throw new Error('Network response was not ok ' + response.statusText);
                 alert('Network response was not ok ' + response.statusText);
               }
               return response.json();
             })
             .then(data => {
+              // console.log("🐍data: ", data);
               const tbody = document.getElementById("projectTable");
               tbody.innerHTML = ""
 
-              console.log("🐍data: ", data);
               if(data.length === 0) {
                 console.log("No data available");
 
@@ -371,98 +433,6 @@
             });
   }
 
-
-
-  document.getElementById("saveBtn").addEventListener("click", function() {
-
-    // let program = document.getElementById("program-text").textContent.trim();
-
-    const selectedProgram = document.querySelector('input[name="program"]:checked');
-
-    console.log("☄️ selectedProgram: " + selectedProgram);
-
-    if (!selectedProgram) {
-      Swal.fire({
-        icon: "error",
-        title: "Oops...",
-        text: "Please select a program to export.",
-      });
-      return;
-    }
-
-    const program = selectedProgram.value;
-
-    document.getElementById("modalLoaderOverlay").style.display = "flex";
-    console.log("Loader should be visible now");
-
-    const semesterYear = document.getElementById("semester-selector").value;
-
-    fetch(`/admin/exportProposalSchedule?program=${encodeURIComponent(program)}&semesterYear=${encodeURIComponent(semesterYear)}`, {
-      method: "GET",
-    })
-            .then(response => {
-              if (!response.ok){
-
-                document.getElementById("modalLoaderOverlay").style.display = "none";
-
-                throw new Error('Network response was not ok ' + response.statusText);
-
-              }
-
-              const filename = response.headers.get('content-disposition')
-                      .split('filename=')[1]
-                      // เอา " ออกจาชื่อ
-                      .replace(/"/g, '');
-
-              // blob -> Binary Large Object
-              return response.blob().then(blob => {
-                return {blob, filename};
-              });
-
-            })
-            .then(data => {
-
-              // https://stackoverflow.com/questions/19327749/javascript-blob-filename-without-link
-
-              // temp url
-              const url = window.URL.createObjectURL(data.blob);
-
-              // <a href="https://example.com">Website</a>
-              const a = document.createElement("a");
-
-              a.style.display = "none";
-              a.href = url;
-              a.download = data.filename;
-
-              document.body.appendChild(a);
-              a.click();
-
-              window.URL.revokeObjectURL(url);
-
-              document.getElementById("modalLoaderOverlay").style.display = "none";
-
-              Swal.fire({
-                icon: "success",
-                title: "Export schedule successfully.",
-                showConfirmButton: false,
-                timer: 2000
-              });
-            })
-            .catch(error => {
-                      console.error("Error exporting schedule:", error);
-                      document.getElementById("modalLoaderOverlay").style.display = "none";
-
-                      Swal.fire({
-                        icon: "error",
-                        title: "Oops...",
-                        text: "Something went wrong!",
-                      });
-                    }
-            );
-  });
-
-
-
 </script>
 
 <!-- ----------- Set Header Value -------------- -->
@@ -526,5 +496,4 @@
     }
   }
   fetchAcademicYears();
-
 </script>

@@ -2,6 +2,7 @@ package com.example.project.service.ManageSchedule;
 
 import com.example.project.DTO.ManageSchedule.Preview.PreviewProposalDTO;
 import com.example.project.DTO.ManageSchedule.Preview.StudentDataDTO;
+import com.example.project.service.ManageSchedule.DefenseSchedule.ManageDefenseService;
 import jakarta.servlet.Servlet;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,11 +30,19 @@ public class ExportScheduleService {
 
     @Autowired
     ManageProposalScheduleService manageProposalScheduleService;
+    @Autowired
+    ManageDefenseService manageDefenseService;
 
-    public List<PreviewProposalDTO> getDataExport(String program) {
+    public List<PreviewProposalDTO> getDataExport(String program, String semesterYear) {
 
-        return manageProposalScheduleService.getDataPreviewSchedule().stream()
+        return manageProposalScheduleService.getDataPreviewSchedule(semesterYear).stream()
                 .filter(p -> program.equalsIgnoreCase(p.getProgram())).collect(Collectors.toList());
+
+    }
+
+    public List<PreviewProposalDTO> getDefenseDataExport(String semesterYear) {
+
+        return manageDefenseService.getDataDefensePreviewSchedule(semesterYear);
 
     }
 
@@ -63,7 +72,7 @@ public class ExportScheduleService {
         return response;
     }
 
-   //
+    //
     public void writeTableHeaderExcel(String sheetName, String titleName, String[] headers) {
 
         // sheet
@@ -113,7 +122,7 @@ public class ExportScheduleService {
             cell.setCellValue((Long) value);
 
         }else if (value instanceof  Byte) {
-                cell.setCellValue((Byte) value);
+            cell.setCellValue((Byte) value);
 
         } else {
             cell.setCellValue((String) value);
@@ -261,6 +270,26 @@ public class ExportScheduleService {
         // write sheet, title & header
         String[] headers = new String[] {"Date", "Time", "Room", "Program", "Project ID", "Project Title", "Student ID", "First - Last Name", "Sec.", "Track", "Advisor and Committees"};
         writeTableHeaderExcel("Schedule_Presentation", "Proposal Schedule Presentation", headers);
+
+        // write content row
+        writeTableData(data);
+
+        workbook.write(outputStream);
+        outputStream.close();
+
+    }
+
+    public void exportDefenseToExcel(HttpServletResponse response, List<PreviewProposalDTO> data) throws IOException {
+
+        newReportExcel();
+
+        // response  writer to excel
+        response = initResponseForExportExcel(response, "Defense_Schedule");
+        ServletOutputStream outputStream = response.getOutputStream();
+
+        // write sheet, title & header
+        String[] headers = new String[] {"Date", "Time", "Room", "Program", "Project ID", "Project Title", "Student ID", "First - Last Name", "Sec.", "Track", "Advisor and Committees"};
+        writeTableHeaderExcel("Schedule_Presentation", "Defense Schedule Presentation", headers);
 
         // write content row
         writeTableData(data);

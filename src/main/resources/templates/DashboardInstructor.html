@@ -674,7 +674,7 @@
         await dashboardDefense();
         await fetchData();
 
-        // getProjectProposal();
+        await getProjectProposal();
     })
 
     // ================================  display dashboard card  ==========================================
@@ -717,42 +717,74 @@
             .then(data => {
                 console.log("🐽🐽🐽data: ", data);
 
+                let projectsData = [];
+
+                if(data.Proposal || data.Defense) {
+
+                    if(data.Proposal && data.Proposal.length) {
+
+                        data.Proposal.forEach(project => {
+
+                            projectsData.push({...project, presentationType: 'Proposal'});
+                        });
+                    }
+
+                    if(data.Defense && data.Defense.length) {
+
+                        data.Defense.forEach(project => {
+
+                            projectsData.push({...project, presentationType: 'Defense'});
+                        });
+                    }
+
+                }
+
+                console.log("🍭 projectsData: ", projectsData);
+
+                projectsData.sort((a, b) => {
+
+                    if(a.presentationType === 'Defense' && b.presentationType !== 'Defense') return -1;
+                    if(a.presentationType !== 'Defense' && b.presentationType === 'Defense') return 1;
+
+                    return 0;
+                });
+
                 const container = document.querySelector(".schedule-container");
                 container.innerHTML = '';
 
-                if(data.length === 0) {
+                if(projectsData === 0) {
                     console.log("No data available");
 
                     const scheduleHTML = `
-            <div class="schedule-title">
-                <i class="fa-solid fa-calendar"></i>
-                Schedule for Presentation
-            </div>
+                        <div class="schedule-title">
+                            <i class="fa-solid fa-calendar"></i>
+                            Schedule for Presentation
+                        </div>
 
-            <p class="warning-text">
-                <i class="fa-solid fa-triangle-exclamation"></i> If you wish to cancel the presentation
-                schedule, please contact staff.
-            </p>
-            <div class="no-schedule">⚠️ The schedule is not yet organized ⚠️</div>
-            `;
+                        <p class="warning-text">
+                            <i class="fa-solid fa-triangle-exclamation"></i> If you wish to cancel the presentation
+                            schedule, please contact staff.
+                        </p>
+                        <div class="no-schedule">⚠️ The schedule is not yet organized ⚠️</div>
+                        `;
 
-                    container.innerHTML = scheduleHTML; // Use = instead of +=
+                    container.innerHTML = scheduleHTML;
                 } else {
-                    // Start with the header content
-                    let scheduleHTML = `
-            <div class="schedule-title">
-                <i class="fa-solid fa-calendar"></i>
-                Schedule for Presentation
-            </div>
 
-            <p class="warning-text">
-                <i class="fa-solid fa-triangle-exclamation"></i> If you wish to cancel the presentation
-                schedule, please contact staff.
-            </p>
-            `;
+                    let scheduleHTML = `
+                    <div class="schedule-title">
+                        <i class="fa-solid fa-calendar"></i>
+                        Schedule for Presentation
+                    </div>
+
+                    <p class="warning-text">
+                        <i class="fa-solid fa-triangle-exclamation"></i> If you wish to cancel the presentation
+                        schedule, please contact staff.
+                    </p>
+                    `;
 
                     // Add all projects to the HTML string
-                    data.forEach(project => {
+                    projectsData.forEach(project => {
                         let projectId = project.projectId;
                         let cleanId = projectId.replace(/DST|ICT/g, '').trim();
 
@@ -803,7 +835,7 @@
                             <div class="schedule-header">
                                 <div class="schedule-header-tags">
                                     <span class="tag tag-${roleTag.toLowerCase()}">${roleTag}</span>
-                                    <span class="tag tag-proposal">Proposal</span>
+                                    <span class="tag tag-${project.presentationType.toLowerCase()}">${project.presentationType}</span>
                                     <span class="tag tag-${project.program.toLowerCase()}">${project.program.toUpperCase()}</span>
                                 </div>
                                 <div class="status-btn ${statusClass}">${statusText}</div>
@@ -811,7 +843,7 @@
 
                             <div class="schedule-content">
                                 <div class="schedule-title">${project.projectTitle}</div>
-                                <span class="schedule-project-subtitle">${cleanId}</span>
+                                <span class="schedule-project-subtitle">Project ID: ${cleanId}</span>
                             </div>
                         </div>
                     </div>
