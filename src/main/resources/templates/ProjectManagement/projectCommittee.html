@@ -18,6 +18,13 @@
 <div class="container">
     <div class="sidebar">
         <h2>ICT MAHIDOL</h2>
+
+        <form th:action="@{/logout}" method="post" class="logout-container">
+            <!--        ค่าที่ใช้สำหรับป้องกัน Cross-Site Request Forgery (CSRF)-->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="logout-button"><i class="fas fa-sign-out-alt"></i></button>
+        </form>
+
         <ul>
             <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">
                 <path
@@ -75,8 +82,8 @@
         <div class="header-section">
             Committee
             <div class="btn-header">
-                <button class="template-btn">Template</button>
-                <button class="upload-btn">Upload Files</button>
+<!--                <button class="template-btn">Template</button>-->
+<!--                <button class="upload-btn">Upload Files</button>-->
             </div>
         </div>
 
@@ -96,7 +103,7 @@
                         <th>Project ID</th>
                         <th>Project Name</th>
                         <th>Student ID</th>
-                        <th colspan="3">Committee</th>  <!-- ใช้ colspan รวมเป็นหัวข้อหลัก -->
+                        <th colspan="4">Committee</th>  <!-- ใช้ colspan รวมเป็นหัวข้อหลัก -->
                         <th class="action-header">Action</th>
                     </tr>
                     <tr class="sub-header-row">

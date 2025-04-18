@@ -6,13 +6,21 @@ public class ScheduleProposalResponseDTO {
     private String status;
     private String message;
     private List<ScheduleAssignmentDTO> scheduledAssignments;
+    private List<ProjectWithInstructorsDTO> unscheduledProjects;
     private List<TimeSlotDTO> allTimeSlots;
 
+//    public ScheduleProposalResponseDTO(String status, String message, List<ScheduleAssignmentDTO> scheduledAssignments, List<TimeSlotDTO> allTimeSlots) {
+//        this.status = status;
+//        this.message = message;
+//        this.scheduledAssignments = scheduledAssignments;
+//        this.allTimeSlots = allTimeSlots;
+//    }
 
-    public ScheduleProposalResponseDTO(String status, String message, List<ScheduleAssignmentDTO> scheduledAssignments, List<TimeSlotDTO> allTimeSlots) {
+    public ScheduleProposalResponseDTO(String status, String message, List<ScheduleAssignmentDTO> scheduledAssignments, List<ProjectWithInstructorsDTO> unscheduledProjects, List<TimeSlotDTO> allTimeSlots) {
         this.status = status;
         this.message = message;
         this.scheduledAssignments = scheduledAssignments;
+        this.unscheduledProjects = unscheduledProjects;
         this.allTimeSlots = allTimeSlots;
     }
 
@@ -49,6 +57,14 @@ public class ScheduleProposalResponseDTO {
 
     public void setScheduledAssignments(List<ScheduleAssignmentDTO> scheduledAssignments) {
         this.scheduledAssignments = scheduledAssignments;
+    }
+
+    public List<ProjectWithInstructorsDTO> getUnscheduledProjects() {
+        return unscheduledProjects;
+    }
+
+    public void setUnscheduledProjects(List<ProjectWithInstructorsDTO> unscheduledProjects) {
+        this.unscheduledProjects = unscheduledProjects;
     }
 
     public List<TimeSlotDTO> getAllTimeSlots() {

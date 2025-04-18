@@ -141,7 +141,7 @@
                 const periodKey = link.getAttribute('data-period');
                 const period = accessPeriods[periodKey];
                 console.log("periodKey:", periodKey); // ตรวจสอบว่า periodKey ถูกต้อง
-                console.log("period: ",period)
+                console.log("period: ", period)
 
                 if (period) {
                     const startTime = period.start ? new Date(period.start) : null;
@@ -188,91 +188,116 @@
 
     <div class="sidebar">
         <h2>ICT MAHIDOL</h2>
+        <form th:action="@{/logout}" method="post" class="logout-container">
+            <!--        ค่าที่ใช้สำหรับป้องกัน Cross-Site Request Forgery (CSRF)-->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+            <button type="submit" class="logout-button"><i class="fas fa-sign-out-alt"></i></button>
+        </form>
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
                      style="fill:#FFFFFF;">
-                <path
-                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
-                </path>
-            </svg> Homepage </h4>
+                    <path
+                            d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+                    </path>
+                </svg>
+                Homepage
+            </h4>
             <li><a href="/instructor/view">Dashboard</a></li>
         </ul>
 
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-                <g fill="#ffffff" fill-rule="nonzero">
-                    <g transform="scale(5.33333,5.33333)">
-                        <path
-                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-                        </path>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
                     </g>
-                </g>
-            </svg> Evaluation (40%) </h4>
-            <li><a href="/show-proposal-eva-projects" data-period="proposalEvaluation">Proposal Evaluation</a></li>
+
+                </svg>
+                Evaluation (40%)
+            </h4>
+
+            <li><a href="/show-proposal-eva-projects" data-period="proposalEvaluation" class="active">Proposal
+                Evaluation</a></li>
             <li><a href="/show-poster-projects" data-period="posterEvaluation">Poster Evaluation</a></li>
             <li><a href="/show-defense-eva-projects" data-period="defenseEvaluation">Defense Evaluation</a></li>
         </ul>
 
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-                <g fill="#ffffff" fill-rule="nonzero">
-                    <g transform="scale(5.33333,5.33333)">
-                        <path
-                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-                        </path>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
                     </g>
-                </g>
-            </svg> Grades (60%) </h4>
+                </svg>
+                Grades (60%)
+            </h4>
             <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Proposal Grade</a></li>
             <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Defense Grade</a></li>
         </ul>
     </div>
-<!--    <div class="sidebar">-->
-<!--        <h2>ICT MAHIDOL</h2>-->
-<!--        <ul>-->
-<!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"-->
-<!--                     style="fill:#FFFFFF;">-->
-<!--                <path-->
-<!--                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">-->
-<!--                </path>-->
-<!--            </svg> Homepage </h4>-->
-<!--            <li><a href="/instructor/view">Dashboard</a></li>-->
-<!--        </ul>-->
+    <!--    <div class="sidebar">-->
+    <!--        <h2>ICT MAHIDOL</h2>-->
+    <!--        <ul>-->
+    <!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"-->
+    <!--                     style="fill:#FFFFFF;">-->
+    <!--                <path-->
+    <!--                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">-->
+    <!--                </path>-->
+    <!--            </svg> Homepage </h4>-->
+    <!--            <li><a href="/instructor/view">Dashboard</a></li>-->
+    <!--        </ul>-->
 
-<!--        <ul>-->
-<!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
-<!--                <g fill="#ffffff" fill-rule="nonzero">-->
-<!--                    <g transform="scale(5.33333,5.33333)">-->
-<!--                        <path-->
-<!--                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
-<!--                        </path>-->
-<!--                    </g>-->
-<!--                </g>-->
-<!--            </svg> Evaluation (40%) </h4>-->
-<!--            <li><a href="/show-proposal-eva-projects">Proposal Evaluation</a></li>-->
-<!--            <li><a href="/show-poster-projects">Poster Evaluation</a></li>-->
-<!--            <li><a href="/show-defense-eva-projects">Defense Evaluation</a></li>-->
-<!--        </ul>-->
+    <!--        <ul>-->
+    <!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
+    <!--                <g fill="#ffffff" fill-rule="nonzero">-->
+    <!--                    <g transform="scale(5.33333,5.33333)">-->
+    <!--                        <path-->
+    <!--                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
+    <!--                        </path>-->
+    <!--                    </g>-->
+    <!--                </g>-->
+    <!--            </svg> Evaluation (40%) </h4>-->
+    <!--            <li><a href="/show-proposal-eva-projects">Proposal Evaluation</a></li>-->
+    <!--            <li><a href="/show-poster-projects">Poster Evaluation</a></li>-->
+    <!--            <li><a href="/show-defense-eva-projects">Defense Evaluation</a></li>-->
+    <!--        </ul>-->
 
-<!--        <ul>-->
-<!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
-<!--                <g fill="#ffffff" fill-rule="nonzero">-->
-<!--                    <g transform="scale(5.33333,5.33333)">-->
-<!--                        <path-->
-<!--                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
-<!--                        </path>-->
-<!--                    </g>-->
-<!--                </g>-->
-<!--            </svg> Grades (60%) </h4>-->
-<!--            <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>-->
-<!--            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>-->
-<!--        </ul>-->
-<!--    </div>-->
+    <!--        <ul>-->
+    <!--            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">-->
+    <!--                <g fill="#ffffff" fill-rule="nonzero">-->
+    <!--                    <g transform="scale(5.33333,5.33333)">-->
+    <!--                        <path-->
+    <!--                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">-->
+    <!--                        </path>-->
+    <!--                    </g>-->
+    <!--                </g>-->
+    <!--            </svg> Grades (60%) </h4>-->
+    <!--            <li><a href="/show-proposal-grade-projects">Proposal Grade</a></li>-->
+    <!--            <li><a href="/show-defense-grade-projects">Defense Grade</a></li>-->
+    <!--        </ul>-->
+    <!--    </div>-->
 
     <div class="content">
 
         <div class="header-section">
             Proposal Evaluation (40%)
+
+            <!-- Dropdown สำหรับเลือก semester -->
+            <div class="semester-container">
+                <select id="semester-selector" onchange="filterBySemester();">
+                    <!-- ตัวเลือกสำหรับปีและ semester -->
+                </select>
+            </div>
+
         </div>
 
         <div class="table-container">
@@ -292,7 +317,7 @@
                         <option value="committee">Committee</option>
                     </select>
                 </label>
-                <input id="search-keyword" type="text" placeholder="Search" />
+                <input id="search-keyword" type="text" placeholder="Search"/>
             </div>
 
             <table id="result-table">
@@ -303,7 +328,7 @@
                     <th>Role</th>
                     <th>Student ID</th>
                     <th>Student Names</th>
-                    <th>Evaluation</th>
+                    <th style="text-align: center">Evaluation</th>
                     <th>Actions</th>
                 </tr>
                 </thead>
@@ -323,37 +348,48 @@
 
 <script>
 
-    function fetchData() {
-        // JSON information fetch project list
-        let url = 'http://localhost:8080/instructor/projectList';
+    // ------ Script for search function ------- //
+    document.getElementById('search-keyword').addEventListener('input', function () {
+        const searchTerm = this.value.toLowerCase();
 
-        // ทำการส่งคำขอไปยัง API หรือ Backend
-        fetch(url)
-            .then(response => {
-                // console.log(response.json());
-                if (!response.ok) {
-                    throw new Error('Network response was not ok ' + response.statusText);
+        // ดึงทุกแถวในตารางมา
+        const rows = document.querySelectorAll("#filter-results tr");
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+
+            // ตัวแปรที่ใช้ check ว่า row นี้มีข้อมูลที่ตรงกับคำค้นหามั้ย
+            let rowMatches = false;
+
+            // วนลูปผ่านทุกคอลัมน์ในแถว
+            cells.forEach(cell => {
+                // ถ้า cell มี ul หรือ li ให้ค้นหาข้อมูลจาก li แทน
+                if (cell.querySelector('ul')) {
+                    const liText = Array.from(cell.querySelectorAll('li')).map(li => li.textContent.toLowerCase()).join(' ');
+                    if (liText.includes(searchTerm)) {
+                        rowMatches = true;
+                    }
+                } else {
+                    if (cell.textContent.toLowerCase().includes(searchTerm)) {
+                        rowMatches = true;
+                    }
                 }
-                return response.json();
-            })
-            .then(data => {
-                console.log("🐍 Data Length: " + data.length);
-                console.log("Show Data: " + JSON.stringify(data, null, 2));
-                // แสดงผลข้อมูลที่ได้รับ
-                displayResults(data);
-            })
-            .catch(error => {
-                console.error('Error fetching data:', error);
-                document.getElementById('filter-results').innerHTML = "ไม่พบข้อมูล";
             });
-    }
+
+            // ถ้าแถวนี้มีข้อมูลที่ตรงกับคำค้นหาก็จะแสดงแถวนั้น
+            if (rowMatches) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    });
 
     document.addEventListener('DOMContentLoaded', function () {
-        fetchData();
+        fetchProjectData();
         // ตั้งค่า event listeners สำหรับแต่ละฟิลด์ฟิลเตอร์ เพื่อดูการเปลี่ยนแปลง
         document.getElementById('program-select-box').addEventListener('change', debounce(applyFilters, 100));
         document.getElementById('role-select-box').addEventListener('change', debounce(applyFilters, 100));
-        // document.getElementById('search-keyword').addEventListener('input', debounce(applyFilters, 100));
+        // document.getElementById('search-keyword').addEventListener('input', debounce(applyFilters, 100)); // เพิ่มการค้นหาคำ
     });
 
     function debounce(func, delay) {
@@ -371,196 +407,197 @@
     function applyFilters() {
         const programFilter = document.getElementById('program-select-box')?.value;
         const roleFilter = document.getElementById('role-select-box')?.value;
+        const searchTerm = document.getElementById('search-keyword')?.value.toLowerCase();  // ค่าค้นหา
+        const semesterSelector = document.getElementById('semester-selector');
+        const selectedSemester = semesterSelector.value;  // ค่า semester ที่เลือก
 
-        const rows = document.querySelectorAll("#filter-results tr");
-        console.log(programFilter)
-        console.log(roleFilter)
+        // กรองข้อมูลตาม semester ที่เลือกก่อน
+        let filteredData = projectData.filter(project => project.semester.toString() === selectedSemester);
 
-        rows.forEach(row => {
-            const programCell = row.querySelector('.tag');
-            const roleCell = row.querySelector('.role');
-
+        // กรองข้อมูลตาม program, role, และ searchTerm
+        filteredData = filteredData.filter(project => {
             let matches = true;
 
-            // กรอง Program: ถ้าเลือก "All" จะไม่กรอง
-            if (matches && programFilter !== 'all' && programCell) {
-                matches = programCell.classList.contains(programFilter);
-                console.log("Filtered Program : " + programFilter)
+            // กรองโปรแกรม
+            if (programFilter !== 'all' && project.projectProgram.toLowerCase() !== programFilter.toLowerCase()) {
+                matches = false;
             }
 
-            // กรอง Role: ถ้าเลือก "All" จะไม่กรอง
-            if (matches && roleFilter !== 'all' && roleCell) {
-                matches = roleCell.classList.contains(roleFilter);
-                console.log("Filtered Role : " + roleFilter)
+            // กรองบทบาท
+            if (roleFilter !== 'all' && project.role.toLowerCase() !== roleFilter.toLowerCase()) {
+                matches = false;
             }
 
-            // แสดงหรือซ่อนแถว
-            row.style.display = matches ? '' : 'none';
+            // ฟังก์ชันค้นหาคำ
+            if (searchTerm && !project.projectId.toLowerCase().includes(searchTerm) && !project.projectTitle.toLowerCase().includes(searchTerm)) {
+                matches = false;
+            }
+
+            return matches;
         });
+
+        // แสดงผลข้อมูลที่กรองแล้ว
+        displayResults(filteredData);
     }
 
-    // // ------ Script for filter function ------- //
-    // function applyFilters() {
-    //
-    //     // ดึงค่าจากฟิลด์ฟิลเตอร์
-    //     const program = document.getElementById('program-select-box').value;
-    //     const role = document.getElementById('role-select-box').value;
-    //
-    //     // สร้าง URL สำหรับส่งข้อมูลไปยัง API ที่ใช้กรองข้อมูล
-    //     let url = `http://localhost:8080/api/filter?program=${program}&role=${role}`;
-    //         // http://localhost:8080/api/filter?program=${program}&role=${role}
-    //     // http://localhost:8080/instructor/projectList?projectProgram=${program}&role=${role}
-    //
-    //     fetch(url)
-    //         .then(response => {
-    //             if (!response.ok) {
-    //                 throw new Error('Network response was not ok ' + response.statusText);
-    //             }
-    //             return response.json();
-    //         })
-    //         .then(data => {
-    //             console.log(data);
-    //
-    //             // เช็คว่า data เป็น Array หรือไม่
-    //             if (Array.isArray(data)) {
-    //                 displayResults(data); // หากเป็น Array ให้แสดงผล
-    //             } else if (data && data.studentName) {
-    //                 // หากเป็น Object เดียว ให้แปลงเป็น Array ก่อนแล้วแสดงผล
-    //                 displayResults([data]);
-    //             } else {
-    //                 // ถ้า data ไม่ใช่ Array หรือ Object ที่ต้องการ
-    //                 console.error("Expected an array or object, but received:", data);
-    //                 document.getElementById('filter-results').innerHTML = "No data found.";
-    //             }
-    //         })
-    //         .catch(error => {
-    //             console.error("Error fetching data:", error);
-    //             document.getElementById('filter-results').innerHTML = "An error occurred while fetching data.";
-    //         });
-    // }
-
-    // ------ Script for search function ------- //
-    document.getElementById('search-keyword').addEventListener('input', function () {
-        const searchTerm = this.value.toLowerCase();
-
-        // ดึงทุกแถวในตารางมา
-        const rows = document.querySelectorAll("#filter-results tr");
-        rows.forEach(row => {
-            const cells = row.querySelectorAll('td');
-
-            // ตัวแปรที่ใช้ check ว่า row นี้มีข้อมูลที่ตรงกับคำค้นหามั้ย
-            let rowMatches = false;
-
-            // วนลูปผ่านทุกคอลัมน์ในแถว
-            cells.forEach(cell => {
-                if (cell.textContent.toLowerCase().includes(searchTerm)) {
-                    rowMatches = true;
-                }
-            });
-
-            // ถ้าแถวนี้มีข้อมูลที่ตรงกับคำค้นหาก็จะแสดงแถวนั้น
-            if (rowMatches) {
-                row.style.display = '';
-            } else {
-                row.style.display = 'none';
-            }
-        });
+    document.getElementById('semester-selector').addEventListener('change', function () {
+        if (this.value === 'all') {
+            filterBySemester();
+        } else {
+            filterBySemester();
+        }
     });
 
-    function displayResults(data) {
-        let tableBody = document.querySelector("tbody");
-        tableBody.innerHTML = "";  // เคลียร์ข้อมูลเก่า
+    // ตัวแปรที่ใช้เก็บข้อมูลที่ได้รับจาก API
+    let projectData = [];
 
-        // if (Array.isArray(data)) {
-        //     // สร้าง object สำหรับเก็บข้อมูลที่มี projectId เดียวกัน
-        //     let groupedData = {};
-        //     data.forEach(item => {
-        //         // ตรวจสอบว่ามีข้อมูลใน groupedData สำหรับ projectId นี้อยู่แล้วหรือไม่
-        //         console.log(item);
-        //         if (!groupedData[item.projectId]) {
-        //             // ถ้ายังไม่มีข้อมูลของ projectId นี้ใน groupedData ให้สร้างใหม่
-        //             groupedData[item.projectId] = {
-        //                 program: item.projectProgram,
-        //                 projectId: item.projectId,
-        //                 projectTitle: item.projectTitle,
-        //                 role: item.role,
-        //                 studentIds: [],
-        //                 studentNames: []
-        //             };
-        //         }
-        //
-        //         // ตรวจสอบว่า studentId หรือ studentName นี้มีอยู่ในกลุ่มแล้วหรือไม่
-        //         if (!groupedData[item.projectId].studentIds.includes(item.studentId)) {
-        //             // ถ้าไม่มี studentId นี้ในกลุ่ม ให้เพิ่มลงไป
-        //             groupedData[item.projectId].studentIds.push(item.studentId);
-        //         }
-        //         if (!groupedData[item.projectId].studentNames.includes(item.studentName)) {
-        //             // ถ้าไม่มี studentName นี้ในกลุ่ม ให้เพิ่มลงไป
-        //             groupedData[item.projectId].studentNames.push(item.studentName);
-        //         }
-        //     });
-        //
-        //     // แสดงผลข้อมูลที่จัดกลุ่มแล้ว
-        //     for (let projectId in groupedData) {
-        //         let item = groupedData[projectId];
-        //         let row = document.createElement("tr");
-        //
-        //         // ตรวจสอบว่า studentIds และ studentNames เป็นอาร์เรย์หรือไม่ ก่อนใช้งาน .map()
-        //         const studentIdsList = Array.isArray(item.studentIds) ? item.studentIds : [item.studentIds];
-        //         const studentNamesList = Array.isArray(item.studentNames) ? item.studentNames : [item.studentNames];
-        //
-        //     //     // สร้างข้อมูลแต่ละเซลล์ในแถว
-        //         row.innerHTML = `
-        //         <td><span class="tag ${item.program.toLowerCase()}">${item.program}</span> ${item.projectId}</td>
-        //         <td>${item.projectTitle}</td>
-        //         <td><span class="role ${item.role.toLowerCase()}">${item.role}</span></td>
-        //         <td>
-        //             <ul>
-        //                 ${studentIdsList.map(id => `<li>${id}</li>`).join('')}
-        //             </ul>
-        //         </td>
-        //         <td>
-        //             <ul>
-        //                 ${studentNamesList.map(name => `<li>${name}</li>`).join('')}
-        //             </ul>
-        //         </td>
-        //         <td class="evaluation completed"><span class="material-icons">done</span></td>
-        //         <td class="actions"><span class="material-icons" @onClick="editAction">edit</span></td>
-        //     `;
-        //
-        //         tableBody.appendChild(row);  // เพิ่มแถวในตาราง
-        //     }
-        // } else {
-        //     console.error("Data is not an array:", data);
-        //     document.getElementById('filter-results').innerHTML = "No valid data to display.";
-        // }
+    // ฟังก์ชันดึงข้อมูลจาก API
+    async function fetchProjectData() {
+        try {
+            const response = await fetch('http://localhost:8080/instructor/projectList');
+            // ตรวจสอบว่า response ถูกต้องและมีข้อมูล
+            if (!response.ok) {
+                console.error("Failed to fetch project data. Status: " + response.status);
+                return;  // หากไม่สามารถดึงข้อมูลได้ให้หยุด
+            }
+
+            projectData = await response.json();  // เก็บข้อมูลโปรเจกต์
+
+            // เรียกใช้ฟังก์ชันเพื่ออัปเดต dropdown และแสดงข้อมูลที่กรอง
+            updateSemesterDropdown();
+            filterBySemester();  // กรองข้อมูลและแสดงผลตาม semester ที่เลือก
+        } catch (error) {
+            console.error("Error fetching project data:", error);
+        }
+    }
+
+    async function fetchSemesterData() {
+        try {
+            const response = await fetch('http://localhost:8080/instructor/projectSemesterList');
+
+            // ตรวจสอบว่า response ถูกต้อง
+            if (!response.ok) {
+                console.error("Failed to fetch semester data. Status: " + response.status);
+                return;  // หากไม่สามารถดึงข้อมูลได้ให้หยุด
+            }
+
+            const semesters = await response.json();  // ดึงข้อมูล semester จาก API
+            console.log(semesters)
+
+            // ตรวจสอบว่า semesters เป็น array และมีข้อมูล
+            if (!Array.isArray(semesters) || semesters.length === 0) {
+                console.error("No semester data received or invalid format.");
+                return;  // หากไม่มีข้อมูลหรือข้อมูลไม่ถูกต้อง
+            }
+
+            updateSemesterDropdown(semesters);  // เรียกฟังก์ชันเพื่ออัปเดต dropdown
+        } catch (error) {
+            console.error("Error fetching semester data:", error);
+        }
+    }
+
+    // ฟังก์ชันอัปเดต dropdown สำหรับเลือกปี
+    function updateSemesterDropdown(semesters) {
+        // ตรวจสอบว่า semesters มีค่าหรือไม่
+        if (!Array.isArray(semesters) || semesters.length === 0) {
+            return;
+        }
+
+        const semesterSelector = document.getElementById('semester-selector');
+        semesterSelector.innerHTML = ""; // เคลียร์ค่าก่อนเติมใหม่
+
+        semesters.forEach(semester => {
+            const option = document.createElement("option");
+            option.value = semester;
+            option.textContent = `🗓︎ ${semester}`;
+            semesterSelector.appendChild(option);
+        });
+
+        // ตรวจสอบเดือนปัจจุบัน
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear();
+        const currentMonth = currentDate.getMonth() + 1; // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
+
+        // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
+        const defaultYear = currentMonth <= 6 ? currentYear - 1 : currentYear;
+
+        // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
+        if (semesters.includes(defaultYear.toString())) {
+            semesterSelector.value = defaultYear.toString();
+        } else {
+
+            semesterSelector.selectedIndex = 1; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+
+        }
+
+    }
+
+    // ฟังก์ชันกรองข้อมูลตาม semester ที่เลือก
+    function filterBySemester() {
+        const semesterSelector = document.getElementById('semester-selector');
+        const selectedSemester = semesterSelector.value;
+
+        // กรองข้อมูลตาม semester ที่เลือก
+        const filteredData = projectData.filter(project => project.semester.toString() === selectedSemester);
+
+        // เรียก applyFilters เพื่อกรองตาม filter อื่น ๆ
+        applyFilters(filteredData);
+    }
+
+    // เรียกใช้ฟังก์ชัน fetchProjectData และ fetchSemesterData
+    fetchProjectData();
+    fetchSemesterData();
+
+    // ฟังก์ชันแสดงข้อมูลที่กรองแล้ว
+    function displayResults(data) {
+        const tableBody = document.querySelector("tbody");
+        tableBody.innerHTML = "";  // เคลียร์ข้อมูลเก่า
 
         try {
             data.forEach(project => {
-                console.log("Process project: "+ project);
-
                 const row = document.createElement('tr');
 
-                // status
-                const evaluationStatus = project.allEvaluationsComplete
-                ? `<td class="evaluation completed" title="Complete Evaluation"><i class="fa-solid fa-check"></i></td>`
-                : `<td class="evaluation uncompleted" title="Incomplete Evaluation"><i class="fa-solid fa-spinner"></i></td>`;
+                // ใช้ split เพื่อแยกค่าออกจากโปรแกรม
+                const programParts = project.projectId.split(" ");
+                const programPrefix = programParts[0]; // ค่าก่อนหน้า (DST, ICT, etc.)
+                const projectId = programParts.slice(1).join(" ");
 
+                // สถานะการประเมิน
+                const evaluationStatus = project.allEvaluationsComplete
+
+                    ? `<td>
+                        <div class="status-icon completed">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                             <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                           </svg>
+                        </div>
+                         </td>`
+
+                    : `<td>
+                        <div class="status-icon pending">
+                           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                             <circle cx="12" cy="12" r="10"></circle>
+                             <polyline points="12 6 12 12 16 14"></polyline>
+                           </svg>
+                           </div>
+                         </td>`;
+
+                // สร้างข้อมูลของแถว
                 row.innerHTML = `
-                 <td><span class="tag ${project.projectProgram.toLowerCase()}">${project.projectProgram}</span> ${project.projectId}</td>
+                <td><span class="tag ${project.projectProgram.toLowerCase()}">${project.projectProgram}</span> ${projectId}</td>
                 <td>${project.projectTitle}</td>
                 <td><span class="role ${project.role.toLowerCase()}">${project.role}</span></td>
                 <td>
                     <ul>
-                        ${project.students.map(id => `<li>${id.studentId}</li>`).join('')}
+                        ${project.students.map(student => `<li>${student.studentId}</li>`).join('')}
                     </ul>
                 </td>
                 <td>
                     <ul>
-                        ${project.students.map(name => `<li>${name.studentName}</li>`).join('')}
+                        ${project.students.map(student => `<li>${student.studentName}</li>`).join('')}
                     </ul>
                 </td>
-<!--                <td class="evaluation completed"><i class="fa-solid fa-check"></i></td>-->
                 ${evaluationStatus}
                 <td>
                     <form action="/instructor/editProposalEvaluation" method="get">
@@ -568,15 +605,19 @@
                         <button type="submit"><span class="material-icons">edit</span></button>
                     </form>
                 </td>
-                `;
-                tableBody.appendChild(row);
-            })
+            `;
+                tableBody.appendChild(row);  // เพิ่มแถวในตาราง
+            });
         } catch (error) {
-            console.error("Error display data in html: "+ error);
+            console.error("Error displaying data in HTML:", error);
             document.getElementById('filter-results').innerHTML = "No valid data to display.";
         }
     }
 
+    // เรียกใช้เมื่อเริ่มหน้าเพื่อดึงข้อมูลโปรเจกต์
+    fetchProjectData();
+
+    // เพิ่ม event listener สำหรับการเลือก semester
+    document.getElementById('semester-selector').addEventListener('change', filterBySemester);
+
 </script>
-
-

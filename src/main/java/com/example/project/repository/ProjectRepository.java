@@ -49,6 +49,18 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
     @Query("SELECT p.projectId FROM Project p WHERE p.program = :program")
     List<String> findByProjectIdAndProgram(@Param("program") String program);
 
+    @Query("SELECT p.projectId FROM Project p WHERE p.program = :program AND p.semester = :semester ")
+    List<String> findByProjectIdAndProgramAndSemster(@Param("program") String program, @Param("semester") String semester);
+
+    @Query("SELECT p FROM Project p WHERE p.program = :program AND p.semester = :semester ")
+    List<Project> findByProjectAndProgramAndSemster(@Param("program") String program, @Param("semester") String semester);
+
+    @Query("SELECT p.projectId FROM Project p WHERE p.semester = :semester ")
+    List<String> findByProjectIdAndSemster(@Param("semester") String semester);
+
+    @Query("SELECT p FROM Project p WHERE p.semester = :semester ")
+    List<Project> findByProjectAndSemster(@Param("semester") String semester);
+
     @Query("SELECT p.projectId FROM Project p")
     List<String> findByProjectIdList();
 
@@ -70,6 +82,12 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 
     List<Project> findBySemesterAndProgramAndProjectInstructorRoles_Instructor_Account_Username(String param, String year, String username);
 
+    @Query("SELECT MAX(p.projectId) FROM Project p WHERE p.program = :program AND p.projectId LIKE CONCAT(:program, ' SP%')")
+    String findLatestProjectIdByProgram(@Param("program") String program);
+
+    // เพิ่มฟังก์ชันที่ดึงข้อมูลโปรเจกต์ทั้งหมดได้
+//    List<Project> findAll();
+
 }
 
 
@@ -88,4 +106,3 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 //    Project findByProjectId(String projectId);
 //
 //}
-

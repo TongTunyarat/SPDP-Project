@@ -1,12 +1,12 @@
 package com.example.project.service;
 
-import com.example.project.DTO.DefenseEvaResponseDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class DefenseEvaluationService {
@@ -29,13 +29,15 @@ public class DefenseEvaluationService {
         this.studentProjectRepository = studentProjectRepository;
         this.projectRepository = projectRepository;
         this.defenseEvaluationRepository = defenseEvaluationRepository;
+        this.defenseEvalScoreRepository = defenseEvalScoreRepository;
     }
 
     //=========================================== USE ===================================================
 
     // get proposal criteria
     public List<Criteria> getDefenseCriteria() {
-        List<Criteria> criteriaList = criteriaRepository.findByEvaluationPhase("Defense Evaluation");
+        List<Criteria> criteriaList = criteriaRepository.findByEvaluationPhase("Defense Evaluation")
+                .stream().filter(name -> !"Timeliness".equalsIgnoreCase(name.getCriteriaName())).collect(Collectors.toList());
 //        List<Criteria> criteriaList = criteriaRepository.findAll();
         return criteriaList;
     }
@@ -47,6 +49,10 @@ public class DefenseEvaluationService {
 
         List<StudentProject> studentProjectList = project.getStudentProjects();
         return studentProjectList;
+    }
+
+    public List<DefenseEvalScore> getDefenseEvalScoresByProjectId(String projectId) {
+        return defenseEvalScoreRepository.findByDefenseEvaluation_ProjectId_ProjectId(projectId);
     }
 
     // get student score

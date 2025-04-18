@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ProposalEvaluationService {
@@ -43,7 +44,8 @@ public class ProposalEvaluationService {
 
     // get proposal criteria
     public List<Criteria> getProposalCriteria() {
-        List<Criteria> criteriaList = criteriaRepository.findByEvaluationPhase("Proposal Evaluation");
+        List<Criteria> criteriaList = criteriaRepository.findByEvaluationPhase("Proposal Evaluation")
+                .stream().filter(name -> !"Timeliness".equalsIgnoreCase(name.getCriteriaName())).collect(Collectors.toList());
 //        List<Criteria> criteriaList = criteriaRepository.findAll();
         return criteriaList;
     }

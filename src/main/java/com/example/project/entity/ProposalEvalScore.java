@@ -75,5 +75,11 @@ public class ProposalEvalScore {
         return this;
     }
 
-
+    @Override
+    public String toString() {
+        return "ProposalEvalScore{" +
+                "evaId='" + evaId + '\'' +
+                ", score=" + score +
+                '}';
+    }
 }

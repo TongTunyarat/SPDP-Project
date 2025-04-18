@@ -40,8 +40,8 @@ public class EditProposalScheduleController {
 
     // 👀 เอารายการโปรเจคที่สามารถเเก้ไขได้หลังจากยกเลิก 👀
     @GetMapping("/admin/getProjectEditProposal")
-    public ResponseEntity<List<GetAllEditProposalScheduleDTO> > getProjectEditProposal() {
-        List<GetAllEditProposalScheduleDTO> response = editProposalService.getProjectEditProposal();
+    public ResponseEntity<List<GetAllEditProposalScheduleDTO> > getProjectEditProposal(@RequestParam String semesterYear) {
+        List<GetAllEditProposalScheduleDTO> response = editProposalService.getProjectEditProposal(semesterYear);
         return ResponseEntity.ok(response);
     }
 

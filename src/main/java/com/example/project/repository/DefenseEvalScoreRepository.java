@@ -15,6 +15,11 @@ public interface DefenseEvalScoreRepository extends JpaRepository<DefenseEvalSco
 
     DefenseEvalScore findByEvalId(String s);
 
+    DefenseEvalScore findByEvalIdAndCriteria_CriteriaId(String s, String s1);
+
+    DefenseEvalScore findByDefenseEvaluation_DefenseEvaIdAndCriteria_CriteriaId(String s, String s1);
+
+    // สำหรับการค้นหาข้อมูลที่ return ค่า DTO
     @Query("SELECT new com.example.project.DTO.DefenseEvaResponseDTO( " +
             "d.defenseEvaluation.defenseEvaId, " +
             "d.defenseEvaluation.student.studentId, " +
@@ -27,7 +32,9 @@ public interface DefenseEvalScoreRepository extends JpaRepository<DefenseEvalSco
             "JOIN d.defenseEvaluation.student s " +
             "JOIN d.criteria c " +
             "WHERE d.defenseEvaluation.projectId.projectId = :projectId")
-    List<DefenseEvaResponseDTO> findByDefenseEvaluation_ProjectId_ProjectId(@Param("projectId") String projectId);
+    List<DefenseEvaResponseDTO> findDefenseEvaluationDetailsByProjectId(@Param("projectId") String projectId);
 
-//    List<DefenseEvalScore> findByDefenseEvaluation_ProjectId_ProjectId(String projectId);
+
+    // สำหรับการค้นหาข้อมูลที่ return เป็น Entity
+    List<DefenseEvalScore> findByDefenseEvaluation_ProjectId_ProjectId(String projectId);
 }

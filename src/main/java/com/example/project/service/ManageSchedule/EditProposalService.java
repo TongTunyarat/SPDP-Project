@@ -1,10 +1,7 @@
 package com.example.project.service.ManageSchedule;
 
 import com.example.project.DTO.ManageSchedule.EditSchedule.*;
-import com.example.project.entity.Project;
-import com.example.project.entity.ProjectInstructorRole;
-import com.example.project.entity.ProposalSchedule;
-import com.example.project.entity.Room;
+import com.example.project.entity.*;
 import com.example.project.repository.ProjectInstructorRoleRepository;
 import com.example.project.repository.ProjectRepository;
 import com.example.project.repository.ProposalSchedRepository;
@@ -37,22 +34,22 @@ public class EditProposalService {
     RoomRepository roomRepository;
 
     // 👀 เอารายการโปรเจคที่สามารถเเก้ไขได้หลังจากยกเลิก 👀
-    public List<GetAllEditProposalScheduleDTO> getProjectEditProposal() {
+    public List<GetAllEditProposalScheduleDTO> getProjectEditProposal(String semesterYear) {
 
-        List<Project> ProjectList = projectRepository.findAll();
+        List<String> ProjectList = projectRepository.findByProjectIdAndSemster(semesterYear);
 
-        int maxSemester = ProjectList.stream()
-                .mapToInt(i -> Integer.parseInt(i.getSemester())).max().orElse(0);
-
-        System.out.println("🧸maxSemester" + maxSemester);
-
-        List<String> projectIdsWithMaxSemester = ProjectList.stream()
-                .filter(p -> Integer.parseInt(p.getSemester()) == maxSemester)
-                .map(Project::getProjectId)
-                .collect(Collectors.toList());
+//        int maxSemester = ProjectList.stream()
+//                .mapToInt(i -> Integer.parseInt(i.getSemester())).max().orElse(0);
+//
+//        System.out.println("🧸maxSemester" + maxSemester);
+//
+//        List<String> projectIdsWithMaxSemester = ProjectList.stream()
+//                .filter(p -> Integer.parseInt(p.getSemester()) == maxSemester)
+//                .map(Project::getProjectId)
+//                .collect(Collectors.toList());
 
         // หา project ที่ user สามารถเพิ่มได้
-        List<ProposalSchedule> proposalSchedulesUserAdd = proposalSchedRepository.findEditProject(projectIdsWithMaxSemester);
+        List<ProposalSchedule> proposalSchedulesUserAdd = proposalSchedRepository.findEditProject(ProjectList);
 
         List<GetAllEditProposalScheduleDTO> projectDTO = proposalSchedulesUserAdd.stream()
                 .filter(p -> "User-Add".equals(p.getRemark()))
@@ -85,28 +82,28 @@ public class EditProposalService {
                         return null;
                     }
 //❗️❗️❗️❗️❗️ ห้ามลบ
-//                    if (project.getStudentProjects() != null && !project.getStudentProjects().isEmpty()) {
-//                        boolean hasActive = project.getStudentProjects().stream()
-//                                .anyMatch(studentProject -> "Active".equalsIgnoreCase(studentProject.getStatus()));
-//
-//                        boolean allExited = project.getStudentProjects().stream()
-//                                .allMatch(studentProject -> "Exited".equalsIgnoreCase(studentProject.getStatus()));
-//
-//                        if (!hasActive || allExited) {
-//                            System.out.println("!hasActive || allExited");
-//
-//                            project.getStudentProjects().stream()
-//                                    .filter(studentProject -> "Exited".equalsIgnoreCase(studentProject.getStatus()))
-//                                    .forEach(studentProject -> {
-//                                        System.out.println("Student Name: " + studentProject.getStudent().getStudentName());
-//                                    });
-//
-//                            return null;
-//                        }
-//                    } else {
-//                        System.out.println("No student projects available.");
-//                        return null;
-//                    }
+                    if (project.getStudentProjects() != null && !project.getStudentProjects().isEmpty()) {
+                        boolean hasActive = project.getStudentProjects().stream()
+                                .anyMatch(studentProject -> "Active".equalsIgnoreCase(studentProject.getStatus()));
+
+                        boolean allExited = project.getStudentProjects().stream()
+                                .allMatch(studentProject -> "Exited".equalsIgnoreCase(studentProject.getStatus()));
+
+                        if (!hasActive || allExited) {
+                            System.out.println("!hasActive || allExited");
+
+                            project.getStudentProjects().stream()
+                                    .filter(studentProject -> "Exited".equalsIgnoreCase(studentProject.getStatus()))
+                                    .forEach(studentProject -> {
+                                        System.out.println("Student Name: " + studentProject.getStudent().getStudentName());
+                                    });
+
+                            return null;
+                        }
+                    } else {
+                        System.out.println("No student projects available.");
+                        return null;
+                    }
 
 
                     Map<String, List<String>> mapRoleNameInstruct = new HashMap<>();
@@ -230,6 +227,9 @@ public class EditProposalService {
         List<ProposalSchedule> proposalScheduleList = proposalSchedRepository.findByAllAndStatusActive();
 
         List<RoomColflictDTO> roomConflicts = proposalScheduleList.stream()
+                .filter(p -> p.getDate() != null)
+                .filter(p -> p.getStartTime() != null && p.getEndTime() != null)
+                .filter(p -> p.getRoom() != null)
                 .filter(schedule -> {
                     LocalDateTime existStartDateTime = LocalDateTime.of(LocalDate.parse(schedule.getDate()), schedule.getStartTime().toLocalTime());
                     LocalDateTime existEndDateTime = LocalDateTime.of(LocalDate.parse(schedule.getDate()), schedule.getEndTime().toLocalTime());
@@ -238,7 +238,7 @@ public class EditProposalService {
                     System.out.println("existStartDateTime: " + existStartDateTime);
                     System.out.println("existEndDateTime: " + existEndDateTime);
 
-                    boolean isConflict = schedule.getRoom().equals(roomNumber) && schedule.getDate().equals(startDate)
+                    boolean isConflict = roomNumber.equals(schedule.getRoom()) && schedule.getDate().equals(startDate)
                             && timeOverlap(startDateTimeInput, endDateTimeInput, existStartDateTime, existEndDateTime);
 
                     if(isConflict) {
@@ -260,74 +260,93 @@ public class EditProposalService {
         boolean hasRoomConflict = !roomConflicts.isEmpty();
         System.out.println("roomConflicts: " + roomConflicts);
 
-        Map<String, List<Pair<LocalDateTime, LocalDateTime>>> instructorScheduleMap = new HashMap<>();
+        Map<String, List<Pair<String, Pair<LocalDateTime, LocalDateTime>>>> instructorScheduleMap = new HashMap<>();
 
         proposalScheduleList.stream()
+                .filter(p -> p.getDate() != null)
+                .filter(p -> p.getStartTime() != null && p.getEndTime() != null)
+                .filter(p -> p.getRoom() != null)
                 .filter(schedule -> schedule.getDate().equals(startDate))
                 .forEach(p -> {
 
-                            System.out.println("🍭 Check  equals Date: " + p.getDate());
-                            System.out.println("🐍 projectId: " + p.getProjectId());
+                    System.out.println("🍭 Check  equals Date: " + p.getDate());
+                    System.out.println("🐍 projectId: " + p.getProjectId());
 
-                            LocalDateTime existStartDateTime = LocalDateTime.of(LocalDate.parse(p.getDate()), p.getStartTime().toLocalTime());
-                            LocalDateTime existEndDateTime = LocalDateTime.of(LocalDate.parse(p.getDate()), p.getEndTime().toLocalTime());
-                            System.out.println("existStartDateTime: " + existStartDateTime);
-                            System.out.println("existEndDateTime: " + existEndDateTime);
+                    LocalDateTime existStartDateTime = LocalDateTime.of(LocalDate.parse(p.getDate()), p.getStartTime().toLocalTime());
+                    LocalDateTime existEndDateTime = LocalDateTime.of(LocalDate.parse(p.getDate()), p.getEndTime().toLocalTime());
+                    System.out.println("existStartDateTime: " + existStartDateTime);
+                    System.out.println("existEndDateTime: " + existEndDateTime);
 
-                            String currentProject = p.getProjectId();
-                            List<ProjectInstructorRole> instructors = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(currentProject);
+                    String currentProject = p.getProjectId();
+                    List<ProjectInstructorRole> instructors = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(currentProject);
 
-                            List<ProjectInstructorRole> filteredInstructors = instructors.stream()
-                                    .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
-                                    .collect(Collectors.toList());
-
-                            System.out.println("👩🏻‍🏫 filteredInstructors: ");
-                            for (ProjectInstructorRole instructor : filteredInstructors) {
-                                System.out.println(instructor.getInstructor().getProfessorName());
-                            }
-
-                            for (ProjectInstructorRole instrucotr : filteredInstructors) {
-
-                                String instructorName = instrucotr.getInstructor().getProfessorName();
-
-                                if (!instructorScheduleMap.containsKey(instructorName)) {
-                                    instructorScheduleMap.put(instructorName, new ArrayList<>());
-                                }
-
-                                instructorScheduleMap.get(instructorName).add(new Pair<>(existStartDateTime, existEndDateTime));
-
-                            }
-                        });
-
-                    System.out.println("👩‍🏫 instructorScheduleMap (All Projects): " + instructorScheduleMap);
-
-                    List<InstructorConflictDTO> instructorConflict = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(projectId)
-                            .stream()
+                    List<ProjectInstructorRole> filteredInstructors = instructors.stream()
                             .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
-                            .filter(newInstructor -> instructorScheduleMap.containsKey(newInstructor.getInstructor().getProfessorName()))
-                            .flatMap(newInstructor -> {
+                            .collect(Collectors.toList());
 
-                                String instructorName = newInstructor.getInstructor().getProfessorName();
-                                System.out.println("👩🏻‍🏫 instructorName: " + instructorName);
+                    System.out.println("👩🏻‍🏫 filteredInstructors: ");
+                    for (ProjectInstructorRole instructor : filteredInstructors) {
+                        System.out.println(instructor.getInstructor().getProfessorName());
+                    }
 
-                                List<Pair<LocalDateTime, LocalDateTime>> existingTimes = instructorScheduleMap.get(instructorName);
-                                System.out.println("🕰️ existingTimes: " + existingTimes);
+                    for (ProjectInstructorRole instrucotr : filteredInstructors) {
 
-                                return existingTimes.stream()
-                                        .filter(timePair -> timeOverlap(startDateTimeInput, endDateTimeInput, timePair.a, timePair.b))
-                                        .map(timePair -> {
-                                            System.out.println("🤯ชนกันที่เวลา: " + timePair.a + " - " + timePair.b);
-                                            return new InstructorConflictDTO(instructorName, projectId, timePair.a.toLocalTime(), timePair.b.toLocalTime());
-                                        });
+                        String instructorName = instrucotr.getInstructor().getProfessorName();
 
-                            }).collect(Collectors.toList());
+                        if (!instructorScheduleMap.containsKey(instructorName)) {
+                            instructorScheduleMap.put(instructorName, new ArrayList<>());
+                        }
+
+                        Pair<LocalDateTime, LocalDateTime> timePair = new Pair<>(existStartDateTime, existEndDateTime);
+                        Pair<String, Pair<LocalDateTime, LocalDateTime>> projectTimePair = new Pair<>(currentProject, timePair);
+                        instructorScheduleMap.get(instructorName).add(projectTimePair);
+                    }
+                });
+
+        System.out.println("👩‍🏫 instructorScheduleMap (All Projects): " + instructorScheduleMap);
+
+        List<InstructorConflictDTO> instructorConflict = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(projectId)
+                .stream()
+                .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
+                .filter(newInstructor -> instructorScheduleMap.containsKey(newInstructor.getInstructor().getProfessorName()))
+                .flatMap(newInstructor -> {
+
+                    String instructorName = newInstructor.getInstructor().getProfessorName();
+                    System.out.println("👩🏻‍🏫 instructorName: " + instructorName);
+
+                    List<Pair<String, Pair<LocalDateTime, LocalDateTime>>> existingProjectTimes = instructorScheduleMap.get(instructorName);
+                    System.out.println("🕰️ existingProjectTimes: " + existingProjectTimes);
+
+                    return existingProjectTimes.stream()
+                            .filter(projectTimePair -> {
+                                Pair<LocalDateTime, LocalDateTime> timePair = projectTimePair.b;
+                                return timeOverlap(startDateTimeInput, endDateTimeInput, timePair.a, timePair.b);
+                            })
+                            .map(projectTimePair -> {
+                                String existingProject = projectTimePair.a;
+                                Pair<LocalDateTime, LocalDateTime> timePair = projectTimePair.b;
+                                System.out.println("🤯ชนกันที่เวลา: " + timePair.a + " - " + timePair.b);
+//                                String dateConflict = proposalSchedRepository.findByProjectId(existingProject).getDate();
+
+                                List<ProposalSchedule> existingSchedule = proposalSchedRepository.findByProjectAllId(existingProject);
+                                String dateConflict = existingSchedule.stream()
+                                        .filter(s -> "Active".equalsIgnoreCase(s.getStatus()))
+                                        .map(ProposalSchedule::getDate)
+                                        .findFirst()
+                                        .orElse(null);
+
+                                return new InstructorConflictDTO(instructorName, existingProject, dateConflict, timePair.a.toLocalTime(), timePair.b.toLocalTime());
+                            });
+
+                }).collect(Collectors.toList());
 
         boolean hasInstructorConflict = !instructorConflict.isEmpty();
 
         System.out.println("🌻 instructorConflict " + instructorConflict);
 
-        if(!roomConflicts.isEmpty() && !instructorConflict.isEmpty()) {
-            project.setStatus(originalStatus);
+        if(!roomConflicts.isEmpty() || !instructorConflict.isEmpty()) {
+//            project.setStatus(originalStatus);
+            project.setStatus("Active");
             proposalSchedRepository.save(project);
         }
 

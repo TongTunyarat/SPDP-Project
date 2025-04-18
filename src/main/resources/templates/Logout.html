@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Test admin</title>
+</head>
+<body>
+<p>Hi Admin!</p><br>
+<form th:action="@{/logout}" method="post">
+    <!--        ค่าที่ใช้สำหรับป้องกัน Cross-Site Request Forgery (CSRF)-->
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+    <button type="submit">Logout</button>
+</form>
+</body>
+</html>

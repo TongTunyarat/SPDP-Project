@@ -1,9 +1,14 @@
 package com.example.project.controller.Dashboard;
 
+import ch.qos.logback.core.model.Model;
 import com.example.project.DTO.ManageSchedule.Preview.PreviewProposalDTO;
+import com.example.project.entity.ProjectInstructorRole;
 import com.example.project.entity.ScoringPeriods;
+import com.example.project.entity.StudentProject;
 import com.example.project.repository.ScoringPeriodsRepository;
 import com.example.project.service.DashboardCardService;
+import com.example.project.service.ProjectService;
+import lombok.ToString;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -24,40 +30,49 @@ public class DashboardController {
     private DashboardCardService dashboardService;
     @Autowired
     private ScoringPeriodsRepository scoringPeriodsRepository;
-
+    @Autowired
+    private ProjectService projectService;
 
     // Proposal
     @GetMapping("/instructor/proposalStatusDashboard")
-    public ResponseEntity<Map<String, Object>> checkGroupEvaStatus() {
-        Map<String, Object> response = dashboardService.checkGroupEvaStatus();
+    public ResponseEntity<Map<String, Object>> checkGroupEvaStatus(@RequestParam("year") String year) {
+        System.out.println("🌻 year" + year);
+        Map<String, Object> response = dashboardService.checkGroupEvaStatus(year);
         return ResponseEntity.ok(response);
     }
 
     // Poster
     @GetMapping("/instructor/posterStatusDashboard")
-    public ResponseEntity<Map<String, Object>> checkGroupPosterEvaStatus() {
-        Map<String, Object> response =dashboardService.checkGroupPosterEvaStatus();
+    public ResponseEntity<Map<String, Object>> checkGroupPosterEvaStatus(@RequestParam("year") String year) {
+        Map<String, Object> response =dashboardService.checkGroupPosterEvaStatus(year);
         return ResponseEntity.ok(response);
     }
 
     // Defense
     @GetMapping("/instructor/defenseStatusDashboard")
-    public  ResponseEntity<Map<String, Object>> checkGroupDefenseEvaStatus() {
-        Map<String, Object> response = dashboardService.checkGroupDefenseEvaStatus();
+    public  ResponseEntity<Map<String, Object>> checkGroupDefenseEvaStatus(@RequestParam("year") String year) {
+        Map<String, Object> response = dashboardService.checkGroupDefenseEvaStatus(year);
         return ResponseEntity.ok(response);
     }
 
     // Period
     @GetMapping("/api/period")
     public ResponseEntity<?> getScoringPeriod() {
-        String currentYear = String.valueOf(LocalDate.now().getYear());
-        List<ScoringPeriods> response = scoringPeriodsRepository.findByYear(currentYear);
+        LocalDate currentDate = LocalDate.now();
+        int currentYear = currentDate.getYear();
+        int currentMonth = currentDate.getMonthValue(); // 1-12 (มกราคม = 1)
 
-        if (response == null) {
-            return ResponseEntity.notFound().build(); // Handle case when no data is found
+        // ถ้าเดือน <= 6 (มกราคม - มิถุนายน) ใช้ปีปัจจุบัน -1, ถ้า ก.ค. เป็นต้นไปใช้ปีปัจจุบัน
+        String defaultYear = String.valueOf(currentMonth <= 6 ? currentYear - 1 : currentYear);
+
+        List<ScoringPeriods> response = scoringPeriodsRepository.findByYear(defaultYear);
+
+        if (response == null || response.isEmpty()) {
+            return ResponseEntity.notFound().build(); // ถ้าไม่พบข้อมูล
         }
         return ResponseEntity.ok(response);
     }
+
 
     @GetMapping("/api/grading-graph-instructor")
     public ResponseEntity<?> getGradingStatistics(
@@ -89,8 +104,24 @@ public class DashboardController {
     // Proposal schedule
     @GetMapping("/instructor/getProposalScheduleDashboard")
     @ResponseBody
-    public List<PreviewProposalDTO> getProposalScheduleDashboard() {
-        return dashboardService.getProposalSchedule();
+    public Map<String, List<PreviewProposalDTO>> getProposalScheduleDashboard(@RequestParam("year") String year) {
+        return dashboardService.getProposalSchedule(year);
+    }
+
+    // Get Project by Instructor
+    @GetMapping("/instructor/getProjectByInstructor")
+    @ResponseBody
+    public Map<String, Long> getProjectByInstructor (@RequestParam("year") String year){
+
+        System.out.println("🌻 year" + year);
+        List<ProjectInstructorRole> projectInstructorRoleList = projectService.getInstructorProject();
+
+        Map<String, Long> counts = dashboardService.getProjectByInstructor(projectInstructorRoleList, year);
+
+        System.out.println("📚 Check Program Group: " + counts);
+
+        return counts;
+
     }
 
 
@@ -114,4 +145,3 @@ public class DashboardController {
 //        return "DST: " + programDST + " ICT: " + programICT;
 //    }
 }
-

@@ -4,6 +4,7 @@ import com.example.project.DTO.ManageSchedule.Preview.PreviewProposalDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
 import com.example.project.service.*;
+import com.example.project.service.ManageSchedule.DefenseSchedule.ManageDefenseService;
 import com.example.project.service.ManageSchedule.ManageProposalScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -62,13 +63,16 @@ public class DashboardCardService {
     private ManageProposalScheduleService manageProposalScheduleService;
 
     @Autowired
+    private ManageDefenseService manageDefenseService;
+
+    @Autowired
     private InstructorRepository instructorRepository;
 
     //=========================================== USE ===================================================
 
 
     // Proposal
-    public Map<String, Object> checkGroupEvaStatus() {
+    public Map<String, Object> checkGroupEvaStatus(String year) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -80,12 +84,14 @@ public class DashboardCardService {
 
         long totalProjects = projectInstructorRoles.stream()
                 .filter(role -> ("Advisor".equalsIgnoreCase(role.getRole()) || "Committee".equalsIgnoreCase(role.getRole())) && role.getInstructor().getAccount().getUsername().equals(username))
+                .filter(i -> year.equalsIgnoreCase(i.getProjectIdRole().getSemester()))
                 .count();
 
         List<String> successfulProjects = new ArrayList<>();
 
         long instructorPropoSuccessEva = projectInstructorRoles.stream()
                 .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
+                .filter(i -> year.equalsIgnoreCase(i.getProjectIdRole().getSemester()))
                 .filter(i -> {
 
                     List<StudentProject> studentProjectsList = i.getProjectIdRole().getStudentProjects();
@@ -145,7 +151,7 @@ public class DashboardCardService {
     }
 
     // Poster
-    public Map<String, Object> checkGroupPosterEvaStatus() {
+    public Map<String, Object> checkGroupPosterEvaStatus(String year) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -156,10 +162,12 @@ public class DashboardCardService {
 
         long totalProjects = projectInstructorRoles.stream()
                 .filter(role -> ("Poster-Committee".equalsIgnoreCase(role.getRole()) || "Committee".equalsIgnoreCase(role.getRole())) && role.getInstructor().getAccount().getUsername().equals(username))
+                .filter(i -> year.equalsIgnoreCase(i.getProjectIdRole().getSemester()))
                 .count();
 
         long instructorPosterSuccessEva = projectInstructorRoles.stream()
                 .filter(i -> "Poster-Committee".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
+                .filter(i -> year.equalsIgnoreCase(i.getProjectIdRole().getSemester()))
                 .filter(i -> {
 
                     // get projectId
@@ -197,13 +205,13 @@ public class DashboardCardService {
 //        return "✅ instructorPosterSuccessEva: " + instructorPosterSuccessEva + " From 📊 totalProjects: " + totalProjects;
         Map<String, Object> result = new HashMap<>();
         result.put("totalProjects", (int) totalProjects);
-        result.put("instructorPropoSuccessEva", (int) instructorPosterSuccessEva);
+        result.put("instructorPosterSuccessEva", (int) instructorPosterSuccessEva);
 
         return result;
     }
 
     // Defense
-    public Map<String, Object> checkGroupDefenseEvaStatus() {
+    public Map<String, Object> checkGroupDefenseEvaStatus(String year) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -215,10 +223,12 @@ public class DashboardCardService {
 
         long totalProjects = projectInstructorRoles.stream()
                 .filter(role -> ("Advisor".equalsIgnoreCase(role.getRole()) || "Committee".equalsIgnoreCase(role.getRole())) && role.getInstructor().getAccount().getUsername().equals(username))
+                .filter(i -> year.equalsIgnoreCase(i.getProjectIdRole().getSemester()))
                 .count();
 
         long instructorDefenseSuccessEva = projectInstructorRoles.stream()
                 .filter(i -> "Advisor".equalsIgnoreCase(i.getRole()) || "Committee".equalsIgnoreCase(i.getRole()))
+                .filter(i -> year.equalsIgnoreCase(i.getProjectIdRole().getSemester()))
                 .filter(i -> {
 
                     List<StudentProject> studentProjectsList = i.getProjectIdRole().getStudentProjects();
@@ -274,13 +284,13 @@ public class DashboardCardService {
 
         Map<String, Object> result = new HashMap<>();
         result.put("totalProjects", (int) totalProjects);
-        result.put("instructorPropoSuccessEva", (int) instructorDefenseSuccessEva);
+        result.put("instructorDefenseSuccessEva", (int) instructorDefenseSuccessEva);
 
         return result;
     }
 
-  
-  // --------- Grade Distribute ------------ //
+
+    // --------- Grade Distribute ------------ //
     public Map<String, Integer> getGradeDistribution(String program, String year, String evaType) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -304,11 +314,19 @@ public class DashboardCardService {
         Map<String, Integer> gradeDistribution = new HashMap<>();
 
         for (Project project : allProjects) {
+            // เช็กว่า project นี้ มี instructor ที่มี role == Advisor ไหม
+            boolean hasAdvisorRole = project.getProjectInstructorRoles().stream()
+                    .anyMatch(role -> "Advisor".equalsIgnoreCase(role.getRole()) &&
+                            username.equals(role.getInstructor().getAccount().getUsername()));
+
+            if (!hasAdvisorRole) {
+                continue; // ข้ามถ้าไม่ใช่ Advisor
+            }
+
             List<StudentProject> studentProjects = studentProjectRepository.findByProject_ProjectId(project.getProjectId());
             System.out.println("studentProjects [grade distribute]: " + studentProjects.size() + ", " + project.getProjectId());
 
             for (StudentProject studentProject : studentProjects) {
-                // เพิ่มการเช็คว่า studentProjects.ต้องมีสถานะเท่ากับ active ถึงจะนับ
                 if ("active".equalsIgnoreCase(studentProject.getStatus())) {
                     String studentId = studentProject.getStudent().getStudentId();
                     System.out.println("studentId: " + studentId);
@@ -324,47 +342,62 @@ public class DashboardCardService {
                                     .findGradeResultByProjectIdAndStudentId_StudentId(project, studentId)
                                     .getGradeResult();
                         } else if ("Poster Exhibition".equalsIgnoreCase(evaType)) {
-                            return new HashMap<>(); // ไม่มีการให้เกรดสำหรับ Poster Exhibition
+                            return new HashMap<>();
                         } else {
                             throw new IllegalArgumentException("Invalid evaType: " + evaType);
                         }
                     } catch (NullPointerException e) {
-                        // ถ้าเกิด NullPointerException ให้ถือว่าเป็นเกรด "I"
                         grade = "I";
                     }
-                    // ถ้า grade เป็น null หรือว่าง ให้ถือว่าเป็น "I"
+
                     if (grade == null || grade.isEmpty()) {
                         grade = "I";
                     }
-                    // เพิ่มเข้า gradeDistribution
                     gradeDistribution.put(grade, gradeDistribution.getOrDefault(grade, 0) + 1);
                 }
             }
         }
 
+
         return gradeDistribution;
     }
-  
-    public List<PreviewProposalDTO> getProposalSchedule() {
+
+    // get proposchedule instructor
+    public Map<String, List<PreviewProposalDTO>> getProposalSchedule(String year) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
         System.out.println("💌 Account username: " + username);
 
-        List<Project> projectList = projectRepository.findProjectsByUsername(username);
+        List<Project> projectList = projectRepository.findProjectsByUsername(username).stream()
+                .filter(y -> y.getSemester().equalsIgnoreCase(year)).collect(Collectors.toList());
 
         Optional<Instructor> instructorOpt = instructorRepository.findByAccountUsername(username);
         String professorName = instructorOpt.map(Instructor::getProfessorName).orElse("Unknown");
-        System.out.println("professorName " + professorName);
+        System.out.println("👩🏻‍🏫professorName " + professorName);
 
         List<String> projectIds = projectList.stream()
                 .map(Project::getProjectId).collect(Collectors.toList());
 
-        List<PreviewProposalDTO> proposals = manageProposalScheduleService.getDataPreviewSchedule().stream()
+        List<PreviewProposalDTO> proposals = manageProposalScheduleService.getDataPreviewSchedule(year).stream()
                 .filter(p -> projectIds.contains(p.getProjectId()))
                 .filter(p -> p.getInstructorNames().values().stream()
                         .anyMatch(list -> list.stream().anyMatch(name -> name.equals(professorName)))).collect(Collectors.toList());
 
+        System.out.println("🌼 Proposal ");
+        System.out.println("project list: "+projectIds.size());
+        System.out.println("projectIds list: "+projectIds);
+        System.out.println("year: "+year);
+
+        List<PreviewProposalDTO> defenses = manageDefenseService.getDataDefensePreviewSchedule(year).stream()
+                .filter(p -> projectIds.contains(p.getProjectId()))
+                .filter(p -> p.getInstructorNames().values().stream()
+                        .anyMatch(list -> list.stream().anyMatch(name -> name.equals(professorName)))).collect(Collectors.toList());
+
+        System.out.println("⭐️ Defense");
+        System.out.println("project list: "+projectIds.size());
+        System.out.println("projectIds list: "+projectIds);
+        System.out.println("year: "+year);
 
         for(PreviewProposalDTO proposal : proposals ){
 
@@ -385,12 +418,85 @@ public class DashboardCardService {
 
             // เอาไปทับทที่
             proposal.setInstructorNames(colletctName);
+
+            System.out.println(proposal);
         }
 
 
-        return proposals;
-    }
-  
-}
+        for(PreviewProposalDTO defense : defenses ){
 
+            Map<String, List<String>> instructorNames = defense.getInstructorNames();
+
+            Map<String, List<String>> colletctName =new HashMap<>();
+
+            instructorNames.forEach((role, names) -> {
+
+                if(names.contains(professorName)) {
+
+                    List<String> filterName = new ArrayList<>();
+                    filterName.add(professorName);
+
+                    colletctName.put(role, filterName);
+                }
+            });
+
+            // เอาไปทับทที่
+            defense.setInstructorNames(colletctName);
+
+            System.out.println(defense);
+        }
+
+        Map<String, List<PreviewProposalDTO>> result = new HashMap<>();
+        result.put("Proposal", proposals);
+        result.put("Defense", defenses);
+
+        return result;
+    }
+
+    // get project foe each instructor
+    public Map<String, Long> getProjectByInstructor(List<ProjectInstructorRole> list, String year) {
+
+        Map<String, Long> result = new HashMap<>();
+
+        String[][] conditions = {
+                {"DST", "Advisor", "programDST"},
+                {"DST", "Committee", "committeeProgramDST"},
+                {"DST", "Co-Advisor", "coProgramDST"},
+                {"ICT", "Advisor", "programICT"},
+                {"ICT", "Committee", "committeeProgramICT"},
+                {"ICT", "Co-Advisor", "coProgramICT"}
+
+        };
+
+        for(String[] condition : conditions) {
+
+            String program = condition[0];
+            String role = condition[1];
+            String keyName = condition[2];
+
+            long count = list.stream()
+                    .filter(i -> program.equalsIgnoreCase(i.getProjectIdRole().getProgram()) && year.equalsIgnoreCase(i.getProjectIdRole().getSemester()))
+                    .filter(i -> role.equalsIgnoreCase(i.getRole()))
+                    .map(i -> {
+
+                        List<StudentProject> studentProjects = i.getProjectIdRole().getStudentProjects();
+                        if (studentProjects == null || studentProjects.isEmpty()) return false;
+
+                        boolean hasActive = studentProjects.stream()
+                                .anyMatch(studentProject -> "Active".equalsIgnoreCase(studentProject.getStatus()));
+
+                        boolean allExited = studentProjects.stream()
+                                .allMatch(studentProject -> "Exited".equalsIgnoreCase(studentProject.getStatus()));
+
+                        return hasActive && !allExited;
+
+                    }).count();
+
+            result.put(keyName, count);
+
+        }
+
+        return result;
+    }
+}
 

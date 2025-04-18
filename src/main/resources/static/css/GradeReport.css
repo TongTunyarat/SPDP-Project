@@ -400,3 +400,8 @@ th:nth-child(8), td:nth-child(8) { width: 5%; }  /* Grade */
 .column-options::-webkit-scrollbar-thumb:hover {
     background: #a8a8a8;
 }
+
+td[rowspan] {
+    vertical-align: top;
+    padding-top: 15px;
+}
