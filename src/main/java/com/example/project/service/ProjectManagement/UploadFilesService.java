@@ -1362,18 +1362,6 @@ public class UploadFilesService {
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
     // ฟังก์ชันในการดึงรหัส Project ล่าสุด และเพิ่มขึ้นเป็นตัวเลขต่อไป (คืนค่าเป็น int)
     private int generateNextProjectNumber(String program, String year) {
         String latestProjectId = projectRepository.findLatestProjectIdByProgramAndYear(program, year);
