@@ -44,5 +44,9 @@ public interface ProjectInstructorRoleRepository extends JpaRepository<ProjectIn
 
 
     boolean existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(String currentProjectId, String professorId, String committee);
+
+    void deleteByProjectIdRole_ProjectId(String projectId);
+
+    List<ProjectInstructorRole> findByProjectIdRole_ProjectIdOrderByAssignDateAsc(String projectId);
 }
 

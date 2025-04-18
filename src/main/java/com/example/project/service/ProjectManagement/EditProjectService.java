@@ -1,20 +1,19 @@
 package com.example.project.service.ProjectManagement;
 
+import com.example.project.DTO.projectManagement.ProfessorRoleDTO;
 import com.example.project.DTO.projectManagement.ProjectDetailsDTO;
+import com.example.project.entity.Instructor;
 import com.example.project.entity.Project;
 import com.example.project.entity.ProjectInstructorRole;
 import com.example.project.entity.StudentProject;
-import com.example.project.repository.ProjectInstructorRoleRepository;
-import com.example.project.repository.ProjectRepository;
-import com.example.project.repository.StudentProjectRepository;
-import com.example.project.repository.StudentRepository;
+import com.example.project.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,9 +27,13 @@ public class EditProjectService {
     private StudentRepository studentRepository;
     @Autowired
     private StudentProjectRepository studentProjectRepository;
+    @Autowired
+    private InstructorRepository instructorRepository;
 
     @Transactional
-    public void updateProjectDetails(String projectId, ProjectDetailsDTO updatedDetails) {
+    public List<String> updateProjectDetails(String projectId, ProjectDetailsDTO updatedDetails) {
+
+        // --------- Update Project Details --------- //
         // ดึงข้อมูลโปรเจกต์จากฐานข้อมูล
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found for ID: " + projectId));
@@ -52,28 +55,108 @@ public class EditProjectService {
             isUpdated = true;
         }
 
-        // อัปเดตข้อมูลอาจารย์ที่ปรึกษา
-        List<ProjectInstructorRole> existingRoles = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(projectId);
+        // --------- Update Instructor in Project --------- //
 
-        // เช็คว่า professorList ไม่เป็น null ก่อนใช้งาน
-        List<ProjectInstructorRole> updatedRoles = Optional.ofNullable(updatedDetails.getProfessorList())
-                .orElse(Collections.emptyList())  // ถ้า professorList เป็น null ให้ใช้ List ว่าง
-                .stream()
-                .map(professor -> {
-                    // ค้นหาหรือสร้าง ProjectInstructorRole ใหม่ตามข้อมูลที่ได้
-                    ProjectInstructorRole role = existingRoles.stream()
-                            .filter(r -> r.getInstructor().getProfessorName().equals(professor.getProfessorName()))
-                            .findFirst()
-                            .orElse(new ProjectInstructorRole(project));  // ถ้าไม่เจอให้สร้างใหม่
-                    role.setRole(professor.getRole());
-                    return role;
-                })
-                .collect(Collectors.toList());
+        List<String> errors = new ArrayList<>();
 
-        // ตรวจสอบและบันทึกการเปลี่ยนแปลงอาจารย์ที่ปรึกษา
-        projectInstructorRoleRepository.saveAll(updatedRoles);
+        Project inst = projectRepository.findById(projectId)
+                .orElseThrow(() -> new IllegalArgumentException("Project not found: " + projectId));
 
-        // อัปเดตข้อมูลนักศึกษา
+        List<ProfessorRoleDTO> profs = Optional.ofNullable(updatedDetails.getProfessorList())
+                .orElse(Collections.emptyList());
+        Set<String> seen = new HashSet<>();
+        for (ProfessorRoleDTO p : profs) {
+            if (!seen.add(p.getProfessorId())) {
+                errors.add("Duplicate instructor: " + p.getProfessorName() + " (ID=" + p.getProfessorId() + ")");
+            }
+        }
+
+        List<ProfessorRoleDTO> dtos = Optional.ofNullable(updatedDetails.getProfessorList())
+                .orElse(Collections.emptyList());
+
+        long committeeCount = profs.stream()
+                .filter(p -> "Committee".equals(p.getRole()))
+                .count();
+        if (committeeCount > 2) {
+            errors.add("Role 'Committee' cannot exceed 2 members \n(got " + committeeCount + ")");
+        }
+
+        // – Advisor ไม่เกิน 1
+        long advCount = dtos.stream()
+                .filter(p -> "Advisor".equals(p.getRole()))
+                .count();
+        if (advCount > 1) {
+            errors.add(" Role 'Advisor' should be one \n(got " + advCount + ")");
+        }
+
+            // ถ้ามี error ให้รีเทิร์นเลย
+        if (!errors.isEmpty()) {
+            return errors;
+        }
+
+        // 2) อัปเดตฟิลด์ Project เรียงตามเดิม (title, description, program…)
+        boolean dirty = false;
+        if (!project.getProjectTitle().equals(updatedDetails.getProjectTitle())) {
+            project.setProjectTitle(updatedDetails.getProjectTitle());
+            dirty = true;
+        }
+        if (!project.getProjectDescription().equals(updatedDetails.getProjectDescription())) {
+            project.setProjectDescription(updatedDetails.getProjectDescription());
+            dirty = true;
+        }
+        if (!project.getProgram().equals(updatedDetails.getProgram())) {
+            project.setProgram(updatedDetails.getProgram());
+            dirty = true;
+        }
+        if (dirty) projectRepository.save(project);
+
+
+        // 3) ดึงรายการ ProjectInstructorRole เดิม (ordered ให้ตำแหน่ง stable)
+        List<ProjectInstructorRole> existing = projectInstructorRoleRepository
+                .findByProjectIdRole_ProjectIdOrderByAssignDateAsc(projectId);
+
+
+        // 4) เตรียมข้อมูลใหม่จาก front‑end
+        List<ProfessorRoleDTO> newList = Optional.ofNullable(updatedDetails.getProfessorList())
+                .orElse(Collections.emptyList());
+
+        // 5) ไล่ override record เดิม ตาม index
+        int i = 0;
+        for (; i < existing.size() && i < newList.size(); i++) {
+            ProjectInstructorRole role = existing.get(i);
+            ProfessorRoleDTO dto = newList.get(i);
+
+            // เปลี่ยนผูก Instructor ใหม่
+            Instructor instr = instructorRepository.findById(dto.getProfessorId())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Instructor not found: " + dto.getProfessorId()));
+            role.setInstructor(instr);
+
+            // เปลี่ยน role type ถ้ามีการแก้ไข
+            role.setRole(dto.getRole());
+
+            projectInstructorRoleRepository.save(role);
+        }
+
+        // 6) ถ้ามีรายการใหม่เกินจำนวนเดิม → สร้างเพิ่ม
+        for (; i < newList.size(); i++) {
+            ProfessorRoleDTO dto = newList.get(i);
+            Instructor instr = instructorRepository.findById(dto.getProfessorId())
+                    .orElseThrow(() -> new IllegalArgumentException(
+                            "Instructor not found: " + dto.getProfessorId()));
+
+            ProjectInstructorRole newRole = new ProjectInstructorRole();
+            newRole.setProjectIdRole(project);
+            newRole.setInstructor(instr);
+            newRole.setRole(dto.getRole());
+            newRole.setAssignDate(LocalDateTime.now());
+            newRole.setInstructorId(generateNextInstructorId());
+            projectInstructorRoleRepository.save(newRole);
+        }
+
+
+
+        // --------- Update Student in Project --------- //
         List<StudentProject> updatedStudents = Optional.ofNullable(updatedDetails.getStudentList())
                 .orElse(Collections.emptyList())  // ถ้า studentList เป็น null ให้ใช้ List ว่าง
                 .stream()
@@ -98,6 +181,22 @@ public class EditProjectService {
         if (isUpdated) {
             projectRepository.save(project);
         }
+        return errors;
+    }
+
+    private String generateNextInstructorId() {
+        // ค้นหาค่ารหัสล่าสุดที่มีอยู่ในฐานข้อมูล
+        String latestId = projectInstructorRoleRepository.findLatestInstructorId();
+
+        // ถ้าไม่พบรหัสล่าสุด (กรณีฐานข้อมูลยังว่างเปล่า)
+        if (latestId == null) {
+            return "INST001";  // เริ่มต้นที่ INST001
+        }
+
+        // เอารหัสล่าสุดออกมาจาก INSTxxxx และเพิ่ม 1
+        String numericPart = latestId.substring(4);  // เอาส่วนเลขออกจาก INSTxxxx
+        int nextId = Integer.parseInt(numericPart) + 1;  // เพิ่ม 1
+        return String.format("INST%03d", nextId);  // ใช้ String.format เพื่อให้รหัสใหม่มีรูปแบบเหมือนเดิม เช่น INST002, INST003, ...
     }
 
     @Transactional
@@ -110,5 +209,5 @@ public class EditProjectService {
         studentProjectRepository.delete(studentProject);
     }
 
-
 }
+

@@ -72,7 +72,6 @@ h3 {
 }
 
 .form-group textarea {
-    resize: none;
     height: 60px;
 }
 
@@ -306,6 +305,59 @@ h3 {
 #confirmDeletePopup,
 #confirmSavePopup {
     display: none;
+}
+
+
+/* Styling for the entire table */
+#studentList table,
+.instructor-table table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Header styling */
+#studentList th,
+.instructor-table th{
+    background-color: #f4f4f4;
+    color: black;
+    text-align: left;
+    padding: 12px;
+}
+
+/* Row styling */
+#studentList td,
+.instructor-table td{
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Styling for even rows */
+#studentList tr:nth-child(even),
+.instructor-table tr:nth-child(even){
+    background-color: #f9f9f9;
+}
+
+/* Styling for the table container */
+#studentList,
+.instructor-table{
+    overflow-x: auto;
+}
+
+/* Add borders to the table */
+#studentList table, #studentList th, #studentList td,
+.instructor-table table, .instructor-table th, .instructor-table td{
+    border: 1px solid #ddd;
+}
+
+/* Styling for input and textarea inside modal */
+input[type="text"], textarea, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
 
 

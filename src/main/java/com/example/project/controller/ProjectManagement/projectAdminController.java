@@ -52,6 +52,8 @@ public class projectAdminController {
     private StudentProjectRepository studentProjectRepository;
     @Autowired
     private AddNewProjectService AddNewProjectService;
+    @Autowired
+    private EditProjectService EditProjectService;
 
     @Autowired
     public projectAdminController(ProjectService projectService) {
@@ -89,7 +91,8 @@ public class projectAdminController {
         List<ProfessorRoleDTO> professorList = roles.stream()
                 .map(role -> new ProfessorRoleDTO(
                         role.getInstructor().getProfessorName(), // ชื่ออาจารย์
-                        role.getRole() // บทบาท (Role)
+                        role.getRole(), // บทบาท (Role)
+                        role.getInstructorId()
                 ))
                 .collect(Collectors.toList());
 
@@ -115,7 +118,8 @@ public class projectAdminController {
                 project.getProjectDescription(),
                 project.getProgram(),
                 studentList,
-                project.getProjectCategory()
+                project.getProjectCategory(),
+                project.getSemester()
         );
 
         return ResponseEntity.ok(response);
@@ -136,7 +140,8 @@ public class projectAdminController {
         List<ProfessorRoleDTO> professorList = roles.stream()
                 .map(role -> new ProfessorRoleDTO(
                         role.getInstructor().getProfessorName(), // ชื่ออาจารย์
-                        role.getRole() // บทบาท (Role)
+                        role.getRole(), // บทบาท (Role)
+                        role.getInstructorId()
                 ))
                 .collect(Collectors.toList());
 
@@ -162,29 +167,26 @@ public class projectAdminController {
                 project.getProjectDescription(),
                 project.getProgram(),
                 studentList,
-                project.getProjectCategory()
+                project.getProjectCategory(),
+                project.getSemester()
         );
 
         return response;  // Spring จะทำการแปลง ProjectDetailsDTO เป็น JSON
     }
 
     @PostMapping("/updateProjectDetails")
-    public ResponseEntity<Map<String, String>> updateProjectDetails(
-            @RequestParam String projectId, @RequestBody ProjectDetailsDTO updatedDetails) {
-        try {
-            // เรียกใช้ Service เพื่ออัปเดตข้อมูล
-            editProjectService.updateProjectDetails(projectId, updatedDetails);
-
-            // ส่งข้อความสำเร็จเป็น JSON
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Project details updated successfully");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            // ส่งข้อผิดพลาดเป็น JSON
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    public ResponseEntity<?> updateProject(
+            @RequestParam String projectId,
+            @RequestBody ProjectDetailsDTO updatedDetails
+    ) {
+        List<String> errors = EditProjectService.updateProjectDetails(projectId, updatedDetails);
+        if (!errors.isEmpty()) {
+            // คืน 400 พร้อม list ของ messages
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("message", "Validation failed", "errors", errors));
         }
+        return ResponseEntity.ok(Map.of("message", "Project updated successfully"));
     }
 
     @DeleteMapping("/deleteProject/{projectId}")

@@ -15,8 +15,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -136,6 +138,60 @@ public class UploadFilesController {
         }
     }
 
+
+
+    @PostMapping("/validateProjectFiles")
+    public ResponseEntity<Map<String, Object>> validateProjectFile(@RequestParam("file") MultipartFile file) {
+        try {
+            Map<String, List<String>> errors = uploadFilesService.validateProjectAndStudent(file);
+            // คืนเฉพาะ map ของ projectId -> list ของ discrepancy messages
+            return ResponseEntity.ok(Map.of("errors", errors));
+        } catch (IOException e) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(Map.of(
+                            "message", "Validation failed",
+                            "errors", List.of(e.getMessage())
+                    ));
+        }
+    }
+
+    /**
+     * 2) Persist phase: ถ้า front-end ยืนยันมา จึงอัปโหลดจริง
+     */
+    @PostMapping("/uploadProjectDBFiles")
+    public ResponseEntity<Map<String, Object>> uploadProjectFile(@RequestParam("file") MultipartFile file) {
+        try {
+            List<String> warnings = uploadFilesService.processProjectAndStudent(file);
+            if (warnings.isEmpty()) {
+                return ResponseEntity.ok(Map.of("message", "File processed successfully"));
+            } else {
+                String shortMessage = String.join(" | ", warnings);
+                return ResponseEntity.ok(Map.of(
+                        "message", "File processed with warnings",
+                        "warnings", warnings,
+                        "shortMessage", shortMessage
+                ));
+            }
+        } catch (Exception e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of(
+                            "message", "File processing failed",
+                            "errors", List.of(e.getMessage())
+                    ));
+        }
+    }
+
+
+    @GetMapping("/generateNextProjectId")
+    public ResponseEntity<Map<String, String>> getNextProjectId(
+            @RequestParam("program") String program
+    ) {
+        String year = String.valueOf(LocalDate.now().getYear());
+        String projectId = uploadFilesService.generateNextProjectId(program, year);
+        return ResponseEntity.ok(Map.of("projectId", projectId));
+    }
 
 
 

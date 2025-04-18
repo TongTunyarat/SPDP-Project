@@ -12,10 +12,11 @@ public class ProjectDetailsDTO {
     private String program;
     private List<StudentProjectDTO> studentList;
     private String category;
+    private String semester;
 
     // Constructor
     public ProjectDetailsDTO(String projectId, String projectTitle, List<ProfessorRoleDTO> professorList,
-                             String projectDescription, String program, List<StudentProjectDTO> studentList, String category) {
+                             String projectDescription, String program, List<StudentProjectDTO> studentList, String category, String semester) {
         this.projectId = projectId;
         this.projectTitle = projectTitle;
         this.professorList = professorList;  // กำหนดค่าให้กับ professorList
@@ -23,10 +24,19 @@ public class ProjectDetailsDTO {
         this.program = program;
         this.studentList = studentList;
         this.category = category;
+        this.semester = semester;
     }
 
     // Getter และ Setter
 
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
+    }
 
     public String getCategory() {
         return category;

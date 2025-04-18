@@ -106,7 +106,7 @@
                 <div class="dropdown-export">
                     <button class="dropbtn">Export Project Template</button>
                     <div class="dropdown-content">
-                        <a href="#" id="export-project-excel">Export Raw Project Template</a>
+                        <a href="#" id="export-project-raw-excel">Export Raw Project Data</a>
                         <a href="#" id="export-project-excel-new">Export Project Template</a>
                     </div>
                 </div>
@@ -939,7 +939,7 @@
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'Project_Overview.xlsx';
+                link.download = 'Raw_data.xlsx';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -950,7 +950,7 @@
     }
 
     // เพิ่ม event listener ให้ปุ่ม Export
-    document.getElementById("export-project-excel").addEventListener("click", exportTemplate);
+    document.getElementById("export-project-raw-excel").addEventListener("click", exportTemplate);
 
 
     function exportTemplateNew() {
@@ -971,8 +971,7 @@
             "Program",
             "Advisor",
             "Co-advisor",
-            "Committee",
-            "Poster Committee" // คอลัมน์ใหม่
+            "Committee"
         ];
 
         // สร้าง array สำหรับเก็บ rows ของข้อมูล Excel
@@ -1033,19 +1032,19 @@
                 committees = committees.slice(0, numRows);
             }
 
-            // ------------------- Poster Committee -------------------
-            let posterCommittees = [];
-            if (project.professorList && Array.isArray(project.professorList)) {
-                posterCommittees = project.professorList
-                    .filter(p => p.role === "posterCommittee")
-                    .map(p => p.professorName || "");
-            }
-            while (posterCommittees.length < numRows) {
-                posterCommittees.push("");
-            }
-            if (posterCommittees.length > numRows) {
-                posterCommittees = posterCommittees.slice(0, numRows);
-            }
+            // // ------------------- Poster Committee -------------------
+            // let posterCommittees = [];
+            // if (project.professorList && Array.isArray(project.professorList)) {
+            //     posterCommittees = project.professorList
+            //         .filter(p => p.role === "posterCommittee")
+            //         .map(p => p.professorName || "");
+            // }
+            // while (posterCommittees.length < numRows) {
+            //     posterCommittees.push("");
+            // }
+            // if (posterCommittees.length > numRows) {
+            //     posterCommittees = posterCommittees.slice(0, numRows);
+            // }
 
             // ------------------- เติมข้อมูลลง dataRows -------------------
             let startIndex = dataRows.length; // จุดเริ่มต้น
@@ -1061,7 +1060,6 @@
                     advisor,               // index 7 => Col H
                     coAdvisor,             // index 8 => Col I
                     committees[i],         // index 9 => Col J
-                    posterCommittees[i]    // index 10 => Col K (คอลัมน์ใหม่)
                 ];
                 dataRows.push(row);
             }
@@ -1085,14 +1083,13 @@
             { width: 20 }, // H: Advisor
             { width: 20 }, // I: Co-advisor
             { width: 20 }, // J: Committee
-            { width: 20 }, // K: Poster Committee (ใหม่)
         ];
 
         // Merge cells สำหรับ Header area (แถว 1-4) -> A1:K1, A2:K2, ฯลฯ
-        ws.mergeCells('A1:K1');
-        ws.mergeCells('A2:K2');
-        ws.mergeCells('A3:K3');
-        ws.mergeCells('A4:K4');
+        ws.mergeCells('A1:J1');
+        ws.mergeCells('A2:J2');
+        ws.mergeCells('A3:J3');
+        ws.mergeCells('A4:J4');
 
         // กำหนดค่า Header area
         ws.getCell('A1').value = "Senior Project Overview";
@@ -1183,7 +1180,7 @@
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'ForPosterCommittee_SignUp.xlsx';
+                link.download = 'ForCommittee_SignUp.xlsx';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
