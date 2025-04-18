@@ -351,6 +351,9 @@
             return;
         }
 
+        // ✅ เรียงตามชื่ออาจารย์ก่อน render
+        filteredData.sort((a, b) => a.professorName.localeCompare(b.professorName));
+
         filteredData.forEach((professor, professorIndex) => {
             // Sort projects: completed first, then by projectId
             professor.projects.sort((a, b) => {
