@@ -18,17 +18,31 @@ public class ExportScheduleController {
     @Autowired
     ExportScheduleService exportScheduleService;
 
+
 //    @GetMapping("/admin/exportProposalSchedule")
 //    public List<PreviewProposalDTO> exPortProposalSchedule(@RequestParam String program) {
 //        return exportScheduleService.getDataExport(program);
 //    }
 
     @GetMapping("/admin/exportProposalSchedule")
-    public void exPortProposalSchedule(HttpServletResponse response, @RequestParam String program) {
+    public void exPortProposalSchedule(HttpServletResponse response, @RequestParam String program, @RequestParam String semesterYear) {
 
         try {
-            List<PreviewProposalDTO> data = exportScheduleService.getDataExport(program);
+            List<PreviewProposalDTO> data = exportScheduleService.getDataExport(program, semesterYear);
             exportScheduleService.exportToExcel(response, data);
+        } catch (IOException e) {
+
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+
+        }
+    }
+
+    @GetMapping("/admin/exportDefenseSchedule")
+    public void exPortDefenseSchedule(HttpServletResponse response, @RequestParam String semesterYear) {
+
+        try {
+            List<PreviewProposalDTO> data = exportScheduleService.getDefenseDataExport(semesterYear);
+            exportScheduleService.exportDefenseToExcel(response, data);
         } catch (IOException e) {
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

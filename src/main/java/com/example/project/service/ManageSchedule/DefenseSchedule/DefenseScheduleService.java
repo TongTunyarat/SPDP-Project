@@ -2,6 +2,7 @@ package com.example.project.service.ManageSchedule.DefenseSchedule;
 
 import com.example.project.DTO.ManageSchedule.Defense.ScheduleDefenseResponseDTO;
 import com.example.project.DTO.ManageSchedule.Defense.SlotDTO;
+import com.example.project.DTO.ManageSchedule.Defense.TimeEachSlotDTO;
 import com.example.project.DTO.ManageSchedule.ProjectWithInstructorsDTO;
 import com.example.project.DTO.ManageSchedule.ScheduleAssignmentDTO;
 import com.example.project.DTO.ManageSchedule.ScheduleProposalResponseDTO;
@@ -12,6 +13,7 @@ import com.example.project.repository.ProjectRepository;
 import com.example.project.repository.ProposalSchedRepository;
 import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,32 +30,37 @@ public class DefenseScheduleService {
     ProjectRepository projectRepository;
     @Autowired
     DefenseSchedRepository defenseSchedRepository;
-    @Autowired
-    ProposalSchedRepository proposalSchedRepository;
+//    @Autowired
+//    ProposalSchedRepository proposalSchedRepository;
 
 
     // check already schedule
-    public boolean haveExitDefenseSchedule() {
+    public boolean haveExitDefenseSchedule(String semesterYear) {
 
-        if(defenseSchedRepository.findAll().isEmpty()) {
+        List<String> projectIds = projectRepository.findByProjectIdAndSemster(semesterYear);
+
+        if(projectIds.isEmpty()) {
             System.out.println("No projects found");
             return false;
         }
 
         // have = ture
-        return true;
+        return defenseSchedRepository.existsByProjectId(projectIds);
     }
 
 
     // prepare data of project in controller
-    public List<ProjectWithInstructorsDTO> prepareDefenseProject() {
+    public List<ProjectWithInstructorsDTO> prepareDefenseProject(String semesterYear) {
 
-        List<Project> ProjectList = projectRepository.findAll();
+        List<Project> ProjectList = projectRepository.findByProjectAndSemster(semesterYear);
+        int semesterYearInt = Integer.parseInt(semesterYear);
 
-        int maxSemester = ProjectList.stream()
-                .mapToInt(i -> Integer.parseInt(i.getSemester())).max().orElse(0);
-
-        System.out.println("🧸maxSemester" + maxSemester);
+//        List<Project> ProjectList = projectRepository.findAll();
+//
+//        int maxSemester = ProjectList.stream()
+//                .mapToInt(i -> Integer.parseInt(i.getSemester())).max().orElse(0);
+//
+//        System.out.println("🧸maxSemester" + maxSemester);
 
         return ProjectList.stream()
                 // อย่าลืมกลับมา filter อาจารย์ เเล้วก็ปีการศึกษา
@@ -70,7 +77,7 @@ public class DefenseScheduleService {
 //
 //                    return hasActive && !allExited;
 //                })
-                .filter(i -> Integer.parseInt(i.getSemester()) == maxSemester)
+                .filter(i -> Integer.parseInt(i.getSemester()) == semesterYearInt)
                 .map(i -> {
 
                     // get instructor
@@ -99,22 +106,12 @@ public class DefenseScheduleService {
     }
 
 
-    public ScheduleDefenseResponseDTO generateDefenseSchedule(String startDate, String endDate, List<ProjectWithInstructorsDTO> projectWithInstructorsDTOList) {
+    public ScheduleDefenseResponseDTO generateDefenseSchedule(String startDate, String endDate, Map<String, List<TimeEachSlotDTO>> timeSlots, List<ProjectWithInstructorsDTO> projectWithInstructorsDTOList) {
 
         System.out.println("🙊startDate: "+ startDate +" endDate: " + endDate);
 
-        LocalTime startTime = LocalTime.of(16,15);
-        LocalTime endTime = LocalTime.of(17,30);
-//        System.out.println("Start time: " + startTime);
-//        System.out.println("End time: " + endTime);
-
-        // https://www.geeksforgeeks.org/how-to-convert-a-string-to-a-localdate-in-java/
-        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-        LocalDate startDateConvert = LocalDate.parse(startDate, dateFormatter);
-        LocalDate endDateConvert = LocalDate.parse(endDate, dateFormatter);
-
         //create time slots
-        List<Pair<LocalDateTime, LocalDateTime>> allTimeSlots = generateTimeSlots(startDateConvert, endDateConvert, startTime, endTime);
+        List<Pair<LocalDateTime, LocalDateTime>> allTimeSlots = generateTimeSlots(timeSlots);
 
         int requiredSlots = (int) (projectWithInstructorsDTOList.size() * 1.20);
         System.out.println("Total Project: " + projectWithInstructorsDTOList.size());
@@ -148,9 +145,9 @@ public class DefenseScheduleService {
                     " | Instructors: " + assignment.getInstructorUsernames());
         }
 
-        if (!unscheduledProjects.isEmpty()) {
-            return new ScheduleDefenseResponseDTO("error", "Some projects could not be scheduled");
-        }
+//        if (!unscheduledProjects.isEmpty()) {
+//            return new ScheduleDefenseResponseDTO("error", "Some projects could not be scheduled");
+//        }
 
         List<String> roomNameUse = new ArrayList<>();
 
@@ -161,58 +158,54 @@ public class DefenseScheduleService {
             }
         }
 
-//        //❗️❗️❗️❗️❗️ ห้ามลบ
-//        try {
-//            saveDefenseSchedule(scheduledAssignments);
-//        } catch (Exception e) {
-//            return new ScheduleDefenseResponseDTO("error", "Failed to generate schedule");
-//        }
+        //❗️❗️❗️❗️❗️ ห้ามลบ
+        try {
+            saveDefenseSchedule(scheduledAssignments);
 
-        return new ScheduleDefenseResponseDTO("success", "finished generate schedule", scheduledAssignments, roomNameUse);
+            if (!unscheduledProjects.isEmpty()) {
+                saveUnDefenseSchedule(unscheduledProjects);
+            }
+
+        } catch (Exception e) {
+            return new ScheduleDefenseResponseDTO("error", "Failed to generate schedule");
+        }
+
+        return new ScheduleDefenseResponseDTO("success", "finished generate schedule", scheduledAssignments, unscheduledProjects, roomNameUse);
 
     }
 
 
     // generate time slot
-    public List<Pair<LocalDateTime, LocalDateTime>> generateTimeSlots(LocalDate startDate, LocalDate endDate, LocalTime startTime, LocalTime endTime){
+    public List<Pair<LocalDateTime, LocalDateTime>> generateTimeSlots(Map<String, List<TimeEachSlotDTO>> timeSlots){
 
         List<Pair<LocalDateTime, LocalDateTime>> timeSolts = new ArrayList<>();
+        // https://www.geeksforgeeks.org/how-to-convert-a-string-to-a-localdate-in-java/
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-        // https://www.geeksforgeeks.org/localdatetime-ofdate-time-method-in-java-with-examples/
-        LocalDateTime startDateTime = LocalDateTime.of(startDate, startTime);
-        LocalDateTime endDateTime = LocalDateTime.of(endDate, endTime);
+        DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
 
-        // https://www.geeksforgeeks.org/localdate-isbefore-method-in-java-with-examples/
-        while (!startDateTime.isAfter(endDateTime)) {
+        for (Map.Entry<String, List<TimeEachSlotDTO>> entry : timeSlots.entrySet()) {
 
-            // https://www.geeksforgeeks.org/dayofweek-getvalue-method-in-java-with-examples/
-            if (startDateTime.getDayOfWeek().getValue() == 6 || startDateTime.getDayOfWeek().getValue() == 7) {
+            String dateString = entry.getKey();
+            List<TimeEachSlotDTO> slots = entry.getValue();
 
-//                System.out.println("🍭 Check Start Day ");
-//                System.out.println("Day: " + startDateTime.getDayOfWeek().name());
-//                System.out.println("Start day value: " + startDateTime.getDayOfWeek().getValue());
+            LocalDate date = LocalDate.parse(dateString, dateFormatter);
 
-                startDateTime = LocalDateTime.of(startDateTime.toLocalDate().plusDays(1), startTime);
-                continue;
-            }
+            for(TimeEachSlotDTO slotDTO : slots) {
 
-            if (startDateTime.getDayOfWeek().getValue() <= 5) {
+                LocalTime startTime = LocalTime.parse(slotDTO.getStart(), timeFormatter);
+                LocalTime endTime = LocalTime.parse(slotDTO.getEnd(), timeFormatter);
 
-                // https://www.geeksforgeeks.org/dayofweek-getvalue-method-in-java-with-examples/
-//                System.out.println("🍭 Check Start Day ");
-//                System.out.println("Day: " + startDateTime.getDayOfWeek().name());
-//                System.out.println("Start day value: " + startDateTime.getDayOfWeek().getValue());
+                LocalDateTime startDateTime = LocalDateTime.of(date, startTime);
+                LocalDateTime endDateTime = LocalDateTime.of(date, endTime);
 
-                LocalDateTime endSlotTime = LocalDateTime.of(startDateTime.toLocalDate(), endTime);
-
-                timeSolts.add(new Pair<>(startDateTime, endSlotTime));
-
-//                System.out.println("Added Time Slot: " + startDateTime + " - " + endSlotTime);
-
-                startDateTime = LocalDateTime.of(startDateTime.toLocalDate().plusDays(1), startTime);
+                timeSolts.add(new Pair<>(startDateTime, endDateTime));
+                System.out.println("➕ Added Slot: " + startDateTime + " - " + endDateTime);
 
             }
         }
+
+        timeSolts.sort(Comparator.comparing((Pair<LocalDateTime, LocalDateTime> p) -> p.a));
 
         System.out.println("🔖 All time slot: ");
 
@@ -667,10 +660,10 @@ public class DefenseScheduleService {
                     successfullySchedule.add(project);
                     projectScheduled = true;
 
-                   System.out.println("✅ Rescheduled project " + project.getProject().getProjectId() +
-                        " in room " + slot.getRoom() + " at " + slot.getStartTime());
+                    System.out.println("✅ Rescheduled project " + project.getProject().getProjectId() +
+                            " in room " + slot.getRoom() + " at " + slot.getStartTime());
 
-                   break;
+                    break;
                 }
 
             }
@@ -719,7 +712,7 @@ public class DefenseScheduleService {
             defenseSchedule.setStartTime(assignSlot.getStartTime());
             defenseSchedule.setEndTime(assignSlot.getEndTime());
             defenseSchedule.setDate(assignSlot.getStartTime().toLocalDate().toString());
-            defenseSchedule.setStatus("Active");
+            defenseSchedule.setStatus("Non-Active");
             defenseSchedule.setRemark("Auto-generated schedule");
             defenseSchedule.setRecordOn(LocalDateTime.now());
             defenseSchedule.setRoomTemp(assignSlot.getRoomNumber());
@@ -736,7 +729,76 @@ public class DefenseScheduleService {
 
             defenseSchedRepository.save(defenseSchedule);
 
+            duplicateProject(projectId, assignSlot.getStartTime().toLocalDate().toString(), assignSlot.getStartTime(), assignSlot.getEndTime());
+
         }
     }
+
+    public void duplicateProject(String projectId, String date, LocalDateTime startTime, LocalDateTime endTime) {
+
+        DefenseSchedule newProject = new DefenseSchedule();
+
+//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        newProject.setDefenseScheduleId(UUID.randomUUID().toString());
+        newProject.setProjectId(projectId);
+        newProject.setRemark("User-Add");
+        newProject.setEditedOn(LocalDateTime.now());
+//        newProject.setEditedByUser(username);
+        newProject.setRecordOn(LocalDateTime.now());
+
+        newProject.setStartTime(startTime);
+        newProject.setEndTime(endTime);
+        newProject.setDate(date);
+        newProject.setStatus("Active");
+
+
+        defenseSchedRepository.save(newProject);
+    }
+
+    public void saveUnDefenseSchedule(List<ProjectWithInstructorsDTO> unscheduledProjects) {
+
+        for (ProjectWithInstructorsDTO assignUnSlot : unscheduledProjects) {
+            DefenseSchedule defenseSchedule = new DefenseSchedule();
+
+            System.out.println(assignUnSlot);
+
+            // https://www.quora.com/How-do-I-generate-a-unique-ID-in-Java
+            defenseSchedule.setDefenseScheduleId(UUID.randomUUID().toString());
+            defenseSchedule.setStatus("Non-Active");
+            defenseSchedule.setRemark("Auto-Ungenerated schedule");
+            defenseSchedule.setRecordOn(LocalDateTime.now());
+
+            Project project = projectRepository.findByProjectId(assignUnSlot.getProject().getProjectId());
+            String projectId = project.getProjectId();
+            System.out.println(projectId);
+            defenseSchedule.setProjectId(projectId);
+
+            defenseSchedRepository.save(defenseSchedule);
+
+            duplicateUnScheduleProject(projectId);
+
+        }
+    }
+
+    public void duplicateUnScheduleProject(String projectId) {
+
+        DefenseSchedule newProject = new DefenseSchedule();
+
+//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        newProject.setDefenseScheduleId(UUID.randomUUID().toString());
+        newProject.setProjectId(projectId);
+        newProject.setRemark("User-Add");
+        newProject.setEditedOn(LocalDateTime.now());
+//        newProject.setEditedByUser(username);
+        newProject.setRecordOn(LocalDateTime.now());
+        newProject.setStatus("Active");
+
+
+        defenseSchedRepository.save(newProject);
+    }
+
+
 
 }

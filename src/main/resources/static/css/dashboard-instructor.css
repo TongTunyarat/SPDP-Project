@@ -705,11 +705,3 @@ label {
     text-align: center;
     padding: 3.5rem;
 }
-
-.timeline-empty {
-    text-align: center;
-    color: #c5c5c5;
-    padding: 20px;
-    font-size: 1.5rem;
-    margin-top: 18%;
-}

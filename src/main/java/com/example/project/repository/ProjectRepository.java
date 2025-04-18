@@ -1,14 +1,18 @@
 package com.example.project.repository;
 
 
+import com.example.project.DTO.FilterResponseDTO;
 import com.example.project.DTO.projectManagement.ProjectDTO;
+import com.example.project.DTO.projectManagement.StudentProjectDTO;
 import com.example.project.entity.Project;
+import com.example.project.entity.ProposalSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, String> {
@@ -45,6 +49,18 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
     @Query("SELECT p.projectId FROM Project p WHERE p.program = :program")
     List<String> findByProjectIdAndProgram(@Param("program") String program);
 
+    @Query("SELECT p.projectId FROM Project p WHERE p.program = :program AND p.semester = :semester ")
+    List<String> findByProjectIdAndProgramAndSemster(@Param("program") String program, @Param("semester") String semester);
+
+    @Query("SELECT p FROM Project p WHERE p.program = :program AND p.semester = :semester ")
+    List<Project> findByProjectAndProgramAndSemster(@Param("program") String program, @Param("semester") String semester);
+
+    @Query("SELECT p.projectId FROM Project p WHERE p.semester = :semester ")
+    List<String> findByProjectIdAndSemster(@Param("semester") String semester);
+
+    @Query("SELECT p FROM Project p WHERE p.semester = :semester ")
+    List<Project> findByProjectAndSemster(@Param("semester") String semester);
+
     @Query("SELECT p.projectId FROM Project p")
     List<String> findByProjectIdList();
 
@@ -70,8 +86,7 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
     String findLatestProjectIdByProgram(@Param("program") String program);
 
     // เพิ่มฟังก์ชันที่ดึงข้อมูลโปรเจกต์ทั้งหมดได้
-    List<Project> findAll();
-
+//    List<Project> findAll();
 
 }
 
@@ -91,4 +106,3 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 //    Project findByProjectId(String projectId);
 //
 //}
-

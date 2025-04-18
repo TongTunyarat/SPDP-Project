@@ -1,5 +1,6 @@
 package com.example.project.repository;
 
+import com.example.project.entity.DefenseSchedule;
 import com.example.project.entity.ProposalSchedule;
 import jakarta.transaction.Transactional;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -24,6 +25,9 @@ public interface ProposalSchedRepository extends JpaRepository<ProposalSchedule,
     @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectIds AND p.remark = 'Auto-generated schedule'")
     List<ProposalSchedule> findByProjectIds(@Param("projectIds") List<String> projectIds);
 
+    @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectIds AND p.remark = 'Auto-Ungenerated schedule'")
+    List<ProposalSchedule> findByProjectIdsUnschedule(@Param("projectIds") List<String> projectIds);
+
     @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectId AND p.remark = 'Auto-generated schedule' ")
     ProposalSchedule findByProjectId(String projectId);
 
@@ -46,4 +50,6 @@ public interface ProposalSchedRepository extends JpaRepository<ProposalSchedule,
     @Query("SELECT DISTINCT p.startTime FROM ProposalSchedule p WHERE p.projectId IN :projectIds AND p.remark = 'Auto-generated schedule' ")
     List<LocalDateTime> findByGenerateSlotTime(@Param("projectIds") List<String> projectIds);
 
+    @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectId ")
+    List<ProposalSchedule> findByProjectAllId(String projectId);
 }

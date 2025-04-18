@@ -9,16 +9,17 @@ public class BookingSettingsDTO {
     private String startTime;
     private String endTime;
     private List<String> rooms;
-
     private String program;
+    private String semester;
 
-    public BookingSettingsDTO(String startDate, String endDate, String startTime, String endTime, List<String> rooms, String program) {
+    public BookingSettingsDTO(String startDate, String endDate, String startTime, String endTime, List<String> rooms, String program, String semester) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.startTime = startTime;
         this.endTime = endTime;
         this.rooms = rooms;
         this.program = program;
+        this.semester = semester;
     }
 
     public String getStartDate() {
@@ -67,6 +68,14 @@ public class BookingSettingsDTO {
 
     public void setRooms(List<String> rooms) {
         this.rooms = rooms;
+    }
+
+    public String getSemester() {
+        return semester;
+    }
+
+    public void setSemester(String semester) {
+        this.semester = semester;
     }
 
     @Override

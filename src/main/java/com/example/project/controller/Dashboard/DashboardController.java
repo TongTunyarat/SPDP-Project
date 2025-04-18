@@ -104,10 +104,9 @@ public class DashboardController {
     // Proposal schedule
     @GetMapping("/instructor/getProposalScheduleDashboard")
     @ResponseBody
-    public List<PreviewProposalDTO> getProposalScheduleDashboard(@RequestParam("year") String year) {
+    public Map<String, List<PreviewProposalDTO>> getProposalScheduleDashboard(@RequestParam("year") String year) {
         return dashboardService.getProposalSchedule(year);
     }
-
 
     // Get Project by Instructor
     @GetMapping("/instructor/getProjectByInstructor")

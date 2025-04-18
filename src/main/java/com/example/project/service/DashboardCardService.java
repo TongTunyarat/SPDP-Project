@@ -4,6 +4,7 @@ import com.example.project.DTO.ManageSchedule.Preview.PreviewProposalDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
 import com.example.project.service.*;
+import com.example.project.service.ManageSchedule.DefenseSchedule.ManageDefenseService;
 import com.example.project.service.ManageSchedule.ManageProposalScheduleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -60,6 +61,9 @@ public class DashboardCardService {
 
     @Autowired
     private ManageProposalScheduleService manageProposalScheduleService;
+
+    @Autowired
+    private ManageDefenseService manageDefenseService;
 
     @Autowired
     private InstructorRepository instructorRepository;
@@ -359,7 +363,7 @@ public class DashboardCardService {
     }
 
     // get proposchedule instructor
-    public List<PreviewProposalDTO> getProposalSchedule(String year) {
+    public Map<String, List<PreviewProposalDTO>> getProposalSchedule(String year) {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String username = authentication.getName();
@@ -370,16 +374,27 @@ public class DashboardCardService {
 
         Optional<Instructor> instructorOpt = instructorRepository.findByAccountUsername(username);
         String professorName = instructorOpt.map(Instructor::getProfessorName).orElse("Unknown");
-        System.out.println("professorName " + professorName);
+        System.out.println("👩🏻‍🏫professorName " + professorName);
 
         List<String> projectIds = projectList.stream()
                 .map(Project::getProjectId).collect(Collectors.toList());
 
-        List<PreviewProposalDTO> proposals = manageProposalScheduleService.getDataPreviewSchedule().stream()
+        List<PreviewProposalDTO> proposals = manageProposalScheduleService.getDataPreviewSchedule(year).stream()
                 .filter(p -> projectIds.contains(p.getProjectId()))
                 .filter(p -> p.getInstructorNames().values().stream()
                         .anyMatch(list -> list.stream().anyMatch(name -> name.equals(professorName)))).collect(Collectors.toList());
 
+        System.out.println("🌼 Proposal ");
+        System.out.println("project list: "+projectIds.size());
+        System.out.println("projectIds list: "+projectIds);
+        System.out.println("year: "+year);
+
+        List<PreviewProposalDTO> defenses = manageDefenseService.getDataDefensePreviewSchedule(year).stream()
+                .filter(p -> projectIds.contains(p.getProjectId()))
+                .filter(p -> p.getInstructorNames().values().stream()
+                        .anyMatch(list -> list.stream().anyMatch(name -> name.equals(professorName)))).collect(Collectors.toList());
+
+        System.out.println("⭐️ Defense");
         System.out.println("project list: "+projectIds.size());
         System.out.println("projectIds list: "+projectIds);
         System.out.println("year: "+year);
@@ -408,7 +423,34 @@ public class DashboardCardService {
         }
 
 
-        return proposals;
+        for(PreviewProposalDTO defense : defenses ){
+
+            Map<String, List<String>> instructorNames = defense.getInstructorNames();
+
+            Map<String, List<String>> colletctName =new HashMap<>();
+
+            instructorNames.forEach((role, names) -> {
+
+                if(names.contains(professorName)) {
+
+                    List<String> filterName = new ArrayList<>();
+                    filterName.add(professorName);
+
+                    colletctName.put(role, filterName);
+                }
+            });
+
+            // เอาไปทับทที่
+            defense.setInstructorNames(colletctName);
+
+            System.out.println(defense);
+        }
+
+        Map<String, List<PreviewProposalDTO>> result = new HashMap<>();
+        result.put("Proposal", proposals);
+        result.put("Defense", defenses);
+
+        return result;
     }
 
     // get project foe each instructor
