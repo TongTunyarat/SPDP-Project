@@ -15,6 +15,10 @@ public interface DefenseEvalScoreRepository extends JpaRepository<DefenseEvalSco
 
     DefenseEvalScore findByEvalId(String s);
 
+    DefenseEvalScore findByEvalIdAndCriteria_CriteriaId(String s, String s1);
+
+    DefenseEvalScore findByDefenseEvaluation_DefenseEvaIdAndCriteria_CriteriaId(String s, String s1);
+
     // สำหรับการค้นหาข้อมูลที่ return ค่า DTO
     @Query("SELECT new com.example.project.DTO.DefenseEvaResponseDTO( " +
             "d.defenseEvaluation.defenseEvaId, " +

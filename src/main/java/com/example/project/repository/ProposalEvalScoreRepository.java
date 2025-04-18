@@ -10,6 +10,10 @@ import java.util.List;
 public interface ProposalEvalScoreRepository extends JpaRepository<ProposalEvalScore, String> {
     ProposalEvalScore findByEvaId(String s);
 
+    ProposalEvalScore findByEvaIdAndCriteria_CriteriaId(String s, String s1);
+
+    ProposalEvalScore findByProposalEvaluation_ProposalIdAndCriteria_CriteriaId(String s, String s1);
+
     List<ProposalEvalScore> findByProposalEvaluation_Project_ProjectId(String projectId);
 }
 
