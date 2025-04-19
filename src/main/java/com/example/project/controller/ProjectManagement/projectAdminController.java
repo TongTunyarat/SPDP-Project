@@ -1,9 +1,6 @@
 package com.example.project.controller.ProjectManagement;
 
-import com.example.project.DTO.projectManagement.ProfessorRoleDTO;
-import com.example.project.DTO.projectManagement.ProjectDetailsResponseDTO;
-import com.example.project.DTO.projectManagement.StudentProjectDTO;
-import com.example.project.DTO.projectManagement.ProjectDetailsDTO;
+import com.example.project.DTO.projectManagement.*;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
 import com.example.project.service.ProjectManagement.EditProjectService;
@@ -231,31 +228,50 @@ public class projectAdminController {
         }
     }
 
-    // ฟังก์ชัน POST สำหร0ับการสร้างโปรเจกต์ใหม่
-    @PostMapping("/addNewProject")
-    public ResponseEntity<Map<String, String>> addNewProject(@RequestBody ProjectDetailsDTO projectDetailsDTO) {
-        try {
-            AddNewProjectService.addNewProject(projectDetailsDTO);  // เรียกใช้ Service สำหรับเพิ่มโปรเจกต์ใหม่
 
-            // ส่งข้อความสำเร็จเป็น JSON
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Project added successfully");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            // ส่งข้อผิดพลาดเป็น JSON
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
+    // ============= ADD NEW PROJECT ============= //
+
+
+    // ฟังก์ชัน POST สำหรับการสร้างโปรเจกต์ใหม่
+//    @PostMapping("/addNewProject")
+//    public ResponseEntity<Map<String, String>> addNewProject(@RequestBody ProjectDetailsDTO projectDetailsDTO) {
+//        try {
+//            AddNewProjectService.addNewProject(projectDetailsDTO);  // เรียกใช้ Service สำหรับเพิ่มโปรเจกต์ใหม่
+//
+//            // ส่งข้อความสำเร็จเป็น JSON
+//            Map<String, String> response = new HashMap<>();
+//            response.put("message", "Project added successfully");
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            // ส่งข้อผิดพลาดเป็น JSON
+//            Map<String, String> response = new HashMap<>();
+//            response.put("message", "Error: " + e.getMessage());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+//        }
+//    }
+
+    // รับ JSON จาก JS แล้วสร้าง Project ใหม่
+    @PostMapping("/addProject")
+    public ResponseEntity<String> addProject(@RequestBody NewProjectDTO dto) {
+        try {
+            String newId = String.valueOf(AddNewProjectService.createProject(dto));
+            return ResponseEntity.ok(newId);
+        } catch (Exception ex) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Failed to add project: " + ex.getMessage());
         }
     }
 
     @GetMapping("/getLastProjectId")
-    public ResponseEntity<Map<String, String>> getLastProjectId() {
-        String lastProjectId = AddNewProjectService.findLastProjectId();  // Get the last project ID from the service
-        Map<String, String> response = new HashMap<>();
-        response.put("lastProjectId", lastProjectId);  // Wrap it in a JSON object
-
-        return ResponseEntity.ok(response);  // Return the response as JSON
+    public ResponseEntity<String> getLastProjectId(
+            @RequestParam String program,
+            @RequestParam String semester
+    ) {
+        return ResponseEntity.ok(
+                AddNewProjectService.findLatestProjectId(program, semester)
+        );
     }
 
     @GetMapping("/getStudentsWithoutProject")

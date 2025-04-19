@@ -14,6 +14,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 </head>
@@ -281,39 +283,44 @@
     </div>
 
         <!-- แสดง Instructor -->
-       <h3>Instructor Details</h3>
-      <div id="instructorList">
-        <table class="instructor-table">
-          <thead>
-            <tr><th>Role</th><th>Professor</th><th>Action</th></tr>
-          </thead>
-          <tbody>
-            ${data.professorList.map(pr => `
-              <tr data-role="${pr.role}">
-               <td>
-                  <select class="role-select">
-                    <option value="Advisor"      ${pr.role === 'Advisor' ? 'selected' : ''}>Advisor</option>
-                    <option value="Co-Advisor"   ${pr.role === 'Co-Advisor' ? 'selected' : ''}>Co-Advisor</option>
-                    <option value="Committee"    ${pr.role === 'Committee' ? 'selected' : ''}>Committee</option>
-                    <option value="Poster-Committee"${pr.role === 'Poster-Committee' ? 'selected' : ''}>Poster-Committee</option>
-                  </select>
-                </td>
-                <td>
-                  <select class="instructor-select"
-                          data-id="${pr.professorId}"
-                          data-name="${pr.professorName}">
-                    <!-- options เติมหลัง fetch -->
-                  </select>
-                </td>
-                <td>
-                  <button class="delete-btn">🗑️</button>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-            <button id="addInstructorBtn">+ Add Instructor</button>
-        </table>
-      </div>
+        <h3>Instructor Details</h3>
+        <div id="instructorList">
+          <table class="instructor-table">
+            <thead>
+              <tr><th>Role</th><th>Professor</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              ${data.professorList.map(pr => `
+                <tr data-role="${pr.role}">
+                  <td>
+                    <select class="role-select">
+                      <option value="Advisor"        ${pr.role==='Advisor'?'selected':''}>Advisor</option>
+                      <option value="Co-Advisor"     ${pr.role==='Co-Advisor'?'selected':''}>Co-Advisor</option>
+                      <option value="Committee"      ${pr.role==='Committee'?'selected':''}>Committee</option>
+                      <option value="Poster-Committee"${pr.role==='Poster-Committee'?'selected':''}>
+                        Poster-Committee
+                      </option>
+                    </select>
+                  </td>
+                  <td>
+                    <select class="instructor-select"
+                            data-id="${pr.professorId}"
+                            data-name="${pr.professorName}">
+                      <option value="">-- Select --</option>
+                      ${instructors.map(inst => `
+                        <option value="${inst.professorId}"
+                                ${inst.professorId===pr.professorId?'selected':''}>
+                          ${inst.professorName}
+                        </option>`).join('')}
+                    </select>
+                  </td>
+                  <td><button class="delete-btn">🗑️</button></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <button id="addInstructorBtn">+ Add Instructor</button>
+        </div>
 
         <!-- Actions Button -->
         <div class="button-group">
@@ -357,30 +364,47 @@
         });
 
         // ผูก listener — เพิ่ม instructor row
-        instrContainer.querySelector('#addInstructorBtn').addEventListener('click', () => {
-            const tbody = instrContainer.querySelector('table.instructor-table tbody');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `
-    <td>
-      <select class="role-select">
-        <option>Advisor</option>
-        <option>Co-Advisor</option>
-        <option>Committee</option>
-        <option>Poster-Committee</option>
-      </select>
-    </td>
-    <td>
-      <select class="instructor-select" data-id="">
-        <option value="">-- Select --</option>
-      </select>
-    </td>
-    <td>
-      <button class="delete-btn">🗑️</button>
-    </td>
-  `;
-            tbody.appendChild(tr);
-            populateInstructorDropdowns();
-        });
+        document.getElementById('addInstructorBtn')
+            .addEventListener('click', () => {
+                const tbody = document.querySelector('#instructorList tbody');
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+          <td>
+            <select class="role-select">
+              <option>Advisor</option>
+              <option>Co-Advisor</option>
+              <option>Committee</option>
+              <option>Poster-Committee</option>
+            </select>
+          </td>
+          <td>
+            <select class="instructor-select" data-id="">
+            </select>
+          </td>
+          <td><button class="delete-btn">🗑️</button></td>
+        `;
+                tbody.appendChild(tr);
+
+                // Populate & init search on new select only
+                const newSel = tr.querySelector('.instructor-select');
+                instructors.forEach(i => {
+                    const opt = document.createElement('option');
+                    opt.value = i.professorId;
+                    opt.textContent = i.professorName;
+                    newSel.appendChild(opt);
+                });
+                newSel.choicesInstance = new Choices(newSel, {
+                    searchEnabled: true,
+                    shouldSort: false,
+                    placeholderValue: 'ค้นหาอาจารย์...',
+                    classNames: {
+                        containerInner: 'my-choices-inner',
+                        listDropdown: 'my-choices-dropdown',
+                        itemChoice: 'my-choices-item',
+                        itemSelectable: 'my-choices-selectable'
+                    }
+                });
+            });
 
         // สุดท้ายเรียก fetchInstructors() เพื่อเติม dropdown
         fetchInstructors();
@@ -405,6 +429,25 @@
             });
         }
 
+        function enableInstructorSearch() {
+            document.querySelectorAll('.instructor-select').forEach(el => {
+                // กันซ้ำกรณี re-init
+                if (!el.choicesInstance) {
+                    el.choicesInstance = new Choices(el, {
+                        searchEnabled: true,
+                        shouldSort: false,
+                        itemSelectText: '',
+                        placeholderValue: 'ค้นหาอาจารย์...',
+                        classNames: {
+                            containerInner: 'my-choices-inner',
+                            listDropdown: 'my-choices-dropdown',
+                            itemChoice: 'my-choices-item',
+                            itemSelectable: 'my-choices-selectable'
+                        }
+                    });
+                }
+            });
+        }
 
 
         // -------------------- Update Project -------------------- //
@@ -440,10 +483,10 @@
                 const professorList = Array.from(
                     document.querySelectorAll('#instructorList .instructor-table tbody tr')
                 ).map(tr => {
-                    const sel  = tr.querySelector('select.instructor-select');
+                    const sel = tr.querySelector('select.instructor-select');
                     const role = tr.querySelector('select.role-select').value;
                     return {
-                        professorId:   sel?.value || "",
+                        professorId: sel?.value || "",
                         professorName: sel?.selectedOptions[0]?.text || "",
                         role
                     };
@@ -478,7 +521,8 @@
                             icon: 'success',
                             title: 'Update Project Success!',
                             timer: 2000,
-                            showConfirmButton: false
+                            showConfirmButton: false,
+                            timerProgressBar: true       // แสดงแถบเวลา
                         }).then(() => location.reload());
                     } else {
                         const err = await resp.json();

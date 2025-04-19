@@ -33,7 +33,6 @@ public interface ProjectInstructorRoleRepository extends JpaRepository<ProjectIn
     boolean existsByInstructorProfessorId(String instructorId);
 
 
-
     List<ProjectInstructorRole> findByProjectIdRole(Project currentProject);
 
     List<ProjectInstructorRole> findByProjectIdRole_Semester(String year);
@@ -48,5 +47,14 @@ public interface ProjectInstructorRoleRepository extends JpaRepository<ProjectIn
     void deleteByProjectIdRole_ProjectId(String projectId);
 
     List<ProjectInstructorRole> findByProjectIdRole_ProjectIdOrderByAssignDateAsc(String projectId);
+
+    @Query(
+            value = "SELECT p.instructor_id " +
+                    "FROM projectInstructorRole p " +
+                    "ORDER BY p.instructor_id DESC " +
+                    "LIMIT 1",
+            nativeQuery = true
+    )
+    String findLatestInstructorRoleId();
 }
 
