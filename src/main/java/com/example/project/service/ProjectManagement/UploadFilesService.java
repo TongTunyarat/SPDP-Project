@@ -2,6 +2,8 @@ package com.example.project.service.ProjectManagement;
 
 import com.example.project.entity.*;
 import com.example.project.repository.*;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -1107,7 +1109,6 @@ public class UploadFilesService {
 //    }
 
 
-
     /**
      * 1) อ่านไฟล์ทั้งหมด สร้างโครงสร้าง in‑memory ของแต่ละโปรเจกต์
      * 2) ตรวจสอบใน DB (StudentProject, ProjectInstructorRole) ว่าตรงกับไฟล์หรือไม่
@@ -1272,6 +1273,32 @@ public class UploadFilesService {
                 pir.setInstructor(instr);
                 projectInstructorRoleRepository.save(pir);
             }
+
+            // 4) NEW: บล็อกสร้าง ProjectInstructorRole สำหรับ Co‑Advisor
+            for (String coAdvName : fp.getCoAdvisors()) {
+                if (coAdvName == null || coAdvName.isBlank()) continue;
+                if (!isValidInstructor(coAdvName)) {
+                    throw new IllegalStateException("Invalid co-advisor format: " + coAdvName);
+                }
+
+                Instructor instr = instructorRepository
+                        .findByProfessorName(coAdvName)
+                        .orElseThrow(() -> new IllegalStateException("Co-Advisor not found: " + coAdvName));
+
+                if (instr.getProfessorId() == null) {
+                    instr.setProfessorId(generateNextInstructorId());
+                    instructorRepository.save(instr);
+                }
+
+                ProjectInstructorRole pir = new ProjectInstructorRole();
+                pir.setInstructorId(generateNextInstructorId());
+                pir.setAssignDate(LocalDateTime.now());
+                pir.setRole("Co-Advisor");
+                pir.setProjectIdRole(project);
+                pir.setInstructor(instr);
+                projectInstructorRoleRepository.save(pir);
+            }
+
         }
 
         return warnings;
@@ -1300,14 +1327,15 @@ public class UploadFilesService {
                     cols = tmp;
                 }
 
-                String fid      = cols[0].trim();
-                String title    = cols[1].trim();
-                String desc     = cols[2].trim();
+                String fid = cols[0].trim();
+                String title = cols[1].trim();
+                String desc = cols[2].trim();
                 String category = cols[3].trim();
-                String sid      = cols[4].trim();
-                String sname    = cols[5].trim();
-                String prog     = cols[6].trim();
-                String adv      = cols[7].trim();
+                String sid = cols[4].trim();
+                String sname = cols[5].trim();
+                String prog = cols[6].trim();
+                String adv = cols[7].trim();
+                String coadv  = cols[8].trim();
 
                 if (!fid.isEmpty()) {
                     currentProjId = fid;
@@ -1326,6 +1354,10 @@ public class UploadFilesService {
                 if (!adv.isEmpty() && !fp.advisors.contains(adv)) {
                     fp.advisors.add(adv);
                 }
+
+                if (!coadv.isBlank()) {
+                    fp.getCoAdvisors().add(coadv);
+                }
             }
         }
         return map;
@@ -1334,17 +1366,22 @@ public class UploadFilesService {
     // —— in‑memory DTO’s ——
     private static class FileProjectData {
         String projectId, title, description, category, program;
-        List<FileStudent> students   = new ArrayList<>();
-        List<String>      advisors   = new ArrayList<>();
+        List<FileStudent> students = new ArrayList<>();
+        private List<String> advisors   = new ArrayList<>();
+        private List<String> coAdvisors = new ArrayList<>();
 
         FileProjectData(String projectId, String title, String desc,
                         String cat, String prog) {
             this.projectId = projectId;
-            this.title     = title;
+            this.title = title;
             this.description = desc;
-            this.category  = cat;
-            this.program   = prog;
+            this.category = cat;
+            this.program = prog;
         }
+
+        public List<String> getCoAdvisors() { return coAdvisors; }
+        public void setCoAdvisors(List<String> coAdvisors) { this.coAdvisors = coAdvisors; }
+
     }
 
     private static class FileStudent {
@@ -1621,8 +1658,6 @@ public class UploadFilesService {
         }
         return warnings;
     }
-
-
 
 
 }
