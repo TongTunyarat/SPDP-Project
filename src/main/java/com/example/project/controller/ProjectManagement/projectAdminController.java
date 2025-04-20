@@ -51,6 +51,10 @@ public class projectAdminController {
     private AddNewProjectService AddNewProjectService;
     @Autowired
     private EditProjectService EditProjectService;
+    @Autowired
+    private ProjectRepository projectRepository;
+    @Autowired
+    private ProjectInstructorRoleRepository ProjectInstructorRoleRepository;
 
     @Autowired
     public projectAdminController(ProjectService projectService) {
@@ -225,6 +229,32 @@ public class projectAdminController {
             Map<String, String> response = new HashMap<>();
             response.put("message", "Error: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @DeleteMapping("/deleteInstructorFromProject")
+    public ResponseEntity<String> deleteInstructorFromProject(
+            @RequestParam String projectId,
+            @RequestParam String professorId) {
+
+        try {
+            // ตรวจสอบว่า Project และ Instructor มีอยู่หรือไม่
+            Project project = projectRepository.findByProjectId(projectId);
+            Instructor instructor = instructorRepository.findByProfessorId(professorId);
+
+            if (project == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Project not found");
+            }
+            if (instructor == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Instructor not found");
+            }
+
+            // ลบ Instructor จาก Project
+            projectInstructorRoleRepository.deleteByProjectIdRole_ProjectIdAndInstructorId(projectId, professorId);
+
+            return ResponseEntity.ok("Instructor removed successfully");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing instructor");
         }
     }
 

@@ -50,11 +50,15 @@ public interface ProjectInstructorRoleRepository extends JpaRepository<ProjectIn
 
     @Query(
             value = "SELECT p.instructor_id " +
-                    "FROM projectInstructorRole p " +
+                    "FROM projectInstr p " +
                     "ORDER BY p.instructor_id DESC " +
                     "LIMIT 1",
             nativeQuery = true
     )
     String findLatestInstructorRoleId();
+
+    Optional<ProjectInstructorRole> findByProjectIdRole_ProjectIdAndInstructorId(String projectId, String instructorId);
+
+    void deleteByProjectIdRole_ProjectIdAndInstructorId(String projectId, String professorId);
 }
 

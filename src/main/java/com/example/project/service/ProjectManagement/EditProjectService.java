@@ -209,5 +209,13 @@ public class EditProjectService {
         studentProjectRepository.delete(studentProject);
     }
 
+    @Transactional
+    public void deleteInstructorFromProject(String projectId, String instructorId) {
+
+        ProjectInstructorRole projectInstructorRole = projectInstructorRoleRepository.findByProjectIdRole_ProjectIdAndInstructorId(projectId, instructorId)
+                .orElseThrow(() -> new IllegalArgumentException("Instructor not found for this project"));
+
+        projectInstructorRoleRepository.delete(projectInstructorRole);
+    }
 }
 

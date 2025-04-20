@@ -294,10 +294,10 @@
                 <tr data-role="${pr.role}">
                   <td>
                     <select class="role-select">
-                      <option value="Advisor"        ${pr.role==='Advisor'?'selected':''}>Advisor</option>
-                      <option value="Co-Advisor"     ${pr.role==='Co-Advisor'?'selected':''}>Co-Advisor</option>
-                      <option value="Committee"      ${pr.role==='Committee'?'selected':''}>Committee</option>
-                      <option value="Poster-Committee"${pr.role==='Poster-Committee'?'selected':''}>
+                      <option value="Advisor"        ${pr.role === 'Advisor' ? 'selected' : ''}>Advisor</option>
+                      <option value="Co-Advisor"     ${pr.role === 'Co-Advisor' ? 'selected' : ''}>Co-Advisor</option>
+                      <option value="Committee"      ${pr.role === 'Committee' ? 'selected' : ''}>Committee</option>
+                      <option value="Poster-Committee"${pr.role === 'Poster-Committee' ? 'selected' : ''}>
                         Poster-Committee
                       </option>
                     </select>
@@ -309,7 +309,7 @@
                       <option value="">-- Select --</option>
                       ${instructors.map(inst => `
                         <option value="${inst.professorId}"
-                                ${inst.professorId===pr.professorId?'selected':''}>
+                                ${inst.professorId === pr.professorId ? 'selected' : ''}>
                           ${inst.professorName}
                         </option>`).join('')}
                     </select>
@@ -350,17 +350,9 @@
         // Delete instructor
         document.querySelectorAll('.instructor-table .delete-btn').forEach(btn => {
             btn.addEventListener('click', e => {
-                e.currentTarget.closest('tr').remove();
+                const row = e.currentTarget.closest('tr');  // หาแถวที่ถูกคลิก
+                confirmDeleteInstructor(row);  // เรียก confirmDeleteInstructor ก่อนการลบ
             });
-        });
-
-        const instrContainer = document.getElementById('instructorList');
-
-        // Delete row (delegation)
-        instrContainer.addEventListener('click', e => {
-            if (e.target.classList.contains('delete-btn')) {
-                e.target.closest('tr').remove();
-            }
         });
 
         // ผูก listener — เพิ่ม instructor row
@@ -523,7 +515,7 @@
                             timer: 2000,
                             showConfirmButton: false,
                             timerProgressBar: true       // แสดงแถบเวลา
-                        }).then(() => location.reload());
+                        }).then(() => window.location.href = "http://localhost:8080/project-details");
                     } else {
                         const err = await resp.json();
                         showErrorsPopup(err.errors || [err.message || 'Unknown error']);
@@ -566,6 +558,85 @@
             };
         }
     }
+
+    // ฟังก์ชันสำหรับลบ student ออกจาก project
+    function deleteStudentFromProject(studentId, projectId) {
+        // ส่งคำขอลบข้อมูลไปยังเซิร์ฟเวอร์
+        fetch(`http://localhost:8080/admin/deleteStudentFromProject?projectId=${encodeURIComponent(projectId)}&studentId=${encodeURIComponent(studentId)}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(errorText => {
+                        throw new Error(`HTTP error! status: ${response.status}, Message: ${errorText}`);
+                    });
+                }
+                // ถ้าลบสำเร็จ
+                return response.text();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                // อัปเดต UI หลังจากลบเสร็จ
+                document.getElementById(`student-${studentId}`).closest('.form-group').remove();
+                showNotification('Student removed from project successfully!');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error deleting student: ' + error.message);
+            });
+    }
+
+
+    // ฟังก์ชันยืนยันการลบ Instructor
+    function confirmDeleteInstructor(row) {
+        const instructorName = row.querySelector('.instructor-select option:checked').textContent;  // ดึงชื่อ Instructor จากแถว
+        const professorId = row.querySelector('.instructor-select').dataset.id; // ดึง professorId จาก dataset ของ select
+
+        if (!instructorName || !professorId) {
+            alert("ข้อมูลไม่ครบถ้วนสำหรับการลบ Instructor");
+            return;
+        }
+
+        const confirmed = confirm(`Are you sure you want to remove Instructor: "${instructorName}" from the list?`);
+        if (confirmed) {
+            // ถ้าผู้ใช้ยืนยันให้ลบ
+            row.remove();  // ลบแถวที่เกี่ยวข้อง
+            // คุณสามารถทำการเรียก API เพื่อลบข้อมูลจากฐานข้อมูลได้ที่นี่
+            deleteInstructorFromProject(professorId);
+        }
+    }
+
+
+    // ฟังก์ชันลบ Instructor จาก Project
+    function deleteInstructorFromProject(projectId, professorId) {
+        fetch(`http://localhost:8080/admin/deleteInstructorFromProject?projectId=${encodeURIComponent(projectId)}&professorId=${encodeURIComponent(professorId)}`, {
+            method: 'DELETE',
+        })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error("Failed to delete instructor from project");
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Instructor removed:', data);
+                alert("Instructor removed successfully from the project.");
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("Error removing instructor.");
+            });
+    }
+
+    // Event listener สำหรับปุ่มลบ
+    document.querySelectorAll('.instructor-table .delete-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const row = e.currentTarget.closest('tr');  // หาแถวที่ถูกคลิก
+            confirmDeleteInstructor(row);  // เรียกฟังก์ชันยืนยันการลบ
+        });
+    });
+
+
 
     // ฟังก์ชัน showNotification สำหรับการแสดงแจ้งเตือน
     function showNotification(message, callback) {

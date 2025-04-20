@@ -15,6 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
 
 </head>
 
@@ -206,6 +207,7 @@
                 <span id="closeModal" class="close-btn">&times;</span>
 
                 <h2>Upload Files</h2>
+                <h6 style="color: #D32F2F; margin-top: -15px"> * You can upload only once.</h6>
 
                 <!--                &lt;!&ndash; File Type Dropdown &ndash;&gt;-->
                 <!--                <div class="form-group">-->
@@ -388,7 +390,7 @@
             ${committeeColumns}  <!-- แสดง Committee ที่มี -->
             ${emptyColumns}  <!-- เติมช่องว่างให้ครบจำนวน maxCommittee -->
            <td>
-                <form action="/admin/editCommittee" method="get">
+                <form action="/admin/editProjectDetails" method="get">
                     <input type="hidden" name="projectId" value="${project.projectId}">
                     <button type="submit" class="edit-btn"><span class="material-icons">edit</span></button>
                 </form>
@@ -512,76 +514,54 @@
 
     // ฟังก์ชันแปลง CSV เป็น JSON
     function csvToJson(csv) {
-        const lines = csv.split("\n");
         const result = [];
 
-        let currentProject = {
-            projectId: "",
-            projectTitle: "",
-            projectDescription: "",
-            projectCategory: "",
-            program: "",
-            advisor: "",
-            committee: "",
-            studentList: []
-        };
+        // ใช้ PapaParse ในการแยกข้อมูล CSV
+        Papa.parse(csv, {
+            skipEmptyLines: true,
+            header: false, // ถ้าไฟล์มี header ให้เปลี่ยนเป็น true
+            complete: function (results) {
+                let currentProject = null;
 
-        // สมมติว่า header อยู่ที่ 1-8 => เริ่มอ่านแถวที่ 9 (i = 8)
-        for (let i = 8; i < lines.length; i++) {
-            let line = lines[i].trim();
-            if (!line) continue;
+                results.data.forEach((row, i) => {
+                    if (i < 8) return;  // ข้าม 8 แถวแรกตามที่ระบุ
 
-            // แยกคอลัมน์ (ช่อง) ด้วย comma แบบง่าย ๆ
-            const cells = line.split(",");
+                    const projectId = row[0].trim();
+                    const projectTitle = row[1].trim();
+                    const projectDescription = row[2].trim();
+                    const projectCategory = row[3].trim();
+                    const studentId = row[4].trim();
+                    const studentName = row[5].trim();
+                    const program = row[6].trim();
+                    const advisor = row[7].trim();
+                    const coAdvisor = row[8].trim();
+                    const committee = row[9].trim();
 
-            // ต้องการคอลัมน์อย่างน้อย 9 ช่อง (index 0..8)
-            // ถ้า < 9 ให้ข้ามแถวนั้น
-            if (cells.length < 9) {
-                continue;
-            }
+                    // สร้างหรืออัปเดตข้อมูลโปรเจกต์
+                    if (projectId) {
+                        currentProject = {
+                            projectId: projectId,
+                            projectTitle: projectTitle,
+                            projectDescription: projectDescription,
+                            projectCategory: projectCategory,
+                            program: program,
+                            advisor: advisor,
+                            committee: committee,
+                            studentList: []
+                        };
+                        result.push(currentProject);
+                    }
 
-            let projectId = cells[0].trim();
-            let projectTitle = cells[1].trim();
-            let projectDescription = cells[2].trim();
-            let projectCategory = cells[3].trim();
-            let studentId = cells[4].trim();
-            let studentName = cells[5].trim();
-            let program = cells[6].trim();
-            let advisor = cells[7].trim();
-            let committee = cells[8].trim(); // คอลัมน์ที่ 9
-
-            // ถ้ามีข้อมูลโปรเจกต์ใหม่ ให้สร้าง currentProject ใหม่
-            // เช็คจาก projectId หรือช่องอื่นที่จำเป็น
-            if (
-                projectId !== "" ||
-                projectTitle !== "" ||
-                projectDescription !== "" ||
-                projectCategory !== "" ||
-                program !== "" ||
-                advisor !== "" ||
-                committee !== ""
-            ) {
-                currentProject = {
-                    projectId: projectId,
-                    projectTitle: projectTitle,
-                    projectDescription: projectDescription,
-                    projectCategory: projectCategory,
-                    program: program,
-                    advisor: advisor,
-                    committee: committee,
-                    studentList: []
-                };
-                result.push(currentProject);
-            }
-
-            // ถ้าพบ studentId หรือ studentName ก็ถือว่ามีข้อมูลนักศึกษา
-            if (studentId || studentName) {
-                currentProject.studentList.push({
-                    studentId: studentId,
-                    studentName: studentName
+                    // เพิ่มข้อมูลนักศึกษาลงใน project
+                    if (studentId || studentName) {
+                        currentProject.studentList.push({
+                            studentId: studentId || "",
+                            studentName: studentName || ""
+                        });
+                    }
                 });
             }
-        }
+        });
 
         return result;
     }
@@ -627,18 +607,20 @@
     `;
         table.appendChild(headerRow);
 
+        // แสดงข้อมูลแต่ละโปรเจกต์
         data.forEach(project => {
             const row = document.createElement('tr');
+
+            // สร้าง string สำหรับ student IDs ถ้ามีหลายคน
             let studentIDs = "N/A";
             if (project.studentList && project.studentList.length > 0) {
                 studentIDs = project.studentList.map(stu => stu.studentId).join(", ");
             }
 
-            // สมมติว่าคุณอยากตัด projectTitle ให้เหลือ 30 ตัวอักษร
-            // หรือ projectDescription ให้เหลือ 50 ตัว (แล้วแต่)
-            // ตัวอย่างนี้ตัด projectTitle ให้สั้นลง (ถ้าจำเป็น)
+            // สมมติว่าคุณอยากตัด projectTitle ให้เหลือ 50 ตัวอักษร
             const shortenedTitle = shortenString(project.projectTitle, 50);
 
+            // เติมข้อมูลในแถว
             row.innerHTML = `
             <td>${project.projectId || "N/A"}</td>
             <td title="${project.projectTitle}">${shortenedTitle}</td>
@@ -939,7 +921,7 @@
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
-                link.download = 'Raw_data.xlsx';
+                link.download = 'Raw_Committee_data.xlsx';
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -1011,7 +993,7 @@
             // ถ้านศ.มีค่าน้อยกว่า 3 ให้ padding ด้วยค่าว่าง
             const minRows = 3;
             while (studentList.length < minRows) {
-                studentList.push({ studentId: "", studentName: "" });
+                studentList.push({studentId: "", studentName: ""});
             }
             const numRows = studentList.length;
 
@@ -1064,7 +1046,7 @@
                 dataRows.push(row);
             }
             let endIndex = dataRows.length;
-            projectMapping.set(projectId, { start: startIndex, end: endIndex });
+            projectMapping.set(projectId, {start: startIndex, end: endIndex});
         });
 
         // ------------------- สร้าง Workbook, Worksheet ด้วย ExcelJS -------------------
@@ -1073,16 +1055,16 @@
 
         // ขยายความกว้างคอลัมน์เป็น 11 คอลัมน์ (A..K)
         ws.columns = [
-            { width: 15 }, // A: Project ID
-            { width: 25 }, // B: Project Title
-            { width: 30 }, // C: Project Description
-            { width: 15 }, // D: Project Category
-            { width: 15 }, // E: Student ID
-            { width: 25 }, // F: Student Name
-            { width: 10 }, // G: Program
-            { width: 20 }, // H: Advisor
-            { width: 20 }, // I: Co-advisor
-            { width: 20 }, // J: Committee
+            {width: 15}, // A: Project ID
+            {width: 25}, // B: Project Title
+            {width: 30}, // C: Project Description
+            {width: 15}, // D: Project Category
+            {width: 15}, // E: Student ID
+            {width: 25}, // F: Student Name
+            {width: 10}, // G: Program
+            {width: 20}, // H: Advisor
+            {width: 20}, // I: Co-advisor
+            {width: 20}, // J: Committee
         ];
 
         // Merge cells สำหรับ Header area (แถว 1-4) -> A1:K1, A2:K2, ฯลฯ
@@ -1093,33 +1075,33 @@
 
         // กำหนดค่า Header area
         ws.getCell('A1').value = "Senior Project Overview";
-        ws.getCell('A1').font = { bold: true, size: 14, color: { argb: 'FF000000' } };
-        ws.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getCell('A1').font = {bold: true, size: 14, color: {argb: 'FF000000'}};
+        ws.getCell('A1').alignment = {horizontal: 'center', vertical: 'middle'};
 
         ws.getCell('A2').value = "Exported Project Committee Data";
-        ws.getCell('A2').font = { size: 12, color: { argb: 'FF4D93D9' } };
-        ws.getCell('A2').alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getCell('A2').font = {size: 12, color: {argb: 'FF4D93D9'}};
+        ws.getCell('A2').alignment = {horizontal: 'center', vertical: 'middle'};
 
         ws.getCell('A3').value = "Link to view detailed project information";
-        ws.getCell('A3').font = { bold: true, size: 12, color: { argb: 'FF000000' } };
-        ws.getCell('A3').alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getCell('A3').font = {bold: true, size: 12, color: {argb: 'FF000000'}};
+        ws.getCell('A3').alignment = {horizontal: 'center', vertical: 'middle'};
 
         ws.getCell('A4').value = "https://yourprojectlink.example.com";
-        ws.getCell('A4').font = { size: 10, color: { argb: 'FF000000' } };
-        ws.getCell('A4').alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getCell('A4').font = {size: 10, color: {argb: 'FF000000'}};
+        ws.getCell('A4').alignment = {horizontal: 'center', vertical: 'middle'};
 
         // แถว 5: Header Row ของคอลัมน์
         const headerRow = ws.getRow(5);
         headerRow.values = headers;  // 11 คอลัมน์
-        headerRow.font = { bold: true, size: 11, color: { argb: 'FF000000' } };
-        headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
-        headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFB5E6A2' } };
+        headerRow.font = {bold: true, size: 11, color: {argb: 'FF000000'}};
+        headerRow.alignment = {vertical: 'middle', horizontal: 'center'};
+        headerRow.fill = {type: 'pattern', pattern: 'solid', fgColor: {argb: 'FFB5E6A2'}};
         headerRow.eachCell(cell => {
             cell.border = {
-                top: { style: 'thin', color: { argb: 'FF000000' } },
-                left: { style: 'thin', color: { argb: 'FF000000' } },
-                bottom: { style: 'thin', color: { argb: 'FF000000' } },
-                right: { style: 'thin', color: { argb: 'FF000000' } }
+                top: {style: 'thin', color: {argb: 'FF000000'}},
+                left: {style: 'thin', color: {argb: 'FF000000'}},
+                bottom: {style: 'thin', color: {argb: 'FF000000'}},
+                right: {style: 'thin', color: {argb: 'FF000000'}}
             };
         });
 
@@ -1143,7 +1125,7 @@
                 // หากมีแถวเดียว แต่ต้องการอย่างน้อย 3 แถว => สร้างแถวว่างเพิ่ม
                 let extraRows = 3 - 1; // มี 1 แถวแล้ว => เพิ่ม 2 แถว
                 for (let i = 0; i < extraRows; i++) {
-                    ws.addRow(["","","","","","","","","","",""]);
+                    ws.addRow(["", "", "", "", "", "", "", "", "", "", ""]);
                     endRow++;
                 }
                 [1, 2, 3, 4, 7, 8, 9].forEach(col => {
@@ -1154,12 +1136,12 @@
 
         // กำหนดสไตล์สำหรับ data rows (พื้นหลังสีเขียวอ่อน)
         const dataRowStyle = {
-            fill: { fgColor: { argb: 'FFC8E6C9' } },
+            fill: {fgColor: {argb: 'FFC8E6C9'}},
             border: {
-                top: { style: 'thin', color: { argb: 'FF000000' } },
-                left: { style: 'thin', color: { argb: 'FF000000' } },
-                bottom: { style: 'thin', color: { argb: 'FF000000' } },
-                right: { style: 'thin', color: { argb: 'FF000000' } }
+                top: {style: 'thin', color: {argb: 'FF000000'}},
+                left: {style: 'thin', color: {argb: 'FF000000'}},
+                bottom: {style: 'thin', color: {argb: 'FF000000'}},
+                right: {style: 'thin', color: {argb: 'FF000000'}}
             }
         };
 
@@ -1167,7 +1149,7 @@
         for (let i = 6; i <= ws.rowCount; i++) {
             let row = ws.getRow(i);
             row.eachCell(cell => {
-                cell.alignment = { vertical: 'middle', horizontal: 'left' };
+                cell.alignment = {vertical: 'middle', horizontal: 'left'};
                 cell.fill = dataRowStyle.fill;
                 cell.border = dataRowStyle.border;
             });
@@ -1176,7 +1158,7 @@
         // สร้างไฟล์ Excel แล้ว trigger ดาวน์โหลด
         wb.xlsx.writeBuffer()
             .then(buffer => {
-                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const blob = new Blob([buffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
@@ -1192,6 +1174,60 @@
 
     // ผูก event listener สำหรับ Export แบบใหม่
     document.getElementById("export-project-excel-new").addEventListener("click", exportTemplateNew);
+
+
+    // ฟังก์ชันยืนยันการลบ
+    function confirmDelete(studentId, studentName, projectId) {
+        // แสดงข้อความใน popup ด้วยข้อมูลที่ได้รับ
+        const popup = document.getElementById('confirmDeletePopup');
+        const deleteConfirmMsg = document.getElementById('delete-confirm-msg');
+        deleteConfirmMsg.innerHTML = `Are you sure you want to remove Student : "${studentId} ${studentName}" <br> from Project ID : "${projectId}"?`;
+
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        const cancelBtn = document.getElementById('cancelDeleteBtn');
+
+        // ทำให้ Popup แสดง
+        popup.style.display = 'block';
+
+        // เมื่อกดยืนยันให้ลบ student
+        confirmBtn.onclick = function () {
+            deleteStudentFromProject(studentId, projectId);  // ส่งคำขอลบ student ออกจาก project
+            popup.style.display = 'none'; // ซ่อน Popup
+        };
+
+        // เมื่อกดยกเลิก
+        cancelBtn.onclick = function () {
+            popup.style.display = 'none'; // ซ่อน Popup
+        };
+    }
+
+
+    // ฟังก์ชันสำหรับลบ student ออกจาก project
+    function deleteStudentFromProject(studentId, projectId) {
+        // ส่งคำขอลบข้อมูลไปยังเซิร์ฟเวอร์
+        fetch(`http://localhost:8080/admin/deleteStudentFromProject?projectId=${encodeURIComponent(projectId)}&studentId=${encodeURIComponent(studentId)}`, {
+            method: 'DELETE'
+        })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(errorText => {
+                        throw new Error(`HTTP error! status: ${response.status}, Message: ${errorText}`);
+                    });
+                }
+                // ถ้าลบสำเร็จ
+                return response.text();
+            })
+            .then(data => {
+                console.log('Success:', data);
+                // อัปเดต UI หลังจากลบเสร็จ
+                document.getElementById(`student-${studentId}`).closest('.form-group').remove();
+                showNotification('Student removed from project successfully!');
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showNotification('Error deleting student: ' + error.message);
+            });
+    }
 
 
 </script>

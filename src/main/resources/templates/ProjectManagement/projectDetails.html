@@ -226,7 +226,7 @@
                 <span id="closeModal" class="close-btn">&times;</span>
 
                 <h2>Upload Files</h2>
-                <h6 style="color: #D32F2F; margin-top: -15px"> * You can upload one file only.</h6>
+                <h6 style="color: #D32F2F; margin-top: -15px"> * You can upload only once.</h6>
 
                 <!-- File Input -->
                 <div class="upload-section">
@@ -672,227 +672,6 @@
     }
 
 
-  //   // ตัวแปรเก็บข้อมูลที่ได้จากไฟล์
-  //   let uploadedData = null;
-  //
-  //   function validateAndShowPreview(data) {
-  //       if (data.error) {
-  //           document.getElementById('preview-content').innerHTML = `<p style="color:red;">${data.error}</p>`;
-  //           return;
-  //       }
-  //       uploadedData = data;
-  //       console.log("Converted JSON Data:\n", JSON.stringify(uploadedData, null, 2));
-  //       displayProjectDetailsPreview(uploadedData);
-  //   }
-  //
-  //   function mockGenerateProjectId(program) {
-  //       return new Promise(resolve => {
-  //           // ตัวอย่าง: สำหรับโปรแกรม "ICT" ในปี 2024 ให้คืนค่า "ICT SP2024-01"
-  //           // สำหรับ demo นี้ เราสามารถใช้ค่าสุ่มหรือคงที่ก็ได้
-  //           // แต่เพื่อให้สอดคล้องกับการ Generate ที่คาดหวัง ให้ใช้โปรแกรม + " SP2024-01"
-  //           resolve(`${program} SP2024-01`);
-  //       });
-  //   }
-  //
-  //
-  //   // ฟังก์ชันสำหรับแสดงพรีวิวของ Project Details
-  //   async function displayProjectDetailsPreview(data) {
-  //       const previewContent = document.getElementById('preview-content');
-  //       previewContent.innerHTML = "";
-  //
-  //       // คำนวณ maxStudents จากกลุ่มทั้งหมด
-  //       let maxStudents = 0;
-  //       data.forEach(project => {
-  //           if (project.studentList && project.studentList.length > maxStudents) {
-  //               maxStudents = project.studentList.length;
-  //           }
-  //       });
-  //
-  //       // สร้างตาราง preview
-  //       const table = document.createElement('table');
-  //       table.classList.add('preview-table');
-  //
-  //       // สร้าง header row (เพิ่มคอลัมน์สำหรับนักศึกษาแบบแยก td)
-  //       const headerRow = document.createElement('tr');
-  //       let headerHTML = `
-  //   <th>No.</th>
-  //   <th>Project Title</th>
-  //   <th>Project Description</th>
-  //   <th>Program</th>
-  //   <th>Advisor</th>
-  // `;
-  //       // เพิ่มคอลัมน์สำหรับแต่ละนักศึกษา (Student 1, Student 2, ...)
-  //       for (let i = 1; i <= maxStudents; i++) {
-  //           headerHTML += `<th>Student ${i}</th>`;
-  //       }
-  //       headerHTML += `<th>Project ID (Generated)</th>
-  //                <th>Validation</th>`;
-  //       headerRow.innerHTML = headerHTML;
-  //       table.appendChild(headerRow);
-  //
-  //       // สำหรับแต่ละโปรเจกต์
-  //       for (let project of data) {
-  //           // เรียก mockGenerateProjectId เพื่อให้ได้ Generated Project ID (จริงๆนี้เรียก API จาก server)
-  //           let generatedProjectId = "";
-  //           if (project.program) {
-  //               generatedProjectId = await mockGenerateProjectId(project.program);
-  //           }
-  //
-  //           // Validation: ตรวจสอบข้อมูลโปรเจกต์และนักศึกษา
-  //           let validationMsg = "";
-  //           if (!project.projectTitle) {
-  //               validationMsg += "Missing project title. ";
-  //           }
-  //           if (!project.studentList || project.studentList.length === 0) {
-  //               validationMsg += "No students. ";
-  //           }
-  //           if (validationMsg === "") validationMsg = "OK";
-  //
-  //           // สร้างแถวใหม่สำหรับโปรเจกต์นี้
-  //           const row = document.createElement('tr');
-  //           let rowHTML = `
-  //     <td>${project.no || "-"}</td>
-  //     <td>${project.projectTitle || "N/A"}</td>
-  //     <td>${project.projectDescription || "N/A"}</td>
-  //     <td>${project.program || "N/A"}</td>
-  //     <td>${project.advisor || "N/A"}</td>
-  //   `;
-  //           // สำหรับนักศึกษาทุกคนในโปรเจกต์นี้
-  //           // เราสร้าง td แยกกันสำหรับแต่ละนักศึกษา
-  //           for (let i = 0; i < maxStudents; i++) {
-  //               if (project.studentList && project.studentList[i]) {
-  //                   const stu = project.studentList[i];
-  //                   rowHTML += `<td>${stu.studentId} (${stu.studentName})</td>`;
-  //               } else {
-  //                   rowHTML += `<td></td>`;
-  //               }
-  //           }
-  //           // เพิ่มคอลัมน์ Generated Project ID และ Validation
-  //           rowHTML += `<td>${generatedProjectId || "N/A"}</td>
-  //               <td>${validationMsg}</td>`;
-  //           row.innerHTML = rowHTML;
-  //
-  //           // เปลี่ยนสีพื้นหลังหาก Validation ไม่ OK
-  //           if (validationMsg !== "OK") {
-  //               row.style.backgroundColor = "#f8d7da";
-  //           }
-  //
-  //           table.appendChild(row);
-  //       }
-  //
-  //       previewContent.appendChild(table);
-  //
-  //       // แสดง JSON ที่ได้ (print in element <pre id="jsonOutput">)
-  //       const jsonOutput = document.getElementById('jsonOutput');
-  //       if (jsonOutput) {
-  //           jsonOutput.textContent = JSON.stringify(uploadedData, null, 2);
-  //       }
-  //   }
-  //
-  //
-  //   // Event Listener เมื่อเลือกไฟล์
-  //   document.getElementById('fileInput').addEventListener('change', function (event) {
-  //       const file = event.target.files[0];
-  //       if (file) {
-  //           const reader = new FileReader();
-  //           reader.onload = function (e) {
-  //               let fileContent = e.target.result;
-  //               fileContent = removeBOM(fileContent);
-  //
-  //               if (file.type === "text/csv" || file.name.endsWith(".csv")) {
-  //                   const jsonData = csvToJson(fileContent);
-  //                   validateAndShowPreview(jsonData);
-  //               } else if (file.type === "application/json" || file.name.endsWith(".json")) {
-  //                   let jsonData;
-  //                   try {
-  //                       jsonData = JSON.parse(fileContent);
-  //                   } catch (err) {
-  //                       document.getElementById('preview-content').innerHTML = "<p style='color:red;'>Error parsing JSON file.</p>";
-  //                       return;
-  //                   }
-  //                   validateAndShowPreview(jsonData);
-  //               } else if (file.name.endsWith(".xlsx")) {
-  //                   // สำหรับไฟล์ Excel แจ้งเตือนว่าไม่รองรับในตัวอย่างนี้
-  //                   validateAndShowPreview({error: "Unsupported file type. Please upload a CSV or JSON file."});
-  //               } else {
-  //                   validateAndShowPreview({error: "Unsupported file type. Please upload a CSV or JSON file."});
-  //               }
-  //
-  //               // แสดงปุ่ม Upload เมื่อเลือกไฟล์แล้ว
-  //               document.getElementById('confirm-upload-btn').style.display = 'inline-block';
-  //           };
-  //           reader.readAsText(file, "UTF-8");
-  //       }
-  //   });
-  //
-  //
-  //   // ฟังก์ชัน Upload ข้อมูลไปยังเซิร์ฟเวอร์ (เรียก API Service)
-  //   document.getElementById('confirm-upload-btn').addEventListener('click', function () {
-  //       const file = document.getElementById('fileInput').files[0];
-  //
-  //       if (!file) {
-  //           alert("Please select a file first!");
-  //           return;
-  //       }
-  //
-  //       const formData = new FormData();
-  //       formData.append("file", file);
-  //
-  //       console.log("📌 Sending file to server:", file.name);
-  //
-  //       fetch("http://localhost:8080/admin/uploadProjectFiles", {
-  //           method: "POST",
-  //           body: formData
-  //       })
-  //           .then(response => response.json())
-  //           .then(data => {
-  //               // ตรวจสอบ data.message ก่อน
-  //               if (data.message === "File processed successfully") {
-  //                   // กรณีอัปโหลดสำเร็จสมบูรณ์
-  //                   Swal.fire({
-  //                       icon: "success",
-  //                       title: "Data Upload successfully.",
-  //                       showConfirmButton: true,
-  //                       timer: 2000
-  //                   }).then(() => {
-  //                       // Reload หน้าเมื่อ swal ปิดลงแล้ว
-  //                       location.reload();
-  //                   });
-  //               } else if (data.message === "File processed with warnings") {
-  //                   // ถ้ามี warnings ให้ลองใช้ shortMessage ถ้ามี
-  //                   if (data.shortMessage) {
-  //                       alert(data.shortMessage);
-  //                   } else if (data.warnings && data.warnings.length > 0) {
-  //                       let warnMsg = data.message + "\n\nWarnings:\n" + data.warnings.join("\n");
-  //                       alert(warnMsg);
-  //                   } else {
-  //                       alert(data.message);
-  //                   }
-  //                   // ถ้าต้องการ reload หน้า ให้ยกเลิก comment บรรทัดต่อไปนี้
-  //                   // location.reload();
-  //
-  //               } else if (data.message === "File processing failed") {
-  //                   // กรณีไฟล์มีปัญหาร้ายแรง
-  //                   if (data.errors && data.errors.length > 0) {
-  //                       alert("Upload failed: " + data.errors.join(", "));
-  //                   } else {
-  //                       alert("Upload failed: " + data.message);
-  //                   }
-  //               } else {
-  //                   // กรณีอื่น ๆ ที่ไม่อยู่ในเงื่อนไขข้างต้น
-  //                   if (data.errors && data.errors.length > 0) {
-  //                       alert("Upload failed: " + data.errors.join(", "));
-  //                   } else if (data.message) {
-  //                       alert("Upload failed: " + data.message);
-  //                   } else {
-  //                       alert("Upload failed: Unknown error");
-  //                   }
-  //               }
-  //           })
-  //           .catch(error => console.error("Error uploading file:", error));
-  //   });
-
-
     // ฟังก์ชันสำหรับลบ BOM (รองรับภาษาไทย)
     function removeBOM(csv) {
         if (csv.charCodeAt(0) === 0xFEFF) {
@@ -910,14 +689,39 @@
 
     // เมื่อเลือกไฟล์ ให้เก็บไฟล์, แปลงเป็น JSON, เรียก validate แล้วโชว์ preview
     document.getElementById('fileInput').addEventListener('change', async function (event) {
-        selectedFile = event.target.files[0];
+        const selectedFile = event.target.files[0];
+
         if (!selectedFile) return;
 
+        // ตรวจสอบประเภทไฟล์
+        const fileType = selectedFile.type;
+        const fileName = selectedFile.name;
+
+        // ถ้าไฟล์ไม่ใช่ CSV หรือ JSON ให้แจ้งเตือน
+        if (fileType !== "text/csv" && !fileName.endsWith(".csv") && fileType !== "application/json" && !fileName.endsWith(".json")) {
+            alert("กรุณาอัปโหลดไฟล์ที่มีนามสกุล .csv หรือ .json เท่านั้น.");
+            document.getElementById('fileInput').value = ""; // รีเซ็ต input
+            return;
+        }
+
+        // ถ้าไฟล์เป็น .csv หรือ .json
         const text = await selectedFile.text();
         const content = removeBOM(text);
-        const data = csvToJson(content);
+        let data;
 
-        // เก็บ data ชั่วคราว
+        // แปลงไฟล์เป็น JSON ตามประเภทไฟล์
+        if (fileType === "application/json" || fileName.endsWith(".json")) {
+            try {
+                data = JSON.parse(content);
+            } catch (error) {
+                document.getElementById('preview-content').innerHTML = "<p style='color:red;'>Error parsing JSON file.</p>";
+                return;
+            }
+        } else if (fileType === "text/csv" || fileName.endsWith(".csv")) {
+            data = csvToJson(content);
+        }
+
+        // เก็บข้อมูลชั่วคราว
         uploadedData = data;
 
         // เรียก validate ไปยัง Back‑end
@@ -926,9 +730,14 @@
         // แสดง preview พร้อม highlight
         await displayProjectDetailsPreview(uploadedData, validationErrors);
 
-        // แสดงปุ่ม Confirm Upload
+        // แสดงปุ่ม Confirm Upload เมื่อไฟล์ถูกเลือก
         document.getElementById('confirm-upload-btn').style.display = 'inline-block';
+
+        // เก็บไฟล์ที่เลือกไว้ในตัวแปร selectedFile
+        window.selectedFile = selectedFile;  // เพิ่มการเก็บไฟล์ในตัวแปร global
     });
+
+
 
     // ฟังก์ชันเรียก Validate API
     async function validateWithBackend(file) {
@@ -971,17 +780,17 @@
           <th>No.</th>
           <th>Project Title</th>
           <th>Project Description</th>
-          <th>Program</th>
           <th>Advisor</th>
+          <th>Program</th>
         `;
         for (let i = 1; i <= maxStudents; i++) {
             headerHTML += `<th>Student ${i}</th>`;
         }
-        // เพิ่มสองคอลัมน์ใหม่
-        headerHTML += `
-          <th>Project ID</th>
-          <th>Discrepancies</th>
-        `;
+        // // เพิ่มสองคอลัมน์ใหม่
+        // headerHTML += `
+        //   <th>Project ID</th>
+        //   <th>Discrepancies</th>
+        // `;
         header.innerHTML = headerHTML;
         table.appendChild(header);
 
@@ -1004,12 +813,13 @@
 
             // เติมข้อมูล cell
             let rowHTML = `
-              <td>${project.no || "-"}</td>
-              <td>${project.projectTitle || "-"}</td>
-              <td>${project.projectDescription || "-"}</td>
-              <td>${project.program || "-"}</td>
-              <td>${project.advisor || "-"}</td>
-            `;
+  <td>${project.no || "-"}</td>
+  <td>${project.projectTitle || "-"}</td>
+  <td>${project.projectDescription || "-"}</td>
+  <td>${project.program || "-"}</td>
+  <td>${project.advisor || "-"}</td>
+`;
+
             for (let i = 0; i < maxStudents; i++) {
                 if (project.studentList[i]) {
                     const s = project.studentList[i];
@@ -1018,17 +828,8 @@
                     rowHTML += `<td></td>`;
                 }
             }
-            // คอลัมน์ Project ID
-            rowHTML += `<td>${generatedId}</td>`;
 
-            // คอลัมน์ Discrepancies
-            if (hasError) {
-                // join แต่ละ msg ใหม่บรรทัดหนึ่ง
-                const detail = errs.map(e => `<div>${e}</div>`).join("");
-                rowHTML += `<td>${detail}</td>`;
-            } else {
-                rowHTML += `<td style="color: green;">OK</td>`;
-            }
+            rowHTML += `</tr>`;
 
             row.innerHTML = rowHTML;
             table.appendChild(row);
@@ -1039,12 +840,12 @@
 
     // ปุ่มยืนยันอัปโหลด
     document.getElementById('confirm-upload-btn').addEventListener('click', async () => {
-        if (!selectedFile) {
+        if (!window.selectedFile) {
             return showErrorsPopup(['กรุณาเลือกไฟล์ก่อน']);
         }
 
         const form = new FormData();
-        form.append('file', selectedFile);
+        form.append('file', window.selectedFile);
 
         try {
             const resp = await fetch('http://localhost:8080/admin/uploadProjectDBFiles', {
@@ -1062,11 +863,9 @@
                 }).then(() => {
                     location.reload();
                 });
-            }
-            else if (json.errors && json.errors.length) {
+            } else if (json.errors && json.errors.length) {
                 showErrorsPopup(json.errors);
-            }
-            else if (json.warnings && json.warnings.length) {
+            } else if (json.warnings && json.warnings.length) {
                 // ถ้ามี warnings แยกมาอีก popup
                 Swal.fire({
                     icon: 'warning',
@@ -1077,8 +876,7 @@
                     width: '600px',
                     confirmButtonText: 'ปิด'
                 });
-            }
-            else {
+            } else {
                 showErrorsPopup([ json.message || 'Unknown error' ]);
             }
         } catch (err) {
@@ -1263,16 +1061,17 @@
             // ประมวลผลรายชื่ออาจารย์ใน professorList
             let advisor = "";
             let coAdvisor = "";
-            let posterCommittee = "";
+            // let posterCommittee = "";
             if (project.professorList && Array.isArray(project.professorList)) {
                 project.professorList.forEach(prof => {
                     if (prof.role === "Advisor") {
                         advisor = prof.professorName;
                     } else if (prof.role === "Co-advisor") {
                         coAdvisor = prof.professorName;
-                    } else if (prof.role === "Committee") {
-                        committee = prof.professorName
                     }
+                    // } else if (prof.role === "Committee") {
+                    //     committee = prof.professorName
+                    // }
                 });
             }
 
@@ -1289,8 +1088,8 @@
                         project.program,
                         advisor,
                         coAdvisor,
-                        committee,
-                        ""
+                        // committee,
+                        // ""
                     ]);
                 });
             } else {
@@ -1305,8 +1104,8 @@
                     project.program,
                     advisor,
                     coAdvisor,
-                    committee,
-                    ""
+                    // committee,
+                    // ""
                 ]);
             }
         });
@@ -1326,15 +1125,15 @@
             {width: 10},  // G - Program
             {width: 20},  // H - Advisor
             {width: 20},  // I - Co-advisor
-            {width: 20},  // J - Committee
-            {width: 20},  // K - Poster-Committee
+            // {width: 20},  // J - Committee
+            // {width: 20},  // K - Poster-Committee
         ];
 
         // Merge cells สำหรับ Header (แถว 1-4)
-        ws.mergeCells('A1:K1');
-        ws.mergeCells('A2:K2');
-        ws.mergeCells('A3:K3');
-        ws.mergeCells('A4:K4');
+        ws.mergeCells('A1:I1');
+        ws.mergeCells('A2:I2');
+        ws.mergeCells('A3:I3');
+        ws.mergeCells('A4:I4');
 
         // แถว 1
         ws.getCell('A1').value = "Senior Project Overview";
@@ -1368,8 +1167,8 @@
             "Program",
             "Advisor",
             "Co-advisor",
-            "Committee",
-            "Poster-Committee"
+            // "Committee",
+            // "Poster-Committee"
         ];
 
         headerRow.font = {bold: true, size: 11, color: {argb: 'FF000000'}};
@@ -1435,7 +1234,6 @@
             return;
         }
 
-        // เพิ่มคอลัมน์ Poster Committee เข้าไปใน headers
         const headers = [
             "Project ID",
             "Project Title",
@@ -1474,7 +1272,7 @@
                 });
             }
 
-            // ------------------- นักศึกษาในโปรเจกต์ -------------------
+            // ------------------- Student -------------------
             let studentList = [];
             if (project.studentList && Array.isArray(project.studentList) && project.studentList.length > 0) {
                 studentList = project.studentList.map(student => ({
