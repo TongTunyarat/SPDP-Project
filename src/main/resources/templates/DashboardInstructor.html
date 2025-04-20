@@ -287,10 +287,10 @@
                         </svg>
                     </div>
                     <label class="text-center">
-                        <h1> 0 </h1>
+                        <h1> 0 </h1><span style="color: #919EAB; font-size: 1.7rem; padding-left: 1rem;">Groups</span>
                     </label>
 
-                    <label class="text-footer"> 0 <span style="color: #919EAB; margin-left: 1rem;"> completed </span> </label>
+<!--                    <label class="text-footer"> 0 <span style="color: #919EAB; margin-left: 1rem;"> completed </span> </label>-->
                 </div>
 
                 <div class="header-container">
@@ -304,10 +304,10 @@
                         </svg>
                     </div>
                     <label class="text-center">
-                        <h1> 0 </h1>
+                        <h1> 0 </h1><span style="color: #919EAB; font-size: 1.7rem; padding-left: 1rem;">Groups</span>
                     </label>
 
-                    <label class="text-footer"> 0 <span style="color: #919EAB; margin-left: 1rem;"> completed </span> </label>
+<!--                    <label class="text-footer"> 0 <span style="color: #919EAB; margin-left: 1rem;"> completed </span> </label>-->
                 </div>
 
                 <div class="header-container">
@@ -327,10 +327,10 @@
                         </svg>
                     </div>
                     <label class="text-center">
-                        <h1> 0 </h1>
+                        <h1> 0 </h1><span style="color: #919EAB; font-size: 1.7rem; padding-left: 1rem;">Groups</span>
                     </label>
 
-                    <label class="text-footer"> 0 <span style="color: #919EAB; margin-left: 1rem;"> completed </span> </label>
+<!--                    <label class="text-footer"> 0 <span style="color: #919EAB; margin-left: 1rem;"> completed </span> </label>-->
                 </div>
 
             </div>
@@ -685,13 +685,13 @@
         const dashboardDefense = data[2];
 
         document.querySelector('.header-container:nth-child(3) .text-center h1').innerText = dashboardProposal.instructorPropoSuccessEva + " / " + dashboardProposal.totalProjects;
-        document.querySelector('.header-container:nth-child(3) .text-footer').innerHTML = `${dashboardProposal.instructorPropoSuccessEva} &nbsp;<span style="color: #919EAB; margin-left: 1rem;"> completed </span>`;
+        // document.querySelector('.header-container:nth-child(3) .text-footer').innerHTML = `${dashboardProposal.instructorPropoSuccessEva} &nbsp;<span style="color: #919EAB; margin-left: 1rem;"> completed </span>`;
 
         document.querySelector('.header-container:nth-child(4) .text-center h1').innerText = dashboardPoster.instructorPosterSuccessEva + " / " + dashboardPoster.totalProjects;
-        document.querySelector('.header-container:nth-child(4) .text-footer').innerHTML = `${dashboardPoster.instructorPosterSuccessEva}  &nbsp; <span style="color: #919EAB; margin-left: 1rem;">  completed </span>`;
+        // document.querySelector('.header-container:nth-child(4) .text-footer').innerHTML = `${dashboardPoster.instructorPosterSuccessEva}  &nbsp; <span style="color: #919EAB; margin-left: 1rem;">  completed </span>`;
 
         document.querySelector('.header-container:nth-child(5) .text-center h1').innerText = dashboardDefense.instructorDefenseSuccessEva + " / " +  dashboardDefense.totalProjects;
-        document.querySelector('.header-container:nth-child(5) .text-footer').innerHTML = `${dashboardDefense.instructorDefenseSuccessEva}  &nbsp; <span style="color: #919EAB; margin-left: 1rem;"> completed </span>`;
+        // document.querySelector('.header-container:nth-child(5) .text-footer').innerHTML = `${dashboardDefense.instructorDefenseSuccessEva}  &nbsp; <span style="color: #919EAB; margin-left: 1rem;"> completed </span>`;
 
     }
 
