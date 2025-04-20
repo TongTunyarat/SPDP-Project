@@ -629,7 +629,7 @@
         <th>Project Title</th>
         <th>Student IDs</th>
         <th>Advisor</th>
-        <th>Committee</th>
+        <th>Poster Committee</th>
     `;
         table.appendChild(headerRow);
 
@@ -650,7 +650,7 @@
             <td title="${project.projectTitle}">${shortenedTitle}</td>
             <td>${studentIDs}</td>
             <td>${project.advisor || "N/A"}</td>
-            <td>${project.committee || "N/A"}</td>
+            <td>${project.posterCommittee || "N/A"}</td>
         `;
             table.appendChild(row);
         });
