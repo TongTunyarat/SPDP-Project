@@ -293,24 +293,44 @@
                 if (isFirstStudent) {
                     const prefix = project.projectId.match(/^(ICT|DST)/)?.[0] || '';
                     const remainingId = project.projectId.substring(prefix.length);
+                    const maxScore = maxScoreMap[project.projectId];
 
+
+                    // row.innerHTML = `
+                    //     <td rowspan="${project.students.length}">${remainingId}<br>
+                    //         <div class="${prefix.toLowerCase()}-badge">${prefix}</div>
+                    //     </td>
+                    //     <td rowspan="${project.students.length}">${project.projectTitle}</td>
+                    //     <td rowspan="${project.students.length}">${project.advisor}</td>
+                    //     <td><input type="number" min="0" max="10" class="timeline-input"
+                    //         value="${timelineScoresMap[project.projectId] ?? ''}"
+                    //         data-project-id="${project.projectId}"></td>
+                    // `;
                     row.innerHTML = `
-                        <td rowspan="${project.students.length}">${remainingId}<br>
-                            <div class="${prefix.toLowerCase()}-badge">${prefix}</div>
-                        </td>
-                        <td rowspan="${project.students.length}">${project.projectTitle}</td>
-                        <td rowspan="${project.students.length}">${project.advisor}</td>
-                        <td><input type="number" min="0" max="10" class="timeline-input"
-                            value="${timelineScoresMap[project.projectId] ?? ''}"
-                            data-project-id="${project.projectId}"></td>
-                    `;
+                    <td rowspan="${project.students.length}">${remainingId}<br>
+                        <div class="${prefix.toLowerCase()}-badge">${prefix}</div>
+                    </td>
+                    <td rowspan="${project.students.length}">${project.projectTitle}</td>
+                    <td rowspan="${project.students.length}">${project.advisor}</td>
+                    <td>
+                        <input type="number" min="0" max="${maxScore}" class="timeline-input"
+                        value="${timelineScoresMap[project.projectId] ?? ''}"
+                        data-project-id="${project.projectId}"
+                        data-max-score="${maxScore}">
+                        <small class="max-score-label">(Max: ${maxScore})</small>
+                    </td>
+                `;
                 }
 
                 tableBody.appendChild(row);
                 isFirstStudent = false;
             });
         });
+
+        addInputValidation();
     }
+
+    let maxScoreMap = {};
 
     function fetchTimelineScores() {
         const selectedYear = document.getElementById("semester-selector").value;
@@ -327,9 +347,15 @@
             .then(response => response.json())
             .then(data => {
                 timelineScoresMap = {};
+                maxScoreMap = {}; // Reset max scores
+
                 data.forEach(score => {
                     timelineScoresMap[score.projectId] = score.timelineScore;
+                    maxScoreMap[score.projectId] = score.maxScore; // Store maxScore for each project
                 });
+                // data.forEach(score => {
+                //     timelineScoresMap[score.projectId] = score.timelineScore;
+                // });
 
                 // หลังจากได้ timeline scores มาแล้ว ให้กรองข้อมูลตาม program อีกครั้ง
                 const activeProgram = document.querySelector('.tab.active').textContent;
@@ -378,10 +404,195 @@
 
 </script>
 
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Save Score -->
 <script>
+    // function saveScores() {
+    //     const scores = [];
+    //     const inputs = document.querySelectorAll('.timeline-input');
+    //
+    //     inputs.forEach(input => {
+    //         const projectId = input.getAttribute('data-project-id');
+    //         const score = input.value;
+    //
+    //         if (score !== '') {
+    //             scores.push({
+    //                 projectId: projectId,
+    //                 score: score,
+    //                 evaType: document.getElementById("evaTypeSelect").value  // ประเภทการประเมิน
+    //             });
+    //         }
+    //     });
+    //
+    //     if (scores.length === 0) {
+    //         alert("No scores to save");
+    //         return;
+    //     }
+    //
+    //     fetch('/api/save/timeliness', {
+    //         method: 'POST',
+    //         headers: {
+    //             'Content-Type': 'application/json',
+    //         },
+    //         body: JSON.stringify(scores)
+    //     })
+    //         .then(async response => {
+    //             const data = await response.text(); // อ่านเป็น text ก่อน
+    //             if (!response.ok) {
+    //                 throw new Error(data); // ขว้าง error เพื่อให้ไปเข้า catch
+    //             }
+    //             console.log('Scores saved:', data);
+    //             alert("Scores saved successfully!");
+    //         })
+    //         .catch(error => {
+    //             console.error('Error saving scores:', error);
+    //             alert("Failed to save scores: " + error.message);
+    //         });
+    //
+    // }
+    // Add this to your existing script section or create a new one
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add CSS styling for invalid scores
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+        .invalid-score {
+            border: 2px solid #ff0000 !important;
+            background-color: rgba(255, 0, 0, 0.1) !important;
+            color: #ff0000;
+        }
+
+        .invalid-score:focus {
+            outline-color: #ff0000;
+        }
+
+        .invalid-score-alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 80%;
+        }
+    `;
+        document.head.appendChild(styleElement);
+
+        // The rest of this function will be called by your existing DOMContentLoaded handler
+    });
+
+    // Add this to your renderGroupedTable function after creating the input elements
+    function addInputValidation() {
+        const inputs = document.querySelectorAll(".timeline-input");
+
+        inputs.forEach(input => {
+            // Remove any existing event listeners by cloning and replacing
+            const newInput = input.cloneNode(true);
+            input.parentNode.replaceChild(newInput, input);
+
+            // Add new event listener for validation
+            newInput.addEventListener("input", function() {
+                const maxScore = parseFloat(this.getAttribute("data-max-score"));
+                let value = parseFloat(this.value);
+
+                if (isNaN(value)) {
+                    this.classList.remove("invalid-score");
+                    this.title = "";
+                } else if (value > maxScore) {
+                    this.classList.add("invalid-score");
+                    this.title = `Maximum score is ${maxScore}`;
+                } else if (value < 0) {
+                    this.classList.add("invalid-score");
+                    this.title = "Score cannot be negative";
+                } else {
+                    this.classList.remove("invalid-score");
+                    this.title = "";
+                }
+            });
+        });
+    }
+
+    function checkForInvalidScores() {
+        const inputs = document.querySelectorAll('.timeline-input');
+        const invalidScores = [];
+
+        inputs.forEach(input => {
+            const value = parseFloat(input.value);
+            const maxScore = parseFloat(input.getAttribute('data-max-score'));
+            const projectId = input.getAttribute('data-project-id');
+
+            // Only check fields that have values entered
+            if (!isNaN(value) && input.value !== '') {
+                if (value > maxScore || value < 0) {
+                    invalidScores.push({
+                        projectId: projectId,
+                        value: input.value,
+                        maxScore: maxScore
+                    });
+                }
+            }
+        });
+
+        return invalidScores;
+    }
+
     function saveScores() {
+        const invalidScores = checkForInvalidScores();
+
+        if (invalidScores.length > 0) {
+            // Create and show invalid score alert
+            const invalidScoreAlert = document.createElement('div');
+            invalidScoreAlert.className = 'invalid-score-alert';
+
+            let alertContent = '<h3 style="margin-top:0">⚠️ Invalid Scores Detected</h3>';
+            alertContent += '<p>Cannot save scores. Please correct the following:</p><ul>';
+
+            invalidScores.forEach(item => {
+                // Determine the problem with the score
+                let problem = "";
+                if (parseFloat(item.value) > parseFloat(item.maxScore)) {
+                    problem = `Maximum score is ${item.maxScore}`;
+                } else if (parseFloat(item.value) < 0) {
+                    problem = "Score cannot be negative";
+                } else {
+                    problem = "Invalid score";
+                }
+
+                alertContent += `
+                <li style="margin-bottom: 10px;">
+                    <div><strong>${item.projectId}</strong></div>
+                    <div style="color: #dc3545;">Score: ${item.value} - <strong>${problem}</strong></div>
+                </li>
+            `;
+            });
+
+            alertContent += '</ul>';
+            alertContent += '<button id="closeInvalidAlert" style="background-color:#dc3545;color:white;border:none;padding:8px 15px;border-radius:4px;cursor:pointer;float:right">Close</button>';
+            alertContent += '<div style="clear:both"></div>';
+
+            invalidScoreAlert.innerHTML = alertContent;
+            document.body.appendChild(invalidScoreAlert);
+
+            // Add event listener to close button
+            document.getElementById('closeInvalidAlert').addEventListener('click', function() {
+                invalidScoreAlert.remove();
+            });
+
+            // Automatically remove after 10 seconds
+            setTimeout(() => {
+                if (document.body.contains(invalidScoreAlert)) {
+                    invalidScoreAlert.remove();
+                }
+            }, 10000);
+
+            return; // Stop execution and don't save
+        }
+
+        // Continue with the original save function if no invalid scores
         const scores = [];
         const inputs = document.querySelectorAll('.timeline-input');
 
@@ -393,7 +604,7 @@
                 scores.push({
                     projectId: projectId,
                     score: score,
-                    evaType: document.getElementById("evaTypeSelect").value  // ประเภทการประเมิน
+                    evaType: document.getElementById("evaTypeSelect").value
                 });
             }
         });
@@ -411,19 +622,31 @@
             body: JSON.stringify(scores)
         })
             .then(async response => {
-                const data = await response.text(); // อ่านเป็น text ก่อน
+                const data = await response.text();
                 if (!response.ok) {
-                    throw new Error(data); // ขว้าง error เพื่อให้ไปเข้า catch
+                    throw new Error(data);
                 }
                 console.log('Scores saved:', data);
-                alert("Scores saved successfully!");
+                // alert("Scores saved successfully!");
+                showAutoAlert("Timeliness score saved successfully!");
             })
             .catch(error => {
                 console.error('Error saving scores:', error);
                 alert("Failed to save scores: " + error.message);
             });
-
     }
+
+    function showAutoAlert(message, type = "success", duration = 3000) {
+        Swal.fire({
+            title: message,
+            icon: type, // "success", "error", "warning", "info", "question"
+            timer: 1000, // ปิดเองหลังจาก 3 วินาที (แก้ไขได้)
+            showConfirmButton: false, // ไม่ต้องกด OK
+            allowOutsideClick: false, // ป้องกันการคลิกเพื่อปิด
+            backdrop: true // มีพื้นหลังโปร่งแสงเหมือน alert()
+        });
+    }
+
 </script>
 
 
