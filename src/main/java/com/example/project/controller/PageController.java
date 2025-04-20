@@ -33,6 +33,8 @@ public class PageController {
     public String adminPropReport() { return "/Dashboard&Report/ProposalGradeReport"; }
     @GetMapping("/admin-defense-report")
     public String adminDefReport() { return "/Dashboard&Report/DefenseGradeReport"; }
+    @GetMapping("/admin-timeliness-scoring")
+    public String timelinessScoring() {return "/GiveScore/GiveTimelineScore"; }
     @GetMapping("/admin-eva-traking")
     public String adminEvaTrack() { return "/Dashboard&Report/EvaluationTracking"; }
 

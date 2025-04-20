@@ -1,8 +1,11 @@
 package com.example.project.repository;
 
 
+import com.example.project.DTO.FilterResponseDTO;
 import com.example.project.DTO.projectManagement.ProjectDTO;
+import com.example.project.DTO.projectManagement.StudentProjectDTO;
 import com.example.project.entity.Project;
+import com.example.project.entity.ProposalSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -46,6 +49,18 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
     @Query("SELECT p.projectId FROM Project p WHERE p.program = :program")
     List<String> findByProjectIdAndProgram(@Param("program") String program);
 
+    @Query("SELECT p.projectId FROM Project p WHERE p.program = :program AND p.semester = :semester ")
+    List<String> findByProjectIdAndProgramAndSemster(@Param("program") String program, @Param("semester") String semester);
+
+    @Query("SELECT p FROM Project p WHERE p.program = :program AND p.semester = :semester ")
+    List<Project> findByProjectAndProgramAndSemster(@Param("program") String program, @Param("semester") String semester);
+
+    @Query("SELECT p.projectId FROM Project p WHERE p.semester = :semester ")
+    List<String> findByProjectIdAndSemster(@Param("semester") String semester);
+
+    @Query("SELECT p FROM Project p WHERE p.semester = :semester ")
+    List<Project> findByProjectAndSemster(@Param("semester") String semester);
+
     @Query("SELECT p.projectId FROM Project p")
     List<String> findByProjectIdList();
 
@@ -70,6 +85,7 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
     @Query("SELECT MAX(p.projectId) FROM Project p WHERE p.program = :program AND p.projectId LIKE CONCAT(:program, ' SP%')")
     String findLatestProjectIdByProgram(@Param("program") String program);
 
+
     @Query(value = "SELECT project_id FROM project " +
             "WHERE project_id LIKE CONCAT(:program, ' SP', :year, '-%') " +
             "ORDER BY CAST(SUBSTRING(project_id, LOCATE('-', project_id) + 1) AS UNSIGNED) DESC " +
@@ -78,7 +94,10 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
                                                @Param("year") String year);
 
     Optional<Project> findByProjectTitleAndProjectDescription(String title, String description);
-}
+
+    // เพิ่มฟังก์ชันที่ดึงข้อมูลโปรเจกต์ทั้งหมดได้
+//    List<Project> findAll();
+
 
 
 // Default กัน พลาด เสียหาย
@@ -96,4 +115,3 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 //    Project findByProjectId(String projectId);
 //
 //}
-

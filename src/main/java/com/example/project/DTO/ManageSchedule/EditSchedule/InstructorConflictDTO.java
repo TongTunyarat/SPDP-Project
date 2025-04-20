@@ -6,12 +6,21 @@ public class InstructorConflictDTO {
 
     private String instructorName;
     private String conflictingProjectId;
+    private String conflictingDate;
     private LocalTime conflictStartTime;
     private LocalTime conflictEndTime;
 
     public InstructorConflictDTO(String instructorName, String conflictingProjectId, LocalTime conflictStartTime, LocalTime conflictEndTime) {
         this.instructorName = instructorName;
         this.conflictingProjectId = conflictingProjectId;
+        this.conflictStartTime = conflictStartTime;
+        this.conflictEndTime = conflictEndTime;
+    }
+
+    public InstructorConflictDTO(String instructorName, String conflictingProjectId, String conflictingDate, LocalTime conflictStartTime, LocalTime conflictEndTime) {
+        this.instructorName = instructorName;
+        this.conflictingProjectId = conflictingProjectId;
+        this.conflictingDate = conflictingDate;
         this.conflictStartTime = conflictStartTime;
         this.conflictEndTime = conflictEndTime;
     }
@@ -46,5 +55,13 @@ public class InstructorConflictDTO {
 
     public void setConflictEndTime(LocalTime conflictEndTime) {
         this.conflictEndTime = conflictEndTime;
+    }
+
+    public String getConflictingDate() {
+        return conflictingDate;
+    }
+
+    public void setConflictingDate(String conflictingDate) {
+        this.conflictingDate = conflictingDate;
     }
 }

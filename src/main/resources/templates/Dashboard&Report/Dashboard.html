@@ -41,6 +41,7 @@
             <li><a href="/admin-proposal-report">Proposal Grade Report</a></li>
             <li><a href="/admin-defense-report">Defense Grade Report</a></li>
             <li><a href="/admin-eva-traking">Evaluation Tracking</a></li>
+            <li><a href="/admin-timeliness-scoring">Timeliness Scoring</a></li>
         </ul>
 
         <h2> Pages </h2>
@@ -89,7 +90,7 @@
             <span id="date-time"></span>
 
             <div class="semester-container">
-                <select id="semester-selector" onchange="fetchGradingStatistics(); fetchProposalData(); fetchDefenseData(); fetchPosterData(); fetchGradeDistribution(); fetchEvaluationStatus(); fetchTeacherScoringData();"></select>
+                <select id="semester-selector" onchange="fetchGradingStatistics(); fetchImportantDates(); fetchProposalData(); fetchDefenseData(); fetchPosterData(); fetchGradeDistribution(); fetchEvaluationStatus(); fetchTeacherScoringData();"></select>
             </div>
 
             <!--    TAB: Proposal & Poster &  Defense   -->
@@ -111,23 +112,16 @@
         <!-- Card Header -->
         <div class="card-wrapper">
             <div class="header-container">
-                <label class="text-header"> Proposal Grading </label>
-                <label class="text-center">
-                    <h1> 0/0 <span style="color: #919EAB;"></span></h1>
-                </label>
-            </div>
-
-            <div class="header-container">
-                <label class="text-header"> Defense Grading </label>
-                <label class="text-center">
-                    <h1> 0/0 <span style="color: #919EAB;"></span></h1>
-                </label>
-            </div>
-
-            <div class="header-container">
                 <label class="text-header"> Proposal Evaluation </label>
                 <label class="text-center">
                     <h1> 0/0 <span style="color: #919EAB;">Groups</span></h1>
+                </label>
+            </div>
+
+            <div class="header-container">
+                <label class="text-header"> Senior Project 1 </label>
+                <label class="text-center">
+                    <h1> 0/0 <span style="color: #919EAB;"></span></h1>
                 </label>
             </div>
 
@@ -144,6 +138,14 @@
                     <h1> 0/0 <span style="color: #919EAB;">Groups</span></h1>
                 </label>
             </div>
+
+            <div class="header-container">
+                <label class="text-header"> Senior Project 2 </label>
+                <label class="text-center">
+                    <h1> 0/0 <span style="color: #919EAB;"></span></h1>
+                </label>
+            </div>
+
         </div>
 
 
@@ -284,7 +286,7 @@
             const currentMonth = currentDate.getMonth() + 1; // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
 
             // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
-            const defaultYear = currentMonth <= 6 ? currentYear - 1 : currentYear;
+            const defaultYear = currentMonth <= 8 ? currentYear - 1 : currentYear;
 
             // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
             if (data.includes(defaultYear.toString())) {
@@ -295,6 +297,7 @@
 
             // เรียก fetchGradingStatistics เพื่อส่งค่า initial ปีไป
             await fetchGradingStatistics();
+            await fetchImportantDates();
             await fetchProposalData();
             await fetchDefenseData();
             await fetchPosterData();
@@ -726,7 +729,9 @@
 <script>
     // ฟังก์ชันสำหรับดึงข้อมูลและอัปเดต timeline
     function fetchImportantDates() {
-        fetch("http://localhost:8080/api/important-dates")
+        const semesterYear = document.getElementById("semester-selector").value;
+
+        fetch(`http://localhost:8080/api/important-dates?year=${semesterYear}`)
             .then(response => {
                 if (!response.ok) {
                     throw new Error(`HTTP error! Status: ${response.status}`);
@@ -756,9 +761,13 @@
         const today = new Date();
         const currentYear = today.getFullYear();
 
+        let hasItems = false; // ตัวแปรเช็คว่ามีข้อมูลไหม
+
         scoringPeriods.forEach(period => {
             const endDate = new Date(period.endDate);
             if (endDate.getFullYear() !== currentYear) return;
+
+            hasItems = true; // ถ้าเข้าเงื่อนไข แปลว่ามีข้อมูล
 
             const daysRemaining = Math.max(0, Math.ceil((endDate - today) / (1000 * 60 * 60 * 24)));
 
@@ -779,7 +788,7 @@
             } else if (daysRemaining >= 30) {
                 statusClass = "timeline-chill";
             } else if (daysRemaining < 30) {
-                statusClass = "timeline-lessthan1m"
+                statusClass = "timeline-lessthan1m";
             }
 
             if (statusClass) timelineItem.classList.add(statusClass);
@@ -797,6 +806,22 @@
 
             timelineContainer.appendChild(timelineItem);
         });
+
+        // ถ้าไม่มีรายการเลย
+        if (!hasItems) {
+            const emptyMessage = document.createElement("div");
+            emptyMessage.classList.add("timeline-empty");
+            emptyMessage.innerHTML = `
+<!--            <div class="timeline-icon">-->
+<!--                <i class="fa-solid fa-calendar-xmark"></i>-->
+<!--            </div>-->
+            <div class="timeline-content">
+                <i class="fa-solid fa-calendar-xmark"></i>
+                <div class="timeline-title">ไม่พบข้อมูลกำหนดการในขณะนี้</div>
+            </div>
+        `;
+            timelineContainer.appendChild(emptyMessage);
+        }
     }
 
 

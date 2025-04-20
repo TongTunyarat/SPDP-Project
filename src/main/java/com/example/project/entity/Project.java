@@ -276,4 +276,3 @@ public class Project {
     public void setStudentList(ArrayList<Object> objects) {
     }
 }
-

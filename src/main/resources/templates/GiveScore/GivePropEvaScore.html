@@ -224,8 +224,8 @@
                     </g>
                 </g>
             </svg> Grades (60%) </h4>
-            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Proposal Grade</a></li>
-            <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Defense Grade</a></li>
+            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Senior Project 1</a></li>
+            <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Senior Project 2</a></li>
         </ul>
     </div>
 
@@ -1063,7 +1063,23 @@
             alertContent += '<p>Cannot save evaluation. Please correct the following scores:</p><ul>';
 
             invalidScores.forEach(item => {
-                alertContent += `<li><strong>${item.name}</strong>: Score ${item.value} exceeds maximum of ${item.maxScore}</li>`;
+                // ระบุปัญหาของคะแนน
+                let problem = "";
+                if (parseFloat(item.value) > parseFloat(item.maxScore)) {
+                    problem = `Maximum score is (${item.maxScore})`;
+                } else if (parseFloat(item.value) < 0) {
+                    problem = "Score cannot be negative";
+                } else {
+                    problem = "Invalid-score";
+                }
+
+                alertContent += `
+                <li style="margin-bottom: 10px;">
+                    <div><strong>${item.name}</strong></div>
+                    <div style="color: #dc3545;">Score: ${item.value}  <strong>${problem}</strong></div>
+                </li>
+            `;
+
             });
 
             alertContent += '</ul>';

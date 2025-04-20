@@ -8,12 +8,10 @@ import com.example.project.repository.ProposalSchedRepository;
 import com.example.project.repository.RoomRepository;
 import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.Year;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,9 +32,9 @@ public class ProposalScheduleService {
     private ProposalSchedRepository proposalSchedRepository;
 
     // check already schedule
-    public boolean haveExitSchedule(String program) {
+    public boolean haveExitSchedule(String program, String semesterYear) {
 
-        List<String> projectIds = projectRepository.findByProjectIdAndProgram(program);
+        List<String> projectIds = projectRepository.findByProjectIdAndProgramAndSemster(program, semesterYear);
 
         System.out.print("🪸List of project: " + projectIds);
 
@@ -67,14 +65,11 @@ public class ProposalScheduleService {
     }
 
     // prepare data of project in controller
-    public List<ProjectWithInstructorsDTO> prepareProject(String program) {
+    public List<ProjectWithInstructorsDTO> prepareProject(String program, String semesterYear) {
 
-        List<Project> ProjectList = projectRepository.findAll();
+        List<Project> ProjectList = projectRepository.findByProjectAndProgramAndSemster(program, semesterYear);
 
-        int maxSemester = ProjectList.stream()
-                .mapToInt(i -> Integer.parseInt(i.getSemester())).max().orElse(0);
-
-        System.out.println("🧸maxSemester" + maxSemester);
+        int semesterYearInt = Integer.parseInt(semesterYear);
 
         return ProjectList.stream()
                 .filter(i -> program.equalsIgnoreCase(i.getProgram()))
@@ -92,7 +87,7 @@ public class ProposalScheduleService {
 //
 //                    return hasActive && !allExited;
 //                })
-                .filter(i -> Integer.parseInt(i.getSemester()) == maxSemester)
+                .filter(i -> Integer.parseInt(i.getSemester()) == semesterYearInt)
                 .map(i -> {
 
                     // get instructor
@@ -140,6 +135,12 @@ public class ProposalScheduleService {
 //            System.out.println("🙊Room List: "+ room);
 //        }
 
+        roomNumbers.sort(Comparator.naturalOrder());
+
+        for (String room: roomNumbers) {
+            System.out.println("Room Sort: "+ room);
+        }
+
         //create time slots
         List<Pair<LocalDateTime, LocalDateTime>> allTimeSlots = generateTimeSlots(startDateConvert, endDateConvert, startTimeConvert, endTimeConvert);
 
@@ -149,13 +150,33 @@ public class ProposalScheduleService {
         //create time slots with room
         List<ScheduleSlotDTO> availableSlots = generateAvailableSlots(allTimeSlots, roomNumbers);
 
+        List<ScheduleSlotDTO> workingSlots = availableSlots.stream()
+                .filter(slot -> !"Break".equals(slot.getRoom())).collect(Collectors.toList());
+
+        System.out.println("workingSlots count: " + workingSlots);
+
+        int realSlotCount = 0;
+
+        for(Pair<LocalDateTime, LocalDateTime> slot : allTimeSlots) {
+
+            long durationMinutes = Duration.between(slot.a, slot.b).toMinutes();
+
+            if (durationMinutes != TIME_BREAK) {
+                realSlotCount++;
+            }
+
+        }
+        System.out.println("realSlotCount: " + realSlotCount);
 
         int requiredSlots = (int) (projectWithInstructorsDTOList.size() * 1.20);
 
-        if (availableSlots.size() < requiredSlots) {
+        if (workingSlots.size() < requiredSlots) {
+
+            int requiredRooms = (int) Math.ceil((double) requiredSlots / realSlotCount);
+            int missingRooms = requiredRooms - roomNumbers.size();
 
             System.out.println("❌ Not enough time slots available");
-//            return new ScheduleProposalResponseDTO("error", "Not enough time slots available");
+            return new ScheduleProposalResponseDTO("error", "Not enough rooms to generate the schedule. You are missing " + missingRooms + " room(s).");
         }
 
         // sort project ตาม instructor
@@ -183,9 +204,9 @@ public class ProposalScheduleService {
                     " | Instructors: " + assignment.getInstructorUsernames());
         }
 
-        if (!unscheduledProjects.isEmpty()) {
-            return new ScheduleProposalResponseDTO("error", "Some projects could not be scheduled");
-        }
+//        if (!unscheduledProjects.isEmpty()) {
+//            return new ScheduleProposalResponseDTO("error", "Some projects could not be scheduled");
+//        }
 
 
         System.out.println("🔖 All time slot: ");
@@ -196,45 +217,47 @@ public class ProposalScheduleService {
         }
 
         List<TimeSlotDTO> timeSlotDTOList = new ArrayList<>();
-        Map<LocalDate, Integer> dailySlotCount = new HashMap<>();
-
 
         for(Pair<LocalDateTime, LocalDateTime> slot : allTimeSlots) {
 
             startTime = slot.a.toString();
             endTime =  slot.b.toString();
 
-            LocalDate currentDate = slot.a.toLocalDate();
-            dailySlotCount.putIfAbsent(currentDate, 0);
-//            System.out.println("dailySlotCount: " + dailySlotCount);
-
-            int slotCount = dailySlotCount.get(currentDate) + 1;
-//            System.out.println("slotCount: " + slotCount);
+            long durationMinutes = Duration.between(slot.a, slot.b).toMinutes();
 
             String breakLabel = "";
             boolean isBreak = false;
 
-            if (slotCount % 4 == 0) {
+            if (durationMinutes == TIME_BREAK) {
                 isBreak = true;
-                breakLabel = ("Take a Break");
-            } else {
-                isBreak = false;
+                breakLabel = "Take a Break";
             }
-
-            dailySlotCount.put(currentDate, slotCount);
-            System.out.println("After dailySlotCount: " + dailySlotCount);
 
             timeSlotDTOList.add(new TimeSlotDTO(startTime, endTime, isBreak, breakLabel));
         }
 
+//        for (TimeSlotDTO time : timeSlotDTOList) {
+//
+//            System.out.println("After dailySlotCount: " + time.getStartTime());
+//            System.out.print("getEndTimet: " + time.getEndTime());
+//            System.out.println("getBreakLabel: " + time.getBreakLabel());
+//
+//        }
+
+
         //❗️❗️❗️❗️❗️ ห้ามลบ
         try {
             saveProposalSchedule(scheduledAssignments);
+
+            if (!unscheduledProjects.isEmpty()) {
+                saveUnProposalSchedule(unscheduledProjects);
+            }
+
         } catch (Exception e) {
             return new ScheduleProposalResponseDTO("error", "Failed to generate schedule");
         }
 
-        return new ScheduleProposalResponseDTO("success", "finished generate schedule", scheduledAssignments, timeSlotDTOList);
+        return new ScheduleProposalResponseDTO("success", "finished generate schedule", scheduledAssignments, unscheduledProjects, timeSlotDTOList);
     }
 
     private static final int TIME_SLOT_DURATION = 25;
@@ -627,216 +650,9 @@ public class ProposalScheduleService {
             remainderProject.removeAll(scheduledProjectsSuccess);
 //            System.out.println("Remove remainderProject" + remainderProject );
         }
-//
-//        if (!unscheduledProjects.isEmpty()) {
-//            scheduleProjectsUnscheduled(unscheduledProjects, scheduledAssignments, timeGroupedSlots, roomNumbers, allTimeSlots);
-//        }
+
 
     }
-
-
-
-//    public List<ProjectWithInstructorsDTO> scheduleProjectsUnscheduled (List<ProjectWithInstructorsDTO> unscheduledProjects,List<ScheduleAssignmentDTO> scheduledAssignments, Map<LocalDateTime, List<ScheduleSlotDTO>> timeGroupedSlots, List<String> roomNumbers, List<Pair<LocalDateTime, LocalDateTime>> allTimeSlots) {
-//
-////        System.out.println("👀 See unscheduledProjects" + unscheduledProjects);
-//
-//        List<ProjectWithInstructorsDTO> remainderProject = new ArrayList<>(unscheduledProjects);
-//        System.out.println("👀 remainderProject" + remainderProject);
-//
-//        int lenghtSlots = allTimeSlots.size();
-//        int projectSlotCount = lenghtSlots;
-//
-//        System.out.println("timeGroupedSlots: " + timeGroupedSlots);
-//        System.out.println("lenghtSlots: " + lenghtSlots);
-//        System.out.println("allTimeSlots: " + allTimeSlots);
-//
-//
-//        Map<LocalDate, LocalDateTime> lastTimePerDay = new HashMap<>();
-//
-//        for(Map.Entry<LocalDateTime, List<ScheduleSlotDTO>> entry : timeGroupedSlots.entrySet()) {
-//            LocalDate date= entry.getKey().toLocalDate();
-//            LocalDateTime dateTime = entry.getKey();
-//
-//            if(!lastTimePerDay.containsKey(date) || dateTime.isAfter(lastTimePerDay.get(date))) {
-//                lastTimePerDay.put(date, dateTime);
-//            }
-//        }
-//
-//        for(Pair<LocalDateTime, LocalDateTime> slot : allTimeSlots) {
-//
-//            LocalDate date = slot.a.toLocalDate();
-//            LocalDateTime endDateTime = slot.b;
-//
-//            if(!lastTimePerDay.containsKey(date) || endDateTime.isAfter(lastTimePerDay.get(date))) {
-//                lastTimePerDay.put(date, endDateTime);
-//            }
-//        }
-//
-//        System.out.println("Last time per day (updated): " + lastTimePerDay);
-
-//        // get data time
-//        Map<LocalDate, LocalDateTime> lastTimePerDay = new LinkedHashMap<>();
-//
-//
-//        for(Map.Entry<LocalDateTime, List<ScheduleSlotDTO>> entry : timeGroupedSlots.entrySet()) {
-//
-//            LocalDate date = entry.getKey().toLocalDate();
-//            LocalDateTime dateTime = entry.getKey();
-//
-//            lastTimePerDay.put(date, dateTime);
-//        }
-//
-//        System.out.println("Last time per day: " + lastTimePerDay);
-//
-//        Map<LocalDateTime, List<ScheduleSlotDTO>> addTimeSlot = new HashMap<>();
-//        // เก็บเวลาเเละ instructor
-//        Map<LocalDateTime, Set<String>> assignedTimeInstructor = new HashMap<>();
-//
-//        List<ProjectWithInstructorsDTO> stillUnscheduledProjects = new ArrayList<>();
-//        List<ProjectWithInstructorsDTO> scheduledProjectsSuccess = new ArrayList<>();
-//        int roomIndex = 0;
-//
-//
-//        for(ProjectWithInstructorsDTO project : remainderProject) {
-//
-//            // keep project status
-//            boolean projectScheduled = false;
-//
-//            for (Map.Entry<LocalDate, LocalDateTime> enntry : lastTimePerDay.entrySet()) {
-//
-//                LocalDate date = enntry.getKey();
-//                LocalDateTime lastTime = enntry.getValue();
-//                System.out.println("lastTime " + lastTime);
-//
-//                LocalTime lastSlotTime = lastTime.toLocalTime();
-//                LocalTime startSlotTime = lastSlotTime.plusMinutes(TIME_BETWEEN + TIME_SLOT_DURATION);
-//                LocalTime endSlotTime = startSlotTime.plusMinutes(TIME_SLOT_DURATION);
-//
-//                System.out.println("startTime " + startSlotTime);
-//                System.out.println("endTime " + endSlotTime);
-//
-//                LocalDateTime newSlotDateTime = LocalDateTime.of(date, startSlotTime);
-//                System.out.println("⏰ newSlotDateTime " + newSlotDateTime);
-//
-//                Set<String> instructorsAtTime = assignedTimeInstructor.getOrDefault(newSlotDateTime, new HashSet<>());
-//                System.out.println("instructorsAtTime " + instructorsAtTime);
-//
-//
-//                boolean instructorConflict = false;
-//
-//                for(String instructor : project.getInstructorUsernames()) {
-//
-//                        System.out.println("👩🏻‍🏫 Instructor: " + instructor);
-//
-//                    if (instructorsAtTime.contains(instructor)) {
-//
-//                            System.out.println("assignedTimeInstructor " + assignedTimeInstructor);
-//                            System.out.println("chek conflict: " + instructorsAtTime);
-//
-//                        instructorConflict = true;
-//                        break;
-//                    }
-//                }
-//
-//                if(!instructorConflict) {
-//
-//                    String room = roomNumbers.get(roomIndex % roomNumbers.size());
-//                    roomIndex ++;
-//
-//                    ScheduleSlotDTO newSlot = new ScheduleSlotDTO(
-//                            room,
-//                            newSlotDateTime,
-//                            LocalDateTime.of(date, endSlotTime)
-//                    );
-//
-//                    // add new & group time
-//                    if(!addTimeSlot.containsKey(newSlotDateTime)) {
-//
-//                        addTimeSlot.put(newSlotDateTime, new ArrayList<>());
-//                    }
-//
-//                    addTimeSlot.get(newSlotDateTime).add(newSlot);
-//                    System.out.println("✅ Add " + addTimeSlot);
-//
-//
-//                    ScheduleAssignmentDTO assignProject = new ScheduleAssignmentDTO(
-//                            project.getProject().getProjectId(),
-//                            room,
-//                            newSlotDateTime,
-//                            LocalDateTime.of(date, endSlotTime),
-//                            project.getInstructorUsernames()
-//                    );
-//
-//                    scheduledAssignments.add(assignProject);
-//
-//                    // เพิ่มข้อมูล instructor
-//                    if(!assignedTimeInstructor.containsKey(newSlotDateTime)) {
-//                        assignedTimeInstructor.put(newSlotDateTime, new HashSet<>());
-//                            System.out.println("Add assignedTimeInstructor " + assignedTimeInstructor);
-//
-//                    }
-//
-//                    assignedTimeInstructor.get(newSlotDateTime).addAll(project.getInstructorUsernames());
-//                        System.out.println("🍭 assignedTimeInstructor" + assignedTimeInstructor);
-//
-//                    lastTimePerDay.put(date, LocalDateTime.of(date, endSlotTime));
-//                    System.out.println("🍭 lastTimePerDay" + lastTimePerDay);
-//
-//                    projectScheduled = true;
-//                    scheduledProjectsSuccess.add(project);
-//
-//                    // update allTimeSlots
-//                    allTimeSlots.add(new Pair<>(newSlotDateTime, LocalDateTime.of(date, endSlotTime)));
-//                    projectSlotCount ++;
-//
-//                    if (projectSlotCount % 3 == 0) {
-//
-//                        LocalDateTime breakStart = LocalDateTime.of(date, endSlotTime);
-//                        LocalDateTime breakEnd = breakStart.plusMinutes(TIME_BREAK);
-//
-//                        allTimeSlots.add(new Pair<>(breakStart, breakEnd));
-////                    System.out.println("Take a break🍔: " + breakStart + " - " + breakEnd);
-//                        newSlotDateTime = breakEnd;
-//                        projectSlotCount ++;
-//
-//                    } else {
-//
-//                        lastTimePerDay.put(date, LocalDateTime.of(date, endSlotTime));
-//
-//                    }
-//
-//                    System.out.println("✅ Rescheduled project " + project.getProject().getProjectId() + " in room " + room + " at " + newSlotDateTime);
-//
-//
-//                    break;
-//
-//                }
-//
-//            }
-//
-//            if (!projectScheduled) {
-//                stillUnscheduledProjects.add(project);
-//            }
-//
-//        }
-//
-//        // update timeGroupedSlots
-//        for(Map.Entry<LocalDateTime, List<ScheduleSlotDTO>> entry : addTimeSlot.entrySet()) {
-//
-//            if(!timeGroupedSlots.containsKey(entry.getKey())) {
-//                timeGroupedSlots.put(entry.getKey(), new ArrayList<>());
-//            }
-//
-//            timeGroupedSlots.get(entry.getKey()).addAll(entry.getValue());
-//        }
-//
-//        unscheduledProjects.removeAll(scheduledProjectsSuccess);
-//
-//        System.out.println("Total projects scheduled in this pass: " + scheduledProjectsSuccess.size());
-//        System.out.println("Remaining unscheduled projects: " + stillUnscheduledProjects.size());
-//
-//        return stillUnscheduledProjects;
-//    }
 
 
     public void saveProposalSchedule(List<ScheduleAssignmentDTO> scheduledAssignments) {
@@ -869,6 +685,49 @@ public class ProposalScheduleService {
             proposalSchedRepository.save(proposalSchedule);
 
         }
+    }
+
+    public void saveUnProposalSchedule(List<ProjectWithInstructorsDTO> unscheduledProjects) {
+
+        for (ProjectWithInstructorsDTO assignUnSlot : unscheduledProjects) {
+            ProposalSchedule proposalSchedule = new ProposalSchedule();
+
+            System.out.println(assignUnSlot);
+
+            // https://www.quora.com/How-do-I-generate-a-unique-ID-in-Java
+            proposalSchedule.setProposalScheduleId(UUID.randomUUID().toString());
+            proposalSchedule.setStatus("Non-Active");
+            proposalSchedule.setRemark("Auto-Ungenerated schedule");
+            proposalSchedule.setRecordOn(LocalDateTime.now());
+
+            Project project = projectRepository.findByProjectId(assignUnSlot.getProject().getProjectId());
+            String projectId = project.getProjectId();
+            System.out.println(projectId);
+            proposalSchedule.setProjectId(projectId);
+
+            proposalSchedRepository.save(proposalSchedule);
+
+            duplicateUnScheduleProject(projectId);
+
+        }
+    }
+
+    public void duplicateUnScheduleProject(String projectId) {
+
+        ProposalSchedule newProject = new ProposalSchedule();
+
+//        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        newProject.setProposalScheduleId(UUID.randomUUID().toString());
+        newProject.setProjectId(projectId);
+        newProject.setRemark("User-Add");
+        newProject.setEditedOn(LocalDateTime.now());
+//        newProject.setEditedByUser(username);
+        newProject.setRecordOn(LocalDateTime.now());
+        newProject.setStatus("Active");
+
+
+        proposalSchedRepository.save(newProject);
     }
 
 }

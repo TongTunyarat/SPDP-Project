@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Controller
@@ -88,6 +89,49 @@ public class DefenseEvaluationController {
                                 student.getProject().getProjectTitle(),
                                 student.getStatus()
                         )).collect(Collectors.toList());
+    }
+
+
+    // get score DTO
+    @GetMapping("/instructor/showScoreDefense")
+    @ResponseBody
+    public List<DefenseEvaScoreDTO> getScoreDefense(@RequestParam String projectId) {
+        // ดึงข้อมูล DefenseEvalScore ตาม projectId
+        List<DefenseEvalScore> defenseEvalScoreList = defenseEvaluationService.getDefenseEvalScoresByProjectId(projectId);
+
+        // ดึงข้อมูล StudentProject ตาม projectId
+        List<StudentProject> studentProjectList = defenseEvaluationService.getStudentCriteria(projectId);
+
+        // สร้าง Set ของ StudentId ที่มี status เป็น "Active"
+        Set<String> activeStudentIds = studentProjectList.stream()
+                .filter(studentProject -> "Active".equals(studentProject.getStatus()))  // กรองเฉพาะ status เป็น "Active"
+                .map(studentProject -> studentProject.getStudent().getStudentId())  // ดึง StudentId
+                .collect(Collectors.toSet());
+
+        return defenseEvalScoreList.stream()
+                .filter(score -> {
+                    // ตรวจสอบว่า studentId จาก DefenseEvaluation มีอยู่ใน activeStudentIds หรือไม่
+                    String studentId = score.getDefenseEvaluation().getStudent().getStudentId();  // ดึง studentId จาก DefenseEvaluation
+                    return activeStudentIds.contains(studentId);  // กรองเฉพาะที่มี status "Active"
+                })
+                .map(score -> {
+                    // ดึงคะแนนจาก score
+                    Double scoreValue = score.getScore() != null ? score.getScore().doubleValue() : 0.0;
+
+                    // สร้างและส่ง DefenseEvaScoreDTO โดยส่ง weight เป็น String
+                    return new DefenseEvaScoreDTO(
+                            score.getEvalId(),
+                            score.getDefenseEvaluation().getStudent().getStudentId(),
+                            score.getDefenseEvaluation().getStudent().getStudentName(),
+                            score.getDefenseEvaluation().getProjectId().getProjectId(),
+                            score.getCriteria().getCriteriaId(),
+                            score.getCriteria().getCriteriaName(),
+                            score.getCriteria().getWeight(),  // ส่งคะแนนจริง
+                            scoreValue,
+                            score.getCriteria().getMaxScore() // ส่ง weight ในรูปแบบ String
+                    );
+                })
+                .collect(Collectors.toList());
     }
 
 //    @GetMapping("/instructor/showScoreDefense")

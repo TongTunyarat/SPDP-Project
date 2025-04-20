@@ -159,7 +159,7 @@
             const currentMonth = currentDate.getMonth() + 1; // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
 
             // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
-            const defaultYear = currentMonth <= 6 ? currentYear - 1 : currentYear;
+            const defaultYear = currentMonth <= 8 ? currentYear - 1 : currentYear;
 
             // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
             if (data.includes(defaultYear.toString())) {
@@ -417,32 +417,6 @@
 
         renderGroupedTable(filteredProjects);
     }
-
-    // ฟังก์ชัน Export ข้อมูลเป็น CSV
-    // function exportToCSV() {
-    //     if (groupedProjects.length === 0) return;
-    //
-    //     // สร้างข้อมูล CSV
-    //     let csvContent = "Project ID,Project Title,Program,Student ID,Student Name,Advisor,Section,Track,Grade\n";
-    //
-    //     // สร้างแถวข้อมูล
-    //     groupedProjects.forEach(project => {
-    //         project.students.forEach(student => {
-    //             csvContent += `"${project.projectId}","${project.projectTitle}","${project.program}","${student.studentId}","${student.studentName}","${project.advisor}","${student.section}","${student.track}","${student.grade}"\n`;
-    //         });
-    //     });
-    //
-    //     // สร้าง Blob และดาวน์โหลด
-    //     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    //     const url = URL.createObjectURL(blob);
-    //     const link = document.createElement('a');
-    //     link.setAttribute('href', url);
-    //     link.setAttribute('download', 'proposal_grades.csv');
-    //     link.style.visibility = 'hidden';
-    //     document.body.appendChild(link);
-    //     link.click();
-    //     document.body.removeChild(link);
-    // }
 </script>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>

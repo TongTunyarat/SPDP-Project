@@ -21,7 +21,7 @@
 
         console.log('Calling updateLinkStatus function');
         // window.onload = fetchAccessPeriods;
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             fetchAccessPeriods();
         });
         setInterval(updateLinkStatus, 60000);
@@ -139,7 +139,7 @@
                 const periodKey = link.getAttribute('data-period');
                 const period = accessPeriods[periodKey];
                 console.log("periodKey:", periodKey); // ตรวจสอบว่า periodKey ถูกต้อง
-                console.log("period: ",period)
+                console.log("period: ", period)
 
                 if (period) {
                     const startTime = period.start ? new Date(period.start) : null;
@@ -187,42 +187,51 @@
     <div class="sidebar">
         <h2>ICT MAHIDOL</h2>
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
                      style="fill:#FFFFFF;">
-                <path
-                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
-                </path>
-            </svg> Homepage </h4>
+                    <path
+                            d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+                    </path>
+                </svg>
+                Homepage
+            </h4>
             <li><a href="/instructor/view">Dashboard</a></li>
         </ul>
 
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-                <g fill="#ffffff" fill-rule="nonzero">
-                    <g transform="scale(5.33333,5.33333)">
-                        <path
-                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-                        </path>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
                     </g>
-                </g>
-            </svg> Evaluation (40%) </h4>
+                </svg>
+                Evaluation (40%)
+            </h4>
             <li><a href="/show-proposal-eva-projects" data-period="proposalEvaluation">Proposal Evaluation</a></li>
             <li><a href="/show-poster-projects" data-period="posterEvaluation">Poster Evaluation</a></li>
             <li><a href="/show-defense-eva-projects" data-period="defenseEvaluation">Defense Evaluation</a></li>
         </ul>
 
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-                <g fill="#ffffff" fill-rule="nonzero">
-                    <g transform="scale(5.33333,5.33333)">
-                        <path
-                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-                        </path>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
                     </g>
-                </g>
-            </svg> Grades (60%) </h4>
-            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade"  class="active">Proposal Grade</a></li>
-            <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Defense Grade</a></li>
+                </svg>
+                Grades (60%)
+            </h4>
+            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade" class="active">Senior Project 1</a></li>
+            <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Senior Project 2</a></li>
         </ul>
     </div>
 
@@ -412,92 +421,92 @@
         document.getElementById('project-advisor').textContent = instructor.professorName;
     }
 
-//     async function fetchAndDisplayScores(projectId) {
-//         const url = `http://localhost:8080/instructor/showScoreProposal?projectId=${encodeURIComponent(projectId)}`;
-//
-//         try {
-//             const response = await fetch(url);
-//             if (!response.ok) {
-//                 throw new Error(`HTTP error! status: ${response.status}`);
-//             }
-//             const scoreData = await response.json();
-//
-//             const tableBody = document.getElementById('student-score');
-//             tableBody.innerHTML = ""; // Clear existing rows
-//
-//             const studentScoresMap = {};
-//
-//             scoreData.forEach(score => {
-//                 const studentId = score.studentId;
-//                 if (!studentScoresMap[studentId]) {
-//                     studentScoresMap[studentId] = {
-//                         studentName: score.studentName,
-//                         presentationScores: [],
-//                         documentScores: {
-//                             qualityScores: [],
-//                             timeliness: null // เริ่มต้นเป็น null เพื่อเช็คว่ามีค่าหรือไม่
-//                         }
-//                     };
-//                 }
-//
-//                 // Group and store scores
-//                 if (["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"].includes(score.criteriaName)) {
-//                     studentScoresMap[studentId].presentationScores.push(score.score);
-//                 }
-//
-//                 if (score.criteriaName === "Quality") {
-//                     studentScoresMap[studentId].documentScores.qualityScores.push(score.score);
-//                 } else if (score.criteriaName === "Timeliness") {
-//                     studentScoresMap[studentId].documentScores.timeliness = score.score;
-//                 }
-//             });
-//
-// // Populate table rows with calculated scores
-//             Object.values(studentScoresMap).forEach(studentData => {
-//                 const {studentName, presentationScores, documentScores} = studentData;
-//
-//                 // Calculate Presentation (20%) score
-//                 const presentationSum = presentationScores.reduce((sum, score) => sum + score, 0);
-//                 let presentationScore = presentationScores.length > 0 ? ((presentationSum * 5) / 30).toFixed(2) : "-"; // แสดง "-" ถ้าไม่มีคะแนน
-//
-//                 // หากคะแนนมากกว่า 20% (20 คะแนน) ให้จำกัดที่ 20%
-//                 if (presentationScore !== "-") {
-//                     presentationScore = Math.min(parseFloat(presentationScore), 20).toFixed(2);
-//                 }
-//
-//                 // Calculate Document (20%) score
-//                 const documentQualitySum = documentScores.qualityScores.reduce((sum, score) => sum + score, 0);
-//                 let documentQualityScore = documentScores.qualityScores.length > 0 ? ((documentQualitySum * 15) / 30).toFixed(2) : "-";
-//                 let documentScore = (documentQualityScore !== "-" && documentScores.timeliness !== null)
-//                     ? (parseFloat(documentQualityScore) + documentScores.timeliness).toFixed(2)
-//                     : "-";
-//
-//                 // หากคะแนนมากกว่า 20% (20 คะแนน) ให้จำกัดที่ 20%
-//                 if (documentScore !== "-") {
-//                     documentScore = Math.min(parseFloat(documentScore), 20).toFixed(2);
-//                 }
-//
-//                 // Calculate Result (40%) score หรือแสดง "-"
-//                 const resultScore = (presentationScore !== "-" && documentScore !== "-")
-//                     ? (parseFloat(presentationScore) + parseFloat(documentScore)).toFixed(2)
-//                     : "-";
-//
-//                 // Create row for each student
-//                 const row = document.createElement('tr');
-//                 row.innerHTML = `
-//         <td>${studentName}</td>
-//         <td>${presentationScore}</td>
-//         <td>${documentScore}</td>
-//         <td>${resultScore}</td>
-//     `;
-//                 tableBody.appendChild(row);
-//             });
-//
-//
-//         } catch (error) {
-//             console.error('Error fetching or displaying score proposal:', error);
-//         }
-//     }
+    //     async function fetchAndDisplayScores(projectId) {
+    //         const url = `http://localhost:8080/instructor/showScoreProposal?projectId=${encodeURIComponent(projectId)}`;
+    //
+    //         try {
+    //             const response = await fetch(url);
+    //             if (!response.ok) {
+    //                 throw new Error(`HTTP error! status: ${response.status}`);
+    //             }
+    //             const scoreData = await response.json();
+    //
+    //             const tableBody = document.getElementById('student-score');
+    //             tableBody.innerHTML = ""; // Clear existing rows
+    //
+    //             const studentScoresMap = {};
+    //
+    //             scoreData.forEach(score => {
+    //                 const studentId = score.studentId;
+    //                 if (!studentScoresMap[studentId]) {
+    //                     studentScoresMap[studentId] = {
+    //                         studentName: score.studentName,
+    //                         presentationScores: [],
+    //                         documentScores: {
+    //                             qualityScores: [],
+    //                             timeliness: null // เริ่มต้นเป็น null เพื่อเช็คว่ามีค่าหรือไม่
+    //                         }
+    //                     };
+    //                 }
+    //
+    //                 // Group and store scores
+    //                 if (["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"].includes(score.criteriaName)) {
+    //                     studentScoresMap[studentId].presentationScores.push(score.score);
+    //                 }
+    //
+    //                 if (score.criteriaName === "Quality") {
+    //                     studentScoresMap[studentId].documentScores.qualityScores.push(score.score);
+    //                 } else if (score.criteriaName === "Timeliness") {
+    //                     studentScoresMap[studentId].documentScores.timeliness = score.score;
+    //                 }
+    //             });
+    //
+    // // Populate table rows with calculated scores
+    //             Object.values(studentScoresMap).forEach(studentData => {
+    //                 const {studentName, presentationScores, documentScores} = studentData;
+    //
+    //                 // Calculate Presentation (20%) score
+    //                 const presentationSum = presentationScores.reduce((sum, score) => sum + score, 0);
+    //                 let presentationScore = presentationScores.length > 0 ? ((presentationSum * 5) / 30).toFixed(2) : "-"; // แสดง "-" ถ้าไม่มีคะแนน
+    //
+    //                 // หากคะแนนมากกว่า 20% (20 คะแนน) ให้จำกัดที่ 20%
+    //                 if (presentationScore !== "-") {
+    //                     presentationScore = Math.min(parseFloat(presentationScore), 20).toFixed(2);
+    //                 }
+    //
+    //                 // Calculate Document (20%) score
+    //                 const documentQualitySum = documentScores.qualityScores.reduce((sum, score) => sum + score, 0);
+    //                 let documentQualityScore = documentScores.qualityScores.length > 0 ? ((documentQualitySum * 15) / 30).toFixed(2) : "-";
+    //                 let documentScore = (documentQualityScore !== "-" && documentScores.timeliness !== null)
+    //                     ? (parseFloat(documentQualityScore) + documentScores.timeliness).toFixed(2)
+    //                     : "-";
+    //
+    //                 // หากคะแนนมากกว่า 20% (20 คะแนน) ให้จำกัดที่ 20%
+    //                 if (documentScore !== "-") {
+    //                     documentScore = Math.min(parseFloat(documentScore), 20).toFixed(2);
+    //                 }
+    //
+    //                 // Calculate Result (40%) score หรือแสดง "-"
+    //                 const resultScore = (presentationScore !== "-" && documentScore !== "-")
+    //                     ? (parseFloat(presentationScore) + parseFloat(documentScore)).toFixed(2)
+    //                     : "-";
+    //
+    //                 // Create row for each student
+    //                 const row = document.createElement('tr');
+    //                 row.innerHTML = `
+    //         <td>${studentName}</td>
+    //         <td>${presentationScore}</td>
+    //         <td>${documentScore}</td>
+    //         <td>${resultScore}</td>
+    //     `;
+    //                 tableBody.appendChild(row);
+    //             });
+    //
+    //
+    //         } catch (error) {
+    //             console.error('Error fetching or displaying score proposal:', error);
+    //         }
+    //     }
 
     async function fetchAndDisplayScores(projectId) {
         const url = `http://localhost:8080/instructor/showScoreProposal?projectId=${encodeURIComponent(projectId)}`;
@@ -521,7 +530,8 @@
             } else {
                 // ✅ มีคะแนน → แสดงผลปกติ
                 tableBody.innerHTML = "";
-                displayScoreData(scoreData, tableBody);
+                const professorCount = getProfessorCount(scoreData); // คำนวณจำนวน professorId ที่ไม่ซ้ำ
+                displayScoreData(scoreData, tableBody, professorCount);
             }
         } catch (error) {
             console.error('Error fetching or displaying score proposal:', error);
@@ -574,90 +584,148 @@
         }
     }
 
-    // 🔵 แสดงตารางคะแนนปกติ (ถ้ามีคะแนน)
+    // ฟังก์ชันคำนวณจำนวน professorId ที่ไม่ซ้ำสำหรับแต่ละ criteriaId
+    function getProfessorCount(scoreData) {
+        const professorMap = new Map();
+
+        scoreData.forEach(score => {
+            const key = score.criteriaId;
+            const professorId = score.professorId;
+
+            if (!professorMap.has(key)) {
+                professorMap.set(key, new Set());
+            }
+
+            professorMap.get(key).add(professorId);
+        });
+
+        // นับจำนวน professors ที่ไม่ซ้ำสำหรับแต่ละ criteriaId
+        const professorCount = {};
+        professorMap.forEach((professorSet, criteriaId) => {
+            professorCount[criteriaId] = professorSet.size;
+        });
+
+        return professorCount;
+    }
+
     function displayScoreData(scoreData, tableBody) {
         const studentScoresMap = {};
 
-        // จัดกลุ่มข้อมูลตาม studentId
+        // คำนวณคะแนนก่อน แล้วค่อยจัดกลุ่มข้อมูลตาม studentId
         scoreData.forEach(score => {
             const studentId = score.studentId;
+            const studentName = score.studentName;
+
+            // หากยังไม่มีข้อมูลนักเรียนใน studentScoresMap ให้สร้างขึ้นใหม่
             if (!studentScoresMap[studentId]) {
                 studentScoresMap[studentId] = {
-                    studentName: score.studentName,
+                    studentName: studentName,
                     presentationScores: {
-                        "Quality of Work": [],
-                        "Level of Progress": [],
-                        "Presentation Language": [],
-                        "Question & Answer": []
+                        "Quality of Work": 0,
+                        "Level of Progress": 0,
+                        "Presentation Language": 0,
+                        "Question & Answer": 0
                     },
                     documentScores: {
                         qualityScores: [],
-                        timelinessScores: [] // เปลี่ยนเป็น timelinessScores เพื่อรองรับหลายค่า
-                    }
+                        timelinessScores: [],
+                    },
+                    totalPresentationScore: 0,
+                    totalDocumentScore: 0,
+                    resultScore: 0
                 };
             }
 
-            // Group and store scores
+            const scoreValue = score.score;
+
+            // คำนวณคะแนนสำหรับ Presentation
             if (["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"].includes(score.criteriaName)) {
-                studentScoresMap[studentId].presentationScores[score.criteriaName].push(score.score);
+                // รวมคะแนนสำหรับแต่ละ criteria
+                studentScoresMap[studentId].presentationScores[score.criteriaName] += scoreValue;
             }
 
+            // คำนวณคะแนนสำหรับ Document (Quality และ Timeliness)
             if (score.criteriaName === "Quality") {
-                studentScoresMap[studentId].documentScores.qualityScores.push(score.score);
+                studentScoresMap[studentId].documentScores.qualityScores.push(scoreValue);
             } else if (score.criteriaName === "Timeliness") {
-                studentScoresMap[studentId].documentScores.timelinessScores.push(score.score); // เก็บหลายค่า
+                studentScoresMap[studentId].documentScores.timelinessScores.push(scoreValue);
             }
         });
 
-        Object.values(studentScoresMap).forEach(studentData => {
+        // หลังจากคำนวณเสร็จแล้ว คำนวณคะแนนรวม
+        for (const studentId in studentScoresMap) {
+            const studentData = studentScoresMap[studentId];
             const { studentName, presentationScores, documentScores } = studentData;
 
-            // คำนวณคะแนนสำหรับแต่ละ Criteria
+            // คำนวณคะแนนสำหรับ Presentation
+            let totalPresentationScore = 0;
 
-            // 1. Quality of Work
-            const qualityOfWorkSum = presentationScores["Quality of Work"].reduce((sum, score) => sum + score, 0);
-            let qualityOfWorkScore = (qualityOfWorkSum * 5) / 30;
+            for (const criteriaName in presentationScores) {
+                const sumScore = presentationScores[criteriaName];
 
-            // 2. Level of Progress
-            const levelOfProgressSum = presentationScores["Level of Progress"].reduce((sum, score) => sum + score, 0);
-            let levelOfProgressScore = (levelOfProgressSum * 5) / 30;
+                // คำนวณจำนวน professorId ที่ไม่ซ้ำกันสำหรับ criteria นี้
+                const professorIds = [...new Set(scoreData
+                    .filter(s => s.criteriaName === criteriaName && s.studentId === studentId)
+                    .map(s => s.professorId))];  // ใช้ Set เพื่อดึงค่า professorId ที่ไม่ซ้ำกัน
 
-            // 3. Presentation Language
-            const presentationLanguageSum = presentationScores["Presentation Language"].reduce((sum, score) => sum + score, 0);
-            let presentationLanguageScore = (presentationLanguageSum * 5) / 30;
+                const numProfessors = professorIds.length > 0 ? professorIds.length : 1;  // ถ้าไม่มีข้อมูล professor ก็ใช้ 1 แทน
 
-            // 4. Question & Answer
-            const questionAndAnswerSum = presentationScores["Question & Answer"].reduce((sum, score) => sum + score, 0);
-            let questionAndAnswerScore = (questionAndAnswerSum * 5) / 30;
+                // ดึง maxScore และ weight
+                const score = scoreData.find(s => s.studentId === studentId && s.criteriaName === criteriaName); // ค้นหาข้อมูลของแต่ละ criteria
+                const maxScore = score ? parseFloat(score.maxScore) : 10.0;  // ตรวจสอบค่า maxScore ว่ามีหรือไม่
+                const weight = score ? parseFloat(score.criteriaWeight) : 0.0;  // คูณด้วย 100 เพื่อให้เป็นเปอร์เซ็นต์ หากไม่มีให้ใช้ค่า default 100
 
-            // 5. Quality (Document)
-            const qualitySum = documentScores.qualityScores.reduce((sum, score) => sum + score, 0);
-            let qualityDocumentScore = (qualitySum * 15) / 30;
+                // คำนวณ weightedScore ตามสูตรที่ระบุ
+                const weightedScore = ((sumScore / numProfessors) / maxScore) * (weight * 100);
+                totalPresentationScore += weightedScore;
+            }
 
-            // 6. Timeliness (ต้องคำนวณหลายค่าด้วย)
-            const timelinessSum = documentScores.timelinessScores.reduce((sum, score) => sum + score, 0);
-            let timelinessScore = (timelinessSum * 5) / 30;
+            studentData.totalPresentationScore = totalPresentationScore;
 
-            // คำนวณคะแนน Presentation
-            const presentationScore = qualityOfWorkScore + levelOfProgressScore + presentationLanguageScore + questionAndAnswerScore;
+            // คำนวณคะแนนสำหรับ Document (ใช้ for-loop)
+            let totalDocumentScore = 0;
 
-            // คำนวณคะแนน Document
-            const documentScore = qualityDocumentScore + timelinessScore;
+            // คำนวณสำหรับ Quality (Document)
+            if (documentScores.qualityScores.length > 0) {
+                const sumQualityScore = documentScores.qualityScores.reduce((sum, score) => sum + score, 0);
+                const numQualityEntries = documentScores.qualityScores.length; // ใช้ความยาวจริงของ qualityScores
+                const qualityMaxScore = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Quality")?.maxScore || 10.0;
+                const qualityWeight = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Quality")?.criteriaWeight || 0.15;
+
+                const qualityDocumentScore = ((sumQualityScore / numQualityEntries) / qualityMaxScore) * (qualityWeight * 100);
+                totalDocumentScore += qualityDocumentScore;
+            }
+
+            // คำนวณสำหรับ Timeliness (Document) โดยหาค่าเฉลี่ย
+            if (documentScores.timelinessScores.length > 0) {
+                const timelinessAverage = documentScores.timelinessScores.reduce((sum, score) => sum + score, 0) / documentScores.timelinessScores.length;
+
+                totalDocumentScore += timelinessAverage;
+            }
+
+            studentData.totalDocumentScore = totalDocumentScore;
 
             // คำนวณคะแนนรวม (Result Score)
-            const resultScore = presentationScore + documentScore;
+            const rawTotalScore = totalPresentationScore + totalDocumentScore;
+
+            const totalScore = Math.min(rawTotalScore, 40.0); // ทำให้คะแนนรวมไม่เกิน 40%
+
+            studentData.resultScore = totalScore;
 
             // แสดงผลข้อมูล
             const row = document.createElement('tr');
             row.innerHTML = `
             <td>${studentName}</td>
-            <td>${presentationScore.toFixed(2)}</td>
-            <td>${documentScore.toFixed(2)}</td>
-            <td>${resultScore.toFixed(2)}</td>
+            <td>${totalPresentationScore.toFixed(2)}</td>
+            <td>${totalDocumentScore.toFixed(2)}</td>
+            <td>${totalScore.toFixed(2)}</td>
         `;
             tableBody.appendChild(row);
-        });
+        }
     }
+
+
+
 
 </script>
 
@@ -916,10 +984,10 @@
         rowHeader.innerHTML = `
                <th></th>
                 ${students.map(student => {
-                    const nameParts = student.studentName.split(' '); // แยกชื่อกับนามสกุล
-                    const lastNameAbbr = nameParts[1] ? nameParts[1].slice(0, 3) + '.' : ''; // ตัดเหลือ 3 ตัว + จุด
-                    return `<th>${student.studentId} ${nameParts[0]} ${lastNameAbbr}</th>`;
-                }).join('')}
+            const nameParts = student.studentName.split(' '); // แยกชื่อกับนามสกุล
+            const lastNameAbbr = nameParts[1] ? nameParts[1].slice(0, 3) + '.' : ''; // ตัดเหลือ 3 ตัว + จุด
+            return `<th>${student.studentId} ${nameParts[0]} ${lastNameAbbr}</th>`;
+        }).join('')}
         `;
         thead.appendChild(rowHeader);
         table.appendChild(thead);
@@ -957,10 +1025,10 @@
         rowHeader.innerHTML = `
                <th></th>
                     ${students.map(student => {
-                        const nameParts = student.studentName.split(' '); // แยกชื่อกับนามสกุล
-                        const lastNameAbbr = nameParts[1] ? nameParts[1].slice(0, 3) + '.' : ''; // ตัดเหลือ 3 ตัว + จุด
-                        return `<th>${student.studentId} ${nameParts[0]} ${lastNameAbbr}</th>`;
-                    }).join('')}
+            const nameParts = student.studentName.split(' '); // แยกชื่อกับนามสกุล
+            const lastNameAbbr = nameParts[1] ? nameParts[1].slice(0, 3) + '.' : ''; // ตัดเหลือ 3 ตัว + จุด
+            return `<th>${student.studentId} ${nameParts[0]} ${lastNameAbbr}</th>`;
+        }).join('')}
         `;
         thead.appendChild(rowHeader);
         table.appendChild(thead);
@@ -1001,8 +1069,6 @@
             }
         }
     });
-
-
 
 
     //================================  displayModal  (Modal)  ==========================================
@@ -1169,7 +1235,7 @@
         inputs.forEach(input => {
             const studentId = input.getAttribute('data-student-id');
             if (!studentMap.has(studentId)) {
-                studentMap.set(studentId, { total: 0, count: 0 });
+                studentMap.set(studentId, {total: 0, count: 0});
             }
 
             const scoreValue = parseFloat(input.value) || 0;
@@ -1194,19 +1260,102 @@
                     }
                 }
 
-                zeroScoreStudents.push({ id: studentId, name: studentName });
+                zeroScoreStudents.push({id: studentId, name: studentName});
             }
         }
 
         return zeroScoreStudents;
     }
 
-    // function checkForInvalidScores() {
-    //     ....
-    // }
-
     document.querySelector('.save-button').addEventListener('click', async function (event) {
         console.log("📝 Save Process Started");
+
+        // ตรวจสอบ invalid score ทันที
+        console.log("Checking for invalid scores...");
+        const invalidInputs = document.querySelectorAll('.invalid-score');
+        console.log("Found invalid inputs:", invalidInputs.length);
+
+        if (invalidInputs.length > 0) {
+            console.log("Invalid scores detected! Showing alert...");
+
+            // สร้าง alert แสดงข้อผิดพลาด
+            const alertBox = document.createElement('div');
+            alertBox.className = 'score-error-alert';
+            alertBox.style.position = 'fixed';
+            alertBox.style.top = '20px';
+            alertBox.style.left = '50%';
+            alertBox.style.transform = 'translate(-50%)';
+            alertBox.style.backgroundColor = '#f8d7da';
+            alertBox.style.color = '#721c24';
+            alertBox.style.padding = '15px 20px';
+            alertBox.style.borderRadius = '5px';
+            alertBox.style.boxShadow = '0 0 10px rgba(0,0,0,0.2)';
+            alertBox.style.zIndex = '1000';
+            alertBox.style.maxWidth = '80%';
+
+            // สร้างเนื้อหา alert
+            let errorContent = '<h3 style="margin-top:0">⚠️ Invalid Scores Detected</h3>';
+            errorContent += '<p>Cannot save evaluation. Please correct the following scores:</p><ul>';
+
+            // แสดงรายการคะแนนที่ไม่ถูกต้อง
+            invalidInputs.forEach(input => {
+                const studentId = input.getAttribute('data-student-id');
+                const studentName = input.getAttribute('data-student-name');
+                const maxScore = input.max;
+                const currentValue = input.value;
+
+                // ดึงชื่อเกณฑ์จาก parent row
+                const criteriaRow = input.closest('tr');
+                const criteriaName = criteriaRow ? criteriaRow.querySelector('strong').textContent : 'N/A';
+
+                // ระบุปัญหาของคะแนน
+                let problem = "";
+                if (parseFloat(currentValue) > parseFloat(maxScore)) {
+                    problem = `Maximum score is (${maxScore})`;
+                } else if (parseFloat(currentValue) < 0) {
+                    problem = "Score cannot be negative";
+                } else {
+                    problem = "Invalid-score";
+                }
+
+                errorContent += `
+                <li style="margin-bottom: 10px;">
+                    <div><strong>${studentName}</strong> (${studentId})</div>
+                    <div>Criteria: ${criteriaName}</div>
+                    <div style="color: #dc3545;">Score: ${currentValue}  <strong>${problem}</strong></div>
+                </li>
+            `;
+
+            });
+
+            errorContent += `
+            </ul>
+            <div style="text-align: center; margin-top: 15px;">
+                <button id="close-error-alert" style="padding: 8px 20px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Close</button>
+            </div>
+        `;
+
+            alertBox.innerHTML = errorContent;
+            document.body.appendChild(alertBox);
+
+            // เมื่อคลิกปุ่มปิด
+            document.getElementById('close-error-alert').addEventListener('click', function () {
+                alertBox.remove();
+
+                // เลื่อนไปยัง input แรกที่มีปัญหา
+                if (invalidInputs.length > 0) {
+                    invalidInputs[0].focus();
+                    invalidInputs[0].scrollIntoView({behavior: 'smooth', block: 'center'});
+                }
+            });
+
+            return false; // ยกเลิกการดำเนินการต่อ
+        }
+
+        // ถ้าไม่พบ invalid scores ให้ดำเนินการตามปกติ
+        console.log("No invalid scores detected, continuing with save process...");
+
+
         event.preventDefault();
 
         // Check for zero scores before showing the modal
@@ -1220,7 +1369,7 @@
             const grade = studentElement ? studentElement.querySelector('.grade').textContent.trim() : '';
 
             if (grade === 'I') {
-                iGradeStudents.push({ id: studentId });
+                iGradeStudents.push({id: studentId});
             }
         });
 
@@ -1318,7 +1467,7 @@
                 if (!studentData[studentId]) {
                     studentData[studentId] = [];
                 }
-                studentData[studentId].push({ scoreCriteriaId, score });
+                studentData[studentId].push({scoreCriteriaId, score});
             });
 
             console.log("📊 Student Score Data:", studentData);
@@ -1360,13 +1509,16 @@
                 };
 
                 if (!projectId || !id || !transformedData) {
-                    console.error(`❌ Missing data for student ${id}:`, { projectId, id, transformedData });
+                    console.error(`❌ Missing data for student ${id}:`, {projectId, id, transformedData});
                     return;
                 }
 
-                let fetchPromise = fetch(`http://localhost:8080/saveProposalGrade?` + new URLSearchParams({ projectId, studentId: id }), {
+                let fetchPromise = fetch(`http://localhost:8080/saveProposalGrade?` + new URLSearchParams({
+                    projectId,
+                    studentId: id
+                }), {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     credentials: 'include',
                     body: JSON.stringify(transformedData)
                 })
@@ -1405,7 +1557,7 @@
                     }
 
                     // แสดงแจ้งเตือนก่อน แล้วค่อยเปลี่ยนหน้า
-                    showNotification("Evaluation saved successfully!", function() {
+                    showNotification("Evaluation saved successfully!", function () {
                         loadEvaluationData(projectId);
                         window.location.href = "/show-proposal-grade-projects";
                     });
@@ -1415,7 +1567,7 @@
                     // window.location.href = '/show-proposal-grade-projects';
                 })
                 .catch(error => console.error('⚠️ Error saving evaluations:', error));
-        }, { once: true });
+        }, {once: true});
     });
     // document.querySelector('.save-button').addEventListener('click', async function (event) {
     //     console.log("📝 Save Process Started");

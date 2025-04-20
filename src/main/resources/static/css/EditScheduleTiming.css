@@ -215,6 +215,19 @@ td:nth-child(4) {
     top: 50%;
     left: 60%;
     transform: translate(-50%, -50%);
+    z-index: 999;
+}
+
+#overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: rgba(38, 36, 36, 0.5);
+    backdrop-filter: blur(2px);
+    z-index: 998;
+    display: none;
 }
 
 .card-header {
@@ -778,4 +791,32 @@ label {
     border-radius: 6px;
     padding: 8px 20px;
     font-size: 14px;
+}
+
+/*===================================================================  Unschedule  =================================================================== */
+
+.semester-container {
+    margin-right: 1rem;
+    background-color: white;
+    border-radius: 10px;
+    /*width: 4rem;*/
+    /*height: 4rem;*/
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+}
+
+#semester-selector {
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    appearance: none;
+    outline: none;
+}
+
+#semester-selector::-ms-expand {
+    display: none;
 }

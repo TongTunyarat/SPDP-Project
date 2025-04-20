@@ -1,6 +1,5 @@
 package com.example.project.service;
 
-import com.example.project.DTO.DefenseEvaResponseDTO;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +76,7 @@ public class DefenseGradeService {
     }
 
     // get student score
-    public List<DefenseEvaResponseDTO> getDefenseEvalScoresByProjectId(String projectId) {
+    public List<DefenseEvalScore> getDefenseEvalScoresByProjectId(String projectId) {
         return defenseEvalScoreRepository.findByDefenseEvaluation_ProjectId_ProjectId(projectId);
     }
 }

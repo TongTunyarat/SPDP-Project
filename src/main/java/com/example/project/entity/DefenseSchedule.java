@@ -63,12 +63,20 @@ public class DefenseSchedule {
     @Column(name = "project_id")
     private String projectId;
 
+    // room_number
+//    @ManyToOne
+//    @JoinColumn(name = "room_number")
+//    @JsonManagedReference
+//    private Room roomNumber;
 
     // room_number
     @ManyToOne
-    @JoinColumn(name = "room_number")
+    @JoinColumn(name = "room_number", insertable = false, updatable = false)
     @JsonManagedReference
     private Room roomNumber;
+
+    @Column(name = "room_number")
+    private String room;
 
     @Column(name = "temp_room")
     private String roomTemp;
@@ -183,5 +191,13 @@ public class DefenseSchedule {
 
     public void setRoomTemp(String roomTemp) {
         this.roomTemp = roomTemp;
+    }
+
+    public String getRoom() {
+        return room;
+    }
+
+    public void setRoom(String room) {
+        this.room = room;
     }
 }

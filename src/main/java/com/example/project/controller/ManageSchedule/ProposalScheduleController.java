@@ -72,22 +72,22 @@ public class ProposalScheduleController {
     // check have project
     @GetMapping("/admin/checkExitsSchedule")
     @ResponseBody
-    public Map<String, Boolean> checkExistingSchedule(@RequestParam String program) {
-        System.out.println("💌 Check exist schedules for program: " + program);
+    public Map<String, Boolean> checkExistingSchedule(@RequestParam String program, @RequestParam String semesterYear) {
+        System.out.println("💌 Check exist schedules for program: " + program + " And semester " + semesterYear);
 
         Map<String, Boolean> response = new HashMap<>();
-        response.put("checkEexti", proposalScheduleService.haveExitSchedule(program));
+        response.put("checkEexti", proposalScheduleService.haveExitSchedule(program, semesterYear));
         return response;
     }
 
     // delete all
     @GetMapping("/admin/deleteAllExitsSchedule")
     @ResponseBody
-    public Map<String,Boolean> deleteAllProposalSchedule(@RequestParam String program) {
-        System.out.println("❗️ Delete exist schedules for program: " + program);
+    public Map<String,Boolean> deleteAllProposalSchedule(@RequestParam String program, @RequestParam String semesterYear) {
+        System.out.println("❗️ Delete exist schedules for program: " + program + "And semester " + semesterYear);
 
         Map<String, Boolean> response = new HashMap<>();
-        response.put("deleteStatus", manageProposalScheduleService.deleteAllProposalSchedule(program));
+        response.put("deleteStatus", manageProposalScheduleService.deleteAllProposalSchedule(program, semesterYear));
         return response;
     }
 
@@ -100,6 +100,7 @@ public class ProposalScheduleController {
         System.out.println("End Time: " + settingData.getEndTime());
         System.out.println("Rooms: " + settingData.getRooms());
         System.out.println("Program: " + settingData.getProgram());
+        System.out.println("Semester: " + settingData.getSemester());
 
         String startDate = settingData.getStartDate();
         String endDate = settingData.getEndDate();
@@ -107,8 +108,9 @@ public class ProposalScheduleController {
         String endTime = settingData.getEndTime();
         List<String> roomNumbers =  settingData.getRooms();
         String program = settingData.getProgram();
+        String semesterYear = settingData.getSemester();
 
-        List<ProjectWithInstructorsDTO> projectWithInstructorsDTOList = proposalScheduleService.prepareProject(program);
+        List<ProjectWithInstructorsDTO> projectWithInstructorsDTOList = proposalScheduleService.prepareProject(program, semesterYear);
 
         if(projectWithInstructorsDTOList.isEmpty()) {
             return ResponseEntity.badRequest().body(new ScheduleProposalResponseDTO("error", "There are no project entries in the database"));
@@ -128,8 +130,15 @@ public class ProposalScheduleController {
     // อย่าลืมกลับมา detect ค่า null
     @GetMapping("/admin/getAllProposalSchedule")
     @ResponseBody
-    public Map<String, Map<Pair<LocalTime, LocalTime>, List<GetProposalScheduleDTO>>> getProposalSchedule(@RequestParam String program) {
-        return manageProposalScheduleService.getProposalSchedule(program);
+    public Map<String, Map<Pair<LocalTime, LocalTime>, List<GetProposalScheduleDTO>>> getProposalSchedule(@RequestParam String program, @RequestParam String semesterYear) {
+        return manageProposalScheduleService.getProposalSchedule(program, semesterYear);
+    }
+
+    // get unSchedule
+    @GetMapping("/admin/getAllProposalUnSchedule")
+    @ResponseBody
+    public List<GetProposalUnScheduleDTO> getProposalUnSchedule(@RequestParam String program, @RequestParam String semesterYear) {
+        return manageProposalScheduleService.getProposalUnSchedule(program, semesterYear);
     }
 
     @GetMapping("/admin/deleteProjectById")
@@ -144,8 +153,8 @@ public class ProposalScheduleController {
 
     @GetMapping("/admin/getDataPreviewProposalSchedule")
     @ResponseBody
-    public ResponseEntity<List<PreviewProposalDTO>> getDataPreviewSchedule() {
-        return ResponseEntity.ok(manageProposalScheduleService.getDataPreviewSchedule());
+    public ResponseEntity<List<PreviewProposalDTO>> getDataPreviewSchedule(@RequestParam String semesterYear) {
+        return ResponseEntity.ok(manageProposalScheduleService.getDataPreviewSchedule(semesterYear));
     }
 
 
@@ -159,10 +168,10 @@ public class ProposalScheduleController {
 //    }
 
     // check project
-    @GetMapping("/prepareProject")
-    @ResponseBody
-    public List<ProjectWithInstructorsDTO> prepareProject(String program) {
-        return proposalScheduleService.prepareProject(program);
-    }
+//    @GetMapping("/prepareProject")
+//    @ResponseBody
+//    public List<ProjectWithInstructorsDTO> prepareProject(String program) {
+//        return proposalScheduleService.prepareProject(program);
+//    }
 
 }

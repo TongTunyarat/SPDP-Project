@@ -1,11 +1,12 @@
-package com.example.project.service.ManageSchedule;
+package com.example.project.service.ManageSchedule.DefenseSchedule;
 
 import com.example.project.DTO.ManageSchedule.EditSchedule.*;
 import com.example.project.entity.*;
+import com.example.project.repository.DefenseSchedRepository;
 import com.example.project.repository.ProjectInstructorRoleRepository;
 import com.example.project.repository.ProjectRepository;
-import com.example.project.repository.ProposalSchedRepository;
 import com.example.project.repository.RoomRepository;
+import org.antlr.v4.runtime.misc.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
@@ -16,28 +17,26 @@ import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
-
-import org.antlr.v4.runtime.misc.Pair;
-
 
 @Service
-public class EditProposalService {
+public class EditDefenseService {
 
     @Autowired
-    ProposalSchedRepository proposalSchedRepository;
-    @Autowired
     ProjectRepository projectRepository;
+    @Autowired
+    DefenseSchedRepository defenseSchedRepository;
     @Autowired
     ProjectInstructorRoleRepository projectInstructorRoleRepository;
     @Autowired
     RoomRepository roomRepository;
 
     // 👀 เอารายการโปรเจคที่สามารถเเก้ไขได้หลังจากยกเลิก 👀
-    public List<GetAllEditProposalScheduleDTO> getProjectEditProposal(String semesterYear) {
+    public List<GetAllEditProposalScheduleDTO> getProjectEditDefense(String semesterYear) {
 
         List<String> ProjectList = projectRepository.findByProjectIdAndSemster(semesterYear);
 
+//        List<Project> ProjectList = projectRepository.findAll();
+//
 //        int maxSemester = ProjectList.stream()
 //                .mapToInt(i -> Integer.parseInt(i.getSemester())).max().orElse(0);
 //
@@ -49,7 +48,7 @@ public class EditProposalService {
 //                .collect(Collectors.toList());
 
         // หา project ที่ user สามารถเพิ่มได้
-        List<ProposalSchedule> proposalSchedulesUserAdd = proposalSchedRepository.findEditProject(ProjectList);
+        List<DefenseSchedule> proposalSchedulesUserAdd = defenseSchedRepository.findEditProject(ProjectList);
 
         List<GetAllEditProposalScheduleDTO> projectDTO = proposalSchedulesUserAdd.stream()
                 .filter(p -> "User-Add".equals(p.getRemark()))
@@ -140,9 +139,9 @@ public class EditProposalService {
     }
 
     // ดึงค่าสำหรับใน cardpopup
-    public List<GetEditProposalScheduleByIdDTO> getProjectEditProposalByProjectId(String projectId) {
+    public List<GetEditProposalScheduleByIdDTO> getProjectEditDefenseByProjectId(String projectId) {
 
-        List<ProposalSchedule> proposalScheduleList = proposalSchedRepository.findEditProjectByProjectId(projectId);
+        List<DefenseSchedule> proposalScheduleList = defenseSchedRepository.findEditProjectByProjectId(projectId);
 
         List<GetEditProposalScheduleByIdDTO> projectDTO = proposalScheduleList.stream()
                 .map(p -> {
@@ -200,7 +199,7 @@ public class EditProposalService {
     }
 
     // เเก้ไขตารางการนำเสนอ
-    public ProposalConflictDTO editProposalByprojectId(String projectId, String program, String startDate, String startTime, String endTime, String roomNumber) {
+    public ProposalConflictDTO editDefenseByprojectId(String projectId, String program, String startDate, String startTime, String endTime, String roomNumber) {
 
         // https://www.geeksforgeeks.org/how-to-convert-a-string-to-a-localdate-in-java/
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
@@ -218,15 +217,15 @@ public class EditProposalService {
         System.out.println("startDateTimeInput: " + startDateTimeInput);
         System.out.println("endDateTimeInput: " + endDateTimeInput);
 
-        ProposalSchedule project = proposalSchedRepository.findEditByProjectId(projectId);
+        DefenseSchedule project = defenseSchedRepository.findEditByProjectId(projectId);
         String originalStatus = project.getStatus();
         project.setStatus("In-Progress");
-        proposalSchedRepository.save(project);
+        defenseSchedRepository.save(project);
 
 
-        List<ProposalSchedule> proposalScheduleList = proposalSchedRepository.findByAllAndStatusActive();
+        List<DefenseSchedule> defenseScheduleList = defenseSchedRepository.findByAllAndStatusActive();
 
-        List<RoomColflictDTO> roomConflicts = proposalScheduleList.stream()
+        List<RoomColflictDTO> roomConflicts = defenseScheduleList.stream()
                 .filter(p -> p.getDate() != null)
                 .filter(p -> p.getStartTime() != null && p.getEndTime() != null)
                 .filter(p -> p.getRoom() != null)
@@ -262,7 +261,7 @@ public class EditProposalService {
 
         Map<String, List<Pair<String, Pair<LocalDateTime, LocalDateTime>>>> instructorScheduleMap = new HashMap<>();
 
-        proposalScheduleList.stream()
+        defenseScheduleList.stream()
                 .filter(p -> p.getDate() != null)
                 .filter(p -> p.getStartTime() != null && p.getEndTime() != null)
                 .filter(p -> p.getRoom() != null)
@@ -300,6 +299,7 @@ public class EditProposalService {
                         Pair<LocalDateTime, LocalDateTime> timePair = new Pair<>(existStartDateTime, existEndDateTime);
                         Pair<String, Pair<LocalDateTime, LocalDateTime>> projectTimePair = new Pair<>(currentProject, timePair);
                         instructorScheduleMap.get(instructorName).add(projectTimePair);
+
                     }
                 });
 
@@ -326,17 +326,18 @@ public class EditProposalService {
                                 String existingProject = projectTimePair.a;
                                 Pair<LocalDateTime, LocalDateTime> timePair = projectTimePair.b;
                                 System.out.println("🤯ชนกันที่เวลา: " + timePair.a + " - " + timePair.b);
-//                                String dateConflict = proposalSchedRepository.findByProjectId(existingProject).getDate();
+//                                String dateConflict = defenseSchedRepository.findByProjectId(existingProject).getDate();
 
-                                List<ProposalSchedule> existingSchedule = proposalSchedRepository.findByProjectAllId(existingProject);
-                                String dateConflict = existingSchedule.stream()
+                                 List<DefenseSchedule> existingSchedule = defenseSchedRepository.findByProjectAllId(existingProject);
+                                 String dateConflict = existingSchedule.stream()
                                         .filter(s -> "Active".equalsIgnoreCase(s.getStatus()))
-                                        .map(ProposalSchedule::getDate)
+                                        .map(DefenseSchedule::getDate)
                                         .findFirst()
                                         .orElse(null);
 
                                 return new InstructorConflictDTO(instructorName, existingProject, dateConflict, timePair.a.toLocalTime(), timePair.b.toLocalTime());
                             });
+
 
                 }).collect(Collectors.toList());
 
@@ -345,9 +346,8 @@ public class EditProposalService {
         System.out.println("🌻 instructorConflict " + instructorConflict);
 
         if(!roomConflicts.isEmpty() || !instructorConflict.isEmpty()) {
-//            project.setStatus(originalStatus);
             project.setStatus("Active");
-            proposalSchedRepository.save(project);
+            defenseSchedRepository.save(project);
         }
 
         boolean hasErrorSaveData = false ;
@@ -363,6 +363,7 @@ public class EditProposalService {
         return new ProposalConflictDTO(hasErrorSaveData, roomConflicts, hasRoomConflict, instructorConflict, hasInstructorConflict);
     }
 
+
     public boolean timeOverlap(LocalDateTime newStartTime, LocalDateTime newEndTime, LocalDateTime existStartTime, LocalDateTime existEndTime) {
 
         // ex. 11:00 - 14:00, 13:00 - 15:00
@@ -374,7 +375,7 @@ public class EditProposalService {
 
     public void saveProposalSchedule(String projectId, String program, String startDate, String startTime, String endTime, String roomNumber) {
 
-        ProposalSchedule project = proposalSchedRepository.findEditByProjectId(projectId);
+        DefenseSchedule project = defenseSchedRepository.findEditByProjectId(projectId);
 
         String username = SecurityContextHolder.getContext().getAuthentication().getName();
 
@@ -403,10 +404,11 @@ public class EditProposalService {
         System.out.println(roomID);
         project.setRoom(roomID);
 
-        proposalSchedRepository.save(project);
+        defenseSchedRepository.save(project);
 
-        ProposalSchedule projectGenerate = proposalSchedRepository.findByProjectId(projectId);
+        DefenseSchedule projectGenerate = defenseSchedRepository.findByProjectId(projectId);
         projectGenerate.setStatus("Edit-Active");
-        proposalSchedRepository.save(projectGenerate);
+        defenseSchedRepository.save(projectGenerate);
     }
+
 }
