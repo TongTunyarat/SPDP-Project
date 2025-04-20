@@ -226,8 +226,8 @@
                     </g>
                 </g>
             </svg> Grades (60%) </h4>
-            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade" >Senior Project 1</a></li>
-            <li><a href="/show-defense-grade-projects" data-period="defenseGrade" class="active">Senior Project 2</a></li>
+            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Senior Project 1</a></li>
+            <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Senior Project 2</a></li>
         </ul>
     </div>
 
@@ -752,7 +752,7 @@
                 const container = document.querySelector(".schedule-container");
                 container.innerHTML = '';
 
-                if(projectsData === 0) {
+                if(!projectsData.length) {
                     console.log("No data available");
 
                     const scheduleHTML = `
