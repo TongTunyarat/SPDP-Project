@@ -500,58 +500,76 @@
     });
 
     // ฟังก์ชันแปลง CSV เป็น JSON
+    // ฟังก์ชันแปลง CSV เป็น JSON พร้อมเช็คว่าแต่ละบรรทัดมี 10 คอลัมน์เท่านั้น
     function csvToJson(csv) {
+        const EXPECTED_COLS = 10; // ต้องมี 10 คอลัมน์ ตั้งแต่ index 0 ถึง 9
         const result = [];
 
-        // ใช้ PapaParse ในการแยกข้อมูล CSV
         Papa.parse(csv, {
             skipEmptyLines: true,
-            header: false, // ถ้าไฟล์มี header ให้เปลี่ยนเป็น true
-            complete: function (results) {
+            header: false,
+            complete: function({ data }) {
+                // 1) ตรวจสอบความยาวคอลัมน์ก่อน (ข้าม 8 แถวแรก)
+                for (let i = 8; i < data.length; i++) {
+                    if (data[i].length !== EXPECTED_COLS) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'ไฟล์ไม่ถูกต้อง',
+                            // text: `บรรทัดที่ ${i + 1} พบ ${data[i].length} คอลัมน์ แต่ต้องเป็น ${EXPECTED_COLS} คอลัมน์`
+                            text: 'กรุณาอัปโหลดไฟล์ CSV ของ Committee '
+                        });
+                        return; // หยุดการแปลงทั้งฟังก์ชัน
+                    }
+                }
+
+                // 2) ถ้าเช็คผ่าน ให้แปลงข้อมูลจริง
                 let currentProject = null;
+                for (let i = 8; i < data.length; i++) {
+                    // trim ทุกช่อง และ slice เอาเฉพาะ 10 ช่องแรก
+                    const row = data[i].map(cell => cell.trim()).slice(0, EXPECTED_COLS);
+                    const [
+                        projectId,
+                        projectTitle,
+                        projectDescription,
+                        projectCategory,
+                        studentId,
+                        studentName,
+                        program,
+                        advisor,
+                        coAdvisor,
+                        committee
+                    ] = row;
 
-                results.data.forEach((row, i) => {
-                    if (i < 8) return;  // ข้าม 8 แถวแรกตามที่ระบุ
-
-                    const projectId = row[0].trim();
-                    const projectTitle = row[1].trim();
-                    const projectDescription = row[2].trim();
-                    const projectCategory = row[3].trim();
-                    const studentId = row[4].trim();
-                    const studentName = row[5].trim();
-                    const program = row[6].trim();
-                    const advisor = row[7].trim();
-                    const coAdvisor = row[8].trim();
-                    const committee = row[9].trim();
-
-                    // สร้างหรืออัปเดตข้อมูลโปรเจกต์
+                    // — สร้าง Project ใหม่ เมื่อเจอ projectId (ไม่ใช่ช่องว่าง) —
                     if (projectId) {
                         currentProject = {
-                            projectId: projectId,
-                            projectTitle: projectTitle,
-                            projectDescription: projectDescription,
-                            projectCategory: projectCategory,
-                            program: program,
-                            advisor: advisor,
-                            committee: committee,
+                            projectId,
+                            projectTitle,
+                            projectDescription,
+                            projectCategory,
+                            program,
+                            advisor,
+                            coAdvisor,
+                            committee,
                             studentList: []
                         };
                         result.push(currentProject);
                     }
 
-                    // เพิ่มข้อมูลนักศึกษาลงใน project
-                    if (studentId || studentName) {
+                    // — เพิ่ม student ลงใน currentProject ถ้ามีข้อมูล —
+                    if (currentProject && (studentId || studentName)) {
                         currentProject.studentList.push({
-                            studentId: studentId || "",
-                            studentName: studentName || ""
+                            studentId,
+                            studentName
                         });
                     }
-                });
+                }
             }
         });
 
         return result;
     }
+
 
     function shortenString(str, maxLen) {
         if (!str) return "";
