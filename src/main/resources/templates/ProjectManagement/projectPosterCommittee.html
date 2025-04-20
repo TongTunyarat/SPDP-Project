@@ -526,51 +526,68 @@
 
     // ฟังก์ชันแปลง CSV เป็น JSON
     function csvToJson(csv) {
+        const EXPECTED_COLS = 11;  // เราต้องการ 11 คอลัมน์: 0..10
         const result = [];
 
-        // ใช้ PapaParse ในการแยกข้อมูล CSV
         Papa.parse(csv, {
             skipEmptyLines: true,
-            header: false, // ถ้าไฟล์มี header ให้เปลี่ยนเป็น true
-            complete: function (results) {
+            header: false,
+            complete: function({ data }) {
+                // 1) ตรวจสอบความยาวคอลัมน์ของทุกแถวก่อน (ข้าม 5 แถวแรก)
+                for (let i = 5; i < data.length; i++) {
+                    if (data[i].length < EXPECTED_COLS) {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'ไฟล์ไม่ถูกต้อง',
+                            // text: `พบคอลัมน์ไม่ครบในแถวที่ ${i + 1} (ต้องมี ${EXPECTED_COLS} คอลัมน์)`,
+                            text: 'กรุณาอัปโหลดไฟล์ CSV ของ Poster Committee '
+                        });
+                        return;  // หยุดแปลงทันที
+                    }
+                }
+
+                // 2) ถ้าผ่าน ให้เริ่มสร้าง JSON
                 let currentProject = null;
+                data.forEach((row, i) => {
+                    if (i < 5) return;  // ข้าม 5 แถวแรก
 
-                results.data.forEach((row, i) => {
-                    if (i < 5) return;  // ข้าม 5 แถวแรกตามที่ระบุ
+                    // trim และ slice เอาเฉพาะ 11 คอลัมน์แรก
+                    const cells = row.map(c => c.trim()).slice(0, EXPECTED_COLS);
 
-                    const projectId = row[0].trim();
-                    const projectTitle = row[1].trim();
-                    const projectDescription = row[2].trim();
-                    const projectCategory = row[3].trim();
-                    const studentId = row[4].trim();
-                    const studentName = row[5].trim();
-                    const program = row[6].trim();
-                    const advisor = row[7].trim();
-                    const coAdvisor = row[8].trim();
-                    const committee = row[9].trim();
-                    const posterCommittee = row[10].trim();
+                    const [
+                        projectId,
+                        projectTitle,
+                        projectDescription,
+                        projectCategory,
+                        studentId,
+                        studentName,
+                        program,
+                        advisor,
+                        coAdvisor,
+                        committee,
+                        posterCommittee
+                    ] = cells;
 
-                    // สร้างหรืออัปเดตข้อมูลโปรเจกต์
+                    // — สร้าง Project ใหม่ เมื่อเจอ projectId (ไม่ใช่ช่องว่าง) —
                     if (projectId) {
                         currentProject = {
-                            projectId: projectId,
-                            projectTitle: projectTitle,
-                            projectDescription: projectDescription,
-                            projectCategory: projectCategory,
-                            program: program,
-                            advisor: advisor,
-                            committee: committee,
+                            projectId,
+                            projectTitle,
+                            projectDescription,
+                            projectCategory,
+                            program,
+                            advisor,
+                            coAdvisor,
+                            committee,
+                            posterCommittee,
                             studentList: []
                         };
                         result.push(currentProject);
                     }
 
-                    // เพิ่มข้อมูลนักศึกษาลงใน project
-                    if (studentId || studentName) {
-                        currentProject.studentList.push({
-                            studentId: studentId || "",
-                            studentName: studentName || ""
-                        });
+                    // — เพิ่ม student ลงใน currentProject ถ้ามี —
+                    if ((studentId || studentName) && currentProject) {
+                        currentProject.studentList.push({ studentId, studentName });
                     }
                 });
             }
@@ -578,6 +595,7 @@
 
         return result;
     }
+
 
     function shortenString(str, maxLen) {
         if (!str) return "";

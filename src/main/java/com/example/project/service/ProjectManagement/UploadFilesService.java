@@ -387,221 +387,188 @@ public class UploadFilesService {
     public List<String> processProjectAndStudent(MultipartFile file) throws Exception {
         Map<String, FileProjectData> fileData = parseFile(file);
         List<String> warnings = new ArrayList<>();
-        int currentYear = LocalDate.now().getYear();
-        Map<String, Integer> projectCounters = new HashMap<>();
-        int studentPjCounter = Integer.parseInt(generateNextStudentPjId());
+
+        // สแกนหา Student ID ที่ซ้ำกับฐานข้อมูล (DB) ทั้งหมด
+        for (FileProjectData fp : fileData.values()) {
+            for (FileStudent fs : fp.students) {
+                if (studentProjectRepository.existsByStudent_StudentId(fs.id)) {
+                    warnings.add("Student ID " + fs.id + " already exists");
+                }
+            }
+        }
+        // ถ้าเจออย่างน้อย 1 ตัว ให้หยุดและคืน warnings กลับไปเลย
+        if (!warnings.isEmpty()) {
+            return warnings;
+        }
+
+
+        int year = LocalDate.now().getYear();
+        Map<String,Integer> counters = new HashMap<>();
+        int studentCounter = Integer.parseInt(generateNextStudentPjId());
 
         for (FileProjectData fp : fileData.values()) {
-            // 1) หาใน DB จาก title+description (หรือ projectId เดิม)
-            Optional<Project> optProj = projectRepository
-                    .findByProjectTitleAndProjectDescription(fp.title, fp.description);
+            // สร้าง projectId จาก program+ปี+ลำดับของ No
+            String key = fp.program + "_" + year;
+            int seq = counters.getOrDefault(key, 0) + 1;
+            counters.put(key, seq);
+            String projId = fp.program + " SP" + year + "-" + String.format("%02d", seq);
 
-            Project project;
-            if (optProj.isPresent()) {
-                // — ถ้ามีอยู่แล้ว: อัปเดตฟิลด์ที่เปลี่ยนแปลง
-                project = optProj.get();
-                project.setProgram(fp.program);
-                project.setSemester(String.valueOf(currentYear));
-                project.setProjectCategory(fp.category);
-                project.setProjectDescription(fp.description);
-                project.setEditedOn(LocalDateTime.now());
-                projectRepository.save(project);
-
-                // — ลบข้อมูลเก่า เพื่อเตรียมแทนที่ใหม่
-                studentProjectRepository.deleteByProject_ProjectId(project.getProjectId());
-                projectInstructorRoleRepository.deleteByProjectIdRole_ProjectId(project.getProjectId());
-            } else {
-                // — ถ้าไม่มี ให้สร้างใหม่ตามเดิม
-                String key = fp.program + "_" + currentYear;
-                int nextNum = projectCounters.getOrDefault(key,
-                        generateNextProjectNumber(fp.program, String.valueOf(currentYear))
-                );
-                projectCounters.put(key, nextNum);
-
-                String newId = fp.program + " SP" + currentYear
-                        + "-" + String.format("%02d", nextNum);
-
-                project = new Project();
-                project.setProjectId(newId);
-                project.setProgram(fp.program);
-                project.setSemester(String.valueOf(currentYear));
-                project.setProjectTitle(fp.title);
-                project.setProjectCategory(fp.category);
-                project.setProjectDescription(fp.description);
-                project.setRecordedOn(LocalDateTime.now());
-                project.setEditedOn(LocalDateTime.now());
-                projectRepository.save(project);
+            // ถ้าเคยมี record นี้ แค่ลบ students & roles เก่า
+            if (projectRepository.existsById(projId)) {
+                studentProjectRepository.deleteByProject_ProjectId(projId);
+                projectInstructorRoleRepository.deleteByProjectIdRole_ProjectId(projId);
             }
 
-            // 2) สร้าง StudentProject ใหม่ (แทนที่ข้อมูลเก่า)
+            // สร้างหรืออัปเดต Project
+            Project project = projectRepository.findById(projId)
+                    .orElseGet(() -> {
+                        Project p = new Project();
+                        p.setProjectId(projId);
+                        p.setRecordedOn(LocalDateTime.now());
+                        return p;
+                    });
+            project.setProgram(fp.program);
+            project.setSemester(String.valueOf(year));
+            project.setProjectTitle(fp.title);
+            project.setProjectCategory(fp.category);
+            project.setProjectDescription(fp.description);
+            project.setEditedOn(LocalDateTime.now());
+            projectRepository.save(project);
+
+            // 2) สร้าง StudentProject สำหรับนักศึกษาทุกคนใน group นี้
             for (FileStudent fs : fp.students) {
-                if (fs.id == null || fs.id.isBlank()) continue;
-
-                // เช็คว่ามีนักศึกษาในระบบ และชื่อตรงกัน
-                Student student = studentRepository.findById(fs.id)
+                Student stu = studentRepository.findById(fs.id)
                         .orElseThrow(() -> new IllegalStateException("Student not found: " + fs.id));
-                if (!student.getStudentName().equals(fs.name)) {
+                if (!stu.getStudentName().equals(fs.name)) {
                     throw new IllegalStateException(
-                            "Name mismatch for " + fs.id + ": DB=" +
-                                    student.getStudentName() + ", File=" + fs.name);
+                            "Name mismatch for " + fs.id +
+                                    ": DB=" + stu.getStudentName() + ", File=" + fs.name);
                 }
-
-                // สร้าง record ใหม่
                 StudentProject sp = new StudentProject();
-                sp.setStudent(student);
+                sp.setStudent(stu);
                 sp.setProject(project);
                 sp.setStatus("Active");
-                sp.setStudentPjId("SP" + String.format("%03d", studentPjCounter++));
+                sp.setStudentPjId("SP" + String.format("%03d", studentCounter++));
                 studentProjectRepository.save(sp);
             }
 
-            // 3) สร้าง ProjectInstructorRole ใหม่ (แทนที่ข้อมูลเก่า)
-            for (String advName : fp.advisors) {
-                if (advName == null || advName.isBlank()) continue;
-                if (!isValidInstructor(advName)) {
-                    throw new IllegalStateException("Invalid advisor format: " + advName);
-                }
-
-                Instructor instr = instructorRepository
-                        .findByProfessorName(advName)
-                        .orElseThrow(() -> new IllegalStateException("Advisor not found: " + advName));
-
-                if (instr.getProfessorId() == null) {
-                    instr.setProfessorId(generateNextInstructorId());
-                    instructorRepository.save(instr);
-                }
-
-                ProjectInstructorRole pir = new ProjectInstructorRole();
-                pir.setInstructorId(generateNextInstructorId());
-                pir.setAssignDate(LocalDateTime.now());
-                pir.setRole("Advisor");
-                pir.setProjectIdRole(project);
-                pir.setInstructor(instr);
-                projectInstructorRoleRepository.save(pir);
-            }
-
-            // 4) NEW: บล็อกสร้าง ProjectInstructorRole สำหรับ Co‑Advisor
-            for (String coAdvName : fp.getCoAdvisors()) {
-                if (coAdvName == null || coAdvName.isBlank()) continue;
-                if (!isValidInstructor(coAdvName)) {
-                    throw new IllegalStateException("Invalid co-advisor format: " + coAdvName);
-                }
-
-                Instructor instr = instructorRepository
-                        .findByProfessorName(coAdvName)
-                        .orElseThrow(() -> new IllegalStateException("Co-Advisor not found: " + coAdvName));
-
-                if (instr.getProfessorId() == null) {
-                    instr.setProfessorId(generateNextInstructorId());
-                    instructorRepository.save(instr);
-                }
-
-                ProjectInstructorRole pir = new ProjectInstructorRole();
-                pir.setInstructorId(generateNextInstructorId());
-                pir.setAssignDate(LocalDateTime.now());
-                pir.setRole("Co-Advisor");
-                pir.setProjectIdRole(project);
-                pir.setInstructor(instr);
-                projectInstructorRoleRepository.save(pir);
-            }
-
+            // 3) สร้าง InstructorRole สำหรับ advisor & co‑advisor
+            createRoles(fp.advisors,      "Advisor",      project);
+            createRoles(fp.coAdvisors,    "Co-Advisor",   project);
         }
 
         return warnings;
     }
 
+
+    private void createRoles(List<String> names, String role, Project project) {
+        if (names == null) return;
+        for (String profName : names) {
+            if (profName.isBlank()) continue;
+            if (!isValidInstructor(profName)) {
+                throw new IllegalStateException("Invalid " + role + ": " + profName);
+            }
+            Instructor instr = instructorRepository.findByProfessorName(profName)
+                    .orElseThrow(() -> new IllegalStateException(role + " not found: " + profName));
+            if (instr.getProfessorId() == null) {
+                instr.setProfessorId(generateNextInstructorId());
+                instructorRepository.save(instr);
+            }
+            ProjectInstructorRole pir = new ProjectInstructorRole();
+            pir.setInstructorId(generateNextInstructorId());
+            pir.setAssignDate(LocalDateTime.now());
+            pir.setRole(role);
+            pir.setProjectIdRole(project);
+            pir.setInstructor(instr);
+            projectInstructorRoleRepository.save(pir);
+        }
+    }
+
+
     // —— HELPER TO PARSE FILE INTO IN‑MEMORY STRUCTURES ——
-
     private Map<String, FileProjectData> parseFile(MultipartFile file) throws IOException {
+        String csv = new String(file.getBytes(), StandardCharsets.UTF_8);
+        String[] lines = csv.split("\r?\n");
         Map<String, FileProjectData> map = new LinkedHashMap<>();
-        try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))) {
-            String line;
-            int row = 0;
-            String currentProjId = null;
+        String currentNo = null;
 
-            // เริ่มอ่านจากบรรทัดที่ 6 (index 5)
-            while ((line = br.readLine()) != null) {
-                row++;
+        // เริ่มอ่านจากบรรทัดที่ 6 (index=5)
+        for (int i = 5; i < lines.length; i++) {
+            String line = lines[i].trim();
+            if (line.isEmpty()) continue;
 
-                // ข้ามบรรทัดก่อนบรรทัดที่ต้องการ (บรรทัดที่ 1 ถึง 5)
-                if (row < 6 || line.trim().isEmpty()) continue;
+            String[] cells = line.split(",", -1);
+            // pad ให้มี 9 columns
+            if (cells.length < 9) {
+                String[] tmp = new String[9];
+                System.arraycopy(cells, 0, tmp, 0, cells.length);
+                Arrays.fill(tmp, cells.length, 9, "");
+                cells = tmp;
+            }
+            String no              = cells[0].trim();
+            String title           = cells[1].trim();
+            String desc            = cells[2].trim();
+            String category        = cells[3].trim();
+            String studentId       = cells[4].trim();
+            String studentName     = cells[5].trim();
+            String program         = cells[6].trim();
+            String advisor         = cells[7].trim();
+            String coAdvisor       = cells[8].trim();
 
-                String[] cols = line.split(",", -1);
+            // ถ้ามี No ใหม่ ให้สร้าง DTO ใหม่
+            if (!no.isEmpty()) {
+                currentNo = no;
+                map.computeIfAbsent(no, k ->
+                        new FileProjectData(no, title, desc, category, program)
+                );
+            }
+            if (currentNo == null) {
+                throw new IllegalStateException("Row " + (i+1) + ": missing No.");
+            }
 
-                // pad to length 8
-                if (cols.length < 8) {
-                    String[] tmp = new String[8];
-                    System.arraycopy(cols, 0, tmp, 0, cols.length);
-                    for (int i = cols.length; i < 8; i++) tmp[i] = "";
-                    cols = tmp;
-                }
-
-                String fid = cols[0].trim();
-                String title = cols[1].trim();
-                String desc = cols[2].trim();
-                String category = cols[3].trim();
-                String sid = cols[4].trim();
-                String sname = cols[5].trim();
-                String prog = cols[6].trim();
-                String adv = cols[7].trim();
-                String coadv  = cols[8].trim();
-
-                if (!fid.isEmpty()) {
-                    currentProjId = fid;
-                    map.putIfAbsent(currentProjId, new FileProjectData(
-                            currentProjId, title, desc, category, prog
-                    ));
-                }
-                if (currentProjId == null) {
-                    throw new IllegalStateException("Row " + row + ": no projectId");
-                }
-
-                FileProjectData fp = map.get(currentProjId);
-                if (!sid.isEmpty()) {
-                    fp.students.add(new FileStudent(sid, sname));
-                }
-                if (!adv.isEmpty() && !fp.advisors.contains(adv)) {
-                    fp.advisors.add(adv);
-                }
-
-                if (!coadv.isBlank()) {
-                    fp.getCoAdvisors().add(coadv);
-                }
+            FileProjectData fp = map.get(currentNo);
+            // เติม student ถ้ามี
+            if (!studentId.isEmpty() && !studentName.isEmpty()) {
+                fp.students.add(new FileStudent(studentId, studentName));
+            }
+            // เติม advisor (ไม่ซ้ำ)
+            if (!advisor.isEmpty() && !fp.advisors.contains(advisor)) {
+                fp.advisors.add(advisor);
+            }
+            // เติม co‑advisor (ไม่ซ้ำ)
+            if (!coAdvisor.isEmpty() && !fp.coAdvisors.contains(coAdvisor)) {
+                fp.coAdvisors.add(coAdvisor);
             }
         }
+
         return map;
     }
 
+
+
     // —— in‑memory DTO’s ——
     private static class FileProjectData {
-        String projectId, title, description, category, program;
-        List<FileStudent> students = new ArrayList<>();
-        private List<String> advisors   = new ArrayList<>();
-        private List<String> coAdvisors = new ArrayList<>();
+        String no, title, description, category, program;
+        List<FileStudent> students   = new ArrayList<>();
+        List<String> advisors        = new ArrayList<>();
+        List<String> coAdvisors      = new ArrayList<>();
 
-        FileProjectData(String projectId, String title, String desc,
-                        String cat, String prog) {
-            this.projectId = projectId;
-            this.title = title;
-            this.description = desc;
-            this.category = cat;
-            this.program = prog;
+        FileProjectData(String no, String t, String d, String c, String p) {
+            this.no          = no;
+            this.title       = t;
+            this.description = d;
+            this.category    = c;
+            this.program     = p;
         }
-
-        public List<String> getCoAdvisors() { return coAdvisors; }
-        public void setCoAdvisors(List<String> coAdvisors) { this.coAdvisors = coAdvisors; }
-
     }
-
     private static class FileStudent {
         String id, name;
-
         FileStudent(String id, String name) {
-            this.id = id;
+            this.id   = id;
             this.name = name;
         }
     }
+
 
     public String generateNextProjectId(String program, String year) {
         int nextNum = generateNextProjectNumber(program, year);
