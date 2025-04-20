@@ -40,6 +40,7 @@
     <li><a href="/admin-proposal-report">Proposal Grade Report</a></li>
     <li><a href="/admin-defense-report">Defense Grade Report</a></li>
     <li><a href="/admin-eva-traking">Evaluation Tracking</a></li>
+    <li><a href="/admin-timeliness-scoring">Timeliness Scoring</a></li>
   </ul>
 
   <h2> Pages </h2>
@@ -66,7 +67,7 @@
     <li><a href="/admin/proposalSchedule" class="active">Proposal Schedule</a></li>
     <li><a href="/admin/editProposalSchedulePage">Edit Proposal Timing</a></li>
     <li><a href="/admin/defenseSchedule">Defense Schedule</a></li>
-    <li><a href="#">Edit Defense Timing</a></li>
+    <li><a href="/admin/editDefenseSchedulePage">Edit Defense Timing</a></li>
   </ul>
 
   <ul>
@@ -2171,6 +2172,8 @@
 
 <!-- --------- Semester Change ------------- -->
 <script>
+
+
   async function fetchAcademicYears() {
     try {
       const response = await fetch('/api/academic-years'); // เรียก API
