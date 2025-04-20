@@ -87,7 +87,7 @@ public class ProjectService {
             // สร้าง professorList ที่เก็บชื่ออาจารย์พร้อมกับ role
             List<ProfessorRoleDTO> professorList = new ArrayList<>();
             for (ProjectInstructorRole roleData : roles) {
-                professorList.add(new ProfessorRoleDTO(roleData.getInstructor().getProfessorName(), roleData.getRole()));
+                professorList.add(new ProfessorRoleDTO(roleData.getInstructor().getProfessorName(), roleData.getRole(), roleData.getInstructorId()));
             }
 
             // ตรวจสอบ program ถ้าเป็น null ให้ตั้งค่าเป็น "Unknown"
@@ -114,7 +114,9 @@ public class ProjectService {
                     professorList,
                     project.getProjectDescription(),
                     program,  // ส่งโปรแกรม
-                    studentList // ส่งข้อมูลนักศึกษา
+                    studentList, // ส่งข้อมูลนักศึกษา
+                    project.getProjectCategory(),
+                    project.getSemester()
             );
 
             projectDetailsDTOList.add(projectDetailsDTO);

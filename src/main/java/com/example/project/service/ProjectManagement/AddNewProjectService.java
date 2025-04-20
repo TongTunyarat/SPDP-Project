@@ -1,5 +1,6 @@
 package com.example.project.service.ProjectManagement;
 
+import com.example.project.DTO.projectManagement.NewProjectDTO;
 import com.example.project.DTO.projectManagement.ProfessorRoleDTO;
 import com.example.project.DTO.projectManagement.ProjectDetailsDTO;
 import com.example.project.DTO.projectManagement.StudentProjectDTO;
@@ -13,8 +14,10 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,118 +39,149 @@ public class AddNewProjectService {
     private InstructorRepository instructorRepository;
 
     @Transactional
-    public void addNewProject(ProjectDetailsDTO projectDetailsDTO) {
-        // ดึงปีปัจจุบัน
-        int currentYear = LocalDateTime.now().getYear();
+    public String createProject(NewProjectDTO dto) {
 
-        // ดึงค่า program จากฟอร์ม
-        String program = projectDetailsDTO.getProgram();
+        if (dto.getAdvisors() == null || dto.getAdvisors().size() != 1) {
+            throw new IllegalArgumentException("กรุณาระบุ Advisor เพียงคนเดียวเท่านั้น");
+        }
 
-        // หาเลขลำดับล่าสุดจากฐานข้อมูล (ใช้รหัส projectId ล่าสุด)
-        String lastProjectId = getLastInstructorRoleId();  // ใช้ method นี้เพื่อหาค่าล่าสุด
-        String newProjectId = generateNewProjectId(lastProjectId, program, currentYear); // สร้าง Project ID ใหม่
-
-        // สร้างโปรเจกต์ใหม่
-        Project newProject = new Project();
-        newProject.setProjectId(newProjectId);  // ตั้งค่า projectId ที่สร้างใหม่
-        newProject.setProjectTitle(projectDetailsDTO.getProjectTitle());
-        newProject.setProjectDescription(projectDetailsDTO.getProjectDescription());
-        newProject.setProgram(projectDetailsDTO.getProgram());
-
-        // บันทึกโปรเจกต์ใหม่ลงในฐานข้อมูล
-        projectRepository.save(newProject);
-
-        // เพิ่มข้อมูลอาจารย์ที่ปรึกษา
-        List<ProfessorRoleDTO> professorList = projectDetailsDTO.getProfessorList();
-        if (professorList != null) {
-            for (ProfessorRoleDTO professorDTO : professorList) {
-                ProjectInstructorRole role = new ProjectInstructorRole();
-
-                // ค้นหาข้อมูลอาจารย์ในฐานข้อมูล
-                Optional<Instructor> instructorOptional = instructorRepository.findByProfessorName(professorDTO.getProfessorName());
-
-                // ตรวจสอบว่า Optional มีค่าหรือไม่
-                Instructor instructor = instructorOptional.orElseThrow(() ->
-                        new ResponseStatusException(HttpStatus.NOT_FOUND, "Instructor not found: " + professorDTO.getProfessorName())
-                );
-
-                // สร้างรหัส ProjectInstructorRole ใหม่ โดยใช้ฟังก์ชัน generateNewInstructorRoleId
-                String instructorRoleId = generateNewInstructorRoleId();  // สร้าง ID ใหม่
-                role.setInstructorId(instructorRoleId);  // ตั้งค่า ID สำหรับ ProjectInstructorRole
-
-                System.out.println("Instructor Role ID: " + instructorRoleId); // ตรวจสอบค่า ID
-
-                // ตั้งค่าอาจารย์ใน ProjectInstructorRole
-                role.setProjectIdRole(newProject);  // ตั้งค่าโปรเจกต์
-                role.setInstructor(instructor);     // ตั้งค่าอาจารย์
-                role.setRole(professorDTO.getRole());  // ตั้งค่าบทบาท
-                role.setAssignDate(LocalDateTime.now());  // ตั้งค่าวันที่ที่มอบหมาย
-
-                // บันทึกข้อมูลอาจารย์ที่ปรึกษาในฐานข้อมูล
-                projectInstructorRoleRepository.save(role);
+        if (dto.getStudentList() != null) {
+            List<String> ids = dto.getStudentList().stream()
+                    .map(StudentProjectDTO::getStudentId)
+                    .collect(Collectors.toList());
+            Set<String> uniqueIds = new HashSet<>(ids);
+            if (uniqueIds.size() != ids.size()) {
+                throw new IllegalArgumentException("มีนักศึกษาซ้ำในรายการ กรุณาตรวจสอบใหม่");
             }
         }
 
-        // เพิ่มข้อมูลนักศึกษา
-        List<StudentProjectDTO> studentList = projectDetailsDTO.getStudentList();
-        if (studentList != null) {
-            for (StudentProjectDTO studentDTO : studentList) {
-                StudentProject studentProject = new StudentProject();
-                // ค้นหาข้อมูลนักศึกษาในฐานข้อมูล
-                Student student = studentRepository.findByStudentId(studentDTO.getStudentId());
-                if (student != null) {
-                    studentProject.setProject(newProject);  // ตั้งค่าโปรเจกต์
-                    studentProject.setStudent(student);    // ตั้งค่านักศึกษา
-                    studentProject.setStatus(studentDTO.getStatus() != null ? studentDTO.getStatus() : "Active"); // ตั้งค่าสถานะ
-                    studentProjectRepository.save(studentProject);
-                } else {
-                    throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Student not found: " + studentDTO.getStudentId());
-                }
+        // 1) Gen projectId
+        String newProjId = generateNewProjectId(dto.getProgram(), dto.getSemester());
+        LocalDateTime now = LocalDateTime.now();
+
+        // 2) สร้าง Project
+        Project p = new Project();
+        p.setProjectId(newProjId);
+        p.setProgram(dto.getProgram());
+        p.setSemester(dto.getSemester());
+        p.setProjectTitle(dto.getProjectTitle());
+        p.setProjectCategory(dto.getProjectCategory());
+        p.setProjectDescription(dto.getProjectDescription());
+        p.setRecordedOn(now);
+        p.setEditedOn(now);
+        projectRepository.save(p);
+
+        // 3) สร้าง StudentProject
+        int counter = Integer.parseInt(generateNextStudentPjId());
+        for (StudentProjectDTO sDto : dto.getStudentList()) {
+            if (sDto.getStudentId() == null || sDto.getStudentId().isBlank()) continue;
+            Student stu = studentRepository.findById(sDto.getStudentId())
+                    .orElseThrow(() -> new IllegalStateException("Student not found: " + sDto.getStudentId()));
+            // (ถ้าต้องเช็ค name ก็เช็ค sDto.getStudentName() เพิ่มได้)
+            StudentProject sp = new StudentProject();
+            sp.setStudent(stu);
+            sp.setProject(p);
+            sp.setStatus("Active");
+            sp.setStudentPjId("SP" + String.format("%03d", counter++));
+            studentProjectRepository.save(sp);
+        }
+
+        // 4) สร้าง Instructor Roles ทั้ง 4 ประเภท
+        now = LocalDateTime.now();  // อัพเดต timestamp ใหม่
+        // helper method ข้างล่างนี้จะ loop ถ้า list เป็น null หรือ empty ก็ข้ามให้
+        addRoles(dto.getAdvisors(),      "Advisor",         p, now);
+        addRoles(dto.getCoAdvisors(),    "Co-Advisor",      p, now);
+        addRoles(dto.getCommittees(),    "Committee",       p, now);
+        addRoles(dto.getPosterCommittee(),"Poster-Committee",p, now);
+
+        return newProjId;
+    }
+
+    private void addRoles(
+            List<ProfessorRoleDTO> list,
+            String role,
+            Project project,
+            LocalDateTime assignDate
+    ) {
+        if (list == null) return;
+        for (ProfessorRoleDTO prof : list) {
+            String name = prof.getProfessorName();  // สมมติ DTO มีฟิลด์นี้
+            if (name == null || name.isBlank()) continue;
+
+            Instructor instr = instructorRepository
+                    .findByProfessorName(name)
+                    .orElseThrow(() -> new IllegalStateException(role + " not found: " + name));
+
+            if (instr.getProfessorId() == null) {
+                instr.setProfessorId(generateNextInstructorId());
+                instructorRepository.save(instr);
             }
+
+            ProjectInstructorRole pir = new ProjectInstructorRole();
+            pir.setInstructorId(generateNextInstructorId());
+            pir.setAssignDate(assignDate);
+            pir.setRole(role);
+            pir.setProjectIdRole(project);
+            pir.setInstructor(instr);
+            projectInstructorRoleRepository.save(pir);
         }
     }
 
-    // ฟังก์ชันในการสร้างรหัส ProjectInstructorRole ใหม่
-    private String generateNewInstructorRoleId() {
-        // ดึงรหัสอาจารย์ล่าสุดจากฐานข้อมูล
-        String lastInstructorId = projectInstructorRoleRepository.findLatestInstructorId();  // ค้นหาจากรหัสล่าสุดของ ProjectInstructorRole
 
-        if (lastInstructorId == null) {
-            return "INST001";  // เริ่มต้นที่ INST001 หากไม่มีข้อมูล
-        }
-
-        // ดึงลำดับจากรหัสล่าสุด
-        String lastSequence = lastInstructorId.substring(4);  // เอาแค่ตัวเลขที่อยู่หลัง "INST"
-        int newSequence = Integer.parseInt(lastSequence) + 1;
-        String newSequenceFormatted = String.format("%03d", newSequence);  // ทำให้ลำดับเป็น 3 หลัก
-
-        // สร้างรหัสใหม่
-        return "INST" + newSequenceFormatted;
+    private String generateNewProjectId(String program, String semester) {
+        int nextNum = generateNextProjectNumber(program, semester);
+        return program + " SP" + semester
+                + "-" + String.format("%02d", nextNum);
     }
 
-    private String generateNewProjectId(String lastProjectId, String program, int year) {
-        // สร้างรหัสโปรเจกต์ใหม่จากลำดับล่าสุดที่พบในฐานข้อมูล
-        String prefix = program;  // ค่า program (DST, ICT)
-        String yearPart = String.valueOf(year);
-        String sequencePart = "01";  // ค่าเริ่มต้นลำดับ
-
-        if (lastProjectId != null && lastProjectId.startsWith(prefix) && lastProjectId.contains("SP")) {
-            String lastSequence = lastProjectId.substring(lastProjectId.length() - 2);  // รับลำดับสุดท้ายจากรหัสโปรเจกต์
-            int newSequence = Integer.parseInt(lastSequence) + 1;
-            sequencePart = String.format("%02d", newSequence);  // เพิ่มลำดับใหม่และจัดรูปแบบให้เป็น 2 หลัก
+    private int generateNextProjectNumber(String program, String year) {
+        String latestProjectId = projectRepository.findLatestProjectIdByProgramAndYear(program, year);
+        if (latestProjectId == null || latestProjectId.isEmpty()) {
+            return 1;
         }
-
-        // รวมรหัสโปรเจกต์ใหม่
-        return String.format("%s SP%s-%s", prefix, yearPart, sequencePart);
+        String[] parts = latestProjectId.split("-");
+        if (parts.length < 2) {
+            return 1;
+        }
+        try {
+            int latestNumber = Integer.parseInt(parts[1]);
+            return latestNumber + 1;
+        } catch (NumberFormatException ex) {
+            return 1;
+        }
     }
 
-    // ฟังก์ชันในการดึงรหัสโปรเจกต์ล่าสุด
-    public String findLastProjectId() {
-        // ค้นหาค่ารหัสโปรเจกต์ล่าสุดจากฐานข้อมูล
-        String lastProjectId = projectRepository.findLastProjectId();
+    private String generateNextStudentPjId() {
+        String latestId = studentProjectRepository.findLatestStudentPjId();
+        if (latestId == null || latestId.isEmpty()) {
+            return "01";
+        }
+        String numericPart = latestId.substring(2);
+        int nextNumber = Integer.parseInt(numericPart) + 1;
+        int width = numericPart.length();
+        return String.format("%0" + width + "d", nextNumber);
+    }
 
-        // ถ้ามีรหัสโปรเจกต์ล่าสุดให้ส่งคืน ถ้าไม่มีก็ส่งค่าว่าง
-        return (lastProjectId != null) ? lastProjectId : "SP0000";  // กำหนดรหัสโปรเจกต์เริ่มต้น
+
+    private String generateNextInstructorId() {
+        // ค้นหาค่ารหัสล่าสุดที่มีอยู่ในฐานข้อมูล
+        String latestId = projectInstructorRoleRepository.findLatestInstructorId();
+
+        // ถ้าไม่พบรหัสล่าสุด (กรณีฐานข้อมูลยังว่างเปล่า)
+        if (latestId == null) {
+            return "INST001";  // เริ่มต้นที่ INST001
+        }
+
+        // เอารหัสล่าสุดออกมาจาก INSTxxxx และเพิ่ม 1
+        String numericPart = latestId.substring(4);  // เอาส่วนเลขออกจาก INSTxxxx
+        int nextId = Integer.parseInt(numericPart) + 1;  // เพิ่ม 1
+        return String.format("INST%03d", nextId);  // ใช้ String.format เพื่อให้รหัสใหม่มีรูปแบบเหมือนเดิม เช่น INST002, INST003, ...
+    }
+
+
+    // ฟังก์ชันในการดึงรหัสโปรเจกต์ล่าสุด ✅
+    public String findLatestProjectId(String program, String semester) {
+        return projectRepository.findLatestProjectIdByProgramAndYear(program, semester);
     }
 
     // ฟังก์ชันในการดึงนักศึกษาที่ยังไม่มีโปรเจกต์
@@ -175,23 +209,7 @@ public class AddNewProjectService {
         return instructorsWithoutProject;
     }
 
-    // ฟังก์ชันนี้จะดึงรหัสโปรเจกต์ล่าสุดจากฐานข้อมูล
-    public String getLastInstructorRoleId() {
-        // ดึงรหัสอาจารย์ล่าสุดจากฐานข้อมูล
-        String lastInstructorId = projectInstructorRoleRepository.findLatestInstructorId(); // ค้นหาจากรหัสล่าสุดของ ProjectInstructorRole
 
-        if (lastInstructorId == null) {
-            return "INST001";  // เริ่มต้นที่ INST001 หากไม่มีข้อมูล
-        }
-
-        // ดึงลำดับจากรหัสโปรเจกต์ล่าสุด
-        String lastSequence = lastInstructorId.substring(4);  // เอาแค่ตัวเลขที่อยู่หลัง "INST"
-        int newSequence = Integer.parseInt(lastSequence) + 1;
-        String newSequenceFormatted = String.format("%03d", newSequence);  // ทำให้ลำดับเป็น 3 หลัก
-
-        // สร้างรหัสโปรเจกต์ใหม่
-        return "INST" + newSequenceFormatted;  // คืนรหัสใหม่เช่น INST001, INST002, ...
-    }
 
 
 }

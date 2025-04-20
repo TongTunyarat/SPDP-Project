@@ -1,9 +1,6 @@
 package com.example.project.controller.ProjectManagement;
 
-import com.example.project.DTO.projectManagement.ProfessorRoleDTO;
-import com.example.project.DTO.projectManagement.ProjectDetailsResponseDTO;
-import com.example.project.DTO.projectManagement.StudentProjectDTO;
-import com.example.project.DTO.projectManagement.ProjectDetailsDTO;
+import com.example.project.DTO.projectManagement.*;
 import com.example.project.entity.*;
 import com.example.project.repository.*;
 import com.example.project.service.ProjectManagement.EditProjectService;
@@ -52,6 +49,12 @@ public class projectAdminController {
     private StudentProjectRepository studentProjectRepository;
     @Autowired
     private AddNewProjectService AddNewProjectService;
+    @Autowired
+    private EditProjectService EditProjectService;
+    @Autowired
+    private ProjectRepository projectRepository;
+    @Autowired
+    private ProjectInstructorRoleRepository ProjectInstructorRoleRepository;
 
     @Autowired
     public projectAdminController(ProjectService projectService) {
@@ -89,7 +92,8 @@ public class projectAdminController {
         List<ProfessorRoleDTO> professorList = roles.stream()
                 .map(role -> new ProfessorRoleDTO(
                         role.getInstructor().getProfessorName(), // ชื่ออาจารย์
-                        role.getRole() // บทบาท (Role)
+                        role.getRole(), // บทบาท (Role)
+                        role.getInstructorId()
                 ))
                 .collect(Collectors.toList());
 
@@ -114,7 +118,9 @@ public class projectAdminController {
                 professorList,
                 project.getProjectDescription(),
                 project.getProgram(),
-                studentList
+                studentList,
+                project.getProjectCategory(),
+                project.getSemester()
         );
 
         return ResponseEntity.ok(response);
@@ -135,7 +141,8 @@ public class projectAdminController {
         List<ProfessorRoleDTO> professorList = roles.stream()
                 .map(role -> new ProfessorRoleDTO(
                         role.getInstructor().getProfessorName(), // ชื่ออาจารย์
-                        role.getRole() // บทบาท (Role)
+                        role.getRole(), // บทบาท (Role)
+                        role.getInstructorId()
                 ))
                 .collect(Collectors.toList());
 
@@ -160,29 +167,27 @@ public class projectAdminController {
                 professorList,
                 project.getProjectDescription(),
                 project.getProgram(),
-                studentList
+                studentList,
+                project.getProjectCategory(),
+                project.getSemester()
         );
 
         return response;  // Spring จะทำการแปลง ProjectDetailsDTO เป็น JSON
     }
 
     @PostMapping("/updateProjectDetails")
-    public ResponseEntity<Map<String, String>> updateProjectDetails(
-            @RequestParam String projectId, @RequestBody ProjectDetailsDTO updatedDetails) {
-        try {
-            // เรียกใช้ Service เพื่ออัปเดตข้อมูล
-            editProjectService.updateProjectDetails(projectId, updatedDetails);
-
-            // ส่งข้อความสำเร็จเป็น JSON
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Project details updated successfully");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            // ส่งข้อผิดพลาดเป็น JSON
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    public ResponseEntity<?> updateProject(
+            @RequestParam String projectId,
+            @RequestBody ProjectDetailsDTO updatedDetails
+    ) {
+        List<String> errors = EditProjectService.updateProjectDetails(projectId, updatedDetails);
+        if (!errors.isEmpty()) {
+            // คืน 400 พร้อม list ของ messages
+            return ResponseEntity
+                    .badRequest()
+                    .body(Map.of("message", "Validation failed", "errors", errors));
         }
+        return ResponseEntity.ok(Map.of("message", "Project updated successfully"));
     }
 
     @DeleteMapping("/deleteProject/{projectId}")
@@ -227,31 +232,76 @@ public class projectAdminController {
         }
     }
 
-    // ฟังก์ชัน POST สำหร0ับการสร้างโปรเจกต์ใหม่
-    @PostMapping("/addNewProject")
-    public ResponseEntity<Map<String, String>> addNewProject(@RequestBody ProjectDetailsDTO projectDetailsDTO) {
-        try {
-            AddNewProjectService.addNewProject(projectDetailsDTO);  // เรียกใช้ Service สำหรับเพิ่มโปรเจกต์ใหม่
+    @DeleteMapping("/deleteInstructorFromProject")
+    public ResponseEntity<String> deleteInstructorFromProject(
+            @RequestParam String projectId,
+            @RequestParam String professorId) {
 
-            // ส่งข้อความสำเร็จเป็น JSON
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Project added successfully");
-            return ResponseEntity.ok(response);
+        try {
+            // ตรวจสอบว่า Project และ Instructor มีอยู่หรือไม่
+            Project project = projectRepository.findByProjectId(projectId);
+            Instructor instructor = instructorRepository.findByProfessorId(professorId);
+
+            if (project == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Project not found");
+            }
+            if (instructor == null) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Instructor not found");
+            }
+
+            // ลบ Instructor จาก Project
+            projectInstructorRoleRepository.deleteByProjectIdRole_ProjectIdAndInstructorId(projectId, professorId);
+
+            return ResponseEntity.ok("Instructor removed successfully");
         } catch (Exception e) {
-            // ส่งข้อผิดพลาดเป็น JSON
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing instructor");
+        }
+    }
+
+
+
+    // ============= ADD NEW PROJECT ============= //
+
+
+    // ฟังก์ชัน POST สำหรับการสร้างโปรเจกต์ใหม่
+//    @PostMapping("/addNewProject")
+//    public ResponseEntity<Map<String, String>> addNewProject(@RequestBody ProjectDetailsDTO projectDetailsDTO) {
+//        try {
+//            AddNewProjectService.addNewProject(projectDetailsDTO);  // เรียกใช้ Service สำหรับเพิ่มโปรเจกต์ใหม่
+//
+//            // ส่งข้อความสำเร็จเป็น JSON
+//            Map<String, String> response = new HashMap<>();
+//            response.put("message", "Project added successfully");
+//            return ResponseEntity.ok(response);
+//        } catch (Exception e) {
+//            // ส่งข้อผิดพลาดเป็น JSON
+//            Map<String, String> response = new HashMap<>();
+//            response.put("message", "Error: " + e.getMessage());
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+//        }
+//    }
+
+    // รับ JSON จาก JS แล้วสร้าง Project ใหม่
+    @PostMapping("/addProject")
+    public ResponseEntity<String> addProject(@RequestBody NewProjectDTO dto) {
+        try {
+            String newId = String.valueOf(AddNewProjectService.createProject(dto));
+            return ResponseEntity.ok(newId);
+        } catch (Exception ex) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Failed to add project: " + ex.getMessage());
         }
     }
 
     @GetMapping("/getLastProjectId")
-    public ResponseEntity<Map<String, String>> getLastProjectId() {
-        String lastProjectId = AddNewProjectService.findLastProjectId();  // Get the last project ID from the service
-        Map<String, String> response = new HashMap<>();
-        response.put("lastProjectId", lastProjectId);  // Wrap it in a JSON object
-
-        return ResponseEntity.ok(response);  // Return the response as JSON
+    public ResponseEntity<String> getLastProjectId(
+            @RequestParam String program,
+            @RequestParam String semester
+    ) {
+        return ResponseEntity.ok(
+                AddNewProjectService.findLatestProjectId(program, semester)
+        );
     }
 
     @GetMapping("/getStudentsWithoutProject")

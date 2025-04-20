@@ -7,6 +7,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Data
@@ -267,4 +269,10 @@ public class Project {
                 '}';
     }
 
+    public Collection<Student> getStudentList() {
+        return List.of();
+    }
+
+    public void setStudentList(ArrayList<Object> objects) {
+    }
 }

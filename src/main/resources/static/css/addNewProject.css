@@ -72,7 +72,6 @@ h3 {
 }
 
 .form-group textarea {
-    resize: none;
     height: 60px;
 }
 
@@ -203,22 +202,22 @@ h3 {
 /* CSS สำหรับ Popup */
 .delete-popup,
 .save-popup {
-    display: flex;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%); /* ทำให้ popup อยู่ตรงกลางทั้งแนวนอนและแนวตั้ง */
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5); /* โปร่งใส */
-    z-index: 1000;
-    justify-content: center; /* จัดให้ popup อยู่กลางในแนวนอน */
-    align-items: center;     /* จัดให้ popup อยู่กลางในแนวตั้ง */
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background-color: rgba(0, 0, 0, 0.5) !important;
+    z-index: 1000 !important;
+    /* ไม่ใช้ flex */
 }
-
 
 /* CSS สำหรับเนื้อหาภายใน Popup */
 .popup-content {
+    position: absolute !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
     background-color: white;
     padding: 20px;
     border-radius: 5px;
@@ -234,18 +233,17 @@ h3 {
     box-sizing: border-box; /* ให้การคำนวณ padding รวมในขนาดทั้งหมด */
 }
 
-/* ปุ่มยืนยันการลบ */
-#confirmDeleteBtn {
-    background-color: #005A5A;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    cursor: pointer;
-    border-radius: 5px;
-    margin: 5px;
-    width: 150px;
-    display: inline-block;
+/* ปรับแต่งปุ่ม */
+#confirmSaveBtn,
+#cancelSaveBtn{
+    margin-top: 15px !important;
+    margin-right: 10px !important;
+    padding: 8px 15px !important;
+    cursor: pointer !important;
+    z-index: 1010 !important; /* เพิ่ม z-index ให้ปุ่มมีค่าสูงกว่า overlay */
+    position: relative !important; /* ช่วยให้ z-index ทำงาน */
 }
+
 
 #confirmDeleteBtn:hover {
     background-color: #004141; /* สีเมื่อ hover */
@@ -269,7 +267,8 @@ h3 {
 }
 
 /* ปุ่มยืนยันการบันทึก (Save) */
-#confirmSaveBtn {
+#confirmSaveBtn,
+#confirmDeleteBtn{
     background-color: #005A5A;
     color: white;
     border: none;
@@ -308,4 +307,132 @@ h3 {
     display: none;
 }
 
+
+/* Styling for the entire table */
+#studentList table,
+.instructor-table table{
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Header styling */
+#studentList th,
+.instructor-table th{
+    background-color: #f4f4f4;
+    color: black;
+    text-align: left;
+    padding: 12px;
+}
+
+/* Row styling */
+#studentList td,
+.instructor-table td{
+    padding: 12px;
+    text-align: left;
+    border-bottom: 1px solid #ddd;
+}
+
+/* Styling for even rows */
+#studentList tr:nth-child(even),
+.instructor-table tr:nth-child(even){
+    background-color: #f9f9f9;
+}
+
+/* Styling for the table container */
+#studentList,
+.instructor-table{
+    overflow-x: auto;
+}
+
+/* Add borders to the table */
+#studentList table, #studentList th, #studentList td,
+.instructor-table table, .instructor-table th, .instructor-table td{
+    border: 1px solid #ddd;
+}
+
+/* Styling for input and textarea inside modal */
+input[type="text"], textarea, select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+/* ----------- DROPDOWN ----------- */
+
+.choices {
+    width: 80% !important;
+    max-width: none;
+    flex: 3;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+}
+
+.my-choices-dropdown .my-choices-item:hover,
+.my-choices-dropdown .my-choices-selectable:hover {
+    background-color: #e0f3ff;    /* พื้นหลังเวลาชี้ */
+    color: #007bff;               /* สีข้อความเวลาชี้ */
+}
+
+.my-choices-dropdown .my-choices-item,
+.my-choices-dropdown .my-choices-selectable {
+    cursor: pointer;
+}
+
+.instructor-select {
+    width: 80% !important;
+    max-width: none;
+    font-size: 14px;
+}
+
+/* 1) ให้ Choices container ของทุก instructor-select กว้างเต็ม cell */
+.instructor-table td .choices {
+    width: 80% !important;
+    max-width: none;
+}
+
+/* 2) หรือกำหนดความกว้างเฉพาะคอลัมน์ที่ 2 (Professor) */
+.instructor-table th:nth-child(2),
+.instructor-table td:nth-child(2) {
+    width: 300px;         /* ปรับตัวเลขเป็น px หรือ % ตามต้องการ */
+}
+
+/* 3) ถ้าคุณใช้ชื่อคลาส custom ของ Choices.js */
+.my-choices-inner {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* ดีไซน์ปุ่ม Add Instructor */
+#addInstructorBtn {
+    display: inline-block;
+    background-color: #005A5A;        /* สีน้ำเงินสดใส */
+    color: #fff;                     /* ตัวอักษรสีขาว */
+    border: none;
+    border-radius: 4px;              /* มุมโค้งเล็กน้อย */
+    padding: 8px 14px;               /* ระยะรอบตัวอักษร */
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s ease, box-shadow 0.2s ease;
+    margin-top: 8px;                 /* เว้นช่องว่างด้านบน */
+}
+
+/* Hover State */
+#addInstructorBtn:hover {
+    background-color: #004141;       /* สีกลางเข้มขึ้น */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Disabled State (ถ้ามี) */
+#addInstructorBtn:disabled {
+    background-color: #cccccc;
+    color: #666666;
+    cursor: not-allowed;
+    box-shadow: none;
+}
 
