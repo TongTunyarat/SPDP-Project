@@ -24,7 +24,6 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
             "LOWER(p.projectCategory) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(p.projectTitle) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(p.projectDescription) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-
     List<Project> searchProjects(@Param("keyword") String keyword);
 
     Object[] findProfessorNameByProjectId(@Param("projectId") String projectId);
@@ -95,6 +94,7 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 
     Optional<Project> findByProjectTitleAndProjectDescription(String title, String description);
 
+
     // เพิ่มฟังก์ชันที่ดึงข้อมูลโปรเจกต์ทั้งหมดได้
 //    List<Project> findAll();
 
@@ -114,4 +114,4 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 //
 //    Project findByProjectId(String projectId);
 //
-//}
+}

@@ -103,15 +103,15 @@
             Project Details
 
             <div class="btn-header">
-                <!--                <button class="export-btn" id="open-export-dialog">Export</button>-->
-                <div class="dropdown-export">
-                    <button class="dropbtn">Export Project Template</button>
-                    <div class="dropdown-content">
-                        <a href="#" id="export-project-template">Export Projects</a>
-                        <a href="#" id="export-committee-template">Export Committee</a>
-                        <a href="#" id="export-poster-committee-template">Export Poster Committee</a>
-                    </div>
-                </div>
+                <button class="export-btn" id="export-project-template">Export Project Template</button>
+<!--                <div class="dropdown-export">-->
+<!--                    <button class="dropbtn">Export Project Template</button>-->
+<!--                    <div class="dropdown-content">-->
+<!--                        <a href="#" id="export-project-template">Export Projects</a>-->
+<!--                        <a href="#" id="export-committee-template">Export Committee</a>-->
+<!--                        <a href="#" id="export-poster-committee-template">Export Poster Committee</a>-->
+<!--                    </div>-->
+<!--                </div>-->
                 <div class="dropdown-export">
                     <button class="dropbtn">Export Project Data</button>
                     <div class="dropdown-content">
@@ -563,8 +563,8 @@
         let currentProject = null;  // เก็บข้อมูล project ล่าสุด
         let lastNo = "";            // no. ล่าสุดที่เจอ
 
-        // เริ่มอ่านไฟล์จากบรรทัดที่ 9 (index=8)
-        for (let i = 8; i < lines.length; i++) {
+        // เริ่มอ่านไฟล์จากบรรทัดที่ 6 (index=5)
+        for (let i = 5; i < lines.length; i++) {
             let line = lines[i].trim();
             if (!line) continue; // ถ้าบรรทัดว่าง ให้ข้าม
 
@@ -911,33 +911,6 @@
             confirmButtonText: 'ปิด'
         });
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
     // -------------------- Delete Project -------------------- //

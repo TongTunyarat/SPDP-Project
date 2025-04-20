@@ -133,7 +133,6 @@
                         <th>Project Name</th>
                         <th>Student ID</th>
                         <th colspan="5">Committee</th>  <!-- ใช้ colspan รวมเป็นหัวข้อหลัก -->
-                        <th class="action-header">Action</th>
                     </tr>
                     <tr class="sub-header-row">
                         <th></th>  <!-- คอลัมน์ว่างเพื่อจัดให้ตรง -->
@@ -405,19 +404,7 @@
             ${emptyCommitteeColumns}  <!-- เติมช่องว่างให้ครบจำนวน maxCommittee -->
             ${posterCommitteeColumns}  <!-- แสดง Poster-Committee ที่มี -->
             ${emptyPosterCommitteeColumns}  <!-- เติมช่องว่างให้ครบจำนวน maxPosterCommittee -->
-             <td>
-                <form action="/admin/editProjectDetails" method="get">
-                    <input type="hidden" name="projectId" value="${project.projectId}">
-                    <button type="submit" class="edit-btn"><span class="material-icons">edit</span></button>
-                </form>
 
-                <form id="deleteForm-${project.projectId}" action="" method="get" onsubmit="return confirmDelete(event, '${project.projectId}')">
-                    <input type="hidden" name="projectId" value="${project.projectId}">
-                    <button type="submit" class="delete-btn">
-                        <span class="material-icons">delete</span>
-                    </button>
-                </form>
-            </td>
         `;
             tableBody.appendChild(row);
         });
@@ -640,9 +627,6 @@
                 studentIDs = project.studentList.map(stu => stu.studentId).join(", ");
             }
 
-            // สมมติว่าคุณอยากตัด projectTitle ให้เหลือ 30 ตัวอักษร
-            // หรือ projectDescription ให้เหลือ 50 ตัว (แล้วแต่)
-            // ตัวอย่างนี้ตัด projectTitle ให้สั้นลง (ถ้าจำเป็น)
             const shortenedTitle = shortenString(project.projectTitle, 50);
 
             row.innerHTML = `

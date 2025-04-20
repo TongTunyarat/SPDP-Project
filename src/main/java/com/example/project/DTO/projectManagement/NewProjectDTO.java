@@ -10,23 +10,17 @@ public class NewProjectDTO {
     private String semester;
     private String projectCategory;
     private List<StudentProjectDTO> studentList;
-    private List<ProfessorRoleDTO> advisors;
-    private List<ProfessorRoleDTO> coAdvisors;
-    private List<ProfessorRoleDTO> committees;
-    private List<ProfessorRoleDTO> posterCommittee;
+    private List<ProfessorRoleDTO> professorList;
 
 
-    public NewProjectDTO(String projectTitle, String projectDescription, String program, String semester, String projectCategory, List<StudentProjectDTO> studentList, List<ProfessorRoleDTO> advisors, List<ProfessorRoleDTO> coAdvisors, List<ProfessorRoleDTO> committees, List<ProfessorRoleDTO> posterCommittee) {
+    public NewProjectDTO(String projectTitle, String projectDescription, String program, String semester, String projectCategory, List<StudentProjectDTO> studentList, List<ProfessorRoleDTO> professorList) {
         this.projectTitle = projectTitle;
         this.projectDescription = projectDescription;
         this.program = program;
         this.semester = semester;
         this.projectCategory = projectCategory;
         this.studentList = studentList;
-        this.advisors = advisors;
-        this.coAdvisors = coAdvisors;
-        this.committees = committees;
-        this.posterCommittee = posterCommittee;
+        this.professorList = professorList;
     }
 
     public String getProjectCategory() {
@@ -77,38 +71,11 @@ public class NewProjectDTO {
         this.studentList = studentList;
     }
 
-    public List<ProfessorRoleDTO> getAdvisors() {
-        return advisors;
+    public List<ProfessorRoleDTO> getProfessorList() {
+        return professorList;
     }
 
-    public void setAdvisors(List<ProfessorRoleDTO> advisors) {
-        this.advisors = advisors;
-    }
-
-    public List<ProfessorRoleDTO> getCoAdvisors() {
-        return coAdvisors;
-    }
-
-    public void setCoAdvisors(List<ProfessorRoleDTO> coAdvisors) {
-        this.coAdvisors = coAdvisors;
-    }
-
-    public List<ProfessorRoleDTO> getCommittees() {
-        return committees;
-    }
-
-    public void setCommittees(List<ProfessorRoleDTO> committees) {
-        this.committees = committees;
-    }
-
-    public List<ProfessorRoleDTO> getPosterCommittee() {
-        return posterCommittee;
-    }
-
-    public void setPosterCommittee(List<ProfessorRoleDTO> posterCommittee) {
-        this.posterCommittee = posterCommittee;
-    }
-
-    public NewProjectDTO() {
+    public void setProfessorList(List<ProfessorRoleDTO> professorList) {
+        this.professorList = professorList;
     }
 }

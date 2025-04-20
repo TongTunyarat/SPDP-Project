@@ -520,11 +520,15 @@ public class UploadFilesService {
             int row = 0;
             String currentProjId = null;
 
+            // เริ่มอ่านจากบรรทัดที่ 6 (index 5)
             while ((line = br.readLine()) != null) {
                 row++;
-                if (row < 9 || line.trim().isEmpty()) continue;
+
+                // ข้ามบรรทัดก่อนบรรทัดที่ต้องการ (บรรทัดที่ 1 ถึง 5)
+                if (row < 6 || line.trim().isEmpty()) continue;
 
                 String[] cols = line.split(",", -1);
+
                 // pad to length 8
                 if (cols.length < 8) {
                     String[] tmp = new String[8];

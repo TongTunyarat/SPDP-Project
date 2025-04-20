@@ -132,8 +132,8 @@
                         <th>Project ID</th>
                         <th>Project Name</th>
                         <th>Student ID</th>
-                        <th colspan="4">Committee</th>  <!-- ใช้ colspan รวมเป็นหัวข้อหลัก -->
-                        <th class="action-header">Action</th>
+                        <th colspan="5">Committee</th>  <!-- ใช้ colspan รวมเป็นหัวข้อหลัก -->
+<!--                        <th class="action-header">Action</th>-->
                     </tr>
                     <tr class="sub-header-row">
                         <th></th>  <!-- คอลัมน์ว่างเพื่อจัดให้ตรง -->
@@ -389,19 +389,6 @@
             ${advisorName}</td>  <!-- แสดง Advisor -->
             ${committeeColumns}  <!-- แสดง Committee ที่มี -->
             ${emptyColumns}  <!-- เติมช่องว่างให้ครบจำนวน maxCommittee -->
-           <td>
-                <form action="/admin/editProjectDetails" method="get">
-                    <input type="hidden" name="projectId" value="${project.projectId}">
-                    <button type="submit" class="edit-btn"><span class="material-icons">edit</span></button>
-                </form>
-
-                <form id="deleteForm-${project.projectId}" action="" method="get" onsubmit="return confirmDelete(event, '${project.projectId}')">
-                    <input type="hidden" name="projectId" value="${project.projectId}">
-                    <button type="submit" class="delete-btn">
-                        <span class="material-icons">delete</span>
-                    </button>
-                </form>
-            </td>
         `;
             tableBody.appendChild(row);
         });
