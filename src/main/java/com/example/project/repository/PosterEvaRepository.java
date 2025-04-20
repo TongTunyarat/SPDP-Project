@@ -13,4 +13,5 @@ public interface PosterEvaRepository extends JpaRepository<PosterEvaluation, Str
 
     int countByInstructorIdPoster_Instructor_ProfessorIdAndProjectIdPoster(String professorId, Project projectIdPoster);
 
+    int countByInstructorIdPosterAndProjectIdPoster(ProjectInstructorRole instructorIdPoster, Project projectIdPoster);
 }

@@ -24,12 +24,6 @@
 <div class="container">
     <div class="sidebar">
         <h2>ICT MAHIDOL</h2>
-
-<!--        <form th:action="@{/logout}" method="post" class="logout-container">-->
-<!--            &lt;!&ndash;        ค่าที่ใช้สำหรับป้องกัน Cross-Site Request Forgery (CSRF)&ndash;&gt;-->
-<!--            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>-->
-<!--            <button type="submit" class="logout-button"><i class="fas fa-sign-out-alt"></i></button>-->
-<!--        </form>-->
         <form th:action="@{/logout}" method="post" class="logout-container" onsubmit="clearLocalStorageBeforeLogout()">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <button type="submit" class="logout-button"><i class="fas fa-sign-out-alt"></i></button>
@@ -38,14 +32,7 @@
         <script>
             function clearLocalStorageBeforeLogout() {
                 localStorage.removeItem("selectedSemester");
-                // ถ้าจะล้างค่าที่จำ tab/filter อื่น ๆ ก็เพิ่มได้ เช่น
-                // localStorage.removeItem("selectedTab");
-                // localStorage.removeItem("selectedFilter");
-
             }
-            // window.addEventListener("beforeunload", function (event) {
-            //     clearLocalStorageBeforeLogout();
-            // });
         </script>
 
 
@@ -971,6 +958,8 @@
 
 <!-- ------- Instructor scoring --------- -->
 <script>
+    const unitLabel = evaType === "Poster" ? "กลุ่ม" : "คน";
+
     async function fetchTeacherScoringData() {
         try {
             const activeFilter = document.querySelector('.filter.active').textContent.trim();
@@ -1049,41 +1038,76 @@
                         legend: {
                             position: 'top',
                         },
+                        // tooltip: {
+                        //     callbacks: {
+                        //         // แสดงชื่ออาจารย์
+                        //         title: function(tooltipItems) {
+                        //             return tooltipItems[0].label;
+                        //         },
+                        //         // แสดงข้อมูลรวม
+                        //         afterTitle: function(context) {
+                        //             const index = context[0].dataIndex;
+                        //             return `สรุปข้อมูลการประเมิน:`;
+                        //         },
+                        //         // แสดงข้อมูลของแต่ละส่วน
+                        //         label: function(context) {
+                        //             const index = context.dataIndex;
+                        //             const datasetIndex = context.datasetIndex;
+                        //
+                        //             // เลือกแสดงข้อมูลตาม dataset ที่ผู้ใช้ชี้
+                        //             if (datasetIndex === 0) {
+                        //                 return `ประเมินแล้ว: ${completedCounts[index]} คน`;
+                        //             } else {
+                        //                 return `ยังไม่ได้ประเมิน: ${remainingCounts[index]} คน`;
+                        //             }
+                        //         },
+                        //         // เพิ่มข้อมูลสรุปหลังจาก label
+                        //         afterLabel: function(context) {
+                        //             const index = context.dataIndex;
+                        //             const totalAssigned = totalAssignedCounts[index];
+                        //             const completed = completedCounts[index];
+                        //             const remaining = remainingCounts[index];
+                        //             const percentComplete = totalAssigned > 0
+                        //                 ? Math.round((completed / totalAssigned) * 100)
+                        //                 : 0;
+                        //
+                        //             return [
+                        //                 `จำนวนทั้งหมด: ${totalAssigned} คน`,
+                        //                 `ความคืบหน้า: ${percentComplete}%`
+                        //             ];
+                        //         }
+                        //     }
+                        // }
                         tooltip: {
                             callbacks: {
-                                // แสดงชื่ออาจารย์
                                 title: function(tooltipItems) {
                                     return tooltipItems[0].label;
                                 },
-                                // แสดงข้อมูลรวม
                                 afterTitle: function(context) {
-                                    const index = context[0].dataIndex;
                                     return `สรุปข้อมูลการประเมิน:`;
                                 },
-                                // แสดงข้อมูลของแต่ละส่วน
                                 label: function(context) {
                                     const index = context.dataIndex;
                                     const datasetIndex = context.datasetIndex;
+                                    const unitLabel = evaType === "Poster" ? "กลุ่ม" : "คน";
 
-                                    // เลือกแสดงข้อมูลตาม dataset ที่ผู้ใช้ชี้
                                     if (datasetIndex === 0) {
-                                        return `ประเมินแล้ว: ${completedCounts[index]} คน`;
+                                        return `ประเมินแล้ว: ${completedCounts[index]} ${unitLabel}`;
                                     } else {
-                                        return `ยังไม่ได้ประเมิน: ${remainingCounts[index]} คน`;
+                                        return `ยังไม่ได้ประเมิน: ${remainingCounts[index]} ${unitLabel}`;
                                     }
                                 },
-                                // เพิ่มข้อมูลสรุปหลังจาก label
                                 afterLabel: function(context) {
                                     const index = context.dataIndex;
                                     const totalAssigned = totalAssignedCounts[index];
                                     const completed = completedCounts[index];
-                                    const remaining = remainingCounts[index];
                                     const percentComplete = totalAssigned > 0
                                         ? Math.round((completed / totalAssigned) * 100)
                                         : 0;
+                                    const unitLabel = evaType === "Poster" ? "กลุ่ม" : "คน";
 
                                     return [
-                                        `จำนวนทั้งหมด: ${totalAssigned} คน`,
+                                        `จำนวนทั้งหมด: ${totalAssigned} ${unitLabel}`,
                                         `ความคืบหน้า: ${percentComplete}%`
                                     ];
                                 }

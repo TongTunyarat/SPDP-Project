@@ -220,59 +220,113 @@ public class StatisticsService {
     }
 
     // ----- Poster Evaluation ----- //
+//    public EvaluationStatusResponse getPosterEvaluationStatus(String param, String year) {
+//        List<Project> allProjects;
+//
+//        // ตรวจสอบค่าของ param
+//        if ("All".equalsIgnoreCase(param)) {
+//            allProjects = projectRepository.findBySemester(year);
+//            System.out.println("allProjects: " + allProjects.size());
+//        } else {
+//            allProjects = projectRepository.findBySemesterAndProgram(year, param);
+//            System.out.println("allProjects: " + allProjects.size());
+//        }
+//
+//        int totalProjects = allProjects.size();
+//        int completedProjects = 0;
+//
+//        for (Project project : allProjects) {
+//            boolean isProjectEvaluated = true; // สมมติว่าเสร็จแล้วก่อนตรวจสอบ
+//
+//            Project currentProject = projectRepository.findByProjectId(project.getProjectId());
+//
+//            // ดึง Instructor ที่มีบทบาทเป็น Poster-Committee หรือ Committee ในโครงการนี้
+//            List<ProjectInstructorRole> instructors = projectInstructorRoleRepository.findByProjectIdRole(currentProject);
+//
+//            // เช็คถ้า instructors เป็น null หรือไม่มีรายการเลย
+//            if (instructors == null || instructors.isEmpty()) {
+//                System.out.println("⚠️ Project: " + project.getProjectId() + " | No assigned instructors for evaluation.");
+//                isProjectEvaluated = false; // ถือว่ายังไม่ประเมิน
+//            } else {
+//                System.out.println("Project: " + project.getProjectId() + " | Instructors: " + instructors);
+//
+//                for (ProjectInstructorRole instructorRole : instructors) {
+//                    if (instructorRole.getRole().equals("Poster-Committee") || instructorRole.getRole().equals("Committee")) {
+////                        ProjectInstructorRole instructorRole =
+//                        int totalEvaluations = posterEvaRepository.countByInstructorIdPosterAndProjectIdPoster(instructorRole, project);
+//                        int totalStudents = project.getStudentProjects().size();
+//
+//                        if (totalEvaluations < totalStudents) {
+//                            isProjectEvaluated = false;
+//                            break;
+//                        }
+//                    }
+//                }
+//            }
+//
+//            if (isProjectEvaluated) {
+//                completedProjects++;
+//                System.out.println("✅ Project: " + project.getProjectId() + " | Evaluation Completed!");
+//            } else {
+//                System.out.println("❌ Project: " + project.getProjectId() + " | Evaluation Not Completed");
+//            }
+//        }
+//
+//        return new EvaluationStatusResponse(totalProjects, completedProjects);
+//    }
     public EvaluationStatusResponse getPosterEvaluationStatus(String param, String year) {
         List<Project> allProjects;
 
-        // ตรวจสอบค่าของ param
+        // กรองโปรเจกต์ตาม param (All หรือ Program)
         if ("All".equalsIgnoreCase(param)) {
             allProjects = projectRepository.findBySemester(year);
-            System.out.println("allProjects: " + allProjects.size());
         } else {
             allProjects = projectRepository.findBySemesterAndProgram(year, param);
-            System.out.println("allProjects: " + allProjects.size());
         }
 
         int totalProjects = allProjects.size();
         int completedProjects = 0;
 
         for (Project project : allProjects) {
-            boolean isProjectEvaluated = true; // สมมติว่าเสร็จแล้วก่อนตรวจสอบ
-
             Project currentProject = projectRepository.findByProjectId(project.getProjectId());
 
-            // ดึง Instructor ที่มีบทบาทเป็น Poster-Committee หรือ Committee ในโครงการนี้
-            List<ProjectInstructorRole> instructors = projectInstructorRoleRepository.findByProjectIdRole(currentProject);
+            // นักศึกษาทั้งหมดในโปรเจกต์นี้
+//            int totalStudents = currentProject.getStudentProjects().size();
 
-            // เช็คถ้า instructors เป็น null หรือไม่มีรายการเลย
-            if (instructors == null || instructors.isEmpty()) {
-                System.out.println("⚠️ Project: " + project.getProjectId() + " | No assigned instructors for evaluation.");
-                isProjectEvaluated = false; // ถือว่ายังไม่ประเมิน
-            } else {
-                System.out.println("Project: " + project.getProjectId() + " | Instructors: " + instructors);
+            // ดึง instructor ทั้งหมดในโปรเจกต์
+            List<ProjectInstructorRole> allRoles = projectInstructorRoleRepository.findByProjectIdRole(currentProject);
 
-                for (ProjectInstructorRole instructorRole : instructors) {
-                    if (instructorRole.getRole().equals("Poster-Committee") || instructorRole.getRole().equals("Committee")) {
-                        int totalEvaluations = defenseEvaluationRepository.countByDefenseInstructorIdAndProjectId(instructorRole, project);
-                        int totalStudents = project.getStudentProjects().size();
+            // กรองเฉพาะ instructor ที่มีบทบาท Poster-Committee หรือ Committee
+            List<ProjectInstructorRole> evaluators = allRoles.stream()
+                    .filter(role -> "Poster-Committee".equals(role.getRole()) || "Committee".equals(role.getRole()))
+                    .toList();
 
-                        if (totalEvaluations < totalStudents) {
-                            isProjectEvaluated = false;
-                            break;
-                        }
-                    }
-                }
+            if (evaluators.isEmpty()) {
+                System.out.println("⚠️ Project: " + project.getProjectId() + " | No evaluators assigned.");
+                continue; // ข้ามโปรเจกต์นี้
             }
 
-            if (isProjectEvaluated) {
+            int expectedEvaluations = evaluators.size();
+            int actualEvaluations = 0;
+
+            // รวมจำนวนใบประเมินจากอาจารย์แต่ละคน
+            for (ProjectInstructorRole evaluator : evaluators) {
+                int evalCount = posterEvaRepository.countByInstructorIdPosterAndProjectIdPoster(evaluator, currentProject);
+                actualEvaluations += evalCount;
+            }
+
+            if (actualEvaluations >= expectedEvaluations) {
                 completedProjects++;
                 System.out.println("✅ Project: " + project.getProjectId() + " | Evaluation Completed!");
             } else {
-                System.out.println("❌ Project: " + project.getProjectId() + " | Evaluation Not Completed");
+                System.out.println("❌ Project: " + project.getProjectId() + " | Incomplete. Expected: "
+                        + expectedEvaluations + ", Found: " + actualEvaluations);
             }
         }
 
         return new EvaluationStatusResponse(totalProjects, completedProjects);
     }
+
 
     // --------- Grade Distribute ------------ //
     public Map<String, Integer> getGradeDistribution(String program, String year, String evaType) {
@@ -598,11 +652,23 @@ public class StatisticsService {
             }
 
             // นับจำนวน students ในโปรเจกต์นี้
+//            Project project = role.getProjectIdRole();
+//            int studentsInProject = studentProjectRepository.countByProject(project);
+//            professorData.setTotalAssigned(professorData.getTotalAssigned() + studentsInProject);
+//
+//            System.out.println("🎞️" + professorData.toString());
+
+            // นับจำนวน students หรือ projects ตามประเภทการประเมิน
             Project project = role.getProjectIdRole();
             int studentsInProject = studentProjectRepository.countByProject(project);
-            professorData.setTotalAssigned(professorData.getTotalAssigned() + studentsInProject);
 
-            System.out.println("🎞️" + professorData.toString());
+            if ("Poster".equalsIgnoreCase(evaType)) {
+                // ✅ Poster → นับเป็น 1 โปรเจกต์
+                professorData.setTotalAssigned(professorData.getTotalAssigned() + 1);
+            } else {
+                // ✅ Proposal & Defense → นับเป็นจำนวน student
+                professorData.setTotalAssigned(professorData.getTotalAssigned() + studentsInProject);
+            }
 
             // นับจำนวนการประเมินที่เสร็จสมบูรณ์สำหรับโปรเจกต์นี้
             int completedForProject = 0;
