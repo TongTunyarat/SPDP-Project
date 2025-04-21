@@ -388,7 +388,46 @@ public class UploadFilesService {
         Map<String, FileProjectData> fileData = parseFile(file);
         List<String> warnings = new ArrayList<>();
 
-        // สแกนหา Student ID ที่ซ้ำกับฐานข้อมูล (DB) ทั้งหมด
+        // 0) ตรวจสอบค่าว่างของแต่ละโปรเจกต์ในไฟล์
+        for (FileProjectData fp : fileData.values()) {
+            String no = fp.no;
+            if (fp.title == null || fp.title.isBlank()) {
+                warnings.add("Project No " + no + ": projectTitle ห้ามเป็นค่าว่าง");
+            }
+            if (fp.description == null || fp.description.isBlank()) {
+                warnings.add("Project No " + no + ": projectDescription ห้ามเป็นค่าว่าง");
+            }
+            if (fp.category == null || fp.category.isBlank()) {
+                warnings.add("Project No " + no + ": projectCategory ห้ามเป็นค่าว่าง");
+            }
+            if (fp.program == null || fp.program.isBlank()) {
+                warnings.add("Project No " + no + ": program ห้ามเป็นค่าว่าง");
+            }
+            // advisor ต้องมีอย่างน้อย 1
+            if (fp.advisors == null || fp.advisors.isEmpty()) {
+                warnings.add("Project No " + no + ": ต้องระบุ advisor อย่างน้อย 1 คน");
+            }
+            // นักศึกษาต้องมีอย่างน้อย 1 record
+            if (fp.students == null || fp.students.isEmpty()) {
+                warnings.add("Project No " + no + ": ต้องมีนักศึกษาอย่างน้อย 1 คน");
+            } else {
+                // เช็คแต่ละนักศึกษา
+                for (FileStudent fs : fp.students) {
+                    if (fs.id == null || fs.id.isBlank()) {
+                        warnings.add("Project No " + no + ": studentId ห้ามเป็นค่าว่าง");
+                    }
+                    if (fs.name == null || fs.name.isBlank()) {
+                        warnings.add("Project No " + no + ": studentName ห้ามเป็นค่าว่าง");
+                    }
+                }
+            }
+        }
+        // ถ้าเจอ warning ใด ๆ ให้หยุด และคืนไปเลย
+        if (!warnings.isEmpty()) {
+            return warnings;
+        }
+
+        // 1) สแกนหา Student ID ที่ซ้ำกับฐานข้อมูล
         for (FileProjectData fp : fileData.values()) {
             for (FileStudent fs : fp.students) {
                 if (studentProjectRepository.existsByStudent_StudentId(fs.id)) {
@@ -396,30 +435,26 @@ public class UploadFilesService {
                 }
             }
         }
-        // ถ้าเจออย่างน้อย 1 ตัว ให้หยุดและคืน warnings กลับไปเลย
         if (!warnings.isEmpty()) {
             return warnings;
         }
 
-
+        // 2) ถ้าไม่มีค่าว่างและไม่ซ้ำแล้ว ก็เริ่มอัพลง DB ตามเดิม
         int year = LocalDate.now().getYear();
         Map<String,Integer> counters = new HashMap<>();
         int studentCounter = Integer.parseInt(generateNextStudentPjId());
 
         for (FileProjectData fp : fileData.values()) {
-            // สร้าง projectId จาก program+ปี+ลำดับของ No
             String key = fp.program + "_" + year;
             int seq = counters.getOrDefault(key, 0) + 1;
             counters.put(key, seq);
             String projId = fp.program + " SP" + year + "-" + String.format("%02d", seq);
 
-            // ถ้าเคยมี record นี้ แค่ลบ students & roles เก่า
             if (projectRepository.existsById(projId)) {
                 studentProjectRepository.deleteByProject_ProjectId(projId);
                 projectInstructorRoleRepository.deleteByProjectIdRole_ProjectId(projId);
             }
 
-            // สร้างหรืออัปเดต Project
             Project project = projectRepository.findById(projId)
                     .orElseGet(() -> {
                         Project p = new Project();
@@ -435,7 +470,6 @@ public class UploadFilesService {
             project.setEditedOn(LocalDateTime.now());
             projectRepository.save(project);
 
-            // 2) สร้าง StudentProject สำหรับนักศึกษาทุกคนใน group นี้
             for (FileStudent fs : fp.students) {
                 Student stu = studentRepository.findById(fs.id)
                         .orElseThrow(() -> new IllegalStateException("Student not found: " + fs.id));
@@ -452,14 +486,12 @@ public class UploadFilesService {
                 studentProjectRepository.save(sp);
             }
 
-            // 3) สร้าง InstructorRole สำหรับ advisor & co‑advisor
-            createRoles(fp.advisors,      "Advisor",      project);
-            createRoles(fp.coAdvisors,    "Co-Advisor",   project);
+            createRoles(fp.advisors,    "Advisor",    project);
+            createRoles(fp.coAdvisors,  "Co-Advisor", project);
         }
 
         return warnings;
     }
-
 
     private void createRoles(List<String> names, String role, Project project) {
         if (names == null) return;

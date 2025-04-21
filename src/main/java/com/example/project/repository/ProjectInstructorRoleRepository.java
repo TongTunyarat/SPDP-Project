@@ -59,6 +59,6 @@ public interface ProjectInstructorRoleRepository extends JpaRepository<ProjectIn
 
     Optional<ProjectInstructorRole> findByProjectIdRole_ProjectIdAndInstructorId(String projectId, String instructorId);
 
-    void deleteByProjectIdRole_ProjectIdAndInstructorId(String projectId, String professorId);
+    void deleteByProjectIdRole_ProjectIdAndInstructor_ProfessorId(String projectId, String professorId);
 }
 

@@ -126,25 +126,25 @@
                     <input type="text" placeholder="Search">
 
                 </div>
-                <table>
+                <table id="projectsTable">
                     <thead>
-                    <tr class="header-row">
-                        <th>Project ID</th>
-                        <th>Project Name</th>
-                        <th>Student ID</th>
-                        <th colspan="5">Committee</th>  <!-- ใช้ colspan รวมเป็นหัวข้อหลัก -->
-<!--                        <th class="action-header">Action</th>-->
-                    </tr>
-                    <tr class="sub-header-row">
-                        <th></th>  <!-- คอลัมน์ว่างเพื่อจัดให้ตรง -->
-                        <th></th>
-                        <th></th>
-                        <th class="advisor-header">Advisor</th>
-                        <th class="committee1-header">Committee 1</th>
-                        <th class="committee2-header">Committee 2</th>
-                        <th></th>
-                        <th></th>
-                    </tr>
+                    <!--                    <tr class="header-row">-->
+                    <!--                        <th>Project ID</th>-->
+                    <!--                        <th>Project Name</th>-->
+                    <!--                        <th>Student ID</th>-->
+                    <!--                        <th colspan="5">Committee</th>  &lt;!&ndash; ใช้ colspan รวมเป็นหัวข้อหลัก &ndash;&gt;-->
+                    <!--&lt;!&ndash;                        <th class="action-header">Action</th>&ndash;&gt;-->
+                    <!--                    </tr>-->
+                    <!--                    <tr class="sub-header-row">-->
+                    <!--                        <th></th>  &lt;!&ndash; คอลัมน์ว่างเพื่อจัดให้ตรง &ndash;&gt;-->
+                    <!--                        <th></th>-->
+                    <!--                        <th></th>-->
+                    <!--                        <th class="advisor-header">Advisor</th>-->
+                    <!--                        <th class="committee1-header">Committee 1</th>-->
+                    <!--                        <th class="committee2-header">Committee 2</th>-->
+                    <!--                        <th></th>-->
+                    <!--                        <th></th>-->
+                    <!--                    </tr>-->
                     </thead>
                     <tbody id="projectTable">
                     <!--          <tr data-category="ict">-->
@@ -340,67 +340,118 @@
             .catch(error => console.error("Error fetching project data:", error));
     }
 
-    // ฟังก์ชันแสดงข้อมูลในตาราง
-    function displayResults(page) {
-        let tableBody = document.querySelector("tbody");
-        tableBody.innerHTML = ""; // เคลียร์ข้อมูลเก่า
+    // ฟังก์ชันสร้าง <thead> แบบไดนามิก (เฉพาะ Committee)
+    function renderCommitteeHeader(maxCommittee) {
+        const thead = document.querySelector("#projectsTable thead");
+        thead.innerHTML = "";
 
-        // คำนวณขอบเขตข้อมูลที่จะแสดง
+        const colors = [
+            "#FCB6B7", "#F9FFA1", "#B0E4FF", "#B4D2FF",
+            "#CCF4DD", "#FCB6CE", "#A8E6CF", "#DCE775",
+        ];
+
+        // — Header หลัก —
+        const headerRow = document.createElement("tr");
+        headerRow.classList.add("header-row");
+        headerRow.innerHTML = `
+            <th>Project ID</th>
+            <th>Project Name</th>
+            <th>Student ID</th>
+            <th colspan="${1 + maxCommittee}">Committee</th>
+          `;
+        thead.appendChild(headerRow);
+
+        // — Sub‑header (Advisor + Committee 1..n) —
+        const subRow = document.createElement("tr");
+        subRow.classList.add("sub-header-row");
+        subRow.innerHTML = `<th></th><th></th><th></th>`;
+
+        // Advisor
+        subRow.innerHTML += `
+            <th style="
+              background-color: ${colors[0]};
+              color: black;
+              font-weight: bold;
+            ">
+              Advisor
+            </th>`;
+
+        // Committee 1..maxCommittee
+        for (let i = 1; i <= maxCommittee; i++) {
+            // เลือกสีโดยวนอาเรย์ (i modulo length)
+            const bg = colors[i % colors.length];
+            subRow.innerHTML += `
+          <th style="
+            background-color: ${bg};
+            color: black;
+          ">
+            Committee ${i}
+          </th>`;
+        }
+
+        thead.appendChild(subRow);
+    }
+
+
+    // ฟังก์ชันแสดงข้อมูลในตาราง (เรียก renderCommitteeHeader ก่อน)
+    function displayResults(page) {
+        const tableBody = document.querySelector("#projectsTable tbody");
+        tableBody.innerHTML = "";
+
         const startIndex = (page - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
         const pageData = projectsData.slice(startIndex, endIndex);
 
-        // คำนวณจำนวนคอลัมน์ Committee โดยให้ขั้นต่ำ 3 คอลัมน์
-        const maxCommittee = Math.max(3, ...projectsData.map(project => project.professorList.filter(p => p.role === 'Committee').length));
+        // คำนวณ maxCommittee อย่างต่ำ 1 (ปรับตามต้องการ)
+        const maxCommittee = Math.max(
+            1,
+            ...projectsData.map(p =>
+                p.professorList.filter(x => x.role === "Committee").length
+            )
+        );
+
+        // สร้าง header ใหม่ พร้อมสี
+        renderCommitteeHeader(maxCommittee);
 
         pageData.forEach(project => {
-            console.log(project);
-            const row = document.createElement('tr');
-            const projectProgram = project.program ? project.program.toLowerCase() : "unknown";
-            row.setAttribute("data-category", projectProgram);
+            const row = document.createElement("tr");
+            const programClass = (project.program || "").toLowerCase();
+            row.setAttribute("data-category", programClass);
 
-            // คัดกรอง professorList ตาม role
-            const advisor = project.professorList.find(professor => professor.role === "Advisor");
-            const committees = project.professorList.filter(professor => professor.role === "Committee");
+            const advisor = project.professorList.find(p => p.role === "Advisor");
+            const committees = project.professorList.filter(p => p.role === "Committee");
+            const advisorName = advisor ? advisor.professorName : "N/A";
 
-            // แสดงชื่อ Advisor (ถ้าไม่มีให้เป็น "N/A")
-            let advisorName = advisor ? advisor.professorName : "N/A";
+            // สร้าง <td> Committee
+            let committeeCols = committees
+                .map(p => `<td>${p.professorName}</td>`)
+                .join("");
+            committeeCols += "<td></td>".repeat(maxCommittee - committees.length);
 
-            // แสดงชื่อ Committee ตามจำนวนที่มี และเติมคอลัมน์ว่างถ้ายังไม่เต็มจำนวน maxCommittee
-            let committeeColumns = committees.map(professor => `<td>${professor.professorName}</td>`).join('');
-
-            // ถ้า Committee มีไม่ถึง maxCommittee ให้เติม <td> ว่างให้ครบ
-            let emptyColumns = `<td></td>`.repeat(maxCommittee - committees.length);
-
-            // ใช้ split เพื่อแยกค่าออกจากโปรแกรม
-            const programParts = project.projectId.split(" ");
-            const programPrefix = programParts[0]; // ค่าก่อนหน้า (DST, ICT, etc.)
-            const projectId = programParts.slice(1).join(" ");
+            // แยก projectId กับ prefix
+            const [prefix, ...rest] = project.projectId.split(" ");
+            const idWithoutPrefix = rest.join(" ");
 
             row.innerHTML = `
-            <td><span class="tag ${projectProgram}">${project.program || "N/A"}</span> ${projectId}</td>
-            <td>${project.projectTitle || "N/A"}</td>
-            <td>
+              <td>
+                <span class="tag ${programClass}">
+                  ${project.program || "N/A"}
+                </span>
+                ${idWithoutPrefix}
+              </td>
+              <td>${project.projectTitle || "N/A"}</td>
+              <td>
                 <ul>
-                    ${project.studentList.map(student => `<li>${student.studentId}</li>`).join('')}
+                  ${project.studentList.map(s => `<li>${s.studentId}</li>`).join("")}
                 </ul>
-            </td>
-            <td>
-            ${advisorName}</td>  <!-- แสดง Advisor -->
-            ${committeeColumns}  <!-- แสดง Committee ที่มี -->
-            ${emptyColumns}  <!-- เติมช่องว่างให้ครบจำนวน maxCommittee -->
-        `;
+              </td>
+              <td>${advisorName}</td>
+              ${committeeCols}
+            `;
             tableBody.appendChild(row);
         });
-
-        // อัปเดตจำนวน <th> ของ Committee ตามจำนวนสูงสุด
-        const committeeHeader = document.querySelector('.committee-header');
-        let committeeHeaders = '';
-
-        for (let i = 0; i < maxCommittee; i++) {
-            committeeHeaders += `<th class="committee${i + 1}-header">Committee ${i + 1}</th>`;
-        }
     }
+
 
     // -------------------- Pagination -------------------- //
     // ฟังก์ชันสำหรับการเปลี่ยนหน้า
@@ -500,7 +551,6 @@
     });
 
     // ฟังก์ชันแปลง CSV เป็น JSON
-    // ฟังก์ชันแปลง CSV เป็น JSON พร้อมเช็คว่าแต่ละบรรทัดมี 10 คอลัมน์เท่านั้น
     function csvToJson(csv) {
         const EXPECTED_COLS = 10; // ต้องมี 10 คอลัมน์ ตั้งแต่ index 0 ถึง 9
         const result = [];
@@ -508,7 +558,7 @@
         Papa.parse(csv, {
             skipEmptyLines: true,
             header: false,
-            complete: function({ data }) {
+            complete: function ({data}) {
                 // 1) ตรวจสอบความยาวคอลัมน์ก่อน (ข้าม 8 แถวแรก)
                 for (let i = 8; i < data.length; i++) {
                     if (data[i].length !== EXPECTED_COLS) {

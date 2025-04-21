@@ -229,7 +229,26 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+
+        // ดึง URL ปัจจุบัน
+        const currentPage = window.location.pathname.split("/").pop();
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('projectId');
+
         displayResults();
+
+        // แล้วค่อยผูก listener แบบ delegation
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('#instructorList tbody')
+                .addEventListener('click', e => {
+                    if (e.target.classList.contains('delete-btn')) {
+                        confirmDeleteInstructor(e.target.closest('tr'));
+                    }
+                });
+
+        });
+
+
     });
 
     let studentsWithoutProject = [];
@@ -411,25 +430,26 @@
 
 
             // ผูก listener — เพิ่ม instructor row
+            // ผูก listener — เพิ่ม instructor row
             document.getElementById('addInstructorBtn')
                 .addEventListener('click', () => {
                     const tbody = document.querySelector('#instructorList tbody');
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-          <td>
-            <select class="role-select">
-              <option>Advisor</option>
-              <option>Co-Advisor</option>
-              <option>Committee</option>
-              <option>Poster-Committee</option>
-            </select>
-          </td>
-          <td>
-            <select class="instructor-select" data-id="">
-            </select>
-          </td>
-          <td><button class="delete-btn">🗑️</button></td>
-        `;
+                          <td>
+                            <select class="role-select">
+                              <option>Advisor</option>
+                              <option>Co-Advisor</option>
+                              <option>Committee</option>
+                              <option>Poster-Committee</option>
+                            </select>
+                          </td>
+                          <td>
+                            <select class="instructor-select" data-id="">
+                            </select>
+                          </td>
+                          <td><button class="delete-btn">🗑️</button></td>
+                        `;
                     tbody.appendChild(tr);
 
                     // Populate & init search on new select only
@@ -452,6 +472,14 @@
                         }
                     });
                 });
+
+
+            document.querySelector('#instructorList tbody').addEventListener('click', e => {
+                if (e.target.classList.contains('delete-btn')) {
+                    // remove the entire <tr> ที่อยู่รอบ ๆ ปุ่มนั้น
+                    e.target.closest('tr').remove();
+                }
+            });
 
             await fetchInstructors();
 
@@ -574,22 +602,30 @@
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify(payload)
                     });
-                    const txt = await res.text();
-                    if (!res.ok) throw new Error(txt);
-                    Swal.fire({
-                        icon: 'success',
-                        title: 'Created',
-                        text: `Project ID: ${txt}`,
-                        timer: 1500,
-                        showConfirmButton: false,    // ซ่อนปุ่ม OK
-                        timerProgressBar: true       // แสดงแถบเวลา
-                    }).then(() => {
-                        // พอ popup ปิดเอง (ครบ 5 วิ) แล้วค่อยรีไดเร็กต์
-                        window.location.href = "http://localhost:8080/project-details";
-                    });
-                } catch (e) {
-                    console.error(e);
-                    showErrorsPopup(err.errors || [err.message || 'Unknown error']);
+
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        // สำเร็จ
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Created',
+                            text: `Project ID: ${data.projectId}`,
+                            timer: 1500,
+                            showConfirmButton: false,
+                            timerProgressBar: true
+                        }).then(() => {
+                            window.location.href = 'http://localhost:8080/project-details';
+                        });
+                    } else {
+                        // ถ้ามี warnings ส่งมาเป็น array
+                        const warnings = data.warnings || [data.message || 'Unknown error'];
+                        showErrorsPopup(warnings);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    // ถ้า network error หรือ parse ผิดพลาด
+                    showErrorsPopup([err.message || 'Unknown error']);
                 }
             });
 
@@ -621,5 +657,60 @@
             }
         });
     }
+
+    // -------------------- Delete Instructor -------------------- //
+
+    const PROJECT_ID = urlParams.get('projectId');
+
+    function confirmDeleteInstructor(row) {
+        // อ่าน projectId จาก URL หรือ attribute ของ element
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('projectId');
+        const sel = row.querySelector('.instructor-select');
+        const professorId = sel.value;   // หรือ sel.dataset.id ตามที่ตั้งไว้
+        const instructorName = sel.options[sel.selectedIndex]?.text;
+
+        if (!projectId || !professorId) {
+            return Swal.fire({icon: 'error', title: 'ข้อมูลไม่ครบ', text: 'ไม่พบ Project ID หรือ Professor ID'});
+        }
+
+        Swal.fire({
+            icon: 'warning',
+            title: `Are you sure you want to remove ${instructorName}?`,
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel'
+        }).then(({isConfirmed}) => {
+            if (isConfirmed) {
+                // ลบแถวออกก่อน
+                row.remove();
+                // เรียก API ส่งทั้งสอง param
+                deleteInstructorFromProject(projectId, professorId);
+            }
+        });
+    }
+
+    // ฟังก์ชันลบ Instructor จาก Project
+    function deleteInstructorFromProject(projectId, professorId) {
+        fetch(`/admin/deleteInstructorFromProject?projectId=${encodeURIComponent(projectId)}&professorId=${encodeURIComponent(professorId)}`, {
+            method: 'DELETE'
+        })
+            .then(res => res.ok
+                ? Swal.fire({icon: 'success', title: 'Delete Success!'})
+                : res.text().then(txt => {
+                    throw new Error(txt)
+                })
+            )
+            .catch(err => Swal.fire({icon: 'error', title: 'Error', text: err.message}));
+    }
+
+
+    // Event listener สำหรับปุ่มลบ
+    document.querySelectorAll('.instructor-table .delete-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const row = e.currentTarget.closest('tr');  // หาแถวที่ถูกคลิก
+            confirmDeleteInstructor(row);  // เรียกฟังก์ชันยืนยันการลบ
+        });
+    });
 
 </script>

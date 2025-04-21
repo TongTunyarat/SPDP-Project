@@ -11,15 +11,13 @@ import com.example.project.service.ProposalEvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -55,6 +53,8 @@ public class projectAdminController {
     private ProjectRepository projectRepository;
     @Autowired
     private ProjectInstructorRoleRepository ProjectInstructorRoleRepository;
+    @Autowired
+    private AddNewProjectService addNewProjectService;
 
     @Autowired
     public projectAdminController(ProjectService projectService) {
@@ -232,30 +232,26 @@ public class projectAdminController {
         }
     }
 
+    @Transactional
     @DeleteMapping("/deleteInstructorFromProject")
     public ResponseEntity<String> deleteInstructorFromProject(
             @RequestParam String projectId,
             @RequestParam String professorId) {
 
-        try {
-            // ตรวจสอบว่า Project และ Instructor มีอยู่หรือไม่
-            Project project = projectRepository.findByProjectId(projectId);
-            Instructor instructor = instructorRepository.findByProfessorId(professorId);
-
-            if (project == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Project not found");
-            }
-            if (instructor == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Instructor not found");
-            }
-
-            // ลบ Instructor จาก Project
-            projectInstructorRoleRepository.deleteByProjectIdRole_ProjectIdAndInstructorId(projectId, professorId);
-
-            return ResponseEntity.ok("Instructor removed successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing instructor");
+        Project project = projectRepository.findByProjectId(projectId);
+        if (project == null) {
+            return ResponseEntity.badRequest().body("Project not found");
         }
+        Instructor instructor = instructorRepository.findByProfessorId(professorId);
+        if (instructor == null) {
+            return ResponseEntity.badRequest().body("Instructor not found");
+        }
+
+        // เรียกเมธอดใหม่ที่พึ่งเพิ่ม
+        projectInstructorRoleRepository
+                .deleteByProjectIdRole_ProjectIdAndInstructor_ProfessorId(projectId, professorId);
+
+        return ResponseEntity.ok("Instructor removed successfully");
     }
 
 
@@ -283,14 +279,17 @@ public class projectAdminController {
 
     // รับ JSON จาก JS แล้วสร้าง Project ใหม่
     @PostMapping("/addProject")
-    public ResponseEntity<String> addProject(@RequestBody NewProjectDTO dto) {
+    public ResponseEntity<?> addProject(@RequestBody NewProjectDTO dto) {
         try {
-            String newId = String.valueOf(AddNewProjectService.createProject(dto));
-            return ResponseEntity.ok(newId);
-        } catch (Exception ex) {
+            String projectId = addNewProjectService.createProject(dto);
+            return ResponseEntity.ok(Map.of("projectId", projectId));
+        } catch (IllegalArgumentException e) {
+            // แยกข้อความกลับเป็น list
+            List<String> warnings = Arrays.stream(e.getMessage().split(";"))
+                    .map(String::trim).toList();
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Failed to add project: " + ex.getMessage());
+                    .body(Map.of("warnings", warnings));
         }
     }
 

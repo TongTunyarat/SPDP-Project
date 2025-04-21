@@ -14,10 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,13 +38,54 @@ public class AddNewProjectService {
     @Transactional
     public String createProject(NewProjectDTO dto) {
 
+        // --- เช็คขอบเขตบทบาท ---
+        List<ProfessorRoleDTO> profs = Optional.ofNullable(dto.getProfessorList()).orElse(List.of());
+        List<String> warnings = new ArrayList<>();
+
+        long advCount = profs.stream()
+                .filter(p -> "Advisor".equalsIgnoreCase(p.getRole()))
+                .count();
+        if (advCount > 1) {
+            warnings.add("ระบุ Advisor ได้ไม่เกิน 1 ท่าน (พบ " + advCount + " ท่าน)");
+        }
+
+        long commCount = profs.stream()
+                .filter(p -> "Committee".equalsIgnoreCase(p.getRole()))
+                .count();
+        if (commCount > 2) {
+            warnings.add("ระบุ Committee ได้ไม่เกิน 2 ท่าน (พบ " + commCount + " ท่าน)");
+        }
+
+        List<String> names = profs.stream()
+                .map(ProfessorRoleDTO::getProfessorName)
+                .filter(name -> name != null && !name.isBlank())
+                .collect(Collectors.toList());
+        Set<String> uniqNames = new HashSet<>(names);
+        if (uniqNames.size() != names.size()) {
+            warnings.add("พบชื่ออาจารย์ซ้ำกันในรายการ");
+        }
+
+        List<String> ids = profs.stream()
+                .map(ProfessorRoleDTO::getProfessorId)
+                .filter(id -> id != null && !id.isBlank())
+                .collect(Collectors.toList());
+        Set<String> uniqIds = new HashSet<>(ids);
+        if (uniqIds.size() != ids.size()) {
+            warnings.add("พบรหัสอาจารย์ซ้ำกันในรายการ");
+        }
+
+
+        if (!warnings.isEmpty()) {
+            // โยน exception ทีเดียว พร้อม list ของ warnings
+            throw new IllegalArgumentException(String.join(";", warnings));
+        }
 
         if (dto.getStudentList() != null) {
-            List<String> ids = dto.getStudentList().stream()
+            List<String> stuIds = dto.getStudentList().stream()
                     .map(StudentProjectDTO::getStudentId)
                     .collect(Collectors.toList());
-            Set<String> uniqueIds = new HashSet<>(ids);
-            if (uniqueIds.size() != ids.size()) {
+            Set<String> uniqStu = new HashSet<>(stuIds);
+            if (uniqStu.size() != stuIds.size()) {
                 throw new IllegalArgumentException("มีนักศึกษาซ้ำในรายการ กรุณาตรวจสอบใหม่");
             }
         }
@@ -121,7 +159,10 @@ public class AddNewProjectService {
             pir.setProjectIdRole(project);
             pir.setInstructor(instr);
             projectInstructorRoleRepository.save(pir);
+
+
         }
+
     }
 
 
