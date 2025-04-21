@@ -100,7 +100,16 @@
     <div class="content">
 
         <div class="header-section">
-            Poster Committee
+            <div class="header-left">
+                Poster Committee
+
+                <!-- Dropdown สำหรับเลือก semester -->
+                <div class="semester-container">
+                    <select id="semester-selector" onchange="filterBySemester();">
+                        <!-- ตัวเลือกสำหรับปีและ semester -->
+                    </select>
+                </div>
+            </div>
 
             <div class="btn-header">
 
@@ -123,28 +132,28 @@
                     <button class="filter active" onclick="filterProjects('all')">All</button>
                     <button class="filter" onclick="filterProjects('ict')">ICT</button>
                     <button class="filter" onclick="filterProjects('dst')">DST</button>
-                    <input type="text" placeholder="Search">
+                    <input type="text" placeholder="Search" id="search-keyword">
 
                 </div>
                 <table id="projectsTable">
                     <thead>
-<!--                    <tr class="header-row">-->
-<!--                        <th>Project ID</th>-->
-<!--                        <th>Project Name</th>-->
-<!--                        <th>Student ID</th>-->
-<!--                        <th colspan="5">Committee</th>  &lt;!&ndash; ใช้ colspan รวมเป็นหัวข้อหลัก &ndash;&gt;-->
-<!--                    </tr>-->
-<!--                    <tr class="sub-header-row">-->
-<!--                        <th></th>  &lt;!&ndash; คอลัมน์ว่างเพื่อจัดให้ตรง &ndash;&gt;-->
-<!--                        <th></th>-->
-<!--                        <th></th>-->
-<!--                        <th class="advisor-header">Advisor</th>-->
-<!--                        <th class="committee1-header">Committee 1</th>-->
-<!--                        <th class="committee2-header">Committee 2</th>-->
-<!--                        <th class="committee3-header">Committee 3</th>-->
-<!--                        <th class="committee4-header">Committee 4</th>-->
-<!--                        <th></th>-->
-<!--                    </tr>-->
+                    <!--                    <tr class="header-row">-->
+                    <!--                        <th>Project ID</th>-->
+                    <!--                        <th>Project Name</th>-->
+                    <!--                        <th>Student ID</th>-->
+                    <!--                        <th colspan="5">Committee</th>  &lt;!&ndash; ใช้ colspan รวมเป็นหัวข้อหลัก &ndash;&gt;-->
+                    <!--                    </tr>-->
+                    <!--                    <tr class="sub-header-row">-->
+                    <!--                        <th></th>  &lt;!&ndash; คอลัมน์ว่างเพื่อจัดให้ตรง &ndash;&gt;-->
+                    <!--                        <th></th>-->
+                    <!--                        <th></th>-->
+                    <!--                        <th class="advisor-header">Advisor</th>-->
+                    <!--                        <th class="committee1-header">Committee 1</th>-->
+                    <!--                        <th class="committee2-header">Committee 2</th>-->
+                    <!--                        <th class="committee3-header">Committee 3</th>-->
+                    <!--                        <th class="committee4-header">Committee 4</th>-->
+                    <!--                        <th></th>-->
+                    <!--                    </tr>-->
                     </thead>
                     <tbody id="projectTable">
 
@@ -230,10 +239,6 @@
 <script>
 
     document.addEventListener("DOMContentLoaded", function () {
-        fetchProjects();
-    });
-
-    document.addEventListener("DOMContentLoaded", function () {
         const menuItems = document.querySelectorAll(".sidebar ul li a");
 
         // ดึง URL ปัจจุบัน
@@ -262,43 +267,122 @@
         document.querySelector(`.filter[onclick="filterProjects('${category}')"]`).classList.add("active");
     }
 
-    // ฟังก์ชันค้นหาโปรเจกต์
-    function searchProjects() {
-        const searchValue = document.getElementById("searchInput").value.toLowerCase();
-        const rows = document.querySelectorAll("#projectTable tr");
-
-        rows.forEach(row => {
-            const text = row.innerText.toLowerCase();
-            row.style.display = text.includes(searchValue) ? "" : "none";
-        });
-    }
-
     // -------------------- Fetch Project -------------------- //
     let currentPage = 1;  // หน้าเริ่มต้น
     const itemsPerPage = 15; // จำนวนข้อมูลที่จะแสดงในแต่ละหน้า
     let projectsData = [];  // ข้อมูลทั้งหมดที่ดึงมาจาก API
+    let filteredData = [];  // หลังกรองแล้ว
+
+    function debounce(fn, ms) {
+        let t;
+        return (...a) => {
+            clearTimeout(t);
+            t = setTimeout(() => fn(...a), ms);
+        };
+    }
+
+    // เติมตัวเลือก semester จาก projectsData
+    function populateSemesterOptions() {
+        const sel = document.getElementById('semester-selector');
+        sel.innerHTML = '';  // เคลียร์ก่อน (ถ้าโหลดซ้ำ)
+        // เก็บ unique semesters
+        const sems = Array.from(new Set(projectsData.map(p => String(p.semester))))
+            .sort();
+
+        sems.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s;
+            opt.textContent = s;
+            sel.appendChild(opt);
+        });
+
+        // ---- เซ็ต defaultYear ----
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;  // 1-12
+        const defaultYear = (currentMonth <= 8 ? currentYear - 1 : currentYear).toString();
+
+        if (sems.includes(defaultYear)) {
+            sel.value = defaultYear;
+        } else {
+            // ถ้าไม่มีปีนั้น ให้เลือกตัวแรก
+            sel.selectedIndex = 0;
+        }
+    }
+
+    function applyFilters() {
+        const sem = document.getElementById('semester-selector').value;
+        const term = document.getElementById('search-keyword').value.trim().toLowerCase();
+
+        filteredData = projectsData.filter(p => {
+            // by semester
+            if (sem && String(p.semester) !== sem) return false;
+            // by search: เช็ค projectId, title, description, program, advisor, co-advisor, students
+            if (term) {
+                const hay = [
+                    p.projectId,
+                    p.projectTitle,
+                    p.projectDescription,
+                    p.program,
+                    // advisor & co-advisor
+                    ...p.professorList.map(x => x.professorName),
+                    // student IDs & names
+                    ...p.studentList.map(s => s.studentId + ' ' + s.studentName)
+                ].join(' ').toLowerCase();
+                if (!hay.includes(term)) return false;
+            }
+            return true;
+        });
+
+        // reset page และ re-render
+        currentPage = 1;
+        updatePagination();
+        displayResults(currentPage);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // once only:
+        document.getElementById('semester-selector')
+            .addEventListener('change', applyFilters);
+        document.getElementById('search-keyword')
+            .addEventListener('input', debounce(applyFilters, 200));
+
+        fetchProjects();
+    });
 
     // ฟังก์ชันดึงข้อมูลโปรเจกต์
     function fetchProjects() {
-        fetch("http://localhost:8080/admin/projectOverview")
-            .then(response => {
-                if (!response.ok) throw new Error("Network response was not ok");
-                return response.json();
+        fetch("/admin/projectOverview")
+            .then(r => {
+                if (!r.ok) throw new Error(r.statusText);
+                return r.json();
             })
             .then(data => {
                 projectsData = data;
+                filteredData = data;
 
-                const uploadBtn = document.getElementById('upload-btn');
-                if (projectsData.length > 0) {
+                populateSemesterOptions();
+
+                applyFilters();
+
+                // ตรวจสอบทีละโปรเจกต์ว่ามี Advisor หรือไม่
+                return Promise.all(
+                    projectsData.map(proj =>
+                        fetch(`/admin/hasPosterCommittee?projectId=${encodeURIComponent(proj.projectId)}`)
+                            .then(r => r.ok ? r.json() : false)
+                    )
+                );
+            })
+            .then(advisorFlags => {
+                // ถ้ามี true อย่างน้อยหนึ่งค่า แปลว่าโปรเจกต์นั้นมี Advisor
+                if (advisorFlags.some(flag => flag)) {
+                    const uploadBtn = document.getElementById('upload-btn');
                     uploadBtn.disabled = true;
                     uploadBtn.classList.add('disabled');
                     uploadBtn.textContent = 'Upload Disabled';
                 }
-
-                displayResults(currentPage);  // แสดงผล
-                updatePagination();           // ปรับ pagination
             })
-            .catch(error => console.error("Error fetching project data:", error));
+            .catch(err => console.error("Error fetching projects or advisors:", err));
     }
 
     // สร้าง <thead> แบบไดนามิกทั้งสองแถว
@@ -344,13 +428,13 @@
         // Committee 1..maxCommittee
         for (let i = 0; i < maxCommittee; i++) {
             const color = committeeColors[i % committeeColors.length];
-            subRow.innerHTML += `<th style="background:${color}">Committee ${i+1}</th>`;
+            subRow.innerHTML += `<th style="background:${color}">Committee ${i + 1}</th>`;
         }
 
         // Poster‑Committee 1..maxPosterCommittee
         for (let j = 0; j < maxPosterCommittee; j++) {
             const color = posterColors[j % posterColors.length];
-            subRow.innerHTML += `<th style="background:${color}">Poster‑Committee ${j+1}</th>`;
+            subRow.innerHTML += `<th style="background:${color}">Poster‑Committee ${j + 1}</th>`;
         }
 
         thead.appendChild(subRow);
@@ -363,11 +447,11 @@
 
         const startIndex = (page - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        const pageData = projectsData.slice(startIndex, endIndex);
+        const pageData = filteredData.slice(startIndex, endIndex);
 
         // คำนวณจำนวนคอลัมน์สูงสุดที่ต้องใช้สำหรับแต่ละ Role
-        const maxCommittee = Math.max(...projectsData.map(p => p.professorList.filter(x=>x.role==='Committee').length));
-        const maxPosterCommittee = Math.max(...projectsData.map(p => p.professorList.filter(x=>x.role==='Poster-Committee').length));
+        const maxCommittee = Math.max(...projectsData.map(p => p.professorList.filter(x => x.role === 'Committee').length));
+        const maxPosterCommittee = Math.max(...projectsData.map(p => p.professorList.filter(x => x.role === 'Poster-Committee').length));
 
         renderTableHeader(maxCommittee, maxPosterCommittee);
 
@@ -539,7 +623,7 @@
         Papa.parse(csv, {
             skipEmptyLines: true,
             header: false,
-            complete: function({ data }) {
+            complete: function ({data}) {
                 // 1) ตรวจสอบความยาวคอลัมน์ของทุกแถวก่อน (ข้าม 5 แถวแรก)
                 for (let i = 5; i < data.length; i++) {
                     if (data[i].length < EXPECTED_COLS) {
@@ -594,7 +678,7 @@
 
                     // — เพิ่ม student ลงใน currentProject ถ้ามี —
                     if ((studentId || studentName) && currentProject) {
-                        currentProject.studentList.push({ studentId, studentName });
+                        currentProject.studentList.push({studentId, studentName});
                     }
                 });
             }
@@ -1211,9 +1295,6 @@
 
     // เพิ่ม event listener ให้ปุ่ม Export
     document.getElementById("export-project-raw-excel").addEventListener("click", exportTemplate);
-
-
-
 
 
     // ฟังก์ชันยืนยันการลบ
