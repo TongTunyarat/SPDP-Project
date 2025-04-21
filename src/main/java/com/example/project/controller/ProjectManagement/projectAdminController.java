@@ -213,23 +213,23 @@ public class projectAdminController {
         }
     }
 
+    @Transactional
     @DeleteMapping("/deleteStudentFromProject")
-    public ResponseEntity<Map<String, String>> deleteStudentFromProject(
-            @RequestParam String projectId, @RequestParam String studentId) {
-        try {
-            // เรียกใช้ Service เพื่อลบข้อมูล
-            editProjectService.deleteStudentFromProject(projectId, studentId);
-
-            // ส่งข้อความสำเร็จเป็น JSON
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Student removed from project successfully");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            // ส่งข้อผิดพลาดเป็น JSON
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    public ResponseEntity<String> deleteStudentFromProject(
+            @RequestParam String projectId,
+            @RequestParam String studentId) {
+        // ยืนยันว่ามี record จริง
+        boolean exists = studentProjectRepository
+                .existsByProject_ProjectIdAndStudent_StudentId(projectId, studentId);
+        if (!exists) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Error: Student not found for this project");
         }
+        // ลบ
+        studentProjectRepository
+                .deleteByProject_ProjectIdAndStudent_StudentId(projectId, studentId);
+        return ResponseEntity.ok("Student removed successfully");
     }
 
     @Transactional

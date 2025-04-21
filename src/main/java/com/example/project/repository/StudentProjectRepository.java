@@ -37,4 +37,6 @@ public interface StudentProjectRepository extends JpaRepository<StudentProject, 
     void deleteByProject_ProjectId(String projectId);
 
     boolean existsByStudent_StudentId(String id);
+
+    void deleteByProject_ProjectIdAndStudent_StudentId(String projectId, String studentId);
 }

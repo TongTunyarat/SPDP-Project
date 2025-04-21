@@ -157,6 +157,18 @@
 
         });
 
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('#studentList tbody').addEventListener('click', e => {
+                if (!e.target.classList.contains('student-delete-btn')) return;
+                const btn = e.target;
+                const studentId = btn.dataset.studentId;
+                const studentName = btn.dataset.studentName;
+                const projectId = btn.dataset.projectId;
+                confirmDelete(studentId, studentName, projectId);
+            });
+        });
+
+
         // -------------------- Fetch Project -------------------- //
         // ฟังก์ชันสำหรับดึงข้อมูลจาก API
         function fetchData(projectId) {
@@ -274,7 +286,7 @@
             </thead>
                 <tbody>
               ${students.map(student => `
-                <tr>
+                <tr id="student-row-${student.studentId}">
                   <td>${student.studentId}</td>
                   <td>${student.studentName}</td>
                   <td>${data.program}</td>
@@ -283,6 +295,7 @@
                   <td>
                     <button
                       class="student-delete-btn"
+                      data-project-id="${data.projectId}"
                       data-student-id="${student.studentId}"
                       data-student-name="${student.studentName}">
                       🗑️
@@ -574,28 +587,27 @@
 
         // ฟังก์ชันสำหรับลบ student ออกจาก project
         function deleteStudentFromProject(studentId, projectId) {
-            // ส่งคำขอลบข้อมูลไปยังเซิร์ฟเวอร์
-            fetch(`http://localhost:8080/admin/deleteStudentFromProject?projectId=${encodeURIComponent(projectId)}&studentId=${encodeURIComponent(studentId)}`, {
-                method: 'DELETE'
-            })
-                .then(response => {
+            fetch(
+                `/admin/deleteStudentFromProject?projectId=${encodeURIComponent(projectId)}&studentId=${encodeURIComponent(studentId)}`,
+                {method: 'DELETE'}
+            )
+                .then(async response => {
+                    const text = await response.text();
                     if (!response.ok) {
-                        return response.text().then(errorText => {
-                            throw new Error(`HTTP error! status: ${response.status}, Message: ${errorText}`);
-                        });
+                        throw new Error(`${response.status}: ${text}`);
                     }
-                    // ถ้าลบสำเร็จ
-                    return response.text();
+                    return text;
                 })
-                .then(data => {
-                    console.log('Success:', data);
-                    // อัปเดต UI หลังจากลบเสร็จ
-                    document.getElementById(`student-${studentId}`).closest('.form-group').remove();
-                    showNotification('Student removed from project successfully!');
+                .then(msg => {
+                    console.log('Success:', msg);
+                    // ลบแถวด้วย id ที่ตรงกับ studentId
+                    const row = document.getElementById(`student-row-${studentId}`);
+                    if (row) row.remove();
+                    Swal.fire({icon: 'success', title: 'Deleted', text: msg});
                 })
                 .catch(error => {
                     console.error('Error:', error);
-                    showNotification('Error deleting student: ' + error.message);
+                    Swal.fire({icon: 'error', title: 'Error', text: error.message});
                 });
         }
 
@@ -606,14 +618,14 @@
 
         function confirmDeleteInstructor(row) {
             // อ่าน projectId จาก URL หรือ attribute ของ element
-            const urlParams   = new URLSearchParams(window.location.search);
-            const projectId   = urlParams.get('projectId');
-            const sel         = row.querySelector('.instructor-select');
+            const urlParams = new URLSearchParams(window.location.search);
+            const projectId = urlParams.get('projectId');
+            const sel = row.querySelector('.instructor-select');
             const professorId = sel.value;   // หรือ sel.dataset.id ตามที่ตั้งไว้
             const instructorName = sel.options[sel.selectedIndex]?.text;
 
             if (!projectId || !professorId) {
-                return Swal.fire({ icon:'error', title:'ข้อมูลไม่ครบ', text:'ไม่พบ Project ID หรือ Professor ID' });
+                return Swal.fire({icon: 'error', title: 'ข้อมูลไม่ครบ', text: 'ไม่พบ Project ID หรือ Professor ID'});
             }
 
             Swal.fire({
@@ -622,7 +634,7 @@
                 showCancelButton: true,
                 confirmButtonText: 'Delete',
                 cancelButtonText: 'Cancel'
-            }).then(({ isConfirmed }) => {
+            }).then(({isConfirmed}) => {
                 if (isConfirmed) {
                     // ลบแถวออกก่อน
                     row.remove();
@@ -638,10 +650,12 @@
                 method: 'DELETE'
             })
                 .then(res => res.ok
-                    ? Swal.fire({ icon:'success', title:'Delete Success!' })
-                    : res.text().then(txt => { throw new Error(txt) })
+                    ? Swal.fire({icon: 'success', title: 'Delete Success!'})
+                    : res.text().then(txt => {
+                        throw new Error(txt)
+                    })
                 )
-                .catch(err => Swal.fire({ icon:'error', title:'Error', text: err.message }));
+                .catch(err => Swal.fire({icon: 'error', title: 'Error', text: err.message}));
         }
 
 
