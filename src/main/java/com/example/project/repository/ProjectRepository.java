@@ -94,6 +94,8 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 
     Optional<Project> findByProjectTitleAndProjectDescription(String title, String description);
 
+    void deleteBySemester(String semester);
+
 
     // เพิ่มฟังก์ชันที่ดึงข้อมูลโปรเจกต์ทั้งหมดได้
 //    List<Project> findAll();

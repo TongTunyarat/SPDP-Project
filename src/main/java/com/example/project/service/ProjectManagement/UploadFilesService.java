@@ -745,4 +745,12 @@ public class UploadFilesService {
     }
 
 
+    @Transactional
+    public void deleteProjectsBySemester(String semester) {
+        List<Project> list = projectRepository.findBySemester(semester);
+        for (Project p : list) {
+            projectRepository.delete(p); //  => this remove() will trigger cascade REMOVE
+        }
+    }
+
 }

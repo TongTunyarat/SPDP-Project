@@ -749,7 +749,7 @@
                     advisor,
                     coAdvisor,
                     committee,
-                    posterCommittee,
+                    posterCommitteeList: [],
                     studentList: []
                 };
                 result.push(currentProject);
@@ -764,7 +764,7 @@
                     advisor,
                     coAdvisor,
                     committee,
-                    posterCommittee,
+                    posterCommitteeList: [],
                     studentList: []
                 };
                 result.push(currentProject);
@@ -779,12 +779,16 @@
                 if (advisor) currentProject.advisor = advisor;
                 if (coAdvisor) currentProject.coAdvisor = coAdvisor;
                 if (committee) currentProject.committee = committee;
-                if (posterCommittee) currentProject.posterCommittee = posterCommittee;
+                // if (posterCommittee) currentProject.posterCommittee = posterCommittee;
             }
 
             // เพิ่ม student ถ้ามี
             if (currentProject && (studentId || studentName)) {
                 currentProject.studentList.push({studentId, studentName});
+            }
+
+            if (currentProject && posterCommittee) {
+                currentProject.posterCommitteeList.push({posterCommittee});
             }
 
         }
@@ -835,9 +839,15 @@
 
         data.forEach(project => {
             const row = document.createElement('tr');
+
             let studentIDs = "N/A";
             if (project.studentList && project.studentList.length > 0) {
                 studentIDs = project.studentList.map(stu => stu.studentId).join(", ");
+            }
+
+            let posterCommittee = "N/A";
+            if (project.posterCommitteeList && project.posterCommitteeList.length > 0) {
+                posterCommittee = project.posterCommitteeList.map(pos => pos.posterCommittee).join(", ");
             }
 
             const shortenedTitle = shortenString(project.projectTitle, 50);
@@ -847,7 +857,7 @@
             <td title="${project.projectTitle}">${shortenedTitle}</td>
             <td>${studentIDs}</td>
             <td>${project.advisor || "N/A"}</td>
-            <td>${project.posterCommittee || "N/A"}</td>
+            <td>${posterCommittee}</td>
         `;
             table.appendChild(row);
         });

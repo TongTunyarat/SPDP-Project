@@ -210,18 +210,12 @@ public class projectAdminController {
     }
 
 
-    @DeleteMapping("/deleteAllProjects")
-    public ResponseEntity<String> deleteAllProjects() {
-        try {
-            uploadFilesService.deleteAllProjects();
-            return ResponseEntity.ok("All projects deleted successfully.");
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error deleting all projects: " + e.getMessage());
-        }
+    @DeleteMapping("/deleteProjectsBySemester")
+    public ResponseEntity<String> deleteBySemester(@RequestParam String semester) {
+        uploadFilesService.deleteProjectsBySemester(semester);
+        return ResponseEntity.ok("Deleted projects for semester " + semester);
     }
+
 
     @Transactional
     @DeleteMapping("/deleteStudentFromProject")
@@ -315,47 +309,47 @@ public class projectAdminController {
 
 
     /** คืน `true` ถ้ามี Advisor สำหรับ projectId นั้นอยู่แล้ว */
-//    @GetMapping("/hasAdvisor")
-//    public ResponseEntity<Boolean> hasAdvisor(@RequestParam String projectId) {
-//        boolean has = projectInstructorRoleRepository
-//                .existsByProjectIdRole_ProjectIdAndRole(projectId, "Advisor");
-//        return ResponseEntity.ok(has);
-//    }
-//
-//    @GetMapping("/hasCommittee")
-//    public ResponseEntity<Boolean> hasCommittee(@RequestParam String projectId) {
-//        boolean has = projectInstructorRoleRepository
-//                .existsByProjectIdRole_ProjectIdAndRole(projectId, "Committee");
-//        return ResponseEntity.ok(has);
-//    }
-//
-//    @GetMapping("/hasPosterCommittee")
-//    public ResponseEntity<Boolean> hasPosterCommittee(@RequestParam String projectId) {
-//        boolean has = projectInstructorRoleRepository
-//                .existsByProjectIdRole_ProjectIdAndRole(projectId, "Poster-Committee");
-//        return ResponseEntity.ok(has);
-//    }
-
     @GetMapping("/hasAdvisor")
-    public ResponseEntity<Boolean> hasAdvisor(@RequestParam String semester) {
+    public ResponseEntity<Boolean> hasAdvisor(@RequestParam String projectId) {
         boolean has = projectInstructorRoleRepository
-                .existsByProjectIdRole_SemesterAndRole(semester, "Advisor");
+                .existsByProjectIdRole_ProjectIdAndRole(projectId, "Advisor");
         return ResponseEntity.ok(has);
     }
 
     @GetMapping("/hasCommittee")
-    public ResponseEntity<Boolean> hasCommittee(@RequestParam String semester) {
+    public ResponseEntity<Boolean> hasCommittee(@RequestParam String projectId) {
         boolean has = projectInstructorRoleRepository
-                .existsByProjectIdRole_SemesterAndRole(semester, "Committee");
+                .existsByProjectIdRole_ProjectIdAndRole(projectId, "Committee");
         return ResponseEntity.ok(has);
     }
 
     @GetMapping("/hasPosterCommittee")
-    public ResponseEntity<Boolean> hasPosterCommittee(@RequestParam String semester) {
+    public ResponseEntity<Boolean> hasPosterCommittee(@RequestParam String projectId) {
         boolean has = projectInstructorRoleRepository
-                .existsByProjectIdRole_SemesterAndRole(semester, "Poster-Committee");
+                .existsByProjectIdRole_ProjectIdAndRole(projectId, "Poster-Committee");
         return ResponseEntity.ok(has);
     }
+
+//    @GetMapping("/hasAdvisor")
+//    public ResponseEntity<Boolean> hasAdvisor(@RequestParam String semester) {
+//        boolean has = projectInstructorRoleRepository
+//                .existsByProjectIdRole_SemesterAndRole(semester, "Advisor");
+//        return ResponseEntity.ok(has);
+//    }
+//
+//    @GetMapping("/hasCommittee")
+//    public ResponseEntity<Boolean> hasCommittee(@RequestParam String semester) {
+//        boolean has = projectInstructorRoleRepository
+//                .existsByProjectIdRole_SemesterAndRole(semester, "Committee");
+//        return ResponseEntity.ok(has);
+//    }
+//
+//    @GetMapping("/hasPosterCommittee")
+//    public ResponseEntity<Boolean> hasPosterCommittee(@RequestParam String semester) {
+//        boolean has = projectInstructorRoleRepository
+//                .existsByProjectIdRole_SemesterAndRole(semester, "Poster-Committee");
+//        return ResponseEntity.ok(has);
+//    }
 
 
 

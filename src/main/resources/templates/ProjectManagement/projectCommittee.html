@@ -771,7 +771,7 @@
                     program,
                     advisor,
                     coAdvisor,
-                    committee,
+                    committeeList: [],
                     studentList: []
                 };
                 result.push(currentProject);
@@ -785,7 +785,7 @@
                     program,
                     advisor,
                     coAdvisor,
-                    committee,
+                    committeeList: [],
                     studentList: []
                 };
                 result.push(currentProject);
@@ -799,12 +799,16 @@
                 if (program) currentProject.program = program;
                 if (advisor) currentProject.advisor = advisor;
                 if (coAdvisor) currentProject.coAdvisor = coAdvisor;
-                if (committee) currentProject.committee = committee;
+                // if (committee) currentProject.committee = committee;
             }
 
             // เพิ่ม student ถ้ามี
             if (currentProject && (studentId || studentName)) {
                 currentProject.studentList.push({studentId, studentName});
+            }
+
+            if (currentProject && committee) {
+                currentProject.committeeList.push({committee});
             }
 
         }
@@ -864,6 +868,11 @@
                 studentIDs = project.studentList.map(stu => stu.studentId).join(", ");
             }
 
+            let committeeList = "N/A";
+            if (project.committeeList && project.committeeList.length > 0) {
+                committeeList = project.committeeList.map(com => com.committee).join(", ");
+            }
+
             // สมมติว่าคุณอยากตัด projectTitle ให้เหลือ 50 ตัวอักษร
             const shortenedTitle = shortenString(project.projectTitle, 50);
 
@@ -873,7 +882,7 @@
             <td title="${project.projectTitle}">${shortenedTitle}</td>
             <td>${studentIDs}</td>
             <td>${project.advisor || "N/A"}</td>
-            <td>${project.committee || "N/A"}</td>
+            <td>${committeeList || "N/A"}</td>
         `;
             table.appendChild(row);
         });
