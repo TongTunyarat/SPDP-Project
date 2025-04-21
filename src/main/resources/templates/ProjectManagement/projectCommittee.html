@@ -685,7 +685,7 @@
         if (buffer) rows.push(buffer);  // กรณี malformed ก็ push ท้าย
 
         // 2) ตรวจความยาว column ในแต่ละบรรทัด (ข้าม header 8 แถวแรก → index 0..7)
-        for (let i = 8; i < rows.length; i++) {
+        for (let i = 9; i < rows.length; i++) {
             const cols = splitCSV(rows[i]);
             if (cols.length < EXPECTED_COLS) {
                 Swal.fire({
@@ -1060,7 +1060,7 @@
             "Student Name",
             "Program",
             "Advisor",
-            "Co-advisor",
+            "Co-Advisor",
             "Committee",
             "Poster-Committee"
         ];
