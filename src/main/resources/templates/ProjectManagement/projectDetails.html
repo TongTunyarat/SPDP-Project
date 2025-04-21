@@ -439,16 +439,16 @@
 
         sems.forEach(s => {
             const opt = document.createElement('option');
-            opt.value       = s;
+            opt.value = s;
             opt.textContent = s;
             sel.appendChild(opt);
         });
 
         // ---- เซ็ต defaultYear ----
-        const now          = new Date();
-        const currentYear  = now.getFullYear();
+        const now = new Date();
+        const currentYear = now.getFullYear();
         const currentMonth = now.getMonth() + 1;  // 1-12
-        const defaultYear  = (currentMonth <= 8 ? currentYear - 1 : currentYear).toString();
+        const defaultYear = (currentMonth <= 8 ? currentYear - 1 : currentYear).toString();
 
         if (sems.includes(defaultYear)) {
             sel.value = defaultYear;
@@ -513,15 +513,24 @@
 
                 applyFilters();
 
-                // ปิดปุ่ม upload ถ้ามีข้อมูลแล้ว
-                const uploadBtn = document.getElementById('upload-btn');
-                if (projectsData.length > 0) {
+                // ตรวจสอบทีละโปรเจกต์ว่ามี Advisor หรือไม่
+                return Promise.all(
+                    projectsData.map(proj =>
+                        fetch(`/admin/hasAdvisor?projectId=${encodeURIComponent(proj.projectId)}`)
+                            .then(r => r.ok ? r.json() : false)
+                    )
+                );
+            })
+            .then(advisorFlags => {
+                // ถ้ามี true อย่างน้อยหนึ่งค่า แปลว่าโปรเจกต์นั้นมี Advisor
+                if (advisorFlags.some(flag => flag)) {
+                    const uploadBtn = document.getElementById('upload-btn');
                     uploadBtn.disabled = true;
                     uploadBtn.classList.add('disabled');
                     uploadBtn.textContent = 'Upload Disabled';
                 }
             })
-            .catch(err => console.error("Error fetching projects:", err));
+            .catch(err => console.error("Error fetching projects or advisors:", err));
     }
 
     // ฟังก์ชันแสดงข้อมูลในตาราง
