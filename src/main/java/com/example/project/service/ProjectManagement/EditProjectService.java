@@ -54,6 +54,14 @@ public class EditProjectService {
             project.setProgram(updatedDetails.getProgram());
             isUpdated = true;
         }
+        if (!Objects.equals(project.getProjectCategory(), updatedDetails.getCategory())) {
+            project.setProjectCategory(updatedDetails.getCategory());
+            isUpdated = true;
+        }
+        if (!project.getSemester().equals(updatedDetails.getSemester())) {
+            project.setSemester(updatedDetails.getSemester());
+            isUpdated = true;
+        }
 
         // --------- Update Instructor in Project --------- //
 
@@ -106,6 +114,10 @@ public class EditProjectService {
         }
         if (!project.getProgram().equals(updatedDetails.getProgram())) {
             project.setProgram(updatedDetails.getProgram());
+            dirty = true;
+        }
+        if(!project.getSemester().equals(updatedDetails.getSemester())) {
+            project.setSemester(updatedDetails.getSemester());
             dirty = true;
         }
         if (dirty) projectRepository.save(project);
