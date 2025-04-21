@@ -616,76 +616,94 @@
 
     // ฟังก์ชันแปลง CSV เป็น JSON
     function csvToJson(csv) {
-        const EXPECTED_COLS = 11; // เราต้องการ 11 คอลัมน์: 0..10
-        const result = [];
-
         // helper: แยก comma เฉพาะข้างนอก quotes
         function splitCSV(line) {
-            const out = [];
-            let cur = "", insideQuotes = false;
+            const res = [];
+            let cur = "", inside = false;
             for (let i = 0; i < line.length; i++) {
                 const ch = line[i];
                 if (ch === '"') {
-                    // ถ้าเจอ "" ให้ treat เป็น " เดียว
-                    if (insideQuotes && line[i + 1] === '"') {
+                    // ถ้ามี "" => ใส่ " แล้วข้ามตัวถัดไป
+                    if (inside && line[i + 1] === '"') {
                         cur += '"';
                         i++;
                     } else {
-                        insideQuotes = !insideQuotes;
+                        inside = !inside;
                     }
-                } else if (ch === ',' && !insideQuotes) {
-                    out.push(cur);
+                } else if (ch === ',' && !inside) {
+                    res.push(cur);
                     cur = "";
                 } else {
                     cur += ch;
                 }
             }
-            out.push(cur);
-            return out;
+            res.push(cur);
+            return res;
         }
 
-        // 1) ทำให้แต่ละ "logical row" สมบูรณ์ก่อน
+        // 1) แปลง input เป็น "logical rows" โดย buffering จนกว่าจะเจอ quotes คู่สมบูรณ์
         const rawLines = csv.split(/\r?\n/);
         const rows = [];
         let buffer = "";
         for (const line of rawLines) {
-            buffer += (buffer ? "\n" : "") + line;
+            buffer = buffer ? buffer + "\n" + line : line;
             const quoteCount = (buffer.match(/"/g) || []).length;
+            // ถ้าจำนวน quote เป็นคู่ (mod 2 === 0) แปลว่าเสร็จหนึ่ง record
             if (quoteCount % 2 === 0) {
                 rows.push(buffer);
                 buffer = "";
             }
         }
 
+        // ถ้ายังเหลือ buffer (malformed) ก็ใส่ลงไป
         if (buffer) rows.push(buffer);
 
-        // 2) ตรวจความยาวคอลัมน์ ในทุกแถว
-        for (let i = 11; i < rows.length; i++) {
-            const cols = splitCSV(rows[i]);
-            if (cols.length < EXPECTED_COLS) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'ไฟล์ไม่ถูกต้อง',
-                    // text: `บรรทัดที่ ${i+1} พบ ${cols.length} คอลัมน์ แต่ต้องเป็นอย่างน้อย ${EXPECTED_COLS} คอลัมน์`
-                    text: 'กรุณาอัปโหลดไฟล์ Poster Committee'
-                });
-                return [];
-            }
+        // 2) ตรวจความยาว column ในแต่ละบรรทัด
+        const headerLine = rows[4] || "";
+        const headers = splitCSV(headerLine).map(h => h.trim().replace(/^"|"$/g, ""));
+        const expected = [
+            "Project ID",
+            "Project Title",
+            "Project Description",
+            "Project Category",
+            "Student ID",
+            "Student Name",
+            "Program",
+            "Advisor",
+            "Co-Advisor",
+            "Committee",
+            "Poster-Committee"
+        ];
+        const mismatch = expected.some((h, i) => headers[i] !== h);
+        if (mismatch) {
+            Swal.fire({
+                icon: "error",
+                title: "ไฟล์ไม่ถูกต้อง",
+                // text: "กรุณาอัปโหลด CSV ที่มีคอลัมน์ตามนี้:\n" + expected.join(", ")
+                text: "กรุณาอัปโหลดไฟล์ Committee"
+            });
+            return [];
         }
 
-        // 3) parse จริง ตั้งแต่บรรทัดที่ 6 (index=5)
-        let current = null;
+        // 3) เริ่ม parse จริง ตั้งแต่บรรทัดที่ 6 (index=5)
+        const result = [];
+        let currentProject = null;
+        let lastNo = "";
+
         for (let i = 5; i < rows.length; i++) {
-            // trim และ slice 11 คอลัมน์แรก
-            const cells = splitCSV(rows[i])
-                .map(c => {
-                    let v = c.trim();
-                    if (v.startsWith('"') && v.endsWith('"')) {
-                        v = v.slice(1, -1).replace(/""/g, '"');
-                    }
-                    return v;
-                })
-                .slice(0, EXPECTED_COLS);
+            const raw = rows[i].trim();
+            if (!raw) continue;
+
+            // split & trim & unquote
+            let cells = splitCSV(raw).map(c => {
+                let t = c.trim();
+                if (t.startsWith('"') && t.endsWith('"')) {
+                    t = t.slice(1, -1).replace(/""/g, '"');
+                }
+                return t;
+            });
+            // pad ให้ครบ 11 columns
+            while (cells.length < 11) cells.push("");
 
             const [
                 projectId,
@@ -701,9 +719,9 @@
                 posterCommittee
             ] = cells;
 
-            // ถ้าเจอ projectId (ไม่ใช่ค่าว่าง) → เริ่ม object ใหม่
-            if (projectId) {
-                current = {
+            // ถ้าเจอ projectId ใหม่ ให้เริ่ม object ใหม่
+            if (projectId && projectId !== lastNo) {
+                currentProject = {
                     projectId,
                     projectTitle,
                     projectDescription,
@@ -715,18 +733,45 @@
                     posterCommittee,
                     studentList: []
                 };
-                result.push(current);
+                result.push(currentProject);
+                lastNo = projectId;
+            } else if (!currentProject) {
+                currentProject = {
+                    projectId,
+                    projectTitle,
+                    projectDescription,
+                    projectCategory,
+                    program,
+                    advisor,
+                    coAdvisor,
+                    committee,
+                    posterCommittee,
+                    studentList: []
+                };
+                result.push(currentProject);
+                lastNo = projectId;
+
+            } else {
+                if (projectId) currentProject.projectId = projectId;
+                if (projectTitle) currentProject.projectTitle = projectTitle;
+                if (projectDescription) currentProject.projectDescription = projectDescription;
+                if (projectCategory) currentProject.projectCategory = projectCategory;
+                if (program) currentProject.program = program;
+                if (advisor) currentProject.advisor = advisor;
+                if (coAdvisor) currentProject.coAdvisor = coAdvisor;
+                if (committee) currentProject.committee = committee;
+                if (posterCommittee) currentProject.posterCommittee = posterCommittee;
             }
 
-            // เพิ่ม studentList ถ้ามี
-            if (current && (studentId || studentName)) {
-                current.studentList.push({ studentId, studentName });
+            // เพิ่ม student ถ้ามี
+            if (currentProject && (studentId || studentName)) {
+                currentProject.studentList.push({studentId, studentName});
             }
+
         }
 
         return result;
     }
-
 
     function shortenString(str, maxLen) {
         if (!str) return "";
@@ -929,9 +974,9 @@
             "Student Name",
             "Program",
             "Advisor",
-            "Co-advisor",
+            "Co-Advisor",
             "Committee",
-            "Poster Committee" // คอลัมน์ใหม่
+            "PosterCommittee" // คอลัมน์ใหม่
         ];
 
         // สร้าง array สำหรับเก็บ rows ของข้อมูล Excel

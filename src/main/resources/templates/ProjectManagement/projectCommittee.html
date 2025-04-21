@@ -113,13 +113,13 @@
             <div class="btn-header">
                 <button class="export-btn" id="export-project-excel-new">Download Project Template</button>
 
-<!--                <div class="dropdown-export">-->
-<!--                    <button class="dropbtn">Export</button>-->
-<!--                    <div class="dropdown-content">-->
-<!--                        <a href="#" id="export-project-raw-excel">Export Raw Project Data</a>-->
-<!--                        <a href="#" id="export-project-excel-new">Export Project Template</a>-->
-<!--                    </div>-->
-<!--                </div>-->
+                <!--                <div class="dropdown-export">-->
+                <!--                    <button class="dropbtn">Export</button>-->
+                <!--                    <div class="dropdown-content">-->
+                <!--                        <a href="#" id="export-project-raw-excel">Export Raw Project Data</a>-->
+                <!--                        <a href="#" id="export-project-excel-new">Export Project Template</a>-->
+                <!--                    </div>-->
+                <!--                </div>-->
                 <input type="file" id="upload-file" accept=".csv, .xlsx, .xls" style="display: none;"/>
                 <button id="upload-btn">Upload Files</button>
             </div>
@@ -132,7 +132,7 @@
                     <button class="filter active" onclick="filterProjects('all')">All</button>
                     <button class="filter" onclick="filterProjects('ict')">ICT</button>
                     <button class="filter" onclick="filterProjects('dst')">DST</button>
-                    <input type="text" placeholder="Search" id="search-keyword" />
+                    <input type="text" placeholder="Search" id="search-keyword"/>
 
                 </div>
                 <table id="projectsTable">
@@ -266,9 +266,9 @@
         </div>
 
 
-<!--        <div class="btn-footer">-->
-<!--            <button class="deleteAll-btn">Delete ALL</button>-->
-<!--        </div>-->
+        <!--        <div class="btn-footer">-->
+        <!--            <button class="deleteAll-btn">Delete ALL</button>-->
+        <!--        </div>-->
 
         <div class="pagination">
             <button class="page-btn" onclick="changePage('prev')">&lt;</button>
@@ -495,11 +495,11 @@
 
         const startIndex = (page - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        const pageData   = filteredData.slice(startIndex, endIndex);
+        const pageData = filteredData.slice(startIndex, endIndex);
 
         // คำนวณ maxCommittee อย่างต่ำ 1 (ปรับตามต้องการ)
         const maxCommittee = Math.max(
-            1, ...filteredData.map(p => p.professorList.filter(x=>x.role==="Committee").length)
+            1, ...filteredData.map(p => p.professorList.filter(x => x.role === "Committee").length)
         );
 
         // สร้าง header ใหม่ พร้อมสี
@@ -642,32 +642,29 @@
 
     // ฟังก์ชันแปลง CSV เป็น JSON
     function csvToJson(csv) {
-        const EXPECTED_COLS = 10; // จำนวน column ที่คาดไว้
-        const result = [];
-
         // helper: แยก comma เฉพาะข้างนอก quotes
         function splitCSV(line) {
-            const out = [];
-            let cur = "", insideQuotes = false;
+            const res = [];
+            let cur = "", inside = false;
             for (let i = 0; i < line.length; i++) {
                 const ch = line[i];
                 if (ch === '"') {
-                    // ถ้าเจอ "" ให้ treat เป็น " เดียว
-                    if (insideQuotes && line[i + 1] === '"') {
+                    // ถ้ามี "" => ใส่ " แล้วข้ามตัวถัดไป
+                    if (inside && line[i + 1] === '"') {
                         cur += '"';
                         i++;
                     } else {
-                        insideQuotes = !insideQuotes;
+                        inside = !inside;
                     }
-                } else if (ch === ',' && !insideQuotes) {
-                    out.push(cur);
+                } else if (ch === ',' && !inside) {
+                    res.push(cur);
                     cur = "";
                 } else {
                     cur += ch;
                 }
             }
-            out.push(cur);
-            return out;
+            res.push(cur);
+            return res;
         }
 
         // 1) แปลง input เป็น "logical rows" โดย buffering จนกว่าจะเจอ quotes คู่สมบูรณ์
@@ -675,44 +672,63 @@
         const rows = [];
         let buffer = "";
         for (const line of rawLines) {
-            buffer += (buffer ? "\n" : "") + line;
+            buffer = buffer ? buffer + "\n" + line : line;
             const quoteCount = (buffer.match(/"/g) || []).length;
+            // ถ้าจำนวน quote เป็นคู่ (mod 2 === 0) แปลว่าเสร็จหนึ่ง record
             if (quoteCount % 2 === 0) {
                 rows.push(buffer);
                 buffer = "";
             }
         }
 
-        if (buffer) rows.push(buffer);  // กรณี malformed ก็ push ท้าย
+        // ถ้ายังเหลือ buffer (malformed) ก็ใส่ลงไป
+        if (buffer) rows.push(buffer);
 
         // 2) ตรวจความยาว column ในแต่ละบรรทัด
-        for (let i = 10; i < rows.length; i++) {
-            const cols = splitCSV(rows[i]);
-            if (cols.length < EXPECTED_COLS) {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'ไฟล์ไม่ถูกต้อง',
-                    // text: `บรรทัดที่ ${i + 1} พบ ${cols.length} คอลัมน์ แต่ต้องเป็น ${EXPECTED_COLS} คอลัมน์`
-                    text: 'กรุณาอัปโหลด Committee Files'
-                });
-                return [];
-            }
+        const headerLine = rows[4] || "";
+        const headers = splitCSV(headerLine).map(h => h.trim().replace(/^"|"$/g, ""));
+        const expected = [
+            "Project ID",
+            "Project Title",
+            "Project Description",
+            "Project Category",
+            "Student ID",
+            "Student Name",
+            "Program",
+            "Advisor",
+            "Co-Advisor",
+            "Committee"
+        ];
+        const mismatch = expected.some((h, i) => headers[i] !== h);
+        if (mismatch) {
+            Swal.fire({
+                icon: "error",
+                title: "ไฟล์ไม่ถูกต้อง",
+                // text: "กรุณาอัปโหลด CSV ที่มีคอลัมน์ตามนี้:\n" + expected.join(", ")
+                text: "กรุณาอัปโหลดไฟล์ Committee"
+            });
+            return [];
         }
 
         // 3) เริ่ม parse จริง ตั้งแต่บรรทัดที่ 6 (index=5)
+        const result = [];
         let currentProject = null;
+        let lastNo = "";
+
         for (let i = 5; i < rows.length; i++) {
-            // split, trim, slice ให้ได้แค่ 10 คอลัมน์แรก
-            const cells = splitCSV(rows[i])
-                .map(c => {
-                    let t = c.trim();
-                    // ลบ quote รอบ ๆ และ unescape ""
-                    if (t.startsWith('"') && t.endsWith('"')) {
-                        t = t.slice(1, -1).replace(/""/g, '"');
-                    }
-                    return t;
-                })
-                .slice(0, EXPECTED_COLS);
+            const raw = rows[i].trim();
+            if (!raw) continue;
+
+            // split & trim & unquote
+            let cells = splitCSV(raw).map(c => {
+                let t = c.trim();
+                if (t.startsWith('"') && t.endsWith('"')) {
+                    t = t.slice(1, -1).replace(/""/g, '"');
+                }
+                return t;
+            });
+            // pad ให้ครบ 10 columns
+            while (cells.length < 10) cells.push("");
 
             const [
                 projectId,
@@ -728,7 +744,7 @@
             ] = cells;
 
             // ถ้าเจอ projectId ใหม่ ให้เริ่ม object ใหม่
-            if (projectId) {
+            if (projectId && projectId !== lastNo) {
                 currentProject = {
                     projectId,
                     projectTitle,
@@ -741,12 +757,38 @@
                     studentList: []
                 };
                 result.push(currentProject);
+                lastNo = projectId;
+            } else if (!currentProject) {
+                currentProject = {
+                    projectId,
+                    projectTitle,
+                    projectDescription,
+                    projectCategory,
+                    program,
+                    advisor,
+                    coAdvisor,
+                    committee,
+                    studentList: []
+                };
+                result.push(currentProject);
+                lastNo = projectId;
+
+            } else {
+                if (projectId) currentProject.projectId = projectId;
+                if (projectTitle) currentProject.projectTitle = projectTitle;
+                if (projectDescription) currentProject.projectDescription = projectDescription;
+                if (projectCategory) currentProject.projectCategory = projectCategory;
+                if (program) currentProject.program = program;
+                if (advisor) currentProject.advisor = advisor;
+                if (coAdvisor) currentProject.coAdvisor = coAdvisor;
+                if (committee) currentProject.committee = committee;
             }
 
             // เพิ่ม student ถ้ามี
             if (currentProject && (studentId || studentName)) {
-                currentProject.studentList.push({ studentId, studentName });
+                currentProject.studentList.push({studentId, studentName});
             }
+
         }
 
         return result;
@@ -1139,7 +1181,7 @@
             "Student Name",
             "Program",
             "Advisor",
-            "Co-advisor",
+            "Co-Advisor",
             "Committee"
         ];
 
