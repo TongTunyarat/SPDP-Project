@@ -459,12 +459,10 @@
                     title: 'Errors',
                     html: errors.map(e => `<p style="text-align:left; margin:0.25em 0;">${e}</p>`).join(''),
                     width: '600px',
-                    confirmButtonText: 'ปิด'
+                    confirmButtonText: 'ปิด',
+                    timer: 1500
                 }).then(() => {
-                    // ถ้าต้องการ redirect ต่อทันที
-                    if (redirectUrl) {
-                        window.location.href = redirectUrl;
-                    }
+                    window.location.reload();
                 });
             }
 

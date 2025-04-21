@@ -640,11 +640,50 @@
 
 
     function csvToJson(csv) {
-        const lines = csv.split("\n");
+        // helper: แยก comma ข้างนอก quotes
+        function splitCSV(line) {
+            const res = [];
+            let cur = "", inside = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"') {
+                    // ถ้ามี "" => ใส่ " แล้วข้ามตัวถัดไป
+                    if (inside && line[i + 1] === '"') {
+                        cur += '"';
+                        i++;
+                    } else {
+                        inside = !inside;
+                    }
+                } else if (ch === ',' && !inside) {
+                    res.push(cur);
+                    cur = "";
+                } else {
+                    cur += ch;
+                }
+            }
+            res.push(cur);
+            return res;
+        }
 
-        // 1) ตรวจสอบ header ก่อน (บรรทัด index=4)
-        const headerLine = lines[4] || "";
-        const headers = headerLine.split(",").map(h => h.trim());
+        // 1) แบ่งเป็น "logical lines" โดย buffering จน quotes คู่สมบูรณ์
+        const rawLines = csv.split(/\r?\n/);
+        const rows = [];
+        let buffer = "";
+        for (const line of rawLines) {
+            buffer = buffer ? buffer + "\n" + line : line;
+            const quoteCount = (buffer.match(/"/g) || []).length;
+            // ถ้าจำนวน quote เป็นคู่ (mod 2 === 0) แปลว่าเสร็จหนึ่ง record
+            if (quoteCount % 2 === 0) {
+                rows.push(buffer);
+                buffer = "";
+            }
+        }
+        // ถ้ายังเหลือ buffer (malformed) ก็ใส่ลงไป
+        if (buffer) rows.push(buffer);
+
+        // 2) ตรวจ header (ลายละเอียดบรรทัดที่ 5 → index 4)
+        const headerLine = rows[4] || "";
+        const headers = splitCSV(headerLine).map(h => h.trim().replace(/^"|"$/g, ""));
         const expected = [
             "No.",
             "Project Title",
@@ -658,70 +697,86 @@
         ];
         const mismatch = expected.some((h, i) => headers[i] !== h);
         if (mismatch) {
-            // ใช้ Swal หรือ alert แจ้งเตือน แล้วหยุด parse ทันที
             Swal.fire({
-                icon: 'error',
-                title: 'ไฟล์ไม่ถูกต้อง',
-                // text: 'กรุณาอัปโหลดไฟล์ CSV ที่มีคอลัมน์ตามนี้: ' + expected.join(', ')
-                text: 'กรุณาอัปโหลดไฟล์ CSV ของ Project '
+                icon: "error",
+                title: "ไฟล์ไม่ถูกต้อง",
+                // text: "กรุณาอัปโหลด CSV ที่มีคอลัมน์ตามนี้:\n" + expected.join(", ")
+                text: "กรุณาอัปโหลดไฟล์ Project"
             });
-            return []; // คืน array เปล่าเพื่อหยุดการทำงานต่อ
+            return [];
         }
 
+        // 3) เริ่ม parse data ตั้งแต่บรรทัดที่ 6 (index 5)
         const result = [];
         let currentProject = null;
         let lastNo = "";
 
-        // 2) เริ่มอ่านข้อมูลจริงจากบรรทัดที่ 6 (index=5)
-        for (let i = 5; i < lines.length; i++) {
-            const line = lines[i].trim();
-            if (!line) continue;
+        for (let i = 5; i < rows.length; i++) {
+            const raw = rows[i].trim();
+            if (!raw) continue;
 
-            let cells = line.split(",");
-            if (cells.length < 9) {
-                const padded = Array(9).fill("");
-                for (let j = 0; j < cells.length; j++) padded[j] = cells[j].trim();
-                cells = padded;
-            } else {
-                cells = cells.map(x => x.trim());
-            }
+            // split & trim & unquote
+            let cells = splitCSV(raw).map(c => {
+                let t = c.trim();
+                if (t.startsWith('"') && t.endsWith('"')) {
+                    t = t.slice(1, -1).replace(/""/g, '"');
+                }
+                return t;
+            });
+            // pad ให้ครบ 9 columns
+            while (cells.length < 9) cells.push("");
 
-            const [no, projectTitle, projectDesc, projectCategory,
-                studentId, studentName, program, advisor, coAdvisor] = cells;
+            const [
+                no, projectTitle, projectDesc, projectCategory,
+                studentId, studentName, program, advisor, coAdvisor
+            ] = cells;
 
-            // (โค้ดสร้าง/อัปเดต currentProject เหมือนเดิม)
+            // กรณีเจอ No. ใหม่ → สร้าง project ใหม่
             if (no && no !== lastNo) {
                 currentProject = {
-                    no, projectTitle, projectDescription: projectDesc,
-                    projectCategory, program, advisor, coAdvisor, studentList: []
+                    no,
+                    projectTitle,
+                    projectDescription: projectDesc,
+                    projectCategory,
+                    program,
+                    advisor,
+                    coAdvisor,
+                    studentList: []
                 };
                 result.push(currentProject);
                 lastNo = no;
             } else if (!currentProject) {
+                // แถวแรกถ้าไม่มี currentProject ให้สร้าง
                 currentProject = {
-                    no, projectTitle, projectDescription: projectDesc,
-                    projectCategory, program, advisor, coAdvisor, studentList: []
+                    no,
+                    projectTitle,
+                    projectDescription: projectDesc,
+                    projectCategory,
+                    program,
+                    advisor,
+                    coAdvisor,
+                    studentList: []
                 };
                 result.push(currentProject);
                 lastNo = no;
             } else {
+                // ต่อเติม property ของโปรเจกต์ถ้ามีข้อมูลใหม่
                 if (projectTitle) currentProject.projectTitle = projectTitle;
-                if (projectDesc) currentProject.projectDescription = projectDesc;
+                if (projectDesc)   currentProject.projectDescription = projectDesc;
                 if (projectCategory) currentProject.projectCategory = projectCategory;
-                if (program) currentProject.program = program;
-                if (advisor) currentProject.advisor = advisor;
-                if (coAdvisor) currentProject.coAdvisor = coAdvisor;
+                if (program)       currentProject.program = program;
+                if (advisor)       currentProject.advisor = advisor;
+                if (coAdvisor)     currentProject.coAdvisor = coAdvisor;
             }
 
-            // เพิ่มนักศึกษา
+            // เพิ่ม student ถ้ามี
             if (studentId || studentName) {
-                currentProject.studentList.push({studentId, studentName});
+                currentProject.studentList.push({ studentId, studentName });
             }
         }
 
         return result;
     }
-
 
     // ฟังก์ชันสำหรับลบ BOM (รองรับภาษาไทย)
     function removeBOM(csv) {

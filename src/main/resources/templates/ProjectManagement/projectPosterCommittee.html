@@ -226,9 +226,9 @@
             <button class="page-btn" onclick="changePage('next')">&gt;</button>
         </div>
 
-        <div class="btn-footer">
-            <button class="deleteAll-btn">Delete ALL</button>
-        </div>
+<!--        <div class="btn-footer">-->
+<!--            <button class="deleteAll-btn">Delete ALL</button>-->
+<!--        </div>-->
 
 
     </div>
@@ -616,72 +616,112 @@
 
     // ฟังก์ชันแปลง CSV เป็น JSON
     function csvToJson(csv) {
-        const EXPECTED_COLS = 11;  // เราต้องการ 11 คอลัมน์: 0..10
+        const EXPECTED_COLS = 11; // เราต้องการ 11 คอลัมน์: 0..10
         const result = [];
 
-        Papa.parse(csv, {
-            skipEmptyLines: true,
-            header: false,
-            complete: function ({data}) {
-                // 1) ตรวจสอบความยาวคอลัมน์ของทุกแถวก่อน (ข้าม 5 แถวแรก)
-                for (let i = 5; i < data.length; i++) {
-                    if (data[i].length < EXPECTED_COLS) {
-                        Swal.fire({
-                            icon: 'error',
-                            title: 'ไฟล์ไม่ถูกต้อง',
-                            // text: `พบคอลัมน์ไม่ครบในแถวที่ ${i + 1} (ต้องมี ${EXPECTED_COLS} คอลัมน์)`,
-                            text: 'กรุณาอัปโหลดไฟล์ CSV ของ Poster Committee '
-                        });
-                        return;  // หยุดแปลงทันที
+        // helper: แยก comma เฉพาะข้างนอก quotes
+        function splitCSV(line) {
+            const out = [];
+            let cur = "", inside = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"') {
+                    if (inside && line[i + 1] === '"') {
+                        // "" → " ภายใน field
+                        cur += '"';
+                        i++;
+                    } else {
+                        inside = !inside;
                     }
+                } else if (ch === ',' && !inside) {
+                    out.push(cur);
+                    cur = "";
+                } else {
+                    cur += ch;
                 }
+            }
+            out.push(cur);
+            return out;
+        }
 
-                // 2) ถ้าผ่าน ให้เริ่มสร้าง JSON
-                let currentProject = null;
-                data.forEach((row, i) => {
-                    if (i < 5) return;  // ข้าม 5 แถวแรก
-
-                    // trim และ slice เอาเฉพาะ 11 คอลัมน์แรก
-                    const cells = row.map(c => c.trim()).slice(0, EXPECTED_COLS);
-
-                    const [
-                        projectId,
-                        projectTitle,
-                        projectDescription,
-                        projectCategory,
-                        studentId,
-                        studentName,
-                        program,
-                        advisor,
-                        coAdvisor,
-                        committee,
-                        posterCommittee
-                    ] = cells;
-
-                    // — สร้าง Project ใหม่ เมื่อเจอ projectId (ไม่ใช่ช่องว่าง) —
-                    if (projectId) {
-                        currentProject = {
-                            projectId,
-                            projectTitle,
-                            projectDescription,
-                            projectCategory,
-                            program,
-                            advisor,
-                            coAdvisor,
-                            committee,
-                            posterCommittee,
-                            studentList: []
-                        };
-                        result.push(currentProject);
-                    }
-
-                    // — เพิ่ม student ลงใน currentProject ถ้ามี —
-                    if ((studentId || studentName) && currentProject) {
-                        currentProject.studentList.push({studentId, studentName});
-                    }
-                });
+        // 1) ทำให้แต่ละ "logical row" สมบูรณ์ก่อน
+        const raw = csv.split(/\r?\n/);
+        const rows = [];
+        let buf = "";
+        raw.forEach(line => {
+            buf += (buf ? "\n" : "") + line;
+            // นับ " ว่าคู่ครบหรือยัง
+            const qc = (buf.match(/"/g) || []).length;
+            if (qc % 2 === 0) {
+                rows.push(buf);
+                buf = "";
             }
         });
+        if (buf) rows.push(buf); // ถ้ามียังเหลือก็อัดลงไป
+
+        // 2) ตรวจความยาวคอลัมน์ ในทุกแถว (ข้าม 5 แถว header)
+        for (let i = 5; i < rows.length; i++) {
+            const cols = splitCSV(rows[i]);
+            if (cols.length < EXPECTED_COLS) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'ไฟล์ไม่ถูกต้อง',
+                    text: `บรรทัดที่ ${i+1} พบ ${cols.length} คอลัมน์ แต่ต้องเป็นอย่างน้อย ${EXPECTED_COLS} คอลัมน์`
+                });
+                return [];
+            }
+        }
+
+        // 3) parse จริง ตั้งแต่บรรทัดที่ 6 (index=5)
+        let current = null;
+        for (let i = 5; i < rows.length; i++) {
+            // trim และ slice 11 คอลัมน์แรก
+            const cells = splitCSV(rows[i])
+                .map(c => {
+                    let v = c.trim();
+                    if (v.startsWith('"') && v.endsWith('"')) {
+                        v = v.slice(1, -1).replace(/""/g, '"');
+                    }
+                    return v;
+                })
+                .slice(0, EXPECTED_COLS);
+
+            const [
+                projectId,
+                projectTitle,
+                projectDescription,
+                projectCategory,
+                studentId,
+                studentName,
+                program,
+                advisor,
+                coAdvisor,
+                committee,
+                posterCommittee
+            ] = cells;
+
+            // ถ้าเจอ projectId (ไม่ใช่ค่าว่าง) → เริ่ม object ใหม่
+            if (projectId) {
+                current = {
+                    projectId,
+                    projectTitle,
+                    projectDescription,
+                    projectCategory,
+                    program,
+                    advisor,
+                    coAdvisor,
+                    committee,
+                    posterCommittee,
+                    studentList: []
+                };
+                result.push(current);
+            }
+
+            // เพิ่ม studentList ถ้ามี
+            if (current && (studentId || studentName)) {
+                current.studentList.push({ studentId, studentName });
+            }
+        }
 
         return result;
     }
@@ -913,7 +953,7 @@
                 project.professorList.forEach(prof => {
                     if (prof.role === "Advisor") {
                         advisor = prof.professorName;
-                    } else if (prof.role === "Co-advisor") {
+                    } else if (prof.role === "Co-Advisor") {
                         coAdvisor = prof.professorName;
                     }
                 });
