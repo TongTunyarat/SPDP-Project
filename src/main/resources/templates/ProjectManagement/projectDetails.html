@@ -1586,6 +1586,14 @@
 
 
     function exportProjectTemplate() {
+
+        const semester = document.getElementById('semester-selector').value;
+        // 1) กรองข้อมูลโปรเจกต์ตาม semester
+        const filteredProjects = projectsData.filter(p => String(p.semester) === semester);
+        if (filteredProjects.length === 0) {
+            return Swal.fire('ไม่มีข้อมูล', `ไม่มีโปรเจกต์ในภาคการศึกษา ${semester}`, 'info');
+        }
+
         const wb = new ExcelJS.Workbook();
         const ws = wb.addWorksheet("Project List");
 

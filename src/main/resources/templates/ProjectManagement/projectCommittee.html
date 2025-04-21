@@ -1193,10 +1193,12 @@
 
 
     function exportTemplateNew() {
-        // ตรวจสอบว่ามี projectsData จาก fetch หรือไม่
-        if (!projectsData || projectsData.length === 0) {
-            alert("No project data available to export.");
-            return;
+
+        const semester = document.getElementById('semester-selector').value;
+        // 1) กรองข้อมูลโปรเจกต์ตาม semester
+        const filteredProjects = projectsData.filter(p => String(p.semester) === semester);
+        if (filteredProjects.length === 0) {
+            return Swal.fire('ไม่มีข้อมูล', `ไม่มีโปรเจกต์ในภาคการศึกษา ${semester}`, 'info');
         }
 
         // เพิ่มคอลัมน์ Poster Committee เข้าไปใน headers
@@ -1218,7 +1220,7 @@
         // mapping สำหรับโปรเจกต์: key = projectId, value = { start: index, end: index }
         let projectMapping = new Map();
 
-        projectsData.forEach(project => {
+        filteredProjects.forEach(project => {
             // ------------------- ข้อมูลระดับโปรเจกต์ -------------------
             let projectId = project.projectId || "";
             let projectTitle = project.projectTitle || "";
