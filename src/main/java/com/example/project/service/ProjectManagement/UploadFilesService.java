@@ -717,32 +717,32 @@ public class UploadFilesService {
         this.proposalSched = proposalSched;
     }
 
-    @Transactional
-    public void deleteAllProjects() {
-        // 1) bulk‑delete ข้อมูลใน child ก่อน
-        proposalEvalScore.deleteAllInBatch();
-        defenseEvalScore.deleteAllInBatch();
-        posterEvalScore.deleteAllInBatch();
-
-        proposalRepo.deleteAllInBatch();
-        posterRepo.deleteAllInBatch();
-        defenseRepo.deleteAllInBatch();
-
-        gradePropRepo.deleteAllInBatch();
-        gradeDefenseRepo.deleteAllInBatch();
-
-        defenseSched.deleteAllInBatch();
-        proposalSched.deleteAllInBatch();
-
-        // 2) bulk‑delete project‑instructor‑role
-        roleRepo.deleteAllInBatch();
-
-        // 3) bulk‑delete student‑project
-        stuRepo.deleteAllInBatch();
-
-        // 4) bulk‑delete project
-        projRepo.deleteAllInBatch();
-    }
+//    @Transactional
+//    public void deleteAllProjects() {
+//        // 1) bulk‑delete ข้อมูลใน child ก่อน
+//        proposalEvalScore.deleteAllInBatch();
+//        defenseEvalScore.deleteAllInBatch();
+//        posterEvalScore.deleteAllInBatch();
+//
+//        proposalRepo.deleteAllInBatch();
+//        posterRepo.deleteAllInBatch();
+//        defenseRepo.deleteAllInBatch();
+//
+//        gradePropRepo.deleteAllInBatch();
+//        gradeDefenseRepo.deleteAllInBatch();
+//
+//        defenseSched.deleteAllInBatch();
+//        proposalSched.deleteAllInBatch();
+//
+//        // 2) bulk‑delete project‑instructor‑role
+//        roleRepo.deleteAllInBatch();
+//
+//        // 3) bulk‑delete student‑project
+//        stuRepo.deleteAllInBatch();
+//
+//        // 4) bulk‑delete project
+//        projRepo.deleteAllInBatch();
+//    }
 
 
     @Transactional
