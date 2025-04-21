@@ -369,19 +369,16 @@
         const sem = document.getElementById('semester-selector').value;
         const term = document.getElementById('search-keyword').value.trim().toLowerCase();
 
+        // กรองข้อมูล
         filteredData = projectsData.filter(p => {
-            // by semester
             if (sem && String(p.semester) !== sem) return false;
-            // by search: เช็ค projectId, title, description, program, advisor, co-advisor, students
             if (term) {
                 const hay = [
                     p.projectId,
                     p.projectTitle,
                     p.projectDescription,
                     p.program,
-                    // advisor & co-advisor
                     ...p.professorList.map(x => x.professorName),
-                    // student IDs & names
                     ...p.studentList.map(s => s.studentId + ' ' + s.studentName)
                 ].join(' ').toLowerCase();
                 if (!hay.includes(term)) return false;
@@ -389,7 +386,18 @@
             return true;
         });
 
-        // reset page และ re-render
+        // คำนวณ maxCommittee ตาม filteredData (อย่างน้อย 1)
+        const committeeCounts = filteredData.map(p =>
+            p.professorList.filter(x => x.role === 'Committee').length
+        );
+        const maxCommittee = committeeCounts.length
+            ? Math.max(...committeeCounts)
+            : 1;
+
+        // วาดหัวตารางใหม่
+        renderCommitteeHeader(maxCommittee);
+
+        // รีเซ็ต pagination แล้ว render body
         currentPage = 1;
         updatePagination();
         displayResults(currentPage);
@@ -459,9 +467,13 @@
         const thead = document.querySelector("#projectsTable thead");
         thead.innerHTML = "";
 
+        // คำนวณจำนวนคอลัมน์ในกลุ่ม Committee (Advisor + Committee x N)
+        const roleCount = 1 + maxCommittee;
+
         const colors = [
-            "#FCB6B7", "#F9FFA1", "#B0E4FF", "#B4D2FF",
-            "#CCF4DD", "#FCB6CE", "#A8E6CF", "#DCE775",
+            "#F9FFA1", "#B0E4FF", "#B4D2FF", "#CCF4DD",
+            "#FCB6CE", "#FFD7A8", "#C3FFD3", "#E0C3FF",
+            "#FFE0C3", "#C3E0FF"
         ];
 
         // — Header หลัก —
@@ -471,7 +483,7 @@
             <th>Project ID</th>
             <th>Project Name</th>
             <th>Student ID</th>
-            <th colspan="${1 + maxCommittee}">Committee</th>
+            <th colspan="${roleCount}">Committee</th>
           `;
         thead.appendChild(headerRow);
 
@@ -481,26 +493,12 @@
         subRow.innerHTML = `<th></th><th></th><th></th>`;
 
         // Advisor
-        subRow.innerHTML += `
-            <th style="
-              background-color: ${colors[0]};
-              color: black;
-              font-weight: bold;
-            ">
-              Advisor
-            </th>`;
+        subRow.innerHTML += `<th style="background:#FCB6B7">Advisor</th>`;
 
         // Committee 1..maxCommittee
-        for (let i = 1; i <= maxCommittee; i++) {
-            // เลือกสีโดยวนอาเรย์ (i modulo length)
-            const bg = colors[i % colors.length];
-            subRow.innerHTML += `
-          <th style="
-            background-color: ${bg};
-            color: black;
-          ">
-            Committee ${i}
-          </th>`;
+        for (let i = 0; i < maxCommittee; i++) {
+            const color = colors[i % colors.length];
+            subRow.innerHTML += `<th style="background:${color}">Committee ${i + 1}</th>`;
         }
 
         thead.appendChild(subRow);
@@ -516,52 +514,65 @@
         const endIndex = startIndex + itemsPerPage;
         const pageData = filteredData.slice(startIndex, endIndex);
 
-        // คำนวณ maxCommittee อย่างต่ำ 1 (ปรับตามต้องการ)
-        const maxCommittee = Math.max(
-            1, ...filteredData.map(p => p.professorList.filter(x => x.role === "Committee").length)
-        );
-
-        // สร้าง header ใหม่ พร้อมสี
-        renderCommitteeHeader(maxCommittee);
+        // คำนวณจำนวนคอลัมน์สูงสุดที่ต้องใช้สำหรับแต่ละ Role
+        const maxCommittee = Math.max(...projectsData.map(p => p.professorList.filter(x => x.role === 'Committee').length));
 
         pageData.forEach(project => {
             const row = document.createElement("tr");
-            const programClass = (project.program || "").toLowerCase();
-            row.setAttribute("data-category", programClass);
+            const projectProgram = project.program ? project.program.toLowerCase() : "unknown";
+            row.setAttribute("data-category", projectProgram);
 
             const advisor = project.professorList.find(p => p.role === "Advisor");
             const committees = project.professorList.filter(p => p.role === "Committee");
-            const advisorName = advisor ? advisor.professorName : "N/A";
 
-            // สร้าง <td> Committee
-            let committeeCols = committees
-                .map(p => `<td>${p.professorName}</td>`)
-                .join("");
-            committeeCols += "<td></td>".repeat(maxCommittee - committees.length);
+            // แสดงชื่อ Advisor (ถ้าไม่มีให้เป็น "N/A")
+            let advisorName = advisor ? advisor.professorName : " ";
 
-            // แยก projectId กับ prefix
-            const [prefix, ...rest] = project.projectId.split(" ");
-            const idWithoutPrefix = rest.join(" ");
+            // แสดงชื่อ Committee และเติมคอลัมน์ว่างถ้ายังไม่เต็ม maxCommittee
+            let committeeColumns = committees.map(professor => `<td>${professor.professorName}</td>`).join('');
+            let emptyCommitteeColumns = `<td></td>`.repeat(maxCommittee - committees.length);
+
+            // ใช้ split เพื่อแยกค่าออกจากโปรแกรม
+            const programParts = project.projectId.split(" ");
+            const programPrefix = programParts[0]; // ค่าก่อนหน้า (DST, ICT, etc.)
+            const projectId = programParts.slice(1).join(" ");
+
 
             row.innerHTML = `
-              <td>
-                <span class="tag ${programClass}">
-                  ${project.program || "N/A"}
-                </span>
-                ${idWithoutPrefix}
-              </td>
-              <td>${project.projectTitle || "N/A"}</td>
-              <td>
-                <ul>
-                  ${project.studentList.map(s => `<li>${s.studentId}</li>`).join("")}
-                </ul>
-              </td>
-              <td>${advisorName}</td>
-              ${committeeCols}
-            `;
+            <td>
+              <span class="tag ${projectProgram}">
+                ${project.program || "N/A"}
+              </span>
+              ${projectId}
+            </td>
+            <td>${project.projectTitle || "N/A"}</td>
+            <td>
+              <ul>
+                ${project.studentList.map(s => `<li>${s.studentId}</li>`).join("")}
+              </ul>
+            </td>
+            <td>${advisorName}</td>
+            ${committeeColumns}
+            ${emptyCommitteeColumns}
+        `;
             tableBody.appendChild(row);
         });
+
+        let committeeHeaders = '';
+        for (let i = 0; i < maxCommittee; i++) {
+            committeeHeaders += `<th class="committee${i + 1}-header">Committee ${i + 1}</th>`;
+        }
+
     }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('semester-selector')
+            .addEventListener('change', applyFilters);
+        document.getElementById('search-keyword')
+            .addEventListener('input', debounce(applyFilters, 200));
+        fetchProjects();
+    });
+
 
 
     // -------------------- Pagination -------------------- //

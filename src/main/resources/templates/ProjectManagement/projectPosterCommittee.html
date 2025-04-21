@@ -343,6 +343,23 @@
             return true;
         });
 
+        // 1) คำนวณ maxCommittee / maxPosterCommittee
+        const committeeCounts = filteredData.map(p =>
+            p.professorList.filter(x => x.role === 'Committee').length
+        );
+        const posterCounts = filteredData.map(p =>
+            p.professorList.filter(x => x.role === 'Poster-Committee').length
+        );
+        const maxCommittee = committeeCounts.length
+            ? Math.max(...committeeCounts)
+            : 1;
+        const maxPosterCommittee = posterCounts.length
+            ? Math.max(...posterCounts)
+            : 0;
+
+        // 2) วาด header ใหม่
+        renderTableHeader(maxCommittee, maxPosterCommittee);
+
         // reset page และ re-render
         currentPage = 1;
         updatePagination();
@@ -475,8 +492,6 @@
         // คำนวณจำนวนคอลัมน์สูงสุดที่ต้องใช้สำหรับแต่ละ Role
         const maxCommittee = Math.max(...projectsData.map(p => p.professorList.filter(x => x.role === 'Committee').length));
         const maxPosterCommittee = Math.max(...projectsData.map(p => p.professorList.filter(x => x.role === 'Poster-Committee').length));
-
-        renderTableHeader(maxCommittee, maxPosterCommittee);
 
         pageData.forEach(project => {
             const row = document.createElement('tr');
