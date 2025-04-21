@@ -66,6 +66,5 @@ public interface ProjectInstructorRoleRepository extends JpaRepository<ProjectIn
 
     boolean existsByProjectIdRole_SemesterAndRole(String semester, String role);
 
-
 }
 

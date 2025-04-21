@@ -529,7 +529,7 @@
         if (!sem) return;
 
         fetch(`/admin/hasAdvisor?semester=${encodeURIComponent(sem)}`)
-            .then(r => r.ok ? r.json() : false)
+            .then(r => r.json())
             .then(hasAdvisor => {
                 if (hasAdvisor) {
                     uploadBtn.disabled = true;
@@ -712,7 +712,7 @@
             "Student Name",
             "Program",
             "Advisor",
-            "Co-advisor"
+            "Co-Advisor"
         ];
         const mismatch = expected.some((h, i) => headers[i] !== h);
         if (mismatch) {

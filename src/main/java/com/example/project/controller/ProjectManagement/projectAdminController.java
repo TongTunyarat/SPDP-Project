@@ -310,23 +310,23 @@ public class projectAdminController {
 
     /** คืน `true` ถ้ามี Advisor สำหรับ projectId นั้นอยู่แล้ว */
     @GetMapping("/hasAdvisor")
-    public ResponseEntity<Boolean> hasAdvisor(@RequestParam String projectId) {
+    public ResponseEntity<Boolean> hasAdvisorBySemester(@RequestParam("semester") String semester) {
         boolean has = projectInstructorRoleRepository
-                .existsByProjectIdRole_ProjectIdAndRole(projectId, "Advisor");
+                .existsByProjectIdRole_SemesterAndRole(semester, "Advisor");
         return ResponseEntity.ok(has);
     }
 
     @GetMapping("/hasCommittee")
-    public ResponseEntity<Boolean> hasCommittee(@RequestParam String projectId) {
+    public ResponseEntity<Boolean> hasCommittee(@RequestParam("semester") String semester) {
         boolean has = projectInstructorRoleRepository
-                .existsByProjectIdRole_ProjectIdAndRole(projectId, "Committee");
+                .existsByProjectIdRole_SemesterAndRole(semester, "Committee");
         return ResponseEntity.ok(has);
     }
 
     @GetMapping("/hasPosterCommittee")
-    public ResponseEntity<Boolean> hasPosterCommittee(@RequestParam String projectId) {
+    public ResponseEntity<Boolean> hasPosterCommittee(@RequestParam("semester") String semester) {
         boolean has = projectInstructorRoleRepository
-                .existsByProjectIdRole_ProjectIdAndRole(projectId, "Poster-Committee");
+                .existsByProjectIdRole_SemesterAndRole(semester, "Poster-Committee");
         return ResponseEntity.ok(has);
     }
 

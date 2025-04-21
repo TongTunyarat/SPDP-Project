@@ -385,9 +385,9 @@
         if (!sem) return;
 
         fetch(`/admin/hasPosterCommittee?semester=${encodeURIComponent(sem)}`)
-            .then(r => r.ok ? r.json() : false)
-            .then(hasAdvisor => {
-                if (hasAdvisor) {
+            .then(r => r.json())
+            .then(hasPosterCommittee => {
+                if (hasPosterCommittee) {
                     uploadBtn.disabled = true;
                     uploadBtn.classList.add('disabled');
                     uploadBtn.textContent = 'Upload Disabled';
@@ -397,7 +397,7 @@
                     uploadBtn.textContent = 'Upload Files';
                 }
             })
-            .catch(err => console.error("Error checking poster committee:", err));
+            .catch(err => console.error("Error checking advisor:", err));
     }
 
     // เมื่อผู้ใช้เปลี่ยน semester ให้รีเช็คปุ่ม

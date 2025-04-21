@@ -431,7 +431,7 @@
         if (!sem) return;
 
         fetch(`/admin/hasCommittee?semester=${encodeURIComponent(sem)}`)
-            .then(r => r.ok ? r.json() : false)
+            .then(r => r.json())
             .then(hasCommittee => {
                 if (hasCommittee) {
                     uploadBtn.disabled = true;
@@ -443,7 +443,7 @@
                     uploadBtn.textContent = 'Upload Files';
                 }
             })
-            .catch(err => console.error("Error checking committee:", err));
+            .catch(err => console.error("Error checking advisor:", err));
     }
 
     // เมื่อผู้ใช้เปลี่ยน semester ให้รีเช็คปุ่ม
