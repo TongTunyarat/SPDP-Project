@@ -480,7 +480,7 @@ public class UploadFilesService {
             for (CSVRecord rec : parser) {
                 // อ่านค่าจากแต่ละคอลัมน์ตามชื่อ
                 String fileProjId = rec.get("Project ID");
-                String committee  = rec.get("Committee").replaceAll("^'+|'+$", "");  // trim single‑quotes รอบๆ
+                String committee = rec.get("Committee").replaceAll("^'+|'+$", "");  // trim single‑quotes รอบๆ
 
                 // ถ้า record นี้มี Project ID ใหม่ ให้อัพเดตตัวชี้
                 if (!fileProjId.isBlank()) {
@@ -589,9 +589,9 @@ public class UploadFilesService {
                 String currentProjectId = null;
                 for (CSVRecord rec : parser) {
                     // อ่านค่าตามชื่อคอลัมน์
-                    String fileProjId      = rec.get("Project ID").trim();
+                    String fileProjId = rec.get("Project ID").trim();
                     String posterCommittee = rec.get("Poster-Committee").trim();
-                    long   rowNum          = rec.getRecordNumber() + 4; // +4 เพราะข้ามไปแล้ว
+                    long rowNum = rec.getRecordNumber() + 4; // +4 เพราะข้ามไปแล้ว
 
                     // 1) ถ้ามี Project ID ใหม่ ให้อัปเดตตัวชี้
                     if (!fileProjId.isBlank()) {
@@ -651,7 +651,6 @@ public class UploadFilesService {
 
         return warnings;
     }
-
 
 
     // -------------------- DELETE PROJECT -------------------- //
