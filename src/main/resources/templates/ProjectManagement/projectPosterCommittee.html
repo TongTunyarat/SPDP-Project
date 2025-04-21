@@ -659,8 +659,8 @@
 
         if (buffer) rows.push(buffer);
 
-        // 2) ตรวจความยาวคอลัมน์ ในทุกแถว (ข้าม 5 แถว header)
-        for (let i = 10; i < rows.length; i++) {
+        // 2) ตรวจความยาวคอลัมน์ ในทุกแถว
+        for (let i = 11; i < rows.length; i++) {
             const cols = splitCSV(rows[i]);
             if (cols.length < EXPECTED_COLS) {
                 Swal.fire({
