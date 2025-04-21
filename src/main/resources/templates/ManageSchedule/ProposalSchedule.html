@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> Dashboard </title>
+  <title> Proposal Schedule </title>
 
   <!-- CSS -->
   <link rel="stylesheet" href="/css/sidebar-admin.css">
@@ -2158,6 +2158,14 @@
   const semesterSelect = document.getElementById("semester-selector");
   semesterSelect.addEventListener("change", function () {
     console.log("Selected Semester:", semesterSelect.value);
+
+    localStorage.setItem("selectedSemester", semesterSelect.value);
+    // fetchGradeDistribution();
+    // fetchEvaluationStatus();
+    // fetchTeacherScoringData();
+
+    getScheduleData();
+    getUnScheduleData();
   });
 
   // ตั้งค่า event listeners
@@ -2201,12 +2209,23 @@
       const defaultYear = currentMonth <= 8 ? currentYear - 1 : currentYear;
 
       // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
-      if (data.includes(defaultYear.toString())) {
+      // if (data.includes(defaultYear.toString())) {
+      //   semesterSelector.value = defaultYear.toString();
+      //   console.log("yearrrrrrrrrrrrrr : ",document.getElementById('semester-selector').value)
+      // } else {
+      //   semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+      // }
+
+      const savedSemester = localStorage.getItem("selectedSemester");
+
+      if (savedSemester && data.includes(savedSemester)) {
+        semesterSelector.value = savedSemester;
+      } else if (data.includes(defaultYear.toString())) {
         semesterSelector.value = defaultYear.toString();
-        console.log("yearrrrrrrrrrrrrr : ",document.getElementById('semester-selector').value)
       } else {
-        semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+        semesterSelector.selectedIndex = 0;
       }
+
 
       await getScheduleData();
       await getUnScheduleData();

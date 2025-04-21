@@ -29,7 +29,7 @@ public class ExportScheduleController {
 
         try {
             List<PreviewProposalDTO> data = exportScheduleService.getDataExport(program, semesterYear);
-            exportScheduleService.exportToExcel(response, data);
+            exportScheduleService.exportToExcel(response, data, program, semesterYear);
         } catch (IOException e) {
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -42,7 +42,7 @@ public class ExportScheduleController {
 
         try {
             List<PreviewProposalDTO> data = exportScheduleService.getDefenseDataExport(semesterYear);
-            exportScheduleService.exportDefenseToExcel(response, data);
+            exportScheduleService.exportDefenseToExcel(response, data, semesterYear);
         } catch (IOException e) {
 
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Defense Grade Evaluation Project</title>
+    <title>Senior Project 2</title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="/css/sidebar-instructor.css">
@@ -602,10 +602,13 @@
                     </ul>
                 </td>
                 <td>
-                 ${completeEvaIcons}${waitEvaIcons}
+                     <div class="status-icon">
+                            ${completeEvaIcons}${waitEvaIcons}
+                     </div>
 
-                 ${evaluationStatus}
-                </td>
+                 </td>
+                ${evaluationStatus}
+                
                 <td>
                     <ul>
                         ${project.students.map(student => `<li>${student.gradeResult}</li>`).join('')}
