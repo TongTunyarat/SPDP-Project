@@ -112,14 +112,15 @@
             </div>
 
             <div class="btn-header">
+                <button class="export-btn" id="export-project-excel-new">Download Project Template</button>
 
-                <div class="dropdown-export">
-                    <button class="dropbtn">Export</button>
-                    <div class="dropdown-content">
-                        <a href="#" id="export-project-raw-excel">Export Raw Data</a>
-                        <a href="#" id="export-project-excel-new">Export Project Template</a>
-                    </div>
-                </div>
+                <!--                <div class="dropdown-export">-->
+                <!--                    <button class="dropbtn">Export</button>-->
+                <!--                    <div class="dropdown-content">-->
+                <!--                        <a href="#" id="export-project-raw-excel">Export Raw Data</a>-->
+                <!--                        <a href="#" id="export-project-excel-new">Export Project Template</a>-->
+                <!--                    </div>-->
+                <!--                </div>-->
                 <input type="file" id="upload-file" accept=".csv, .xlsx, .xls" style="display: none;"/>
                 <button id="upload-btn">Upload Files</button>
             </div>
@@ -1291,8 +1292,8 @@
             });
     }
 
-    // เพิ่ม event listener ให้ปุ่ม Export
-    document.getElementById("export-project-raw-excel").addEventListener("click", exportTemplate);
+    // // เพิ่ม event listener ให้ปุ่ม Export
+    // document.getElementById("export-project-raw-excel").addEventListener("click", exportTemplate);
 
 
     // ฟังก์ชันยืนยันการลบ
