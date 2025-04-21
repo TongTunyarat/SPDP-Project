@@ -430,26 +430,34 @@
 
 
             // ผูก listener — เพิ่ม instructor row
-            // ผูก listener — เพิ่ม instructor row
             document.getElementById('addInstructorBtn')
                 .addEventListener('click', () => {
                     const tbody = document.querySelector('#instructorList tbody');
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-                          <td>
-                            <select class="role-select">
-                              <option>Advisor</option>
-                              <option>Co-Advisor</option>
-                              <option>Committee</option>
-                              <option>Poster-Committee</option>
-                            </select>
-                          </td>
-                          <td>
-                            <select class="instructor-select" data-id="">
-                            </select>
-                          </td>
-                          <td><button class="delete-btn">🗑️</button></td>
-                        `;
+                        <td>
+                        <select class="role-select">
+                            <option value="Advisor">Advisor</option>
+                            <option value="Co-Advisor">Co-Advisor</option>
+                            <option value="Committee">Committee</option>
+                            <option value="Poster-Committee">Poster-Committee</option>
+                        </select>
+                        </td>
+                        <td>
+                        <select class="instructor-select" data-id="">
+                            <!-- placeholder แถวแรก -->
+                            <option value="" disabled selected>-- Select Instructor --</option>
+                            ${instructors.map(i => `
+                              <option value="${i.professorId}">
+                                ${i.professorName}
+                              </option>
+                            `).join('')}
+                        </select>
+                        </td>
+                        <td>
+                        <button class="delete-btn">🗑️</button>
+                        </td>
+                    `;
                     tbody.appendChild(tr);
 
                     // Populate & init search on new select only
@@ -480,6 +488,7 @@
                     e.target.closest('tr').remove();
                 }
             });
+
 
             await fetchInstructors();
 
@@ -539,6 +548,22 @@
 
             // คลิกปุ่มยืนยันการบันทึก
             document.getElementById('confirmSaveBtn').addEventListener('click', async function () {
+                const instructorRows = document.querySelectorAll('#instructorList .instructor-table tbody tr');
+                for (let tr of instructorRows) {
+                    const sel = tr.querySelector('select.instructor-select');
+                    if (!sel.value) {
+                        // ยังไม่เลือกอาจารย์ในแถวนี้
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'กรุณาเลือกชื่ออาจารย์ทุกแถว',
+                            text: 'มีแถวที่ไม่ได้เลือกชื่ออาจารย์ กรุณาตรวจสอบก่อนบันทึก',
+                            confirmButtonText: 'ตกลง'
+                        });
+                        return; // หยุดการบันทึก
+                    }
+                }
+
+
                 // เก็บค่าจากฟอร์ม
                 const projectTitle = document.getElementById('projectTitle').value;
                 const projectDescription = document.getElementById('projectDescription').value;
