@@ -16,6 +16,11 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+    <!-- CSRF Token -->
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
+
+
 </head>
 
 <body>
@@ -100,25 +105,34 @@
     <div class="content">
 
         <div class="header-section">
-            Project Details
+            <div class="header-left">
+                Project Details
+
+                <!-- Dropdown สำหรับเลือก semester -->
+                <div class="semester-container">
+                    <select id="semester-selector" onchange="filterBySemester();">
+                        <!-- ตัวเลือกสำหรับปีและ semester -->
+                    </select>
+                </div>
+            </div>
 
             <div class="btn-header">
-                <!--                <button class="export-btn" id="open-export-dialog">Export</button>-->
-                <div class="dropdown-export">
-                    <button class="dropbtn">Export Project Template</button>
-                    <div class="dropdown-content">
-                        <a href="#" id="export-project-template">Export Projects</a>
-                        <a href="#" id="export-committee-template">Export Committee</a>
-                        <a href="#" id="export-poster-committee-template">Export Poster Committee</a>
-                    </div>
-                </div>
-                <div class="dropdown-export">
-                    <button class="dropbtn">Export Project Data</button>
-                    <div class="dropdown-content">
-                        <a href="#" id="export-project-raw-excel">Export Raw Data</a>
-                        <a href="#" id="export-project-merge-excel">Export Project Data</a>
-                    </div>
-                </div>
+                <button class="export-btn" id="export-project-template">Download Project Template</button>
+                <!--                <div class="dropdown-export">-->
+                <!--                    <button class="dropbtn">Export Project Template</button>-->
+                <!--                    <div class="dropdown-content">-->
+                <!--                        <a href="#" id="export-project-template">Export Projects</a>-->
+                <!--                        <a href="#" id="export-committee-template">Export Committee</a>-->
+                <!--                        <a href="#" id="export-poster-committee-template">Export Poster Committee</a>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+                <!--                <div class="dropdown-export">-->
+                <!--                    <button class="dropbtn">Export Project Data</button>-->
+                <!--                    <div class="dropdown-content">-->
+                <!--                        <a href="#" id="export-project-raw-excel">Export Raw Data</a>-->
+                <!--                        <a href="#" id="export-project-merge-excel">Export Project Data</a>-->
+                <!--                    </div>-->
+                <!--                </div>-->
                 <input type="file" id="upload-file" accept=".csv, .xlsx, .xls" style="display: none;"/>
                 <button id="upload-btn">Upload Files</button>
                 <button class="addProject-btn"><a href="/project-add-new-project"> + Add Projects </a></button>
@@ -133,7 +147,7 @@
                     <button class="filter active" onclick="filterProjects('all')">All</button>
                     <button class="filter" onclick="filterProjects('ict')">ICT</button>
                     <button class="filter" onclick="filterProjects('dst')">DST</button>
-                    <input type="text" placeholder="Search">
+                    <input type="text" placeholder="Search" id="search-keyword"/>
 
                 </div>
                 <table>
@@ -236,16 +250,6 @@
                     </div>
                 </div>
 
-                <!--                <div class="loading" id="loading">-->
-                <!--                    <div class="spinner"></div>-->
-                <!--                    <p>กำลังประมวลผลข้อมูล...</p>-->
-                <!--                </div>-->
-
-
-                <!--                &lt;!&ndash; ปุ่ม Preview และ Save &ndash;&gt;-->
-                <!--                <button id="preview-btn">Preview</button>-->
-                <!--                <button id="save-btn" style="display:none;">Save</button>-->
-
                 <!-- Preview Content -->
                 <div id="preview-content"></div>
 
@@ -282,7 +286,7 @@
                 <div class="popup-content">
                     <p>Type "DELETE ALL PROJECT" to confirm deletion.</p>
                     <input type="text" id="deleteAllInput" placeholder="Type DELETE ALL PROJECT"/>
-                    <button id="confirmDeleteAllBtn">Delete All</button>
+                    <button id="confirmDeleteAllBtn" type="button">Delete All</button>
                     <button id="cancelDeleteAllBtn">Cancel</button>
                 </div>
             </div>
@@ -378,9 +382,9 @@
 
 <script>
 
-    document.addEventListener("DOMContentLoaded", function () {
-        fetchProjects();
-    });
+    // document.addEventListener("DOMContentLoaded", function () {
+    //     fetchProjects();
+    // });
 
     document.addEventListener("DOMContentLoaded", function () {
         const menuItems = document.querySelectorAll(".sidebar ul li a");
@@ -415,135 +419,233 @@
     let currentPage = 1;  // หน้าเริ่มต้น
     const itemsPerPage = 15; // จำนวนข้อมูลที่จะแสดงในแต่ละหน้า
     let projectsData = [];  // ข้อมูลทั้งหมดที่ดึงมาจาก API
+    let filteredData = [];  // หลังกรองแล้ว
+
+    function debounce(fn, ms) {
+        let t;
+        return (...a) => {
+            clearTimeout(t);
+            t = setTimeout(() => fn(...a), ms);
+        };
+    }
+
+    // เติมตัวเลือก semester จาก projectsData
+    function populateSemesterOptions() {
+        const sel = document.getElementById('semester-selector');
+        sel.innerHTML = '';  // เคลียร์ก่อน (ถ้าโหลดซ้ำ)
+        // เก็บ unique semesters
+        // const sems = Array.from(new Set(projectsData.map(p => String(p.semester))))
+        //     .sort()
+        //     .add(yearnow);
+        let yearnow = String(new Date().getFullYear());
+        let sems = Array.from(
+            new Set([...projectsData.map(p => String(p.semester)), String(yearnow)])
+        ).sort();
+
+        sems.forEach(s => {
+            const opt = document.createElement('option');
+            opt.value = s;
+            opt.textContent = s;
+            sel.appendChild(opt);
+        });
+
+        // ---- เซ็ต defaultYear ----
+        const now = new Date();
+        const currentYear = now.getFullYear();
+        const currentMonth = now.getMonth() + 1;  // 1-12
+        const defaultYear = (currentMonth <= 8 ? currentYear - 1 : currentYear).toString();
+
+        if (sems.includes(defaultYear)) {
+            sel.value = defaultYear;
+        } else {
+            // ถ้าไม่มีปีนั้น ให้เลือกตัวแรก
+            sel.selectedIndex = 0;
+        }
+    }
+
+    function applyFilters() {
+        const sem = document.getElementById('semester-selector').value;
+        const term = document.getElementById('search-keyword').value.trim().toLowerCase();
+
+        filteredData = projectsData.filter(p => {
+            // by semester
+            if (sem && String(p.semester) !== sem) return false;
+            // by search: เช็ค projectId, title, description, program, advisor, co-advisor, students
+            if (term) {
+                const hay = [
+                    p.projectId,
+                    p.projectTitle,
+                    p.projectDescription,
+                    p.program,
+                    // advisor & co-advisor
+                    ...p.professorList.map(x => x.professorName),
+                    // student IDs & names
+                    ...p.studentList.map(s => s.studentId + ' ' + s.studentName)
+                ].join(' ').toLowerCase();
+                if (!hay.includes(term)) return false;
+            }
+            return true;
+        });
+
+        // reset page และ re-render
+        currentPage = 1;
+        updatePagination();
+        displayResults(currentPage);
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // once only:
+        document.getElementById('semester-selector')
+            .addEventListener('change', applyFilters);
+        document.getElementById('search-keyword')
+            .addEventListener('input', debounce(applyFilters, 200));
+
+        fetchProjects();
+    });
+
 
     // ฟังก์ชันดึงข้อมูลโปรเจกต์
     function fetchProjects() {
-        fetch("http://localhost:8080/admin/projectOverview")
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
-                return response.json();
+        fetch("/admin/projectOverview")
+            .then(r => {
+                if (!r.ok) throw new Error(r.statusText);
+                return r.json();
             })
             .then(data => {
-                projectsData = data;  // เก็บข้อมูลทั้งหมด
-                displayResults(currentPage);  // แสดงผลหน้าปัจจุบัน
-                updatePagination();  // อัปเดตปุ่ม pagination
+                projectsData = data;
+                filteredData = data;
+                populateSemesterOptions();
+                applyFilters();
+
+                // หลังเรา render table เสร็จ ให้เช็คปุ่ม upload
+                checkUploadAvailability();
             })
-            .catch(error => console.error("Error fetching project data:", error));
+            .catch(err => console.error("Error fetching projects:", err));
     }
+
+    function checkUploadAvailability() {
+        const uploadBtn = document.getElementById('upload-btn');
+        const sem = document.getElementById('semester-selector').value;
+        if (!sem) return;
+
+        fetch(`/admin/hasAdvisor?semester=${encodeURIComponent(sem)}`)
+            .then(r => r.ok ? r.json() : false)
+            .then(hasAdvisor => {
+                if (hasAdvisor) {
+                    uploadBtn.disabled = true;
+                    uploadBtn.classList.add('disabled');
+                    uploadBtn.textContent = 'Upload Disabled';
+                } else {
+                    uploadBtn.disabled = false;
+                    uploadBtn.classList.remove('disabled');
+                    uploadBtn.textContent = 'Upload Files';
+                }
+            })
+            .catch(err => console.error("Error checking advisor:", err));
+    }
+
+    // เมื่อผู้ใช้เปลี่ยน semester ให้รีเช็คปุ่ม
+    document.getElementById('semester-selector')
+        .addEventListener('change', () => {
+            applyFilters();            // กรองข้อมูลใหม่
+            checkUploadAvailability(); // รีเช็คปุ่ม upload
+        });
+
 
     // ฟังก์ชันแสดงข้อมูลในตาราง
     function displayResults(page) {
-        let tableBody = document.querySelector("tbody");
-        tableBody.innerHTML = ""; // เคลียร์ข้อมูลเก่า
+        const tbody = document.querySelector("tbody");
+        tbody.innerHTML = ""; // เคลียร์ข้อมูลเก่า
 
-        // คำนวณขอบเขตข้อมูลที่จะแสดง
+        // ใช้ filteredData แทน projectsData
         const startIndex = (page - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
-        const pageData = projectsData.slice(startIndex, endIndex);
+        const pageData = filteredData.slice(startIndex, endIndex);
 
         pageData.forEach(project => {
-            console.log(project);
             const row = document.createElement('tr');
             const projectProgram = project.program ? project.program.toLowerCase() : "unknown";
             row.setAttribute("data-category", projectProgram);
 
-            // กรอง professorList เพื่อให้แสดงเฉพาะ "Advisor"
-            const advisor = project.professorList.find(professor => professor.role === "Advisor");
-            const professorName = advisor ? advisor.professorName : "N/A"; // ถ้าไม่มี "Advisor" ให้แสดง "N/A"
+            const advisor = project.professorList.find(p => p.role === "Advisor");
+            const profName = advisor ? advisor.professorName : "N/A";
+            const coadvisor = project.professorList.find(p => p.role === "Co-Advisor");
+            const coProfName = coadvisor ? coadvisor.professorName : "";
 
-            // กรอง professorList เพื่อให้แสดงเฉพาะ "Co-Advisor"
-            const coadvisor = project.professorList.find(professor => professor.role === "Co-Advisor");
-            const coAdvisorName = coadvisor ? coadvisor.professorName : " ";
-
-            // ใช้ split เพื่อแยกค่าออกจากโปรแกรม
-            const programParts = project.projectId.split(" ");
-            const programPrefix = programParts[0]; // ค่าก่อนหน้า (DST, ICT, etc.)
-            const projectId = programParts.slice(1).join(" ");
+            const parts = project.projectId.split(" ");
+            const projId = parts.slice(1).join(" ");
 
             row.innerHTML = `
-            <td><span class="tag ${projectProgram}">${project.program || "N/A"}</span> ${projectId}</td>
-            <td>${professorName}</td>
-            <td>${coAdvisorName || " "}</td>
+            <td><span class="tag ${projectProgram}">${project.program || "N/A"}</span> ${projId}</td>
+            <td>${profName}</td>
+            <td>${coProfName}</td>
             <td>${project.projectTitle || "N/A"}</td>
             <td>${project.projectDescription || "N/A"}</td>
+            <td><ul>${project.studentList.map(s => `<li>${s.studentId}</li>`).join('')}</ul></td>
+            <td><ul>${project.studentList.map(s => `<li>${s.studentName}</li>`).join('')}</ul></td>
             <td>
-                <ul>
-                    ${Array.isArray(project.studentList) ? project.studentList.map(student => `<li>${student.studentId}</li>`).join('') : 'ไม่มีนักศึกษา'}
-                </ul>
+              <form action="/admin/editProjectDetails" method="get">
+                <input type="hidden" name="projectId" value="${project.projectId}">
+                <button type="submit" class="edit-btn"><span class="material-icons">edit</span></button>
+              </form>
+              <form onsubmit="return confirmDelete(event, '${project.projectId}')">
+                <input type="hidden" name="projectId" value="${project.projectId}">
+                <button type="submit" class="delete-btn"><span class="material-icons">delete</span></button>
+              </form>
             </td>
-            <td>
-                <ul>
-                    ${Array.isArray(project.studentList) ? project.studentList.map(student => `<li>${student.studentName}</li>`).join('') : 'ไม่มีนักศึกษา'}
-                </ul>
-            </td> <td>
-                <form action="/admin/editProjectDetails" method="get">
-                    <input type="hidden" name="projectId" value="${project.projectId}">
-                    <button type="submit" class="edit-btn"><span class="material-icons">edit</span></button>
-                </form>
-
-                <form id="deleteForm-${project.projectId}" action="" method="get" onsubmit="return confirmDelete(event, '${project.projectId}')">
-                    <input type="hidden" name="projectId" value="${project.projectId}">
-                    <button type="submit" class="delete-btn">
-                        <span class="material-icons">delete</span>
-                    </button>
-                </form>
-            </td>
-
-            `;
-            tableBody.appendChild(row);
+        `;
+            tbody.appendChild(row);
         });
     }
 
     // -------------------- Pagination -------------------- //
     // ฟังก์ชันสำหรับการเปลี่ยนหน้า
     function changePage(page) {
+        const totalPages = Math.ceil(filteredData.length / itemsPerPage);
         if (page === 'prev' && currentPage > 1) {
             currentPage--;
-        } else if (page === 'next' && currentPage < Math.ceil(projectsData.length / itemsPerPage)) {
+        } else if (page === 'next' && currentPage < totalPages) {
             currentPage++;
         } else if (typeof page === 'number') {
             currentPage = page;
         }
-        displayResults(currentPage);  // แสดงข้อมูลของหน้าที่เลือก
-        updatePagination();  // อัปเดตปุ่ม pagination
+        displayResults(currentPage);
+        updatePagination();
     }
 
-    // ฟังก์ชันอัปเดตปุ่ม pagination
     function updatePagination() {
-        const totalPages = Math.ceil(projectsData.length / itemsPerPage);  // คำนวณจำนวนหน้าทั้งหมด
-        const paginationContainer = document.querySelector('.pagination');
-        paginationContainer.innerHTML = ''; // เคลียร์ปุ่ม pagination เก่า
+        const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+        const container = document.querySelector('.pagination');
+        container.innerHTML = '';
 
-        // เพิ่มปุ่ม "Previous"
-        const prevButton = document.createElement('button');
-        prevButton.classList.add('page-btn');
-        prevButton.innerHTML = '&lt;';
-        prevButton.onclick = () => changePage('prev');
-        paginationContainer.appendChild(prevButton);
+        // Prev
+        const prev = document.createElement('button');
+        prev.classList.add('page-btn');
+        prev.textContent = '<';
+        prev.onclick = () => changePage('prev');
+        container.appendChild(prev);
 
-        // เพิ่มปุ่มหน้า
+        // Pages
         for (let i = 1; i <= totalPages; i++) {
-            const pageButton = document.createElement('button');
-            pageButton.classList.add('page-btn');
-            if (i === currentPage) {
-                pageButton.classList.add('active');
-            }
-            pageButton.innerHTML = i;
-            pageButton.onclick = () => changePage(i);
-            paginationContainer.appendChild(pageButton);
+            const btn = document.createElement('button');
+            btn.classList.add('page-btn');
+            btn.textContent = i;
+            if (i === currentPage) btn.classList.add('active');
+            btn.onclick = () => changePage(i);
+            container.appendChild(btn);
         }
 
-        // เพิ่มปุ่ม "Next"
-        const nextButton = document.createElement('button');
-        nextButton.classList.add('page-btn');
-        nextButton.innerHTML = '&gt;';
-        nextButton.onclick = () => changePage('next');
-        paginationContainer.appendChild(nextButton);
+        // Next
+        const next = document.createElement('button');
+        next.classList.add('page-btn');
+        next.textContent = '>';
+        next.onclick = () => changePage('next');
+        container.appendChild(next);
     }
 
+
     // -------------------- Upload Files -------------------- //
+
     // เปิด Modal เมื่อกดปุ่ม Upload Files
     document.getElementById('upload-btn').addEventListener('click', function () {
         document.getElementById('uploadModal').style.display = 'block';
@@ -557,120 +659,143 @@
 
 
     function csvToJson(csv) {
-        const lines = csv.split("\n");
-        const result = [];
-
-        let currentProject = null;  // เก็บข้อมูล project ล่าสุด
-        let lastNo = "";            // no. ล่าสุดที่เจอ
-
-        // เริ่มอ่านไฟล์จากบรรทัดที่ 9 (index=8)
-        for (let i = 8; i < lines.length; i++) {
-            let line = lines[i].trim();
-            if (!line) continue; // ถ้าบรรทัดว่าง ให้ข้าม
-
-            // แยกคอลัมน์ด้วย comma
-            let cells = line.split(",");
-            // ถ้าความยาว < 9 ให้ pad ด้วยค่าว่าง (เพื่อไม่ให้เกิด insufficient data)
-            if (cells.length < 9) {
-                let padded = [];
-                for (let j = 0; j < 9; j++) {
-                    padded[j] = (j < cells.length) ? cells[j].trim() : "";
+        // helper: แยก comma ข้างนอก quotes
+        function splitCSV(line) {
+            const res = [];
+            let cur = "", inside = false;
+            for (let i = 0; i < line.length; i++) {
+                const ch = line[i];
+                if (ch === '"') {
+                    // ถ้ามี "" => ใส่ " แล้วข้ามตัวถัดไป
+                    if (inside && line[i + 1] === '"') {
+                        cur += '"';
+                        i++;
+                    } else {
+                        inside = !inside;
+                    }
+                } else if (ch === ',' && !inside) {
+                    res.push(cur);
+                    cur = "";
+                } else {
+                    cur += ch;
                 }
-                cells = padded;
-            } else {
-                // trim ทุกช่อง
-                cells = cells.map(x => x.trim());
             }
+            res.push(cur);
+            return res;
+        }
 
-            // mapping คอลัมน์ตามไฟล์:
-            // 0 = no
-            // 1 = projectTitle
-            // 2 = projectDescription
-            // 3 = projectCategory
-            // 4 = studentId
-            // 5 = studentName
-            // 6 = program
-            // 7 = advisor
-            // 8 = coAdvisor
-            const no = cells[0];
-            const projectTitle = cells[1];
-            const projectDesc = cells[2];
-            const projectCategory = cells[3];
-            const studentId = cells[4];
-            const studentName = cells[5];
-            const program = cells[6];
-            const advisor = cells[7];
-            const coAdvisor = cells[8];
+        // 1) แบ่งเป็น "logical lines" โดย buffering จน quotes คู่สมบูรณ์
+        const rawLines = csv.split(/\r?\n/);
+        const rows = [];
+        let buffer = "";
+        for (const line of rawLines) {
+            buffer = buffer ? buffer + "\n" + line : line;
+            const quoteCount = (buffer.match(/"/g) || []).length;
+            // ถ้าจำนวน quote เป็นคู่ (mod 2 === 0) แปลว่าเสร็จหนึ่ง record
+            if (quoteCount % 2 === 0) {
+                rows.push(buffer);
+                buffer = "";
+            }
+        }
+        // ถ้ายังเหลือ buffer (malformed) ก็ใส่ลงไป
+        if (buffer) rows.push(buffer);
 
-            // ------------------ สร้างหรืออัปเดต Project ------------------
-            // กรณีที่ no เปลี่ยน หรือยังไม่มี currentProject => สร้าง Project ใหม่
+        // 2) ตรวจ header (ลายละเอียดบรรทัดที่ 5 → index 4)
+        const headerLine = rows[4] || "";
+        const headers = splitCSV(headerLine).map(h => h.trim().replace(/^"|"$/g, ""));
+        const expected = [
+            "No.",
+            "Project Title",
+            "Project Description",
+            "Project Category",
+            "Student ID",
+            "Student Name",
+            "Program",
+            "Advisor",
+            "Co-advisor"
+        ];
+        const mismatch = expected.some((h, i) => headers[i] !== h);
+        if (mismatch) {
+            Swal.fire({
+                icon: "error",
+                title: "ไฟล์ไม่ถูกต้อง",
+                // text: "กรุณาอัปโหลด CSV ที่มีคอลัมน์ตามนี้:\n" + expected.join(", ")
+                text: "กรุณาอัปโหลดไฟล์ Project"
+            });
+            return [];
+        }
+
+        // 3) เริ่ม parse data ตั้งแต่บรรทัดที่ 6 (index 5)
+        const result = [];
+        let currentProject = null;
+        let lastNo = "";
+
+        for (let i = 5; i < rows.length; i++) {
+            const raw = rows[i].trim();
+            if (!raw) continue;
+
+            // split & trim & unquote
+            let cells = splitCSV(raw).map(c => {
+                let t = c.trim();
+                if (t.startsWith('"') && t.endsWith('"')) {
+                    t = t.slice(1, -1).replace(/""/g, '"');
+                }
+                return t;
+            });
+            // pad ให้ครบ 9 columns
+            while (cells.length < 9) cells.push("");
+
+            const [
+                no, projectTitle, projectDesc, projectCategory,
+                studentId, studentName, program, advisor, coAdvisor
+            ] = cells;
+
+            // กรณีเจอ No. ใหม่ → สร้าง project ใหม่
             if (no && no !== lastNo) {
-                // สร้าง Project ใหม่
                 currentProject = {
-                    no: no,
-                    projectTitle: projectTitle || "",
-                    projectDescription: projectDesc || "",
-                    projectCategory: projectCategory || "",
-                    program: program || "",
-                    advisor: advisor || "",
-                    coAdvisor: coAdvisor || "",
+                    no,
+                    projectTitle,
+                    projectDescription: projectDesc,
+                    projectCategory,
+                    program,
+                    advisor,
+                    coAdvisor,
                     studentList: []
                 };
                 result.push(currentProject);
                 lastNo = no;
             } else if (!currentProject) {
-                // กรณี no ว่าง และยังไม่มี currentProject => สร้าง Project เปล่า
+                // แถวแรกถ้าไม่มี currentProject ให้สร้าง
                 currentProject = {
-                    no: no || "",
-                    projectTitle: projectTitle || "",
-                    projectDescription: projectDesc || "",
-                    projectCategory: projectCategory || "",
-                    program: program || "",
-                    advisor: advisor || "",
-                    coAdvisor: coAdvisor || "",
+                    no,
+                    projectTitle,
+                    projectDescription: projectDesc,
+                    projectCategory,
+                    program,
+                    advisor,
+                    coAdvisor,
                     studentList: []
                 };
                 result.push(currentProject);
-                lastNo = no || "";
+                lastNo = no;
             } else {
-                // อยู่ Project เดิม (no. ไม่เปลี่ยน)
-                // ถ้าไม่ต้องการ override ข้อมูลโปรเจกต์ ยกส่วนนี้ออก
-                // ถ้าต้องการ override เฉพาะ field ที่ไม่ว่างก็ดูตัวอย่างด้านล่าง
+                // ต่อเติม property ของโปรเจกต์ถ้ามีข้อมูลใหม่
                 if (projectTitle) currentProject.projectTitle = projectTitle;
-                if (projectDesc) currentProject.projectDescription = projectDesc;
+                if (projectDesc)   currentProject.projectDescription = projectDesc;
                 if (projectCategory) currentProject.projectCategory = projectCategory;
-                if (program) currentProject.program = program;
-                if (advisor) currentProject.advisor = advisor;
-                if (coAdvisor) currentProject.coAdvisor = coAdvisor;
+                if (program)       currentProject.program = program;
+                if (advisor)       currentProject.advisor = advisor;
+                if (coAdvisor)     currentProject.coAdvisor = coAdvisor;
             }
 
-            // ------------------ เพิ่ม Student ลงใน Project ------------------
-            if ((studentId && studentId !== "") || (studentName && studentName !== "")) {
-                // ถ้า currentProject ยังเป็น null (กรณีสุดขั้ว) ให้สร้างใหม่
-                if (!currentProject) {
-                    currentProject = {
-                        no: no || "",
-                        projectTitle: projectTitle || "",
-                        projectDescription: projectDesc || "",
-                        projectCategory: projectCategory || "",
-                        program: program || "",
-                        advisor: advisor || "",
-                        coAdvisor: coAdvisor || "",
-                        studentList: []
-                    };
-                    result.push(currentProject);
-                    lastNo = no || "";
-                }
-                currentProject.studentList.push({
-                    studentId: studentId || "",
-                    studentName: studentName || ""
-                });
+            // เพิ่ม student ถ้ามี
+            if (studentId || studentName) {
+                currentProject.studentList.push({ studentId, studentName });
             }
         }
 
         return result;
     }
-
 
     // ฟังก์ชันสำหรับลบ BOM (รองรับภาษาไทย)
     function removeBOM(csv) {
@@ -680,8 +805,6 @@
         return csv;
     }
 
-
-    // ------------------ Code Test Test -----------------
 
     let selectedFile = null;
     let uploadedData = null;
@@ -738,7 +861,6 @@
     });
 
 
-
     // ฟังก์ชันเรียก Validate API
     async function validateWithBackend(file) {
         const formData = new FormData();
@@ -780,8 +902,8 @@
           <th>No.</th>
           <th>Project Title</th>
           <th>Project Description</th>
-          <th>Advisor</th>
           <th>Program</th>
+          <th>Advisor</th>
         `;
         for (let i = 1; i <= maxStudents; i++) {
             headerHTML += `<th>Student ${i}</th>`;
@@ -813,12 +935,12 @@
 
             // เติมข้อมูล cell
             let rowHTML = `
-  <td>${project.no || "-"}</td>
-  <td>${project.projectTitle || "-"}</td>
-  <td>${project.projectDescription || "-"}</td>
-  <td>${project.program || "-"}</td>
-  <td>${project.advisor || "-"}</td>
-`;
+              <td>${project.no || "-"}</td>
+              <td>${project.projectTitle || "-"}</td>
+              <td>${project.projectDescription || "-"}</td>
+              <td>${project.program || "-"}</td>
+              <td>${project.advisor || "-"}</td>
+            `;
 
             for (let i = 0; i < maxStudents; i++) {
                 if (project.studentList[i]) {
@@ -871,16 +993,16 @@
                     icon: 'warning',
                     title: 'Warnings',
                     html: json.warnings
-                        .map((w, i) => `<p style="text-align:left; margin:0.25em 0;">${i+1}. ${w}</p>`)
+                        .map((w, i) => `<p style="text-align:left; margin:0.25em 0;">${i + 1}. ${w}</p>`)
                         .join(''),
                     width: '600px',
                     confirmButtonText: 'ปิด'
                 });
             } else {
-                showErrorsPopup([ json.message || 'Unknown error' ]);
+                showErrorsPopup([json.message || 'Unknown error']);
             }
         } catch (err) {
-            showErrorsPopup([ 'เกิดข้อผิดพลาดระหว่างติดต่อ server', err.message ]);
+            showErrorsPopup(['เกิดข้อผิดพลาดระหว่างติดต่อ server', err.message]);
         }
     });
 
@@ -913,34 +1035,8 @@
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     // -------------------- Delete Project -------------------- //
+
     // ฟังก์ชันยืนยันการลบ
     function confirmDelete(event, projectId) {
         event.preventDefault(); // หยุดการส่งฟอร์ม
@@ -1021,24 +1117,49 @@
 
     // ฟังก์ชันลบโปรเจกต์ทั้งหมด
     function deleteAllProjects() {
-        fetch('http://localhost:8080/admin/deleteAllProjects', {
+        const semester = document.getElementById('semester-selector').value;
+        const token  = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+
+        // สร้าง Headers โดยใช้ชื่อคงที่ X-CSRF-TOKEN
+        const headers = new Headers({
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': token
+        });
+
+        fetch(`/admin/deleteProjectsBySemester?semester=${encodeURIComponent(semester)}`, {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers
         })
-            .then(response => {
-                if (response.ok) {
-                    alert('All projects deleted successfully.');
-                    location.reload();  // รีเฟรชหน้าใหม่
-                } else {
-                    alert('Error deleting all projects.');
-                }
-            })
-            .catch(error => {
-                alert('Connection error while deleting projects.');
-            });
+            // .then(res => {
+            //     if (!res.ok) return res.text().then(t => { throw new Error(t) });
+            //     return res.text();
+            // })
+            .then(msg => Swal.fire({
+                icon: 'success',
+                title: 'Deleted',
+                text: msg,
+                showConfirmButton: false,
+                timer: 2000
+            }).then(() => location.reload()))
+            // .catch(err => Swal.fire('Error', err.message, 'error'));
     }
+
+    // ผูกปุ่ม confirm
+    document.getElementById('confirmDeleteAllBtn').addEventListener('click', function () {
+        const userInput = document.getElementById('deleteAllInput').value.trim();
+        if (userInput === 'DELETE ALL PROJECT') {
+            deleteAllProjects();
+            document.getElementById('deleteAllPopup').style.display = 'none';
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'กรุณาพิมพ์ข้อความให้ถูกต้อง',
+                text: 'พิมพ์ "DELETE ALL PROJECT" ให้ตรงก่อนยืนยัน',
+                confirmButtonText: 'ตกลง'
+            });
+        }
+    });
+
 
 </script>
 
@@ -1223,8 +1344,8 @@
             });
     }
 
-    // เพิ่ม event listener ให้ปุ่ม Export
-    document.getElementById("export-project-raw-excel").addEventListener("click", exportRawData);
+    // // เพิ่ม event listener ให้ปุ่ม Export
+    // document.getElementById("export-project-raw-excel").addEventListener("click", exportRawData);
 
 
     function exportMergedData() {
@@ -1283,7 +1404,7 @@
             // ถ้านศ.มีค่าน้อยกว่า 3 ให้ padding ด้วยค่าว่าง
             const minRows = 3;
             while (studentList.length < minRows) {
-                studentList.push({ studentId: "", studentName: "" });
+                studentList.push({studentId: "", studentName: ""});
             }
             const numRows = studentList.length;
 
@@ -1335,7 +1456,7 @@
                 dataRows.push(row);
             }
             let endIndex = dataRows.length;
-            projectMapping.set(projectId, { start: startIndex, end: endIndex });
+            projectMapping.set(projectId, {start: startIndex, end: endIndex});
         });
 
         // ------------------- สร้าง Workbook, Worksheet ด้วย ExcelJS -------------------
@@ -1344,15 +1465,15 @@
 
         // ขยายความกว้างคอลัมน์เป็น 11 คอลัมน์ (A..K)
         ws.columns = [
-            { width: 15 }, // A: Project ID
-            { width: 25 }, // B: Project Title
-            { width: 30 }, // C: Project Description
-            { width: 15 }, // D: Project Category
-            { width: 15 }, // E: Student ID
-            { width: 25 }, // F: Student Name
-            { width: 10 }, // G: Program
-            { width: 20 }, // H: Advisor
-            { width: 20 }, // I: Co-advisor
+            {width: 15}, // A: Project ID
+            {width: 25}, // B: Project Title
+            {width: 30}, // C: Project Description
+            {width: 15}, // D: Project Category
+            {width: 15}, // E: Student ID
+            {width: 25}, // F: Student Name
+            {width: 10}, // G: Program
+            {width: 20}, // H: Advisor
+            {width: 20}, // I: Co-advisor
         ];
 
         // Merge cells สำหรับ Header area (แถว 1-4) -> A1:K1, A2:K2, ฯลฯ
@@ -1363,33 +1484,33 @@
 
         // กำหนดค่า Header area
         ws.getCell('A1').value = "Senior Project Overview";
-        ws.getCell('A1').font = { bold: true, size: 14, color: { argb: 'FF000000' } };
-        ws.getCell('A1').alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getCell('A1').font = {bold: true, size: 14, color: {argb: 'FF000000'}};
+        ws.getCell('A1').alignment = {horizontal: 'center', vertical: 'middle'};
 
         ws.getCell('A2').value = "Exported Project Committee Data";
-        ws.getCell('A2').font = { size: 12, color: { argb: 'FF4D93D9' } };
-        ws.getCell('A2').alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getCell('A2').font = {size: 12, color: {argb: 'FF4D93D9'}};
+        ws.getCell('A2').alignment = {horizontal: 'center', vertical: 'middle'};
 
         ws.getCell('A3').value = "Link to view detailed project information";
-        ws.getCell('A3').font = { bold: true, size: 12, color: { argb: 'FF000000' } };
-        ws.getCell('A3').alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getCell('A3').font = {bold: true, size: 12, color: {argb: 'FF000000'}};
+        ws.getCell('A3').alignment = {horizontal: 'center', vertical: 'middle'};
 
         ws.getCell('A4').value = "https://yourprojectlink.example.com";
-        ws.getCell('A4').font = { size: 10, color: { argb: 'FF000000' } };
-        ws.getCell('A4').alignment = { horizontal: 'center', vertical: 'middle' };
+        ws.getCell('A4').font = {size: 10, color: {argb: 'FF000000'}};
+        ws.getCell('A4').alignment = {horizontal: 'center', vertical: 'middle'};
 
         // แถว 5: Header Row ของคอลัมน์
         const headerRow = ws.getRow(5);
         headerRow.values = headers;  // 11 คอลัมน์
-        headerRow.font = { bold: true, size: 11, color: { argb: 'FF000000' } };
-        headerRow.alignment = { vertical: 'middle', horizontal: 'center' };
-        headerRow.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFB5E6A2' } };
+        headerRow.font = {bold: true, size: 11, color: {argb: 'FF000000'}};
+        headerRow.alignment = {vertical: 'middle', horizontal: 'center'};
+        headerRow.fill = {type: 'pattern', pattern: 'solid', fgColor: {argb: 'FFB5E6A2'}};
         headerRow.eachCell(cell => {
             cell.border = {
-                top: { style: 'thin', color: { argb: 'FF000000' } },
-                left: { style: 'thin', color: { argb: 'FF000000' } },
-                bottom: { style: 'thin', color: { argb: 'FF000000' } },
-                right: { style: 'thin', color: { argb: 'FF000000' } }
+                top: {style: 'thin', color: {argb: 'FF000000'}},
+                left: {style: 'thin', color: {argb: 'FF000000'}},
+                bottom: {style: 'thin', color: {argb: 'FF000000'}},
+                right: {style: 'thin', color: {argb: 'FF000000'}}
             };
         });
 
@@ -1413,7 +1534,7 @@
                 // หากมีแถวเดียว แต่ต้องการอย่างน้อย 3 แถว => สร้างแถวว่างเพิ่ม
                 let extraRows = 3 - 1; // มี 1 แถวแล้ว => เพิ่ม 2 แถว
                 for (let i = 0; i < extraRows; i++) {
-                    ws.addRow(["","","","","","","","","","",""]);
+                    ws.addRow(["", "", "", "", "", "", "", "", "", "", ""]);
                     endRow++;
                 }
                 [1, 2, 3, 4, 7, 8, 9].forEach(col => {
@@ -1424,12 +1545,12 @@
 
         // กำหนดสไตล์สำหรับ data rows (พื้นหลังสีเขียวอ่อน)
         const dataRowStyle = {
-            fill: { fgColor: { argb: 'FFC8E6C9' } },
+            fill: {fgColor: {argb: 'FFC8E6C9'}},
             border: {
-                top: { style: 'thin', color: { argb: 'FF000000' } },
-                left: { style: 'thin', color: { argb: 'FF000000' } },
-                bottom: { style: 'thin', color: { argb: 'FF000000' } },
-                right: { style: 'thin', color: { argb: 'FF000000' } }
+                top: {style: 'thin', color: {argb: 'FF000000'}},
+                left: {style: 'thin', color: {argb: 'FF000000'}},
+                bottom: {style: 'thin', color: {argb: 'FF000000'}},
+                right: {style: 'thin', color: {argb: 'FF000000'}}
             }
         };
 
@@ -1437,7 +1558,7 @@
         for (let i = 6; i <= ws.rowCount; i++) {
             let row = ws.getRow(i);
             row.eachCell(cell => {
-                cell.alignment = { vertical: 'middle', horizontal: 'left' };
+                cell.alignment = {vertical: 'middle', horizontal: 'left'};
                 cell.fill = dataRowStyle.fill;
                 cell.border = dataRowStyle.border;
             });
@@ -1446,7 +1567,7 @@
         // สร้างไฟล์ Excel แล้ว trigger ดาวน์โหลด
         wb.xlsx.writeBuffer()
             .then(buffer => {
-                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const blob = new Blob([buffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
                 const url = URL.createObjectURL(blob);
                 const link = document.createElement('a');
                 link.href = url;
@@ -1460,8 +1581,8 @@
             });
     }
 
-    // ผูก event listener สำหรับ Export แบบใหม่
-    document.getElementById("export-project-merge-excel").addEventListener("click", exportMergedData);
+    // // ผูก event listener สำหรับ Export แบบใหม่
+    // document.getElementById("export-project-merge-excel").addEventListener("click", exportMergedData);
 
 
     function exportProjectTemplate() {
@@ -1884,8 +2005,8 @@
         });
     }
 
-    // ผูก event listener สำหรับ Export แบบใหม่
-    document.getElementById("export-committee-template").addEventListener("click", exportCommitteeTemplate);
+    // // ผูก event listener สำหรับ Export แบบใหม่
+    // document.getElementById("export-committee-template").addEventListener("click", exportCommitteeTemplate);
 
 
     function exportPosterCommitteeTemplate() {
@@ -2062,9 +2183,9 @@
             });
     }
 
-    // เพิ่ม event listener ให้ปุ่ม Export
-    document.getElementById("export-poster-committee-template").addEventListener("click", exportPosterCommitteeTemplate);
-
+    // // เพิ่ม event listener ให้ปุ่ม Export
+    // document.getElementById("export-poster-committee-template").addEventListener("click", exportPosterCommitteeTemplate);
+    //
 
 </script>
 

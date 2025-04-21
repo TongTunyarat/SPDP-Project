@@ -11,15 +11,13 @@ import com.example.project.service.ProposalEvaluationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -55,6 +53,8 @@ public class projectAdminController {
     private ProjectRepository projectRepository;
     @Autowired
     private ProjectInstructorRoleRepository ProjectInstructorRoleRepository;
+    @Autowired
+    private AddNewProjectService addNewProjectService;
 
     @Autowired
     public projectAdminController(ProjectService projectService) {
@@ -175,6 +175,8 @@ public class projectAdminController {
         return response;  // Spring จะทำการแปลง ProjectDetailsDTO เป็น JSON
     }
 
+    // ============= UPDATE PROJECT ============= //
+
     @PostMapping("/updateProjectDetails")
     public ResponseEntity<?> updateProject(
             @RequestParam String projectId,
@@ -190,6 +192,10 @@ public class projectAdminController {
         return ResponseEntity.ok(Map.of("message", "Project updated successfully"));
     }
 
+
+
+    // ============= DELETE PROJECT ============= //
+
     @DeleteMapping("/deleteProject/{projectId}")
     public ResponseEntity<String> deleteProject(@PathVariable  String projectId) {
         System.out.println("🔍 Fetching delete project for Project ID: " + projectId);
@@ -203,94 +209,72 @@ public class projectAdminController {
         }
     }
 
-    @DeleteMapping("/deleteAllProjects")
-    public ResponseEntity<String> deleteAllProjects() {
-        try {
-            uploadFilesService.deleteAllProjects(); // เรียก Service เพื่อลบโปรเจกต์ทั้งหมด
-            return ResponseEntity.ok("All projects deleted successfully.");
-        } catch (Exception e) {
-            return ResponseEntity.status(500).body("Error deleting all projects: " + e.getMessage());
-        }
+
+    @DeleteMapping("/deleteProjectsBySemester")
+    public ResponseEntity<String> deleteBySemester(@RequestParam String semester) {
+        uploadFilesService.deleteProjectsBySemester(semester);
+        return ResponseEntity.ok("Deleted projects for semester " + semester);
     }
 
+
+    @Transactional
     @DeleteMapping("/deleteStudentFromProject")
-    public ResponseEntity<Map<String, String>> deleteStudentFromProject(
-            @RequestParam String projectId, @RequestParam String studentId) {
-        try {
-            // เรียกใช้ Service เพื่อลบข้อมูล
-            editProjectService.deleteStudentFromProject(projectId, studentId);
-
-            // ส่งข้อความสำเร็จเป็น JSON
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Student removed from project successfully");
-            return ResponseEntity.ok(response);
-        } catch (Exception e) {
-            // ส่งข้อผิดพลาดเป็น JSON
-            Map<String, String> response = new HashMap<>();
-            response.put("message", "Error: " + e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    public ResponseEntity<String> deleteStudentFromProject(
+            @RequestParam String projectId,
+            @RequestParam String studentId) {
+        // ยืนยันว่ามี record จริง
+        boolean exists = studentProjectRepository
+                .existsByProject_ProjectIdAndStudent_StudentId(projectId, studentId);
+        if (!exists) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body("Error: Student not found for this project");
         }
+        // ลบ
+        studentProjectRepository
+                .deleteByProject_ProjectIdAndStudent_StudentId(projectId, studentId);
+        return ResponseEntity.ok("Student removed successfully");
     }
 
+    @Transactional
     @DeleteMapping("/deleteInstructorFromProject")
     public ResponseEntity<String> deleteInstructorFromProject(
             @RequestParam String projectId,
             @RequestParam String professorId) {
 
-        try {
-            // ตรวจสอบว่า Project และ Instructor มีอยู่หรือไม่
-            Project project = projectRepository.findByProjectId(projectId);
-            Instructor instructor = instructorRepository.findByProfessorId(professorId);
-
-            if (project == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Project not found");
-            }
-            if (instructor == null) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Instructor not found");
-            }
-
-            // ลบ Instructor จาก Project
-            projectInstructorRoleRepository.deleteByProjectIdRole_ProjectIdAndInstructorId(projectId, professorId);
-
-            return ResponseEntity.ok("Instructor removed successfully");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error removing instructor");
+        Project project = projectRepository.findByProjectId(projectId);
+        if (project == null) {
+            return ResponseEntity.badRequest().body("Project not found");
         }
+        Instructor instructor = instructorRepository.findByProfessorId(professorId);
+        if (instructor == null) {
+            return ResponseEntity.badRequest().body("Instructor not found");
+        }
+
+        // เรียกเมธอดใหม่ที่พึ่งเพิ่ม
+        projectInstructorRoleRepository
+                .deleteByProjectIdRole_ProjectIdAndInstructor_ProfessorId(projectId, professorId);
+
+        return ResponseEntity.ok("Instructor removed successfully");
     }
 
 
 
     // ============= ADD NEW PROJECT ============= //
 
-
-    // ฟังก์ชัน POST สำหรับการสร้างโปรเจกต์ใหม่
-//    @PostMapping("/addNewProject")
-//    public ResponseEntity<Map<String, String>> addNewProject(@RequestBody ProjectDetailsDTO projectDetailsDTO) {
-//        try {
-//            AddNewProjectService.addNewProject(projectDetailsDTO);  // เรียกใช้ Service สำหรับเพิ่มโปรเจกต์ใหม่
-//
-//            // ส่งข้อความสำเร็จเป็น JSON
-//            Map<String, String> response = new HashMap<>();
-//            response.put("message", "Project added successfully");
-//            return ResponseEntity.ok(response);
-//        } catch (Exception e) {
-//            // ส่งข้อผิดพลาดเป็น JSON
-//            Map<String, String> response = new HashMap<>();
-//            response.put("message", "Error: " + e.getMessage());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-//        }
-//    }
-
     // รับ JSON จาก JS แล้วสร้าง Project ใหม่
     @PostMapping("/addProject")
-    public ResponseEntity<String> addProject(@RequestBody NewProjectDTO dto) {
+    public ResponseEntity<?> addProject(@RequestBody NewProjectDTO dto) {
         try {
-            String newId = String.valueOf(AddNewProjectService.createProject(dto));
-            return ResponseEntity.ok(newId);
-        } catch (Exception ex) {
+            String projectId = addNewProjectService.createProject(dto);
+            return ResponseEntity.ok(Map.of("projectId", projectId));
+        } catch (IllegalArgumentException e) {
+            // แยกข้อความกลับเป็น list
+            List<String> warnings = Arrays.stream(e.getMessage().split(";"))
+                    .map(String::trim).toList();
             return ResponseEntity
                     .status(HttpStatus.BAD_REQUEST)
-                    .body("Failed to add project: " + ex.getMessage());
+                    .body(Map.of("warnings", warnings));
         }
     }
 
@@ -324,80 +308,50 @@ public class projectAdminController {
 
 
 
-//    @GetMapping("/editCommittee")
-//    @ResponseBody
-//    public ProjectDetailsResponseDTO getEditCommitteeDetails(@RequestParam String projectId) {
-//        // ดึงข้อมูลโครงการจาก Service
-//        Project project = projectService.getProjectDetails(projectId);
-//
-//        if (project == null) {
-//            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Project not found");
-//        }
-//
-//        // ดึงข้อมูลอาจารย์ทั้งหมดในระบบจาก Instructor (ไม่มี Role)
-//        List<Instructor> allInstructor = instructorRepository.findAll();  // ดึงข้อมูลอาจารย์ทั้งหมดจากฐานข้อมูล
-//
-//        // สร้างรายการ allProfessor ที่จะเก็บข้อมูลอาจารย์ทั้งหมดโดยไม่มีการแบ่งบทบาท
-//        List<ProfessorRoleDTO> allProfessor = allInstructor.stream()
-//                .map(instructor -> new ProfessorRoleDTO(instructor.getProfessorName(), "Unknown")) // ไม่มี Role ระบุในนี้
-//                .collect(Collectors.toList());
-//
-//        // ดึงข้อมูลอาจารย์ที่ปรึกษาของโปรเจค
-//        List<ProjectInstructorRole> roles = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(projectId);
-//
-//        // สร้างรายการ professorList ที่จะเก็บข้อมูลอาจารย์และบทบาทจาก ProjectInstructorRole
-//        List<ProfessorRoleDTO> professorList = roles.stream()
-//                .map(role -> new ProfessorRoleDTO(
-//                        role.getInstructor().getProfessorName(),  // ชื่ออาจารย์
-//                        role.getRole()  // บทบาทของอาจารย์
-//                ))
-//                .collect(Collectors.toList());
-//
-//        // แยกข้อมูลอาจารย์ตามบทบาท (Advisor, Co-Advisor, Committee)
-//        List<ProfessorRoleDTO> advisors = roles.stream()
-//                .filter(role -> "Advisor".equalsIgnoreCase(role.getRole()))
-//                .map(role -> new ProfessorRoleDTO(role.getInstructor().getProfessorName(), "Advisor"))
-//                .collect(Collectors.toList());
-//
-//        List<ProfessorRoleDTO> coAdvisors = roles.stream()
-//                .filter(role -> "Co-Advisor".equalsIgnoreCase(role.getRole()))
-//                .map(role -> new ProfessorRoleDTO(role.getInstructor().getProfessorName(), "Co-Advisor"))
-//                .collect(Collectors.toList());
-//
-//        List<ProfessorRoleDTO> committees = roles.stream()
-//                .filter(role -> "Committee".equalsIgnoreCase(role.getRole()))
-//                .map(role -> new ProfessorRoleDTO(role.getInstructor().getProfessorName(), "Committee"))
-//                .collect(Collectors.toList());
-//
-//        // ดึงข้อมูลนักศึกษาในโครงการ
-//        List<StudentProjectDTO> studentList = project.getStudentProjects().stream()
-//                .filter(studentProject -> "Active".equalsIgnoreCase(studentProject.getStatus()))
-//                .map(studentProject -> new StudentProjectDTO(
-//                        studentProject.getStudent().getStudentId(),
-//                        studentProject.getStudent().getStudentName(),
-//                        (studentProject.getStudent().getSection() != null)
-//                                ? studentProject.getStudent().getSection().toString()
-//                                : "N/A", // ป้องกัน null
-//                        studentProject.getStudent().getTrack(),
-//                        studentProject.getStatus()
-//                ))
-//                .collect(Collectors.toList());
-//
-//        // สร้าง DTO เพื่อส่งกลับ
-//        ProjectDetailsResponseDTO response = new ProjectDetailsResponseDTO(
-//                project.getProjectId(),
-//                project.getProjectTitle(),
-//                allProfessor,  // ส่งอาจารย์ทั้งหมดที่มีในระบบ (จาก Instructor ไม่มี Role)
-//                project.getProjectDescription(),
-//                project.getProgram(),
-//                studentList,
-//                professorList,   // ส่งอาจารย์ที่มีบทบาท (จาก ProjectInstructorRole)
-//                professorList,   // ส่งข้อมูลเดียวกันในแต่ละ dropdown
-//                professorList    // ส่งข้อมูลเดียวกันในแต่ละ dropdown
-//        );
-//
-//        return response;  // Spring จะทำการแปลง ProjectDetailsDTO เป็น JSON
+    /** คืน `true` ถ้ามี Advisor สำหรับ projectId นั้นอยู่แล้ว */
+    @GetMapping("/hasAdvisor")
+    public ResponseEntity<Boolean> hasAdvisor(@RequestParam String projectId) {
+        boolean has = projectInstructorRoleRepository
+                .existsByProjectIdRole_ProjectIdAndRole(projectId, "Advisor");
+        return ResponseEntity.ok(has);
+    }
+
+    @GetMapping("/hasCommittee")
+    public ResponseEntity<Boolean> hasCommittee(@RequestParam String projectId) {
+        boolean has = projectInstructorRoleRepository
+                .existsByProjectIdRole_ProjectIdAndRole(projectId, "Committee");
+        return ResponseEntity.ok(has);
+    }
+
+    @GetMapping("/hasPosterCommittee")
+    public ResponseEntity<Boolean> hasPosterCommittee(@RequestParam String projectId) {
+        boolean has = projectInstructorRoleRepository
+                .existsByProjectIdRole_ProjectIdAndRole(projectId, "Poster-Committee");
+        return ResponseEntity.ok(has);
+    }
+
+//    @GetMapping("/hasAdvisor")
+//    public ResponseEntity<Boolean> hasAdvisor(@RequestParam String semester) {
+//        boolean has = projectInstructorRoleRepository
+//                .existsByProjectIdRole_SemesterAndRole(semester, "Advisor");
+//        return ResponseEntity.ok(has);
 //    }
+//
+//    @GetMapping("/hasCommittee")
+//    public ResponseEntity<Boolean> hasCommittee(@RequestParam String semester) {
+//        boolean has = projectInstructorRoleRepository
+//                .existsByProjectIdRole_SemesterAndRole(semester, "Committee");
+//        return ResponseEntity.ok(has);
+//    }
+//
+//    @GetMapping("/hasPosterCommittee")
+//    public ResponseEntity<Boolean> hasPosterCommittee(@RequestParam String semester) {
+//        boolean has = projectInstructorRoleRepository
+//                .existsByProjectIdRole_SemesterAndRole(semester, "Poster-Committee");
+//        return ResponseEntity.ok(has);
+//    }
+
+
 
 }
 

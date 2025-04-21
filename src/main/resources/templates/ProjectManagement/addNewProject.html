@@ -15,7 +15,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 </head>
@@ -203,6 +203,23 @@
             </div>
         </div>
 
+        <!-- Popup ยืนยันการบันทึก (Save) -->
+        <div id="confirmSavePopup" class="save-popup">
+            <div class="popup-content">
+                <div id="save-confirm-msg">Are you sure you want to save the changes?</div>
+                <button id="confirmSaveBtn">Yes, Save</button>
+                <button id="cancelSaveBtn">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Popup ยืนยันการลบ -->
+        <div id="confirmDeletePopup" class="delete-popup">
+            <div class="popup-content">
+                <div id="delete-confirm-msg"></div>
+                <button id="confirmDeleteBtn">Yes, Delete</button>
+                <button id="cancelDeleteBtn">Cancel</button>
+            </div>
+        </div>
 
     </div>
 </div>
@@ -212,16 +229,81 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", () => {
+
+        // ดึง URL ปัจจุบัน
+        const currentPage = window.location.pathname.split("/").pop();
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('projectId');
+
         displayResults();
+
+        // แล้วค่อยผูก listener แบบ delegation
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('#instructorList tbody')
+                .addEventListener('click', e => {
+                    if (e.target.classList.contains('delete-btn')) {
+                        confirmDeleteInstructor(e.target.closest('tr'));
+                    }
+                });
+
+        });
+
+
     });
 
-    // 1) แสดง modal และผูก event ต่างๆ
+    let studentsWithoutProject = [];
+
+    async function fetchStudentsWithoutProject() {
+        try {
+            const res = await fetch('/admin/getStudentsWithoutProject');
+            studentsWithoutProject = await res.json();
+        } catch (e) {
+            console.error('Error fetching students:', e);
+            studentsWithoutProject = [];
+        }
+    }
+
+    function populateStudentDropdowns() {
+        ['studentSelect1', 'studentSelect2', 'studentSelect3'].forEach(id => {
+            const sel = document.getElementById(id);
+            if (!sel) return;
+            sel.innerHTML = '<option value="">Select Student</option>' +
+                studentsWithoutProject.map(s =>
+                    `<option value="${s.studentId}">
+           ${s.studentId} - ${s.studentName}
+         </option>`
+                ).join('');
+        });
+    }
+
+    // 5) Fetch instructors & populate
+    async function fetchInstructors() {
+        try {
+            const res = await fetch('/admin/getInstructors');
+            return await res.json();
+        } catch (e) {
+            console.error('Error fetching instructors:', e);
+            return [];
+        }
+    }
+
+    function populateInstructorDropdowns(instructors) {
+        document.querySelectorAll('.instructor-select').forEach(sel => {
+            sel.innerHTML = '<option value="">-- Select --</option>' +
+                instructors.map(i =>
+                    `<option value="${i.professorName}">
+           ${i.professorName}
+         </option>`
+                ).join('');
+        });
+    }
+
     async function displayResults() {
         try {
             // ดึงข้อมูลจาก API
             const year = new Date().getFullYear();
-            const projectIdInputValue = `SP${year} -`;
-            const instructors   = await fetchInstructors();
+            const projectIdInputValue = `SP -`;
+            const instructors = await fetchInstructors();
             await fetchStudentsWithoutProject();
 
             // เริ่มต้น empty list สำหรับ projek ที่กำลังสร้างใหม่
@@ -278,43 +360,53 @@
           <select id="studentSelect3"><option value="">Select Student</option></select>
         </div>
 
+         <!-- แสดง Instructor -->
         <h3>Instructor Details</h3>
         <div id="instructorList">
           <table class="instructor-table">
-            <thead><tr><th>Role</th><th>Professor</th><th>Action</th></tr></thead>
+            <thead>
+              <tr><th>Role</th><th>Professor</th><th>Action</th></tr>
+            </thead>
             <tbody>
               ${professorList.map(pr => `
-                <tr>
+                <tr data-role="${pr.role}">
                   <td>
                     <select class="role-select">
-                      <option value="Advisor"        ${pr.role==='Advisor'        ?'selected':''}>Advisor</option>
-                      <option value="Co-Advisor"     ${pr.role==='Co-Advisor'     ?'selected':''}>Co-Advisor</option>
-                      <option value="Committee"      ${pr.role==='Committee'      ?'selected':''}>Committee</option>
-                      <option value="Poster-Committee"${pr.role==='Poster-Committee'?'selected':''}>Poster-Committee</option>
+                      <option value="Advisor"        ${pr.role === 'Advisor' ? 'selected' : ''}>Advisor</option>
+                      <option value="Co-Advisor"     ${pr.role === 'Co-Advisor' ? 'selected' : ''}>Co-Advisor</option>
+                      <option value="Committee"      ${pr.role === 'Committee' ? 'selected' : ''}>Committee</option>
+                      <option value="Poster-Committee"${pr.role === 'Poster-Committee' ? 'selected' : ''}>
+                        Poster-Committee
+                      </option>
                     </select>
                   </td>
                   <td>
-                    <select class="instructor-select">
+                    <select class="instructor-select"
+                            data-id="${pr.professorId}"
+                            data-name="${pr.professorName}">
                       <option value="">-- Select --</option>
                       ${instructors.map(inst => `
-                        <option value="${inst.professorName}">
+                        <option value="${inst.professorId}"
+                                ${inst.professorId === pr.professorId ? 'selected' : ''}>
                           ${inst.professorName}
                         </option>`).join('')}
                     </select>
                   </td>
                   <td><button class="delete-btn">🗑️</button></td>
-                </tr>`).join('')}
+                </tr>
+              `).join('')}
             </tbody>
           </table>
           <button id="addInstructorBtn">+ Add Instructor</button>
         </div>
 
+        <!-- Actions Button -->
         <div class="button-group">
           <button class="cancel-btn">Cancel</button>
           <button class="save-btn">Save</button>
         </div>
-      </div>
-      </div>
+
+
     `;
             document.getElementById('modal-container').innerHTML = modalHTML;
 
@@ -323,210 +415,327 @@
             populateInstructorDropdowns(instructors);
             enableSearchableSelects();
 
+            // คลิกปุ่ม Cancel
+            document.querySelector('.cancel-btn').addEventListener('click', function () {
+                window.location.href = "http://localhost:8080/project-details";
+            });
 
-            // ผูก event listeners
+            // Delete instructor
+            document.querySelectorAll('.instructor-table .delete-btn').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    const row = e.currentTarget.closest('tr');  // หาแถวที่ถูกคลิก
+                    confirmDeleteInstructor(row);  // เรียก confirmDeleteInstructor ก่อนการลบ
+                });
+            });
+
+
+            // ผูก listener — เพิ่ม instructor row
             document.getElementById('addInstructorBtn')
                 .addEventListener('click', () => {
                     const tbody = document.querySelector('#instructorList tbody');
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
-          <td>
-            <select class="role-select">
-              <option value="Advisor">Advisor</option>
-              <option value="Co-Advisor">Co-Advisor</option>
-              <option value="Committee">Committee</option>
-              <option value="Poster-Committee">Poster-Committee</option>
-            </select>
-          </td>
-          <td>
-            <select class="instructor-select">
-              <option value="">-- Select --</option>
-            </select>
-          </td>
-          <td><button class="delete-btn">🗑️</button></td>`;
+                        <td>
+                        <select class="role-select">
+                            <option value="Advisor">Advisor</option>
+                            <option value="Co-Advisor">Co-Advisor</option>
+                            <option value="Committee">Committee</option>
+                            <option value="Poster-Committee">Poster-Committee</option>
+                        </select>
+                        </td>
+                        <td>
+                        <select class="instructor-select" data-id="">
+                            <!-- placeholder แถวแรก -->
+                            <option value="" disabled selected>-- Select Instructor --</option>
+                            ${instructors.map(i => `
+                              <option value="${i.professorId}">
+                                ${i.professorName}
+                              </option>
+                            `).join('')}
+                        </select>
+                        </td>
+                        <td>
+                        <button class="delete-btn">🗑️</button>
+                        </td>
+                    `;
                     tbody.appendChild(tr);
-                    populateInstructorDropdowns(instructors);
-                    enableSearchableSelects();
+
+                    // Populate & init search on new select only
+                    const newSel = tr.querySelector('.instructor-select');
+                    instructors.forEach(i => {
+                        const opt = document.createElement('option');
+                        opt.value = i.professorId;
+                        opt.textContent = i.professorName;
+                        newSel.appendChild(opt);
+                    });
+                    newSel.choicesInstance = new Choices(newSel, {
+                        searchEnabled: true,
+                        shouldSort: false,
+                        placeholderValue: 'ค้นหาอาจารย์...',
+                        classNames: {
+                            containerInner: 'my-choices-inner',
+                            listDropdown: 'my-choices-dropdown',
+                            itemChoice: 'my-choices-item',
+                            itemSelectable: 'my-choices-selectable'
+                        }
+                    });
                 });
 
-            document.getElementById('instructorList')
-                .addEventListener('click', e => {
-                    if (e.target.classList.contains('delete-btn')) {
-                        e.target.closest('tr').remove();
-                    }
-                });
+
+            document.querySelector('#instructorList tbody').addEventListener('click', e => {
+                if (e.target.classList.contains('delete-btn')) {
+                    // remove the entire <tr> ที่อยู่รอบ ๆ ปุ่มนั้น
+                    e.target.closest('tr').remove();
+                }
+            });
 
 
-            document.querySelector('.cancel-btn')
-                .addEventListener('click', () => {
-                    document.getElementById('modal-container').innerHTML = '';
-                });
+            await fetchInstructors();
 
-            document.querySelector('.save-btn')
-                .addEventListener('click', saveProjectData);
+
+            document.querySelector('.cancel-btn').addEventListener('click', function () {
+                window.location.href = "http://localhost:8080/project-details";
+            });
 
         } catch (err) {
             console.error(err);
-            Swal.fire({ icon:'error', title:'Error', text: err.message });
+            Swal.fire({icon: 'error', title: 'Error', text: err.message});
         }
-    }
 
-    // async function fetchLastProjectId(program, year) {
-    //     try {
-    //         const res  = await fetch(`/admin/getLastProjectId?program=${program}&semester=${year}`);
-    //         const json = await res.json();
-    //         return json.lastProjectId || '';
-    //     } catch (e) {
-    //         console.error('Error fetching lastProjectId:', e);
-    //         return '';
-    //     }
-    // }
-    //
-    // function generateNewProjectId(lastId, program, year) {
-    //     let seq = '01';
-    //     if (lastId && lastId.startsWith(program)) {
-    //         const lastSeq = lastId.slice(-2);
-    //         seq = String(Number(lastSeq) + 1).padStart(2, '0');
-    //     }
-    //     return `${program} SP${year}-${seq}`;
-    // }
-
-    let studentsWithoutProject = [];
-    async function fetchStudentsWithoutProject() {
-        try {
-            const res  = await fetch('/admin/getStudentsWithoutProject');
-            studentsWithoutProject = await res.json();
-        } catch(e) {
-            console.error('Error fetching students:', e);
-            studentsWithoutProject = [];
-        }
-    }
-    function populateStudentDropdowns() {
-        ['studentSelect1','studentSelect2','studentSelect3'].forEach(id => {
-            const sel = document.getElementById(id);
-            if (!sel) return;
-            sel.innerHTML = '<option value="">Select Student</option>' +
-                studentsWithoutProject.map(s =>
-                    `<option value="${s.studentId}">
-           ${s.studentId} - ${s.studentName}
-         </option>`
-                ).join('');
-        });
-    }
-
-    // 5) Fetch instructors & populate
-    async function fetchInstructors() {
-        try {
-            const res = await fetch('/admin/getInstructors');
-            return await res.json();
-        } catch(e) {
-            console.error('Error fetching instructors:', e);
-            return [];
-        }
-    }
-
-    function populateInstructorDropdowns(instructors) {
-        document.querySelectorAll('.instructor-select').forEach(sel => {
-            sel.innerHTML = '<option value="">-- Select --</option>' +
-                instructors.map(i =>
-                    `<option value="${i.professorName}">
-           ${i.professorName}
-         </option>`
-                ).join('');
-        });
-    }
-
-    function enableSearchableSelects() {
-        document
-            .querySelectorAll(
-                '#studentSelect1, #studentSelect2, #studentSelect3, ' +
-                '.instructor-select, #advisorSelect, #coAdvisorSelect, #committeeSelect'
-            )
-            .forEach(el => {
-                new Choices(el, {
-                    searchEnabled: true,
-                    shouldSort: false,
-                    classNames: {
-                        containerInner: 'my-choices-inner',
-                        listDropdown: 'my-choices-dropdown',
-                        itemChoice: 'my-choices-item',
-                        itemSelectable: 'my-choices-selectable',
-                    }
+        function enableSearchableSelects() {
+            document
+                .querySelectorAll(
+                    '#studentSelect1, #studentSelect2, #studentSelect3, ' +
+                    '.instructor-select, #advisorSelect, #coAdvisorSelect, #committeeSelect'
+                )
+                .forEach(el => {
+                    new Choices(el, {
+                        searchEnabled: true,
+                        shouldSort: false,
+                        classNames: {
+                            containerInner: 'my-choices-inner',
+                            listDropdown: 'my-choices-dropdown',
+                            itemChoice: 'my-choices-item',
+                            itemSelectable: 'my-choices-selectable',
+                        }
+                    });
                 });
+        }
+
+        function collectProfessorList() {
+            const professorList = Array.from(document.querySelectorAll('#instructorList tbody tr'))
+                .map(tr => {
+                    const role = tr.querySelector('.role-select').value;
+                    const name = tr.querySelector('.instructor-select').value;
+                    return (role && name) ? {professorName: name, role} : null;
+                })
+                .filter(x => x);  // Filter out invalid rows with empty roles or names
+
+            // Check for missing Advisor
+            if (!professorList.find(p => p.role === 'Advisor')) {
+                Swal.fire({icon: 'warning', title: 'Please select an Advisor!'});
+            }
+
+            return professorList;
+        }
+
+        // 7) Save Project Data
+        document.querySelector('.save-btn').addEventListener('click', async function () {
+
+            // แสดง popup ยืนยันการบันทึก
+            const savePopup = document.getElementById('confirmSavePopup');
+            savePopup.style.display = 'block';
+
+            // คลิกปุ่มยืนยันการบันทึก
+            document.getElementById('confirmSaveBtn').addEventListener('click', async function () {
+                const instructorRows = document.querySelectorAll('#instructorList .instructor-table tbody tr');
+                for (let tr of instructorRows) {
+                    const sel = tr.querySelector('select.instructor-select');
+                    if (!sel.value) {
+                        // ยังไม่เลือกอาจารย์ในแถวนี้
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'กรุณาเลือกชื่ออาจารย์ทุกแถว',
+                            text: 'มีแถวที่ไม่ได้เลือกชื่ออาจารย์ กรุณาตรวจสอบก่อนบันทึก',
+                            confirmButtonText: 'ตกลง'
+                        });
+                        return; // หยุดการบันทึก
+                    }
+                }
+
+
+                // เก็บค่าจากฟอร์ม
+                const projectTitle = document.getElementById('projectTitle').value;
+                const projectDescription = document.getElementById('projectDescription').value;
+                const projectCategory = document.getElementById('projectCategory').value;
+
+                // เก็บค่า program จาก dropdown
+                const program = document.getElementById('program').value;
+
+                // เก็บค่า semester จาก dropdown
+                const semester = document.getElementById('semester').value;
+
+                // เก็บข้อมูล Student
+                const studentIds = ['studentSelect1', 'studentSelect2', 'studentSelect3']
+                    .map(id => document.getElementById(id).value)
+                    .filter(x => x);
+                const studentList = studentIds.map(id => {
+                    const s = studentsWithoutProject.find(x => x.studentId === id);
+                    return {studentId: s.studentId, studentName: s.studentName};
+                });
+
+
+                // เก็บข้อมูล Instructor
+                const professorList = Array.from(
+                    document.querySelectorAll('#instructorList .instructor-table tbody tr')
+                ).map(tr => {
+                    const sel = tr.querySelector('select.instructor-select');
+                    const role = tr.querySelector('select.role-select').value;
+                    return {
+                        professorId: sel?.value || "",
+                        professorName: sel?.selectedOptions[0]?.text || "",
+                        role
+                    };
+                })
+                    // drop anything with no professorId
+                    .filter(p => p.professorId);
+
+
+                // เงื่อนไขเช็ค
+                if (!studentList.length) {
+                    return Swal.fire({icon: 'warning', title: 'Please select at least one student!'});
+                }
+                if (!professorList.find(p => p.role === 'Advisor')) {
+                    return Swal.fire({icon: 'warning', title: 'Please select an Advisor!'});
+                }
+
+                const payload = {
+                    projectTitle,
+                    projectDescription,
+                    program,
+                    semester,
+                    projectCategory,
+                    studentList,
+                    professorList
+                };
+
+                console.log("Sending data to the server: ", payload);
+
+                try {
+                    const res = await fetch('/admin/addProject', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        // สำเร็จ
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Created',
+                            text: `Project ID: ${data.projectId}`,
+                            timer: 1500,
+                            showConfirmButton: false,
+                            timerProgressBar: true
+                        }).then(() => {
+                            window.location.href = 'http://localhost:8080/project-details';
+                        });
+                    } else {
+                        // ถ้ามี warnings ส่งมาเป็น array
+                        const warnings = data.warnings || [data.message || 'Unknown error'];
+                        showErrorsPopup(warnings);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    // ถ้า network error หรือ parse ผิดพลาด
+                    showErrorsPopup([err.message || 'Unknown error']);
+                }
             });
-    }
 
-    function collectProfessorList() {
-        return Array.from(document.querySelectorAll('#instructorList tbody tr'))
-            .map(tr => {
-                const role = tr.querySelector('.role-select').value;
-                const name = tr.querySelector('.instructor-select').value;
-                return (role && name) ? { professorName:name, role } : null;
-            })
-            .filter(x => x);
-    }
-
-    // 7) Save Project Data
-    async function saveProjectData() {
-        const projectTitle       = document.getElementById('projectTitle').value;
-        const projectDescription = document.getElementById('projectDescription').value;
-        const program            = document.getElementById('program').value;
-        const semester           = document.getElementById('semester').value;
-        const projectCategory    = document.getElementById('projectCategory').value;
-
-        const studentIds = ['studentSelect1','studentSelect2','studentSelect3']
-            .map(id => document.getElementById(id).value)
-            .filter(x => x);
-        const studentList = studentIds.map(id => {
-            const s = studentsWithoutProject.find(x => x.studentId === id);
-            return { studentId:s.studentId, studentName:s.studentName };
+            // คลิกปุ่มยกเลิกการบันทึก
+            document.getElementById('cancelSaveBtn').addEventListener('click', function () {
+                const savePopup = document.getElementById('confirmSavePopup');
+                savePopup.style.display = 'none';  // ซ่อน popup
+            });
         });
 
-        const professorList = collectProfessorList();
-        if (!studentList.length) {
-            return Swal.fire({ icon:'warning', title:'Please select at least one student!' });
-        }
-        if (!professorList.find(p=>p.role==='Advisor')) {
-            return Swal.fire({ icon:'warning', title:'Please select an Advisor!' });
-        }
-
-        const payload = {
-            projectTitle,
-            projectDescription,
-            program,
-            semester,
-            projectCategory,
-            studentList,
-            advisors:      professorList.filter(p=>p.role==='Advisor'),
-            coAdvisors:    professorList.filter(p=>p.role==='Co-Advisor'),
-            committees:    professorList.filter(p=>p.role==='Committee'),
-            posterCommittee: professorList.filter(p=>p.role==='Poster-Committee')
-        };
-
-        try {
-            const res  = await fetch('/admin/addProject', {
-                method:'POST',
-                headers:{ 'Content-Type':'application/json' },
-                body: JSON.stringify(payload)
-            });
-            const txt = await res.text();
-            if (!res.ok) throw new Error(txt);
-            Swal.fire({
-                icon: 'success',
-                title: 'Created',
-                text: `Project ID: ${txt}`,
-                timer: 1500,
-                showConfirmButton: false,    // ซ่อนปุ่ม OK
-                timerProgressBar: true       // แสดงแถบเวลา
-            }).then(() => {
-                // พอ popup ปิดเอง (ครบ 5 วิ) แล้วค่อยรีไดเร็กต์
-                window.location.href = "http://localhost:8080/project-details";
-            });
-        } catch (e) {
-            console.error(e);
-            Swal.fire({ icon:'error', title:'Error adding project', text:e.message });
-
-        }
     }
+
+    function showErrorsPopup(errors, redirectUrl = null) {
+        const savePopup = document.getElementById('confirmSavePopup');
+        if (savePopup) {
+            savePopup.style.display = 'none';
+        }
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Errors',
+            html: errors.map(e => `<p style="text-align:left; margin:0.25em 0;">${e}</p>`).join(''),
+            width: '600px',
+            confirmButtonText: 'ปิด'
+        }).then(() => {
+            // ถ้าต้องการ redirect ต่อทันที
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+            }
+        });
+    }
+
+    // -------------------- Delete Instructor -------------------- //
+
+    const PROJECT_ID = urlParams.get('projectId');
+
+    function confirmDeleteInstructor(row) {
+        // อ่าน projectId จาก URL หรือ attribute ของ element
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('projectId');
+        const sel = row.querySelector('.instructor-select');
+        const professorId = sel.value;   // หรือ sel.dataset.id ตามที่ตั้งไว้
+        const instructorName = sel.options[sel.selectedIndex]?.text;
+
+        if (!projectId || !professorId) {
+            return Swal.fire({icon: 'error', title: 'ข้อมูลไม่ครบ', text: 'ไม่พบ Project ID หรือ Professor ID'});
+        }
+
+        Swal.fire({
+            icon: 'warning',
+            title: `Are you sure you want to remove ${instructorName}?`,
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel'
+        }).then(({isConfirmed}) => {
+            if (isConfirmed) {
+                // ลบแถวออกก่อน
+                row.remove();
+                // เรียก API ส่งทั้งสอง param
+                deleteInstructorFromProject(projectId, professorId);
+            }
+        });
+    }
+
+    // ฟังก์ชันลบ Instructor จาก Project
+    function deleteInstructorFromProject(projectId, professorId) {
+        fetch(`/admin/deleteInstructorFromProject?projectId=${encodeURIComponent(projectId)}&professorId=${encodeURIComponent(professorId)}`, {
+            method: 'DELETE'
+        })
+            .then(res => res.ok
+                ? Swal.fire({icon: 'success', title: 'Delete Success!'})
+                : res.text().then(txt => {
+                    throw new Error(txt)
+                })
+            )
+            .catch(err => Swal.fire({icon: 'error', title: 'Error', text: err.message}));
+    }
+
+
+    // Event listener สำหรับปุ่มลบ
+    document.querySelectorAll('.instructor-table .delete-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const row = e.currentTarget.closest('tr');  // หาแถวที่ถูกคลิก
+            confirmDeleteInstructor(row);  // เรียกฟังก์ชันยืนยันการลบ
+        });
+    });
 
 </script>

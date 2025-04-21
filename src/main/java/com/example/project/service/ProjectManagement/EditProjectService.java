@@ -54,6 +54,14 @@ public class EditProjectService {
             project.setProgram(updatedDetails.getProgram());
             isUpdated = true;
         }
+        if (!Objects.equals(project.getProjectCategory(), updatedDetails.getCategory())) {
+            project.setProjectCategory(updatedDetails.getCategory());
+            isUpdated = true;
+        }
+        if (!project.getSemester().equals(updatedDetails.getSemester())) {
+            project.setSemester(updatedDetails.getSemester());
+            isUpdated = true;
+        }
 
         // --------- Update Instructor in Project --------- //
 
@@ -62,6 +70,7 @@ public class EditProjectService {
         Project inst = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found: " + projectId));
 
+        // 1) ตรวจสอบ duplicate instructor
         List<ProfessorRoleDTO> profs = Optional.ofNullable(updatedDetails.getProfessorList())
                 .orElse(Collections.emptyList());
         Set<String> seen = new HashSet<>();
@@ -71,25 +80,33 @@ public class EditProjectService {
             }
         }
 
-        List<ProfessorRoleDTO> dtos = Optional.ofNullable(updatedDetails.getProfessorList())
-                .orElse(Collections.emptyList());
-
+        // 2) เช็คจำนวน Committee ไม่เกิน 2
         long committeeCount = profs.stream()
                 .filter(p -> "Committee".equals(p.getRole()))
                 .count();
         if (committeeCount > 2) {
-            errors.add("Role 'Committee' cannot exceed 2 members \n(got " + committeeCount + ")");
+            errors.add("Role 'Committee' cannot exceed 2 members (got " + committeeCount + ")");
         }
 
-        // – Advisor ไม่เกิน 1
-        long advCount = dtos.stream()
+        // 3) เช็ค Advisor ไม่เกิน 1 และอย่างน้อย 1
+        long advCount = profs.stream()
                 .filter(p -> "Advisor".equals(p.getRole()))
                 .count();
         if (advCount > 1) {
-            errors.add(" Role 'Advisor' should be one \n(got " + advCount + ")");
+            errors.add("Role 'Advisor' cannot exceed 1 member (got " + advCount + ")");
+        }
+        if (advCount < 1) {
+            errors.add("Role 'Advisor' must have at least 1 member");
         }
 
-            // ถ้ามี error ให้รีเทิร์นเลย
+        // 4) เช็คว่ามีนักศึกษาอย่างน้อย 1 คน
+        int studentCount = Optional.ofNullable(updatedDetails.getStudentList())
+                .orElse(Collections.emptyList()).size();
+        if (studentCount < 1) {
+            errors.add("At least one student is required");
+        }
+
+        // ถ้ามี error ให้รีเทิร์นเลย
         if (!errors.isEmpty()) {
             return errors;
         }
@@ -106,6 +123,10 @@ public class EditProjectService {
         }
         if (!project.getProgram().equals(updatedDetails.getProgram())) {
             project.setProgram(updatedDetails.getProgram());
+            dirty = true;
+        }
+        if(!project.getSemester().equals(updatedDetails.getSemester())) {
+            project.setSemester(updatedDetails.getSemester());
             dirty = true;
         }
         if (dirty) projectRepository.save(project);

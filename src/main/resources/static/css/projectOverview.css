@@ -74,7 +74,7 @@ body {
     position: absolute;
     background-color: #f9f9f9;
     min-width: 250px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 1;
 }
 
@@ -174,14 +174,13 @@ body {
 
 /* Table */
 .table-container {
+    max-width: 1500px;
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow: hidden;
     padding: 20px;
-    margin-left: 20px;
-    margin-right: 20px;
-    margin-bottom: 50px;
+    margin-top: -60px;
+    margin-left: 32px;
 }
 
 table {
@@ -483,7 +482,6 @@ td:nth-child(4) {
 }
 
 
-
 .close-btn {
     background-color: #f44336; /* สีแดง */
     color: white;
@@ -529,6 +527,78 @@ td:nth-child(4) {
     padding-bottom: 15px;
     border-bottom: 1px solid #e9ecef;
 }
+
+.header-left {
+    display: flex;
+    gap: 1rem; /* ระยะห่างระหว่าง title กับ dropdown */
+}
+
+/* กำหนดให้ dropdown อยู่ในแนวนอน */
+.semester-container {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    cursor: pointer;
+    width: auto;
+    margin: 0 1rem;
+}
+
+/* ปรับให้ dropdown ดูเรียบง่ายและสมูธ */
+.semester-container select {
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    appearance: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* เมื่อ hover บน dropdown */
+.semester-container select:hover {
+    background-color: #f1f1f1;
+    border-color: #00796b;
+}
+
+/* ปรับ dropdown ให้มีขนาดและความยาวเหมาะสม */
+#semester-selector {
+    font-size: 14px;
+    width: 120px; /* ความกว้างของ dropdown */
+    margin-top: -6vh;
+}
+
+/* ปรับไอคอนให้ดูดี */
+.calendar-icon {
+    font-size: 16px;
+    color: #555;
+}
+
+/* ปรับให้ฟิลเตอร์อื่น ๆ ดูเหมาะสม */
+.filter-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* เพิ่มการจัดระเบียบ dropdown ให้ดูสะอาดตา */
+#program-select-box, #role-select-box {
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: white;
+}
+
+/* เพิ่ม hover effect ให้ dropdown */
+#program-select-box:hover, #role-select-box:hover {
+    background-color: #f8f8f8;
+}
+
 
 /* Program Filter Styles */
 .program-filter {
@@ -761,50 +831,3 @@ td:nth-child(4) {
 .tabs input {
     margin-left: auto;
 }
-
-/* SEMESTER */
-.header-button{
-    display: flex;
-    gap: 10px;
-}
-
-.semester-container {
-    display: flex;
-    align-items: center;
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 6px 12px;
-    cursor: pointer;
-    transition: 0.3s;
-    gap: 8px;
-    height: 30px;
-    width: 100px;
-}
-
-.semester-container:hover {
-    background: #f8f8f8;
-}
-
-.calendar-icon {
-    font-size: 16px;
-    color: #555;
-}
-
-#semester-selector {
-    border: none;
-    background: transparent;
-    font-size: 17px;
-    font-weight: bold;
-    color: #333;
-    cursor: pointer;
-    appearance: none;
-    outline: none;
-
-    padding: 20px;
-}
-
-#semester-selector::-ms-expand {
-    display: none;
-}
-

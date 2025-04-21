@@ -10,13 +10,13 @@ body {
 .header-section {
     background-color: #00796b;
     color: white;
-    padding: 20px;
     text-align: left;
     font-size: 24px;
     font-weight: bold;
     height: 100px;
     display: flex;
     justify-content: space-between;
+    padding: 20px;
 }
 
 .btn-header {
@@ -587,6 +587,11 @@ td form {
     cursor: pointer;
 }
 
+button.disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
 .close-btn:hover,
 .close-btn:focus {
     color: black;
@@ -977,5 +982,76 @@ select {
     --light-gray: #f5f5f5;
     --medium-gray: #e0e0e0;
     --dark-gray: #777;
+}
+
+.header-left {
+    display: flex;
+    gap: 1rem;       /* ระยะห่างระหว่าง title กับ dropdown */
+}
+
+/* กำหนดให้ dropdown อยู่ในแนวนอน */
+.semester-container {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    cursor: pointer;
+    width: auto;
+    margin: 0 1rem;
+}
+
+/* ปรับให้ dropdown ดูเรียบง่ายและสมูธ */
+.semester-container select {
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    appearance: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* เมื่อ hover บน dropdown */
+.semester-container select:hover {
+    background-color: #f1f1f1;
+    border-color: #00796b;
+}
+
+/* ปรับ dropdown ให้มีขนาดและความยาวเหมาะสม */
+#semester-selector {
+    font-size: 14px;
+    width: 120px; /* ความกว้างของ dropdown */
+    margin-top: -6vh;
+}
+
+/* ปรับไอคอนให้ดูดี */
+.calendar-icon {
+    font-size: 16px;
+    color: #555;
+}
+
+/* ปรับให้ฟิลเตอร์อื่น ๆ ดูเหมาะสม */
+.filter-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* เพิ่มการจัดระเบียบ dropdown ให้ดูสะอาดตา */
+#program-select-box, #role-select-box {
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: white;
+}
+
+/* เพิ่ม hover effect ให้ dropdown */
+#program-select-box:hover, #role-select-box:hover {
+    background-color: #f8f8f8;
 }
 

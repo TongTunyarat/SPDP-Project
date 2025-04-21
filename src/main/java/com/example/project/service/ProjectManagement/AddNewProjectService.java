@@ -14,10 +14,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -41,16 +38,54 @@ public class AddNewProjectService {
     @Transactional
     public String createProject(NewProjectDTO dto) {
 
-        if (dto.getAdvisors() == null || dto.getAdvisors().size() != 1) {
-            throw new IllegalArgumentException("กรุณาระบุ Advisor เพียงคนเดียวเท่านั้น");
+        // --- เช็คขอบเขตบทบาท ---
+        List<ProfessorRoleDTO> profs = Optional.ofNullable(dto.getProfessorList()).orElse(List.of());
+        List<String> warnings = new ArrayList<>();
+
+        long advCount = profs.stream()
+                .filter(p -> "Advisor".equalsIgnoreCase(p.getRole()))
+                .count();
+        if (advCount > 1) {
+            warnings.add("ระบุ Advisor ได้ไม่เกิน 1 ท่าน (พบ " + advCount + " ท่าน)");
+        }
+
+        long commCount = profs.stream()
+                .filter(p -> "Committee".equalsIgnoreCase(p.getRole()))
+                .count();
+        if (commCount > 2) {
+            warnings.add("ระบุ Committee ได้ไม่เกิน 2 ท่าน (พบ " + commCount + " ท่าน)");
+        }
+
+        List<String> names = profs.stream()
+                .map(ProfessorRoleDTO::getProfessorName)
+                .filter(name -> name != null && !name.isBlank())
+                .collect(Collectors.toList());
+        Set<String> uniqNames = new HashSet<>(names);
+        if (uniqNames.size() != names.size()) {
+            warnings.add("พบชื่ออาจารย์ซ้ำกันในรายการ");
+        }
+
+        List<String> ids = profs.stream()
+                .map(ProfessorRoleDTO::getProfessorId)
+                .filter(id -> id != null && !id.isBlank())
+                .collect(Collectors.toList());
+        Set<String> uniqIds = new HashSet<>(ids);
+        if (uniqIds.size() != ids.size()) {
+            warnings.add("พบรหัสอาจารย์ซ้ำกันในรายการ");
+        }
+
+
+        if (!warnings.isEmpty()) {
+            // โยน exception ทีเดียว พร้อม list ของ warnings
+            throw new IllegalArgumentException(String.join(";", warnings));
         }
 
         if (dto.getStudentList() != null) {
-            List<String> ids = dto.getStudentList().stream()
+            List<String> stuIds = dto.getStudentList().stream()
                     .map(StudentProjectDTO::getStudentId)
                     .collect(Collectors.toList());
-            Set<String> uniqueIds = new HashSet<>(ids);
-            if (uniqueIds.size() != ids.size()) {
+            Set<String> uniqStu = new HashSet<>(stuIds);
+            if (uniqStu.size() != stuIds.size()) {
                 throw new IllegalArgumentException("มีนักศึกษาซ้ำในรายการ กรุณาตรวจสอบใหม่");
             }
         }
@@ -88,43 +123,46 @@ public class AddNewProjectService {
 
         // 4) สร้าง Instructor Roles ทั้ง 4 ประเภท
         now = LocalDateTime.now();  // อัพเดต timestamp ใหม่
-        // helper method ข้างล่างนี้จะ loop ถ้า list เป็น null หรือ empty ก็ข้ามให้
-        addRoles(dto.getAdvisors(),      "Advisor",         p, now);
-        addRoles(dto.getCoAdvisors(),    "Co-Advisor",      p, now);
-        addRoles(dto.getCommittees(),    "Committee",       p, now);
-        addRoles(dto.getPosterCommittee(),"Poster-Committee",p, now);
+        // นำ professorList ทั้งหมดมาอัปโหลด
+        addRoles(dto.getProfessorList(), p, now);
 
         return newProjId;
     }
 
     private void addRoles(
-            List<ProfessorRoleDTO> list,
-            String role,
+            List<ProfessorRoleDTO> professorList,
             Project project,
             LocalDateTime assignDate
     ) {
-        if (list == null) return;
-        for (ProfessorRoleDTO prof : list) {
+        if (professorList == null) return;
+
+        // Process all professor roles in the list
+        for (ProfessorRoleDTO prof : professorList) {
             String name = prof.getProfessorName();  // สมมติ DTO มีฟิลด์นี้
             if (name == null || name.isBlank()) continue;
 
+            // ค้นหา Instructor ตามชื่อ
             Instructor instr = instructorRepository
                     .findByProfessorName(name)
-                    .orElseThrow(() -> new IllegalStateException(role + " not found: " + name));
+                    .orElseThrow(() -> new IllegalStateException("Instructor not found: " + name));
 
             if (instr.getProfessorId() == null) {
                 instr.setProfessorId(generateNextInstructorId());
                 instructorRepository.save(instr);
             }
 
+            // สร้าง ProjectInstructorRole สำหรับ professor นี้
             ProjectInstructorRole pir = new ProjectInstructorRole();
             pir.setInstructorId(generateNextInstructorId());
             pir.setAssignDate(assignDate);
-            pir.setRole(role);
+            pir.setRole(prof.getRole()); // ใช้ role ที่ได้จาก DTO
             pir.setProjectIdRole(project);
             pir.setInstructor(instr);
             projectInstructorRoleRepository.save(pir);
+
+
         }
+
     }
 
 
