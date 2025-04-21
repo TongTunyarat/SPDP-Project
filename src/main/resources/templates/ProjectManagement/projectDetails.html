@@ -434,8 +434,14 @@
         const sel = document.getElementById('semester-selector');
         sel.innerHTML = '';  // เคลียร์ก่อน (ถ้าโหลดซ้ำ)
         // เก็บ unique semesters
-        const sems = Array.from(new Set(projectsData.map(p => String(p.semester))))
-            .sort();
+        // const sems = Array.from(new Set(projectsData.map(p => String(p.semester))))
+        //     .sort()
+        //     .add(yearnow);
+        let yearnow = String(new Date().getFullYear());
+        let sems = Array.from(
+            new Set([...projectsData.map(p => String(p.semester)), String(yearnow)])
+        ).sort();
+
 
         sems.forEach(s => {
             const opt = document.createElement('option');
