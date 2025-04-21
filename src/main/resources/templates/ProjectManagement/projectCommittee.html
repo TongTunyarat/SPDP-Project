@@ -335,8 +335,13 @@
         const sel = document.getElementById('semester-selector');
         sel.innerHTML = '';  // เคลียร์ก่อน (ถ้าโหลดซ้ำ)
         // เก็บ unique semesters
-        const sems = Array.from(new Set(projectsData.map(p => String(p.semester))))
-            .sort();
+        // const sems = Array.from(new Set(projectsData.map(p => String(p.semester))))
+        //     .sort()
+        //     .add(yearnow);
+        let yearnow = String(new Date().getFullYear());
+        let sems = Array.from(
+            new Set([...projectsData.map(p => String(p.semester)), String(yearnow)])
+        ).sort();
 
         sems.forEach(s => {
             const opt = document.createElement('option');
@@ -410,30 +415,43 @@
             .then(data => {
                 projectsData = data;
                 filteredData = data;
-
                 populateSemesterOptions();
-
                 applyFilters();
 
-                // ตรวจสอบทีละโปรเจกต์ว่ามี Advisor หรือไม่
-                return Promise.all(
-                    projectsData.map(proj =>
-                        fetch(`/admin/hasCommittee?projectId=${encodeURIComponent(proj.projectId)}`)
-                            .then(r => r.ok ? r.json() : false)
-                    )
-                );
+                // หลังเรา render table เสร็จ ให้เช็คปุ่ม upload
+                checkUploadAvailability();
             })
-            .then(advisorFlags => {
-                // ถ้ามี true อย่างน้อยหนึ่งค่า แปลว่าโปรเจกต์นั้นมี Advisor
-                if (advisorFlags.some(flag => flag)) {
-                    const uploadBtn = document.getElementById('upload-btn');
+            .catch(err => console.error("Error fetching projects:", err));
+    }
+
+    function checkUploadAvailability() {
+        const uploadBtn = document.getElementById('upload-btn');
+        const sem = document.getElementById('semester-selector').value;
+        if (!sem) return;
+
+        fetch(`/admin/hasCommittee?semester=${encodeURIComponent(sem)}`)
+            .then(r => r.ok ? r.json() : false)
+            .then(hasCommittee => {
+                if (hasCommittee) {
                     uploadBtn.disabled = true;
                     uploadBtn.classList.add('disabled');
                     uploadBtn.textContent = 'Upload Disabled';
+                } else {
+                    uploadBtn.disabled = false;
+                    uploadBtn.classList.remove('disabled');
+                    uploadBtn.textContent = 'Upload Files';
                 }
             })
-            .catch(err => console.error("Error fetching projects or advisors:", err));
+            .catch(err => console.error("Error checking committee:", err));
     }
+
+    // เมื่อผู้ใช้เปลี่ยน semester ให้รีเช็คปุ่ม
+    document.getElementById('semester-selector')
+        .addEventListener('change', () => {
+            applyFilters();            // กรองข้อมูลใหม่
+            checkUploadAvailability(); // รีเช็คปุ่ม upload
+        });
+
 
     // ฟังก์ชันสร้าง <thead> แบบไดนามิก (เฉพาะ Committee)
     function renderCommitteeHeader(maxCommittee) {
