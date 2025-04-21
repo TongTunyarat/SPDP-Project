@@ -682,6 +682,7 @@
                 buffer = "";
             }
         }
+
         if (buffer) rows.push(buffer);  // กรณี malformed ก็ push ท้าย
 
         // 2) ตรวจความยาว column ในแต่ละบรรทัด (ข้าม header 8 แถวแรก → index 0..7)

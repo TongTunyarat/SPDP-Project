@@ -437,189 +437,221 @@ public class UploadFilesService {
     public List<String> processProjectCommittee(MultipartFile file) throws Exception {
         List<String> warnings = new ArrayList<>();
 
-        // เตรียม parser ให้รองรับ comma/newline ใน quotes อัตโนมัติ
+
+        String[] HEADERS = {
+                "Project ID",
+                "Project Title",
+                "Project Description",
+                "Project Category",
+                "Student ID",
+                "Student Name",
+                "Program",
+                "Advisor",
+                "Co-Advisor",
+                "Committee"
+        };
+
+        // format ที่รองรับ RFC4180 (comma/newline ใน quotes, "" escaping)
         CSVFormat format = CSVFormat.DEFAULT
                 .withQuote('"')
                 .withEscape('\\')
-                .withIgnoreEmptyLines()
-                .withTrim();
+                .withTrim()
+                .withIgnoreEmptyLines();
 
-        try (Reader in = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
-             CSVParser parser = new CSVParser(in, format)) {
+        try (
+                // ใช้ LineNumberReader เพื่อ skip บรรทัดก่อนหน้า
+                LineNumberReader lnr = new LineNumberReader(
+                        new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))
+        ) {
+            // ข้าม 4 บรรทัดแรก
+            for (int i = 0; i < 4; i++) {
+                if (lnr.readLine() == null) break;
+            }
 
-            int rowIndex = 0;
+            // บรรทัดถัดไป (row5) จะถูกมองเป็น header
+            CSVParser parser = new CSVParser(
+                    lnr,
+                    format
+                            .withHeader(HEADERS)         // map header names
+                            .withSkipHeaderRecord()      // ไม่เอา header row เป็น data
+            );
+
             String currentProjectId = null;
-
             for (CSVRecord rec : parser) {
-                rowIndex++;
-                // ข้าม header 9 แถวแรก
-                if (rowIndex <= 9) continue;
+                // อ่านค่าจากแต่ละคอลัมน์ตามชื่อ
+                String fileProjId = rec.get("Project ID");
+                String committee  = rec.get("Committee").replaceAll("^'+|'+$", "");  // trim single‑quotes รอบๆ
 
-                // แปลง record เป็น List<String> และ trim
-                List<String> values = StreamSupport.stream(rec.spliterator(), false)
-                        .map(String::trim)
-                        .collect(Collectors.toList());
-
-                // เติมให้ครบ 10 คอลัมน์ (0..9)
-                while (values.size() < 10) values.add("");
-
-                String fileProjectId = values.get(0);
-                String committeeName = values.get(9);
-
-                // 1) หา Project ที่ตรงกับ ID
-                if (!fileProjectId.isEmpty()) {
-                    Optional<Project> projOpt = projectRepository.findById(fileProjectId);
-                    if (projOpt.isPresent()) {
-                        currentProjectId = projOpt.get().getProjectId();
-                    } else {
+                // ถ้า record นี้มี Project ID ใหม่ ให้อัพเดตตัวชี้
+                if (!fileProjId.isBlank()) {
+                    Optional<Project> projOpt = projectRepository.findById(fileProjId);
+                    if (projOpt.isEmpty()) {
+                        warnings.add("Row " + rec.getRecordNumber()
+                                + ": ไม่พบ Project ID '" + fileProjId + "'");
                         continue;
                     }
-                } else if (currentProjectId == null) {
+                    currentProjectId = fileProjId;
+                }
+                if (currentProjectId == null) {
+                    warnings.add("Row " + rec.getRecordNumber()
+                            + ": ยังไม่พบ Project ID ก่อนหน้านี้");
                     continue;
                 }
-                // 2) เช็คชื่อ committee
-                if (committeeName.isEmpty()) {
-                    // ข้ามถ้าไม่มีชื่อ
-                    continue;
-                }
-                // ลบ single‑quote รอบๆ ออก (ถ้ามี)
-                committeeName = committeeName.replaceAll("^'+|'+$", "");
 
-                // เช็คว่ามี instructor ชื่อนี้หรือไม่
-                Optional<Instructor> instOpt = instructorRepository.findByProfessorName(committeeName);
+                // ข้ามถ้าไม่มีชื่อ committee
+                if (committee.isBlank()) continue;
+
+                // lookup อาจารย์ใน DB
+                Optional<Instructor> instOpt = instructorRepository
+                        .findByProfessorName(committee);
                 if (instOpt.isEmpty()) {
+                    warnings.add("Row " + rec.getRecordNumber()
+                            + ": ไม่พบอาจารย์ '" + committee + "'");
                     continue;
                 }
-                Instructor instructor = instOpt.get();
-                // สร้าง professorId ใหม่ถ้ายังไม่มี
-                if (instructor.getProfessorId() == null) {
-                    String newId = generateNextInstructorId();
-                    instructor.setProfessorId(newId);
-                    instructorRepository.save(instructor);
+                Instructor instr = instOpt.get();
+
+                // สร้าง professorId ถ้ายังไม่มี
+                if (instr.getProfessorId() == null) {
+                    instr.setProfessorId(generateNextInstructorId());
+                    instructorRepository.save(instr);
                 }
 
-                // 3) ป้องกันซ้ำ
+                // ตรวจซ้ำก่อน insert
                 boolean exists = projectInstructorRoleRepository
                         .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(
-                                currentProjectId, instructor.getProfessorId(), "Committee");
-                if (exists) {
-                    continue;
-                }
+                                currentProjectId,
+                                instr.getProfessorId(),
+                                "Committee"
+                        );
+                if (exists) continue;
 
-                // 4) สร้างแถวใหม่
+                // สร้าง ProjectInstructorRole ใหม่
                 Project project = projectRepository.findById(currentProjectId).get();
                 ProjectInstructorRole pir = new ProjectInstructorRole();
                 pir.setInstructorId(generateNextInstructorId());
                 pir.setAssignDate(LocalDateTime.now());
                 pir.setRole("Committee");
                 pir.setProjectIdRole(project);
-                pir.setInstructor(instructor);
+                pir.setInstructor(instr);
                 projectInstructorRoleRepository.save(pir);
             }
         } catch (IOException e) {
             throw new Exception("Error อ่าน CSV: " + e.getMessage(), e);
         }
+
         return warnings;
     }
+
 
     @Transactional
     public List<String> processProjectPosterCommittee(MultipartFile file) throws Exception {
         List<String> warnings = new ArrayList<>();
 
-        // กำหนด CSVFormat ให้รองรับ "…", comma, newline, trim
+        // ชื่อคอลัมน์ที่คาดว่าจะอยู่ในบรรทัดที่ 5
+        String[] HEADERS = {
+                "Project ID",
+                "Project Title",
+                "Project Description",
+                "Project Category",
+                "Student ID",
+                "Student Name",
+                "Program",
+                "Advisor",
+                "Co-Advisor",
+                "Committee",
+                "Poster-Committee"
+        };
+
+        // ตั้งค่า CSVFormat ให้รองรับ RFC4180
         CSVFormat format = CSVFormat.DEFAULT
                 .withQuote('"')
                 .withEscape('\\')
-                .withIgnoreEmptyLines()
-                .withTrim();
+                .withTrim()
+                .withIgnoreEmptyLines();
 
         try (
-                Reader in = new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8);
-                CSVParser parser = new CSVParser(in, format)
+                // อ่านข้าม 4 บรรทัดแรกแบบง่าย ๆ
+                LineNumberReader lnr = new LineNumberReader(
+                        new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))
         ) {
-            int rowIndex = 0;
-            String currentProjectId = null;
+            for (int i = 0; i < 4; i++) {
+                if (lnr.readLine() == null) break;
+            }
 
-            for (CSVRecord rec : parser) {
-                rowIndex++;
-                // ข้าม header บรรทัด 1–9
-                if (rowIndex <= 9) continue;
+            // บรรทัดถัดไป (row5) ให้ Commons CSV อ่านเป็น header
+            try (CSVParser parser = new CSVParser(
+                    lnr,
+                    format
+                            .withHeader(HEADERS)     // map header
+                            .withSkipHeaderRecord()  // ไม่เอา header row ไปเป็น data
+            )) {
+                String currentProjectId = null;
+                for (CSVRecord rec : parser) {
+                    // อ่านค่าตามชื่อคอลัมน์
+                    String fileProjId      = rec.get("Project ID").trim();
+                    String posterCommittee = rec.get("Poster-Committee").trim();
+                    long   rowNum          = rec.getRecordNumber() + 4; // +4 เพราะข้ามไปแล้ว
 
-                // เก็บค่าทุกคอลัมน์ (trim แล้ว) ลง list
-                List<String> vals = StreamSupport.stream(rec.spliterator(), false)
-                        .map(String::trim)
-                        .collect(Collectors.toList());
-                // เติมให้มีอย่างน้อย 11 คอลัมน์
-                while (vals.size() < 11) vals.add("");
-
-                String fileProjectId = vals.get(0);   // โปรเจกต์ไอดี
-                String posterCommittee = vals.get(10); // ค่า Poster‑Committee ที่คอลัมน์ 10
-
-                // 1) หา projectId ใหม่
-                if (!fileProjectId.isEmpty()) {
-                    Optional<Project> pOpt = projectRepository.findById(fileProjectId);
-                    if (pOpt.isPresent()) {
-                        currentProjectId = pOpt.get().getProjectId();
-                    } else {
-                        warnings.add("Row " + rowIndex +
-                                ": Project ID '" + fileProjectId + "' ไม่พบ");
+                    // 1) ถ้ามี Project ID ใหม่ ให้อัปเดตตัวชี้
+                    if (!fileProjId.isBlank()) {
+                        Optional<Project> projOpt = projectRepository.findById(fileProjId);
+                        if (projOpt.isEmpty()) {
+                            warnings.add("Row " + rowNum + ": ไม่พบ Project ID '" + fileProjId + "'");
+                            continue;
+                        }
+                        currentProjectId = fileProjId;
+                    }
+                    if (currentProjectId == null) {
+                        warnings.add("Row " + rowNum + ": ยังไม่มี Project ID ก่อนหน้าให้ใช้");
                         continue;
                     }
-                } else if (currentProjectId == null) {
-                    // ถ้าไม่เจอ id ในแถวแรก ก็ข้าม
-//                    warnings.add("Row " + rowIndex + ": ไม่มี Project ID ให้ใช้");
-                    continue;
-                }
 
-                // 2) ถ้าไม่มีชื่อให้ข้าม
-                if (posterCommittee.isEmpty()) {
-                    continue;
-                }
-                // ลบ single‑quote รอบๆ ออก (ถ้ามี)
-                posterCommittee = posterCommittee.replaceAll("^'+|'+$", "");
+                    // 2) ข้ามถ้า posterCommittee ว่าง
+                    if (posterCommittee.isBlank()) continue;
 
-                // 3) ตรวจสอบชื่ออาจารย์
-                Optional<Instructor> instOpt =
-                        instructorRepository.findByProfessorName(posterCommittee);
-                if (instOpt.isEmpty()) {
-                    warnings.add("Row " + rowIndex +
-                            ": ชื่อ Poster‑Committee '" + posterCommittee + "' ไม่พบ");
-                    continue;
-                }
-                Instructor instructor = instOpt.get();
-                if (instructor.getProfessorId() == null) {
-                    String newId = generateNextInstructorId();
-                    instructor.setProfessorId(newId);
-                    instructorRepository.save(instructor);
-                }
+                    // 3) lookup Instructor
+                    Optional<Instructor> instOpt = instructorRepository
+                            .findByProfessorName(posterCommittee);
+                    if (instOpt.isEmpty()) {
+                        warnings.add("Row " + rowNum + ": ไม่พบอาจารย์ Poster-Committee '" + posterCommittee + "'");
+                        continue;
+                    }
+                    Instructor instr = instOpt.get();
 
-                // 4) ป้องกันซ้ำ
-                boolean exists = projectInstructorRoleRepository
-                        .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(
-                                currentProjectId, instructor.getProfessorId(), "Poster-Committee");
-                if (exists) {
-                    warnings.add("Row " + rowIndex +
-                            ": Poster‑Committee '" + posterCommittee +
-                            "' ถูกเพิ่มแล้วในโปรเจกต์ " + currentProjectId);
-                    continue;
-                }
+                    // 4) สร้าง professorId ถ้ายังไม่มี
+                    if (instr.getProfessorId() == null) {
+                        instr.setProfessorId(generateNextInstructorId());
+                        instructorRepository.save(instr);
+                    }
 
-                // 5) สร้าง record ใหม่
-                Project project = projectRepository.findById(currentProjectId).get();
-                ProjectInstructorRole pir = new ProjectInstructorRole();
-                pir.setInstructorId(generateNextInstructorId());
-                pir.setAssignDate(LocalDateTime.now());
-                pir.setRole("Poster-Committee");
-                pir.setProjectIdRole(project);
-                pir.setInstructor(instructor);
-                projectInstructorRoleRepository.save(pir);
+                    // 5) ป้องกันซ้ำ
+                    boolean exists = projectInstructorRoleRepository
+                            .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(
+                                    currentProjectId,
+                                    instr.getProfessorId(),
+                                    "Poster-Committee"
+                            );
+                    if (exists) continue;
+
+                    // 6) สร้าง record ใหม่
+                    Project project = projectRepository.findById(currentProjectId).get();
+                    ProjectInstructorRole pir = new ProjectInstructorRole();
+                    pir.setInstructorId(generateNextInstructorId());
+                    pir.setAssignDate(LocalDateTime.now());
+                    pir.setRole("Poster-Committee");
+                    pir.setProjectIdRole(project);
+                    pir.setInstructor(instr);
+                    projectInstructorRoleRepository.save(pir);
+                }
             }
         } catch (IOException e) {
-            throw new Exception("Error อ่านไฟล์ CSV: " + e.getMessage(), e);
+            throw new Exception("Error อ่าน CSV: " + e.getMessage(), e);
         }
 
         return warnings;
     }
+
 
 
     // -------------------- DELETE PROJECT -------------------- //

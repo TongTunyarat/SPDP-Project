@@ -622,18 +622,18 @@
         // helper: แยก comma เฉพาะข้างนอก quotes
         function splitCSV(line) {
             const out = [];
-            let cur = "", inside = false;
+            let cur = "", insideQuotes = false;
             for (let i = 0; i < line.length; i++) {
                 const ch = line[i];
                 if (ch === '"') {
-                    if (inside && line[i + 1] === '"') {
-                        // "" → " ภายใน field
+                    // ถ้าเจอ "" ให้ treat เป็น " เดียว
+                    if (insideQuotes && line[i + 1] === '"') {
                         cur += '"';
                         i++;
                     } else {
-                        inside = !inside;
+                        insideQuotes = !insideQuotes;
                     }
-                } else if (ch === ',' && !inside) {
+                } else if (ch === ',' && !insideQuotes) {
                     out.push(cur);
                     cur = "";
                 } else {
@@ -645,28 +645,29 @@
         }
 
         // 1) ทำให้แต่ละ "logical row" สมบูรณ์ก่อน
-        const raw = csv.split(/\r?\n/);
+        const rawLines = csv.split(/\r?\n/);
         const rows = [];
-        let buf = "";
-        raw.forEach(line => {
-            buf += (buf ? "\n" : "") + line;
-            // นับ " ว่าคู่ครบหรือยัง
-            const qc = (buf.match(/"/g) || []).length;
-            if (qc % 2 === 0) {
-                rows.push(buf);
-                buf = "";
+        let buffer = "";
+        for (const line of rawLines) {
+            buffer += (buffer ? "\n" : "") + line;
+            const quoteCount = (buffer.match(/"/g) || []).length;
+            if (quoteCount % 2 === 0) {
+                rows.push(buffer);
+                buffer = "";
             }
-        });
-        if (buf) rows.push(buf); // ถ้ามียังเหลือก็อัดลงไป
+        }
+
+        if (buffer) rows.push(buffer);
 
         // 2) ตรวจความยาวคอลัมน์ ในทุกแถว (ข้าม 5 แถว header)
-        for (let i = 5; i < rows.length; i++) {
+        for (let i = 10; i < rows.length; i++) {
             const cols = splitCSV(rows[i]);
             if (cols.length < EXPECTED_COLS) {
                 Swal.fire({
                     icon: 'error',
                     title: 'ไฟล์ไม่ถูกต้อง',
-                    text: `บรรทัดที่ ${i+1} พบ ${cols.length} คอลัมน์ แต่ต้องเป็นอย่างน้อย ${EXPECTED_COLS} คอลัมน์`
+                    // text: `บรรทัดที่ ${i+1} พบ ${cols.length} คอลัมน์ แต่ต้องเป็นอย่างน้อย ${EXPECTED_COLS} คอลัมน์`
+                    text: 'กรุณาอัปโหลดไฟล์ Poster Committee'
                 });
                 return [];
             }
