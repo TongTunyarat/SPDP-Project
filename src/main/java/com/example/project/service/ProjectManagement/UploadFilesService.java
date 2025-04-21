@@ -40,7 +40,6 @@ public class UploadFilesService {
     private InstructorRepository instructorRepository;
 
 
-
     // ฟังก์ชันในการตรวจสอบว่าเป็นชื่ออาจารย์ที่ถูกต้องหรือไม่
     private boolean isValidInstructor(String instructor) {
         return instructor != null && !instructor.trim().isEmpty() && !instructor.equals("Aj. XXXX");
@@ -78,11 +77,6 @@ public class UploadFilesService {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new IllegalArgumentException("Project not found for ID: " + projectId));
 
-//        // ลบข้อมูลอาจารย์ที่ปรึกษาที่เกี่ยวข้องกับโปรเจกต์นี้
-//        List<ProjectInstructorRole> existingRoles = projectInstructorRoleRepository.findByProjectIdRole_ProjectId(projectId);
-//        if (existingRoles != null && !existingRoles.isEmpty()) {
-//            projectInstructorRoleRepository.deleteAll(existingRoles);  // ลบอาจารย์ที่ปรึกษาทั้งหมดที่เกี่ยวข้องกับโปรเจกต์นี้
-//        }
 
         // ลบข้อมูลนักศึกษาที่เกี่ยวข้องกับโปรเจกต์นี้
         List<StudentProject> studentProjects = studentProjectRepository.findByProject_ProjectId(projectId);
@@ -94,9 +88,76 @@ public class UploadFilesService {
         projectRepository.delete(project);
     }
 
+
+    private final DefenseEvaluationRepository defenseRepo;
+    private final ProjectInstructorRoleRepository roleRepo;
+    private final StudentProjectRepository stuRepo;
+    private final ProjectRepository projRepo;
+    private final PosterEvaRepository posterRepo;
+    private final ProposalEvaluationRepository proposalRepo;
+    private final GradingDefenseEvaluationRepository gradeDefenseRepo;
+    private final GradingProposalEvaluationRepository gradePropRepo;
+    private final ProposalEvalScoreRepository proposalEvalScore;
+    private final DefenseEvalScoreRepository defenseEvalScore;
+    private final PosterEvaScoreRepository posterEvalScore;
+    private final DefenseSchedRepository defenseSched;
+    private final ProposalSchedRepository proposalSched;
+
+    public UploadFilesService(
+            DefenseEvaluationRepository defenseRepo,
+            ProjectInstructorRoleRepository roleRepo,
+            StudentProjectRepository stuRepo,
+            ProjectRepository projRepo,
+            PosterEvaRepository posterRepo,
+            ProposalEvaluationRepository proposalRepo,
+            GradingProposalEvaluationRepository gradePropRepo,
+            GradingDefenseEvaluationRepository gradeDefenseRepo,
+            ProposalEvalScoreRepository proposalEvalScore,
+            DefenseEvalScoreRepository defenseEvalScore,
+            PosterEvaScoreRepository posterEvalScore,
+            DefenseSchedRepository defenseSched,
+            ProposalSchedRepository proposalSched
+    ) {
+        this.defenseRepo = defenseRepo;
+        this.roleRepo = roleRepo;
+        this.stuRepo = stuRepo;
+        this.projRepo = projRepo;
+        this.posterRepo = posterRepo;
+        this.proposalRepo = proposalRepo;
+        this.gradeDefenseRepo = gradeDefenseRepo;
+        this.gradePropRepo = gradePropRepo;
+        this.proposalEvalScore = proposalEvalScore;
+        this.defenseEvalScore = defenseEvalScore;
+        this.posterEvalScore =posterEvalScore;
+        this.defenseSched = defenseSched;
+        this.proposalSched = proposalSched;
+    }
+
+    @Transactional
     public void deleteAllProjects() {
-        // ลบทุกโปรเจกต์ในฐานข้อมูล
-        projectRepository.deleteAll();
+        // 1) bulk‑delete ข้อมูลใน child ก่อน
+        proposalEvalScore.deleteAllInBatch();
+        defenseEvalScore.deleteAllInBatch();
+        posterEvalScore.deleteAllInBatch();
+
+        proposalRepo.deleteAllInBatch();
+        posterRepo.deleteAllInBatch();
+        defenseRepo.deleteAllInBatch();
+
+        gradePropRepo.deleteAllInBatch();
+        gradeDefenseRepo.deleteAllInBatch();
+
+        defenseSched.deleteAllInBatch();
+        proposalSched.deleteAllInBatch();
+
+        // 2) bulk‑delete project‑instructor‑role
+        roleRepo.deleteAllInBatch();
+
+        // 3) bulk‑delete student‑project
+        stuRepo.deleteAllInBatch();
+
+        // 4) bulk‑delete project
+        projRepo.deleteAllInBatch();
     }
 
 
@@ -441,7 +502,7 @@ public class UploadFilesService {
 
         // 2) ถ้าไม่มีค่าว่างและไม่ซ้ำแล้ว ก็เริ่มอัพลง DB ตามเดิม
         int year = LocalDate.now().getYear();
-        Map<String,Integer> counters = new HashMap<>();
+        Map<String, Integer> counters = new HashMap<>();
         int studentCounter = Integer.parseInt(generateNextStudentPjId());
 
         for (FileProjectData fp : fileData.values()) {
@@ -486,8 +547,8 @@ public class UploadFilesService {
                 studentProjectRepository.save(sp);
             }
 
-            createRoles(fp.advisors,    "Advisor",    project);
-            createRoles(fp.coAdvisors,  "Co-Advisor", project);
+            createRoles(fp.advisors, "Advisor", project);
+            createRoles(fp.coAdvisors, "Co-Advisor", project);
         }
 
         return warnings;
@@ -537,15 +598,15 @@ public class UploadFilesService {
                 Arrays.fill(tmp, cells.length, 9, "");
                 cells = tmp;
             }
-            String no              = cells[0].trim();
-            String title           = cells[1].trim();
-            String desc            = cells[2].trim();
-            String category        = cells[3].trim();
-            String studentId       = cells[4].trim();
-            String studentName     = cells[5].trim();
-            String program         = cells[6].trim();
-            String advisor         = cells[7].trim();
-            String coAdvisor       = cells[8].trim();
+            String no = cells[0].trim();
+            String title = cells[1].trim();
+            String desc = cells[2].trim();
+            String category = cells[3].trim();
+            String studentId = cells[4].trim();
+            String studentName = cells[5].trim();
+            String program = cells[6].trim();
+            String advisor = cells[7].trim();
+            String coAdvisor = cells[8].trim();
 
             // ถ้ามี No ใหม่ ให้สร้าง DTO ใหม่
             if (!no.isEmpty()) {
@@ -555,7 +616,7 @@ public class UploadFilesService {
                 );
             }
             if (currentNo == null) {
-                throw new IllegalStateException("Row " + (i+1) + ": missing No.");
+                throw new IllegalStateException("Row " + (i + 1) + ": missing No.");
             }
 
             FileProjectData fp = map.get(currentNo);
@@ -577,26 +638,27 @@ public class UploadFilesService {
     }
 
 
-
     // —— in‑memory DTO’s ——
     private static class FileProjectData {
         String no, title, description, category, program;
-        List<FileStudent> students   = new ArrayList<>();
-        List<String> advisors        = new ArrayList<>();
-        List<String> coAdvisors      = new ArrayList<>();
+        List<FileStudent> students = new ArrayList<>();
+        List<String> advisors = new ArrayList<>();
+        List<String> coAdvisors = new ArrayList<>();
 
         FileProjectData(String no, String t, String d, String c, String p) {
-            this.no          = no;
-            this.title       = t;
+            this.no = no;
+            this.title = t;
             this.description = d;
-            this.category    = c;
-            this.program     = p;
+            this.category = c;
+            this.program = p;
         }
     }
+
     private static class FileStudent {
         String id, name;
+
         FileStudent(String id, String name) {
-            this.id   = id;
+            this.id = id;
             this.name = name;
         }
     }
@@ -653,7 +715,6 @@ public class UploadFilesService {
         int nextId = Integer.parseInt(numericPart) + 1;  // เพิ่ม 1
         return String.format("INST%03d", nextId);  // ใช้ String.format เพื่อให้รหัสใหม่มีรูปแบบเหมือนเดิม เช่น INST002, INST003, ...
     }
-
 
 
     public List<String> processProjectCommittee(MultipartFile file) throws Exception {

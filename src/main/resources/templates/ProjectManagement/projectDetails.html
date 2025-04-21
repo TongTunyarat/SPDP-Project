@@ -16,6 +16,11 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
+    <!-- CSRF Token -->
+    <meta name="_csrf" content="${_csrf.token}"/>
+    <meta name="_csrf_header" content="${_csrf.headerName}"/>
+
+
 </head>
 
 <body>
@@ -112,13 +117,13 @@
                 <!--                        <a href="#" id="export-poster-committee-template">Export Poster Committee</a>-->
                 <!--                    </div>-->
                 <!--                </div>-->
-                <div class="dropdown-export">
-                    <button class="dropbtn">Export Project Data</button>
-                    <div class="dropdown-content">
-                        <a href="#" id="export-project-raw-excel">Export Raw Data</a>
-                        <a href="#" id="export-project-merge-excel">Export Project Data</a>
-                    </div>
-                </div>
+<!--                <div class="dropdown-export">-->
+<!--                    <button class="dropbtn">Export Project Data</button>-->
+<!--                    <div class="dropdown-content">-->
+<!--                        <a href="#" id="export-project-raw-excel">Export Raw Data</a>-->
+<!--                        <a href="#" id="export-project-merge-excel">Export Project Data</a>-->
+<!--                    </div>-->
+<!--                </div>-->
                 <input type="file" id="upload-file" accept=".csv, .xlsx, .xls" style="display: none;"/>
                 <button id="upload-btn">Upload Files</button>
                 <button class="addProject-btn"><a href="/project-add-new-project"> + Add Projects </a></button>
@@ -236,16 +241,6 @@
                     </div>
                 </div>
 
-                <!--                <div class="loading" id="loading">-->
-                <!--                    <div class="spinner"></div>-->
-                <!--                    <p>กำลังประมวลผลข้อมูล...</p>-->
-                <!--                </div>-->
-
-
-                <!--                &lt;!&ndash; ปุ่ม Preview และ Save &ndash;&gt;-->
-                <!--                <button id="preview-btn">Preview</button>-->
-                <!--                <button id="save-btn" style="display:none;">Save</button>-->
-
                 <!-- Preview Content -->
                 <div id="preview-content"></div>
 
@@ -282,7 +277,7 @@
                 <div class="popup-content">
                     <p>Type "DELETE ALL PROJECT" to confirm deletion.</p>
                     <input type="text" id="deleteAllInput" placeholder="Type DELETE ALL PROJECT"/>
-                    <button id="confirmDeleteAllBtn">Delete All</button>
+                    <button id="confirmDeleteAllBtn" type="button">Delete All</button>
                     <button id="cancelDeleteAllBtn">Cancel</button>
                 </div>
             </div>
@@ -420,15 +415,21 @@
     function fetchProjects() {
         fetch("http://localhost:8080/admin/projectOverview")
             .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
+                if (!response.ok) throw new Error("Network response was not ok");
                 return response.json();
             })
             .then(data => {
-                projectsData = data;  // เก็บข้อมูลทั้งหมด
-                displayResults(currentPage);  // แสดงผลหน้าปัจจุบัน
-                updatePagination();  // อัปเดตปุ่ม pagination
+                projectsData = data;
+
+                const uploadBtn = document.getElementById('upload-btn');
+                if (projectsData.length > 0) {
+                    uploadBtn.disabled = true;
+                    uploadBtn.classList.add('disabled');
+                    uploadBtn.textContent = 'Upload Disabled';
+                }
+
+                displayResults(currentPage);  // แสดงผล
+                updatePagination();           // ปรับ pagination
             })
             .catch(error => console.error("Error fetching project data:", error));
     }
@@ -543,7 +544,11 @@
         paginationContainer.appendChild(nextButton);
     }
 
+
+
+
     // -------------------- Upload Files -------------------- //
+
     // เปิด Modal เมื่อกดปุ่ม Upload Files
     document.getElementById('upload-btn').addEventListener('click', function () {
         document.getElementById('uploadModal').style.display = 'block';
@@ -648,8 +653,6 @@
         return csv;
     }
 
-
-    // ------------------ Code Test Test -----------------
 
     let selectedFile = null;
     let uploadedData = null;
@@ -780,12 +783,12 @@
 
             // เติมข้อมูล cell
             let rowHTML = `
-  <td>${project.no || "-"}</td>
-  <td>${project.projectTitle || "-"}</td>
-  <td>${project.projectDescription || "-"}</td>
-  <td>${project.program || "-"}</td>
-  <td>${project.advisor || "-"}</td>
-`;
+              <td>${project.no || "-"}</td>
+              <td>${project.projectTitle || "-"}</td>
+              <td>${project.projectDescription || "-"}</td>
+              <td>${project.program || "-"}</td>
+              <td>${project.advisor || "-"}</td>
+            `;
 
             for (let i = 0; i < maxStudents; i++) {
                 if (project.studentList[i]) {
@@ -881,6 +884,7 @@
 
 
     // -------------------- Delete Project -------------------- //
+
     // ฟังก์ชันยืนยันการลบ
     function confirmDelete(event, projectId) {
         event.preventDefault(); // หยุดการส่งฟอร์ม
@@ -961,24 +965,69 @@
 
     // ฟังก์ชันลบโปรเจกต์ทั้งหมด
     function deleteAllProjects() {
-        fetch('http://localhost:8080/admin/deleteAllProjects', {
+        // ดึง CSRF token
+        const tokenMeta = document.querySelector('meta[name="_csrf"]');
+        const token     = tokenMeta ? tokenMeta.getAttribute('content') : null;
+
+        const headers = new Headers();
+        headers.append('Content-Type', 'application/json');
+        if (token) {
+            // ชื่อ header ตาม Spring Security default
+            headers.append('X-CSRF-TOKEN', token);
+        }
+
+        fetch('/admin/deleteAllProjects', {
             method: 'DELETE',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: headers
         })
-            .then(response => {
-                if (response.ok) {
-                    alert('All projects deleted successfully.');
-                    location.reload();  // รีเฟรชหน้าใหม่
-                } else {
-                    alert('Error deleting all projects.');
+            .then(res => {
+                if (!res.ok) {
+                    // อ่านข้อความ error จาก response แล้วโยนเป็น Exception
+                    return res.text().then(text => { throw new Error(text) });
                 }
+                return res.text();
             })
-            .catch(error => {
-                alert('Connection error while deleting projects.');
+            .then(msg => {
+                // ถ้าลบสำเร็จ ให้โชว์ Swal success
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Delete All Project Success!',
+                    text: msg,
+                    timer: 1500,
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    // ถ้าต้องการรีโหลดหน้า
+                    location.reload();
+                });
+            })
+            .catch(err => {
+                // กรณี error ให้โชว์ Swal error
+                console.error('Error deleting all projects:', err);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'เกิดข้อผิดพลาด',
+                    text: err.message,
+                    confirmButtonText: 'ปิด'
+                });
             });
     }
+
+    // ผูกปุ่ม confirm
+    document.getElementById('confirmDeleteAllBtn').addEventListener('click', function () {
+        const userInput = document.getElementById('deleteAllInput').value.trim();
+        if (userInput === 'DELETE ALL PROJECT') {
+            deleteAllProjects();
+            document.getElementById('deleteAllPopup').style.display = 'none';
+        } else {
+            Swal.fire({
+                icon: 'warning',
+                title: 'กรุณาพิมพ์ข้อความให้ถูกต้อง',
+                text: 'พิมพ์ "DELETE ALL PROJECT" ให้ตรงก่อนยืนยัน',
+                confirmButtonText: 'ตกลง'
+            });
+        }
+    });
+
 
 </script>
 
@@ -1163,8 +1212,8 @@
             });
     }
 
-    // เพิ่ม event listener ให้ปุ่ม Export
-    document.getElementById("export-project-raw-excel").addEventListener("click", exportRawData);
+    // // เพิ่ม event listener ให้ปุ่ม Export
+    // document.getElementById("export-project-raw-excel").addEventListener("click", exportRawData);
 
 
     function exportMergedData() {
@@ -1400,8 +1449,8 @@
             });
     }
 
-    // ผูก event listener สำหรับ Export แบบใหม่
-    document.getElementById("export-project-merge-excel").addEventListener("click", exportMergedData);
+    // // ผูก event listener สำหรับ Export แบบใหม่
+    // document.getElementById("export-project-merge-excel").addEventListener("click", exportMergedData);
 
 
     function exportProjectTemplate() {
@@ -1824,8 +1873,8 @@
         });
     }
 
-    // ผูก event listener สำหรับ Export แบบใหม่
-    document.getElementById("export-committee-template").addEventListener("click", exportCommitteeTemplate);
+    // // ผูก event listener สำหรับ Export แบบใหม่
+    // document.getElementById("export-committee-template").addEventListener("click", exportCommitteeTemplate);
 
 
     function exportPosterCommitteeTemplate() {
@@ -2002,9 +2051,9 @@
             });
     }
 
-    // เพิ่ม event listener ให้ปุ่ม Export
-    document.getElementById("export-poster-committee-template").addEventListener("click", exportPosterCommitteeTemplate);
-
+    // // เพิ่ม event listener ให้ปุ่ม Export
+    // document.getElementById("export-poster-committee-template").addEventListener("click", exportPosterCommitteeTemplate);
+    //
 
 </script>
 

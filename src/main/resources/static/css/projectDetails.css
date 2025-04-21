@@ -587,6 +587,11 @@ td form {
     cursor: pointer;
 }
 
+button.disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
 .close-btn:hover,
 .close-btn:focus {
     color: black;

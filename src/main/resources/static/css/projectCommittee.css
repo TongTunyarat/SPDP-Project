@@ -994,6 +994,12 @@ select {
     color: black;
 }
 
+button.disabled {
+    opacity: 0.2;
+    cursor: not-allowed;
+}
+
+
 /*.committee1-header {*/
 /*    background-color: #F9FFA1;*/
 /*    color: black;*/

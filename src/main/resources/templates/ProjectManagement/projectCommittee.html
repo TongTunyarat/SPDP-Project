@@ -327,15 +327,21 @@
     function fetchProjects() {
         fetch("http://localhost:8080/admin/projectOverview")
             .then(response => {
-                if (!response.ok) {
-                    throw new Error("Network response was not ok");
-                }
+                if (!response.ok) throw new Error("Network response was not ok");
                 return response.json();
             })
             .then(data => {
-                projectsData = data;  // เก็บข้อมูลทั้งหมด
-                displayResults(currentPage);  // แสดงผลหน้าปัจจุบัน
-                updatePagination();  // อัปเดตปุ่ม pagination
+                projectsData = data;
+
+                const uploadBtn = document.getElementById('upload-btn');
+                if (projectsData.length > 0) {
+                    uploadBtn.disabled = true;
+                    uploadBtn.classList.add('disabled');
+                    uploadBtn.textContent = 'Upload Disabled';
+                }
+
+                displayResults(currentPage);  // แสดงผล
+                updatePagination();           // ปรับ pagination
             })
             .catch(error => console.error("Error fetching project data:", error));
     }
