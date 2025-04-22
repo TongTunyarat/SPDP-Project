@@ -622,6 +622,8 @@
 
             studentData.totalPresentationScore = totalPresentationScore;
 
+
+
             // **คำนวณคะแนน Document**
             let rawDocumentScore = 0;
 
@@ -694,9 +696,9 @@
             const row = document.createElement('tr');
             row.innerHTML = `
             <td>${studentName}</td>
-            <td>${totalPresentationScore}</td>
+            <td>${totalPresentationScore.toFixed(2)}</td>
             <td>${totalDocumentScore}</td>
-            <td>${totalPosterScore}</td>
+            <td>${totalPosterScore.toFixed(2)}</td>
             <td>${totalScore}</td>
         `;
             tableBody.appendChild(row);
