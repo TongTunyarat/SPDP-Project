@@ -1047,26 +1047,32 @@
         // Show the modal
         modal.style.display = "block";
 
-        // ถ้าผู้ใช้กดปิด modal
-        closeButton.addEventListener('click', function () {
-            modal.style.display = "none"; // ซ่อน modal
+        const newCloseButton = closeButton.cloneNode(true);
+        const newConfirmSaveButton = confirmSaveButton.cloneNode(true);
+        const newCancelSaveButton = cancelSaveButton.cloneNode(true);
+
+        closeButton.parentNode.replaceChild(newCloseButton, closeButton);
+        confirmSaveButton.parentNode.replaceChild(newConfirmSaveButton, confirmSaveButton);
+        cancelSaveButton.parentNode.replaceChild(newCancelSaveButton, cancelSaveButton);
+
+        // Update references
+        const closeBtn = document.getElementById('closeModal');
+        const confirmBtn = document.getElementById('confirmSave');
+        const cancelBtn = document.getElementById('cancelSave');
+
+        // Add new event listeners
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = "none";
         });
 
+        cancelBtn.addEventListener('click', function() {
+            modal.style.display = "none";
+        });
+
+
         // ถ้าผู้ใช้กดยืนยันการบันทึกคะแนน
-        confirmSaveButton.addEventListener('click', function () {
-            modal.style.display = "none"; // ซ่อน modal
-    // document.querySelector('.save-button').addEventListener('click', function(event) {
-    //     event.preventDefault();
-    //
-    //     // แสดง Modal เพื่อให้ผู้ใช้ยืนยัน
-    //     document.getElementById("confirmationModal").style.display = "block";
-    //
-    //     // เมื่อผู้ใช้คลิก "Yes, Submit"
-    //     document.getElementById("confirmSave").addEventListener('click', function() {
-    //         // ปิด Modal
-    //         document.getElementById("confirmationModal").style.display = "none";
-    //
-    //         console.log("Save Process");
+        confirmBtn.addEventListener('click', function() {
+            modal.style.display = "none";
 
             // projectId
             var projectId = getProjectIdFromURL();
@@ -1175,24 +1181,9 @@
                     window.location.href = "/show-defense-eva-projects";
                 });
 
-                // แสดงข้อความ alert ว่าการบันทึกสำเร็จ
-                // alert('Evaluation saved successfully!');
-
-                // เปลี่ยน path ไปที่ /show-defense-eva-projects
-                // window.location.href = '/show-defense-eva-projects';
             }
         });
 
-        // เมื่อผู้ใช้คลิก "Cancel"
-        document.getElementById("cancelSave").addEventListener('click', function() {
-            // ปิด Modal
-            document.getElementById("confirmationModal").style.display = "none";
-        });
-
-        // เมื่อผู้ใช้คลิกปิด Modal
-        document.getElementById("closeModal").addEventListener('click', function() {
-            document.getElementById("confirmationModal").style.display = "none";
-        });
     });
 
 </script>

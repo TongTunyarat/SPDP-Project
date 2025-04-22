@@ -663,7 +663,22 @@
             return; // Stop execution and don't show the confirmation modal
         }
 
+        // Show the modal
         document.getElementById("confirmationModal").style.display = "block";
+
+        // Get references to buttons
+        const confirmBtn = document.getElementById("confirmSave");
+        const cancelBtn = document.getElementById("cancelSave");
+        const closeBtn = document.getElementById("closeModal");
+
+        // Remove existing event listeners by cloning and replacing the buttons
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        const newCloseBtn = closeBtn.cloneNode(true);
+
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
 
         document.getElementById("confirmSave").addEventListener('click', function() {
             document.getElementById("confirmationModal").style.display = "none";
@@ -783,6 +798,7 @@
         document.getElementById("closeModal").addEventListener('click', function() {
             document.getElementById("confirmationModal").style.display = "none";
         });
+
     });
 
 </script>
