@@ -229,9 +229,9 @@
             <button class="page-btn" onclick="changePage('next')">&gt;</button>
         </div>
 
-<!--        <div class="btn-footer">-->
-<!--            <button class="deleteAll-btn">Delete ALL</button>-->
-<!--        </div>-->
+        <!--        <div class="btn-footer">-->
+        <!--            <button class="deleteAll-btn">Delete ALL</button>-->
+        <!--        </div>-->
 
 
     </div>
@@ -253,6 +253,16 @@
                 item.classList.add("active"); // เพิ่ม class "active" ให้เมนูปัจจุบัน
             }
         });
+    });
+
+    const semesterSelect = document.getElementById("semester-selector");
+    semesterSelect.addEventListener("change", function () {
+        console.log("Selected Semester:", semesterSelect.value);
+
+        localStorage.setItem("selectedSemester", semesterSelect.value);
+
+        fetchData();
+
     });
 
     // ฟังก์ชันกรองโปรเจกต์ตามหมวดหมู่
@@ -289,10 +299,7 @@
     function populateSemesterOptions() {
         const sel = document.getElementById('semester-selector');
         sel.innerHTML = '';  // เคลียร์ก่อน (ถ้าโหลดซ้ำ)
-        // เก็บ unique semesters
-        // const sems = Array.from(new Set(projectsData.map(p => String(p.semester))))
-        //     .sort()
-        //     .add(yearnow);
+
         let yearnow = String(new Date().getFullYear());
         let sems = Array.from(
             new Set([...projectsData.map(p => String(p.semester)), String(yearnow)])
@@ -301,21 +308,27 @@
         sems.forEach(s => {
             const opt = document.createElement('option');
             opt.value = s;
-            opt.textContent = s;
+            opt.textContent = "📆 " + s;
             sel.appendChild(opt);
         });
 
-        // ---- เซ็ต defaultYear ----
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth() + 1;  // 1-12
-        const defaultYear = (currentMonth <= 8 ? currentYear - 1 : currentYear).toString();
+        const savedSemester = localStorage.getItem("selectedSemester");
 
-        if (sems.includes(defaultYear)) {
-            sel.value = defaultYear;
+        if (savedSemester && sems.includes(savedSemester)) {
+            sel.value = savedSemester;
         } else {
-            // ถ้าไม่มีปีนั้น ให้เลือกตัวแรก
-            sel.selectedIndex = 0;
+            // ---- เซ็ต defaultYear ----
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;  // 1-12
+            const defaultYear = (currentMonth <= 8 ? currentYear - 1 : currentYear).toString();
+
+            if (sems.includes(defaultYear)) {
+                sel.value = defaultYear;
+            } else {
+                // ถ้าไม่มีปีนั้น ให้เลือกตัวแรก
+                sel.selectedIndex = 0;
+            }
         }
     }
 

@@ -285,9 +285,16 @@
 </html>
 <script>
 
-    // document.addEventListener("DOMContentLoaded", function () {
-    //     fetchProjects();
-    // });
+
+    const semesterSelect = document.getElementById("semester-selector");
+    semesterSelect.addEventListener("change", function () {
+        console.log("Selected Semester:", semesterSelect.value);
+
+        localStorage.setItem("selectedSemester", semesterSelect.value);
+
+        fetchData();
+
+    });
 
     document.addEventListener("DOMContentLoaded", function () {
         const menuItems = document.querySelectorAll(".sidebar ul li a");
@@ -335,10 +342,7 @@
     function populateSemesterOptions() {
         const sel = document.getElementById('semester-selector');
         sel.innerHTML = '';  // เคลียร์ก่อน (ถ้าโหลดซ้ำ)
-        // เก็บ unique semesters
-        // const sems = Array.from(new Set(projectsData.map(p => String(p.semester))))
-        //     .sort()
-        //     .add(yearnow);
+
         let yearnow = String(new Date().getFullYear());
         let sems = Array.from(
             new Set([...projectsData.map(p => String(p.semester)), String(yearnow)])
@@ -347,21 +351,29 @@
         sems.forEach(s => {
             const opt = document.createElement('option');
             opt.value = s;
-            opt.textContent = s;
+            opt.textContent = "📆 " + s;
             sel.appendChild(opt);
         });
 
-        // ---- เซ็ต defaultYear ----
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth() + 1;  // 1-12
-        const defaultYear = (currentMonth <= 8 ? currentYear - 1 : currentYear).toString();
+        const savedSemester = localStorage.getItem("selectedSemester");
 
-        if (sems.includes(defaultYear)) {
-            sel.value = defaultYear;
+        if (savedSemester && sems.includes(savedSemester)) {
+            sel.value = savedSemester;
         } else {
-            // ถ้าไม่มีปีนั้น ให้เลือกตัวแรก
-            sel.selectedIndex = 0;
+            // ---- เซ็ต defaultYear ----
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;   // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
+
+            // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
+            const defaultYear = (currentMonth <= 8 ? currentYear - 1 : currentYear).toString();
+
+            if (sems.includes(defaultYear.toString())) {
+                sel.value = defaultYear.toString();
+            } else {
+
+                sel.selectedIndex = 0;
+            }
         }
     }
 
@@ -572,7 +584,6 @@
             .addEventListener('input', debounce(applyFilters, 200));
         fetchProjects();
     });
-
 
 
     // -------------------- Pagination -------------------- //
