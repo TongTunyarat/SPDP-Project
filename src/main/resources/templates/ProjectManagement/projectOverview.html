@@ -821,6 +821,9 @@
     function exportToExcel() {
         console.log("Export button clicked");
 
+        // อ่าน semester ปัจจุบันจาก dropdown
+        const sem = document.getElementById('semester-selector').value;
+
         // ดึงข้อมูลจาก API
         fetch("http://localhost:8080/admin/projectOverview")
             .then(resp => resp.json())
@@ -828,6 +831,12 @@
                 if (!data || data.length === 0) {
                     console.warn("No data available to export.");
                     return;
+                }
+
+                // กรองเอาเฉพาะโปรเจกต์ของ semester ที่เลือก
+                const filtered = data.filter(p => String(p.semester) === sem);
+                if (filtered.length === 0) {
+                    return Swal.fire('Warning', `ไม่มีข้อมูลสำหรับ Semester ${sem}`, 'warning');
                 }
 
                 // อ่านคอลัมน์ที่เลือก
@@ -850,7 +859,7 @@
 
                 // เตรียมข้อมูลแต่ละแถว
                 const rows = [];
-                data.forEach(project => {
+                filtered.forEach(project => {
                     // หา Advisor
                     const advisorName = project.professorList.find(p => p.role === "Advisor")?.professorName || "";
 
@@ -990,12 +999,18 @@
 
     // 2) ฟังก์ชัน export ฉบับเต็ม
     async function exportTemplateNew() {
-        // 1) ตรวจสอบว่ามี data หรือไม่
+
         if (!projectsData || projectsData.length === 0) {
             return Swal.fire('Warning', 'ไม่มีข้อมูลโปรเจกต์ให้ส่งออก', 'warning');
         }
 
-        // 2) อ่านชื่อคอลัมน์ที่ติ๊กเลือก
+        const sem = document.getElementById('semester-selector').value;
+
+        const exportData = projectsData.filter(p => String(p.semester) === sem);
+        if (exportData.length === 0) {
+            return Swal.fire('Warning', `ไม่มีข้อมูลสำหรับ Semester ${sem}`, 'warning');
+        }
+
         let headers = getSelectedColumnsPC();
         if (headers.length === 0) {
             return Swal.fire('Warning', 'กรุณาเลือกอย่างน้อยหนึ่งคอลัมน์', 'warning');
@@ -1014,7 +1029,7 @@
         const projectMap = new Map(); // สำหรับ merge
         let globalRow = 6; // data เริ่มเขียนที่ row 6
 
-        projectsData.forEach(proj => {
+        exportData.forEach(proj => {
             // แยกอาจารย์ตาม role
             const advs = proj.professorList.filter(p=>p.role==="Advisor").map(p=>p.professorName);
             const coAd = proj.professorList.filter(p=>p.role==="Co-Advisor").map(p=>p.professorName);
