@@ -834,9 +834,6 @@
         return cols;
     }
 
-    // เมื่อกดปุ่ม Export ให้เรียก exportToExcel
-    document.getElementById('confirm-btn').addEventListener('click', exportToExcel);
-
     function exportToExcel() {
         console.log("Export button clicked");
 
@@ -964,7 +961,7 @@
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    a.download = 'Project_Overview.xlsx';
+                    a.download = 'Project_Overview_Raw.xlsx';
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);

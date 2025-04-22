@@ -454,6 +454,7 @@
 
         const savedSemester = localStorage.getItem("selectedSemester");
 
+        // ถ้ามีค่า savedSemester ใน localStorage ให้ตั้งค่าเป็นค่าที่เก็บไว้
         if (savedSemester && sems.includes(savedSemester)) {
             sel.value = savedSemester;
         } else {
