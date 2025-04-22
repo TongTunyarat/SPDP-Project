@@ -258,6 +258,16 @@
 
 <script>
 
+    const semesterSelect = document.getElementById("semester-selector");
+    semesterSelect.addEventListener("change", function () {
+        console.log("Selected Semester:", semesterSelect.value);
+
+        localStorage.setItem("selectedSemester", semesterSelect.value);
+
+        fetchData();
+
+    });
+
     document.addEventListener("DOMContentLoaded", function () {
         const menuItems = document.querySelectorAll(".sidebar ul li a");
 
@@ -305,6 +315,7 @@
     function populateSemesterOptions() {
         const sel = document.getElementById('semester-selector');
         sel.innerHTML = '';  // เคลียร์ก่อน (ถ้าโหลดซ้ำ)
+
         // เก็บ unique semesters
         const sems = Array.from(new Set(projectsData.map(p => String(p.semester))))
             .sort();
@@ -312,21 +323,29 @@
         sems.forEach(s => {
             const opt = document.createElement('option');
             opt.value = s;
-            opt.textContent = s;
+            opt.textContent = "📆 " + s;
             sel.appendChild(opt);
         });
 
-        // ---- เซ็ต defaultYear ----
-        const now = new Date();
-        const currentYear = now.getFullYear();
-        const currentMonth = now.getMonth() + 1;  // 1-12
-        const defaultYear = (currentMonth <= 8 ? currentYear - 1 : currentYear).toString();
+        const savedSemester = localStorage.getItem("selectedSemester");
 
-        if (sems.includes(defaultYear)) {
-            sel.value = defaultYear;
+        if (savedSemester && sems.includes(savedSemester)) {
+            sel.value = savedSemester;
         } else {
-            // ถ้าไม่มีปีนั้น ให้เลือกตัวแรก
-            sel.selectedIndex = 0;
+            // ---- เซ็ต defaultYear ----
+            const now = new Date();
+            const currentYear = now.getFullYear();
+            const currentMonth = now.getMonth() + 1;   // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
+
+            // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
+            const defaultYear = (currentMonth <= 8 ? currentYear - 1 : currentYear).toString();
+
+            if (sems.includes(defaultYear.toString())) {
+                sel.value = defaultYear.toString();
+            } else {
+
+                sel.selectedIndex = 0;
+            }
         }
     }
 
@@ -974,19 +993,19 @@
 
     function getSelectedColumnsPC() {
         const map = [
-            {id: "projectId",           name: "Project ID"},
-            {id: "projectTitle",        name: "Project Title"},
-            {id: "projectDescription",  name: "Project Description"},
-            {id: "projectCategory",     name: "Project Category"},
-            {id: "studentId",           name: "Student ID"},
-            {id: "studentName",         name: "Student Name"},
-            {id: "section",             name: "Section"},
-            {id: "track",               name: "Track"},
-            {id: "program",             name: "Program"},
-            {id: "advisor",             name: "Advisor"},
-            {id: "coAdvisor",           name: "Co-Advisor"},
-            {id: "committee1",          name: "Committee"},
-            {id: "posterCommittee1",    name: "Poster-Committee"}
+            {id: "projectId", name: "Project ID"},
+            {id: "projectTitle", name: "Project Title"},
+            {id: "projectDescription", name: "Project Description"},
+            {id: "projectCategory", name: "Project Category"},
+            {id: "studentId", name: "Student ID"},
+            {id: "studentName", name: "Student Name"},
+            {id: "section", name: "Section"},
+            {id: "track", name: "Track"},
+            {id: "program", name: "Program"},
+            {id: "advisor", name: "Advisor"},
+            {id: "coAdvisor", name: "Co-Advisor"},
+            {id: "committee1", name: "Committee"},
+            {id: "posterCommittee1", name: "Poster-Committee"}
         ];
         return map
             .filter(col => {
@@ -1020,7 +1039,7 @@
         if (!headers.includes("Project Category")) headers.splice(
             headers.indexOf("Project Description") + 1, 0, "Project Category"
         );
-        ["Co-Advisor","Committee","Poster-Committee"].forEach(col => {
+        ["Co-Advisor", "Committee", "Poster-Committee"].forEach(col => {
             if (!headers.includes(col)) headers.push(col);
         });
 
@@ -1031,66 +1050,86 @@
 
         exportData.forEach(proj => {
             // แยกอาจารย์ตาม role
-            const advs = proj.professorList.filter(p=>p.role==="Advisor").map(p=>p.professorName);
-            const coAd = proj.professorList.filter(p=>p.role==="Co-Advisor").map(p=>p.professorName);
-            const coms = proj.professorList.filter(p=>p.role==="Committee").map(p=>p.professorName);
-            const pos  = proj.professorList.filter(p=>p.role==="Poster-Committee").map(p=>p.professorName);
+            const advs = proj.professorList.filter(p => p.role === "Advisor").map(p => p.professorName);
+            const coAd = proj.professorList.filter(p => p.role === "Co-Advisor").map(p => p.professorName);
+            const coms = proj.professorList.filter(p => p.role === "Committee").map(p => p.professorName);
+            const pos = proj.professorList.filter(p => p.role === "Poster-Committee").map(p => p.professorName);
             // เตรียม students
             const studs = Array.isArray(proj.studentList)
-                ? proj.studentList.map(s=>({
-                    "Student ID":   s.studentId||"",
-                    "Student Name": s.studentName||"",
-                    "Section":      s.section||"",
-                    "Track":        s.track||""
+                ? proj.studentList.map(s => ({
+                    "Student ID": s.studentId || "",
+                    "Student Name": s.studentName || "",
+                    "Section": s.section || "",
+                    "Track": s.track || ""
                 }))
                 : [];
 
             const numRows = Math.max(studs.length, advs.length, coAd.length, coms.length, pos.length);
             // pad แต่ละ array
-            while(advs.length < numRows)  advs.push("");
-            while(coAd.length < numRows)  coAd.push("");
-            while(coms.length < numRows)  coms.push("");
-            while(pos.length  < numRows)  pos.push("");
-            while(studs.length< numRows)  studs.push({});
+            while (advs.length < numRows) advs.push("");
+            while (coAd.length < numRows) coAd.push("");
+            while (coms.length < numRows) coms.push("");
+            while (pos.length < numRows) pos.push("");
+            while (studs.length < numRows) studs.push({});
 
             const startRow = globalRow;
             for (let i = 0; i < numRows; i++, globalRow++) {
                 // สร้าง object แถวนี้
                 const obj = {};
                 headers.forEach(h => {
-                    switch(h) {
-                        case "Project ID":            obj[h] = proj.projectId; break;
-                        case "Project Title":         obj[h] = proj.projectTitle; break;
-                        case "Project Description":   obj[h] = proj.projectDescription; break;
-                        case "Project Category":      obj[h] = proj.category; break;
-                        case "Program":               obj[h] = proj.program; break;
+                    switch (h) {
+                        case "Project ID":
+                            obj[h] = proj.projectId;
+                            break;
+                        case "Project Title":
+                            obj[h] = proj.projectTitle;
+                            break;
+                        case "Project Description":
+                            obj[h] = proj.projectDescription;
+                            break;
+                        case "Project Category":
+                            obj[h] = proj.category;
+                            break;
+                        case "Program":
+                            obj[h] = proj.program;
+                            break;
                         case "Student ID":
                         case "Student Name":
                         case "Section":
                         case "Track":
-                            obj[h] = studs[i][h] || ""; break;
-                        case "Advisor":               obj[h] = advs[i]; break;
-                        case "Co-Advisor":            obj[h] = coAd[i]; break;
-                        case "Committee":             obj[h] = coms[i]; break;
-                        case "Poster-Committee":      obj[h] = pos[i]; break;
-                        default:                      obj[h] = "";
+                            obj[h] = studs[i][h] || "";
+                            break;
+                        case "Advisor":
+                            obj[h] = advs[i];
+                            break;
+                        case "Co-Advisor":
+                            obj[h] = coAd[i];
+                            break;
+                        case "Committee":
+                            obj[h] = coms[i];
+                            break;
+                        case "Poster-Committee":
+                            obj[h] = pos[i];
+                            break;
+                        default:
+                            obj[h] = "";
                     }
                 });
                 rowObjs.push(obj);
             }
-            projectMap.set(proj.projectId, { startRow, endRow: globalRow - 1 });
+            projectMap.set(proj.projectId, {startRow, endRow: globalRow - 1});
         });
 
         // 5) สร้าง Workbook & Worksheet
         const wb = new ExcelJS.Workbook();
         const ws = wb.addWorksheet("Project Overview");
-        ws.columns = headers.map(() => ({ width: 20 }));
+        ws.columns = headers.map(() => ({width: 20}));
 
         // 6) Merge title rows A1..A4
         const lastCol = String.fromCharCode(64 + headers.length);
-        ["1","2","3","4"].forEach(r => {
+        ["1", "2", "3", "4"].forEach(r => {
             ws.mergeCells(`A${r}:${lastCol}${r}`);
-            ws.getCell(`A${r}`).alignment = {horizontal:"center", vertical:"middle"};
+            ws.getCell(`A${r}`).alignment = {horizontal: "center", vertical: "middle"};
         });
         ws.getCell("A1").value = "Senior Project Overview";
         ws.getCell("A2").value = "Exported Project Committee Data";
@@ -1100,29 +1139,39 @@
         // 7) เขียน header row ที่แถว 5
         const hr = ws.getRow(5);
         hr.values = headers;
-        hr.font = {bold:true};
-        hr.alignment = {horizontal:"center", vertical:"middle"};
+        hr.font = {bold: true};
+        hr.alignment = {horizontal: "center", vertical: "middle"};
         hr.eachCell(cell => {
-            cell.fill   = {type:"pattern", pattern:"solid", fgColor:{argb:"FFB5E6A2"}};
-            cell.border = {top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"}};
+            cell.fill = {type: "pattern", pattern: "solid", fgColor: {argb: "FFB5E6A2"}};
+            cell.border = {
+                top: {style: "thin"},
+                left: {style: "thin"},
+                bottom: {style: "thin"},
+                right: {style: "thin"}
+            };
         });
 
         // 8) เขียน dataRows
         rowObjs.forEach((obj, idx) => {
             const row = ws.getRow(6 + idx);
             row.values = headers.map(h => obj[h]);
-            row.alignment = {vertical:"middle", horizontal:"left"};
+            row.alignment = {vertical: "middle", horizontal: "left"};
             row.eachCell(cell => {
-                cell.border = {top:{style:"thin"}, left:{style:"thin"}, bottom:{style:"thin"}, right:{style:"thin"}};
+                cell.border = {
+                    top: {style: "thin"},
+                    left: {style: "thin"},
+                    bottom: {style: "thin"},
+                    right: {style: "thin"}
+                };
             });
         });
 
         // 9) Merge คอลัมน์หลัก ตาม projectMap
-        ["Project ID","Project Title","Project Description","Project Category","Program","Advisor","Co-Advisor"]
+        ["Project ID", "Project Title", "Project Description", "Project Category", "Program", "Advisor", "Co-Advisor"]
             .forEach(colName => {
                 const colIdx = headers.indexOf(colName) + 1;
                 if (colIdx < 1) return;
-                projectMap.forEach(({startRow,endRow}) => {
+                projectMap.forEach(({startRow, endRow}) => {
                     if (endRow > startRow) {
                         ws.mergeCells(startRow, colIdx, endRow, colIdx);
                     }
@@ -1130,13 +1179,14 @@
             });
 
         // 10) ดาวน์โหลดไฟล์
-        const buf  = await wb.xlsx.writeBuffer();
-        const blob = new Blob([buf], { type:
+        const buf = await wb.xlsx.writeBuffer();
+        const blob = new Blob([buf], {
+            type:
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         });
-        const url  = URL.createObjectURL(blob);
-        const a    = document.createElement("a");
-        a.href     = url;
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
         a.download = "Project_Overview.xlsx";
         document.body.appendChild(a);
         a.click();
@@ -1145,8 +1195,6 @@
 
     // ผูกปุ่ม Export
     document.getElementById("export-project-excel-new").addEventListener("click", exportTemplateNew);
-
-
 
 
 </script>
