@@ -65,18 +65,18 @@ public class DefenseScheduleService {
         return ProjectList.stream()
                 // อย่าลืมกลับมา filter อาจารย์ เเล้วก็ปีการศึกษา
                 //❗️❗️❗️❗️❗️ ห้ามลบ
-//                .filter(i -> {
-//                    List<StudentProject> studentProjects = i.getStudentProjects();
-//                    if (studentProjects == null || studentProjects.isEmpty()) return false;
-//
-//                    boolean hasActive = studentProjects.stream()
-//                            .anyMatch(studentProject -> "Active".equalsIgnoreCase(studentProject.getStatus()));
-//
-//                    boolean allExited = studentProjects.stream()
-//                            .allMatch(studentProject -> "Exited".equalsIgnoreCase(studentProject.getStatus()));
-//
-//                    return hasActive && !allExited;
-//                })
+                .filter(i -> {
+                    List<StudentProject> studentProjects = i.getStudentProjects();
+                    if (studentProjects == null || studentProjects.isEmpty()) return false;
+
+                    boolean hasActive = studentProjects.stream()
+                            .anyMatch(studentProject -> "Active".equalsIgnoreCase(studentProject.getStatus()));
+
+                    boolean allExited = studentProjects.stream()
+                            .allMatch(studentProject -> "Exited".equalsIgnoreCase(studentProject.getStatus()));
+
+                    return hasActive && !allExited;
+                })
                 .filter(i -> Integer.parseInt(i.getSemester()) == semesterYearInt)
                 .map(i -> {
 
