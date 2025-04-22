@@ -601,22 +601,27 @@
             let totalPresentationScore = 0;
 
             for (const criteriaName in presentationScores) {
-                const sumScore = presentationScores[criteriaName];
+                const scores = presentationScores[criteriaName];    // นี่คือ array ของคะแนนแต่ละ criteria
+                // รวมคะแนนทั้งหมดของ criteria นี้
+                const sumScore = scores.length
+                    ? scores.reduce((acc, v) => acc + v, 0)
+                    : 0;
 
                 // คำนวณจำนวน professorId ที่ไม่ซ้ำกันสำหรับ criteria นี้
-                const professorIds = [...new Set(scoreData
-                    .filter(s => s.criteriaName === criteriaName && s.studentId === studentId)
-                    .map(s => s.professorId))];  // ใช้ Set เพื่อดึงค่า professorId ที่ไม่ซ้ำกัน
-
-                const numProfessors = professorIds.length > 0 ? professorIds.length : 1;  // ถ้าไม่มีข้อมูล professor ก็ใช้ 1 แทน
+                const professorIds = [...new Set(
+                    scoreData
+                        .filter(s => s.criteriaName === criteriaName && s.studentId === studentId)
+                        .map(s => s.professorId)
+                )];
+                const numProfessors = professorIds.length || 1;
 
                 // ดึง maxScore และ weight
-                const score = scoreData.find(s => s.studentId === studentId && s.criteriaName === criteriaName); // ค้นหาข้อมูลของแต่ละ criteria
-                const maxScore = score ? parseFloat(score.maxScore) : 10.0;  // ตรวจสอบค่า maxScore ว่ามีหรือไม่
-                const weight = score ? parseFloat(score.criteriaWeight) : 0.0;  // คูณด้วย 100 เพื่อให้เป็นเปอร์เซ็นต์ หากไม่มีให้ใช้ค่า default 100
+                const rec = scoreData.find(s => s.studentId === studentId && s.criteriaName === criteriaName);
+                const maxScore = rec ? parseFloat(rec.maxScore) : 10.0;
+                const weight   = rec ? parseFloat(rec.criteriaWeight) : 0.0;
 
-                // คำนวณ weightedScore ตามสูตรที่ระบุ
-                const weightedScore = ((sumScore / numProfessors) / maxScore) * (weight * 100);
+                // คำนวณ weightedScore
+                const weightedScore = (sumScore / numProfessors / maxScore) * (weight * 100);
                 totalPresentationScore += weightedScore;
             }
 
