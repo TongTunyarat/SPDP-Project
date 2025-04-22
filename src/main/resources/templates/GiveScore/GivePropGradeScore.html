@@ -628,7 +628,6 @@
                     },
                     documentScores: {
                         qualityScores: [],
-                        timelinessScores: [],
                     },
                     totalPresentationScore: 0,
                     totalDocumentScore: 0,
@@ -647,8 +646,6 @@
             // คำนวณคะแนนสำหรับ Document (Quality และ Timeliness)
             if (score.criteriaName === "Quality") {
                 studentScoresMap[studentId].documentScores.qualityScores.push(scoreValue);
-            } else if (score.criteriaName === "Timeliness") {
-                studentScoresMap[studentId].documentScores.timelinessScores.push(scoreValue);
             }
         });
 
@@ -696,12 +693,12 @@
                 totalDocumentScore += qualityDocumentScore;
             }
 
-            // คำนวณสำหรับ Timeliness (Document) โดยหาค่าเฉลี่ย
-            if (documentScores.timelinessScores.length > 0) {
-                const timelinessAverage = documentScores.timelinessScores.reduce((sum, score) => sum + score, 0) / documentScores.timelinessScores.length;
-
-                totalDocumentScore += timelinessAverage;
-            }
+            // // คำนวณสำหรับ Timeliness (Document) โดยหาค่าเฉลี่ย
+            // if (documentScores.timelinessScores.length > 0) {
+            //     const timelinessAverage = documentScores.timelinessScores.reduce((sum, score) => sum + score, 0) / documentScores.timelinessScores.length;
+            //
+            //     totalDocumentScore += timelinessAverage;
+            // }
 
             studentData.totalDocumentScore = totalDocumentScore;
 
