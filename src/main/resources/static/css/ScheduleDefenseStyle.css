@@ -208,6 +208,25 @@ label {
     cursor: pointer;
 }
 
+.remove-day-btn {
+    background-color: #dc7633 ;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    margin-top: 5px;
+    cursor: pointer;
+}
+
+.header-container {
+    display: flex;
+    justify-content: start;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 5px;
+}
+
+
 /*===================================================================  Schedule =================================================================== */
 
 .background-schedule {

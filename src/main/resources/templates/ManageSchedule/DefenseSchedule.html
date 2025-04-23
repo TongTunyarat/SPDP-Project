@@ -125,6 +125,12 @@
             <label for="end-date">End Date:</label>
             <input type="date" class="custom-input" id="end-date"/>
           </div>
+
+          <div class="date-field">
+            <label for="session-duration">Session Duration (minutes):</label>
+            <input type="number" class="custom-input" id="session-duration" min="1" value="75" oninput="this.value = !!this.value && Math.abs(this.value) >= 1 ? Math.abs(this.value) : null">
+          </div>
+
         </div>
 
         <div id="time-slots-container" class="hidden">
@@ -259,6 +265,7 @@
     await getScheduleData();
     // await fetchData();
     await fetchAcademicYears();
+
   });
 
 
@@ -367,7 +374,9 @@
 
   });
 
-  // 🥹🥹🥹🥹🥹🥹🥹
+
+
+    // 🥹🥹🥹🥹🥹🥹🥹
   function updateTimeSlots() {
 
     selectedTimeSlots = {};
@@ -402,6 +411,7 @@
           dayHeader.textContent = `${displayDateString}`;
           dayContainer.appendChild(dayHeader);
 
+
           // div ใหญ่ครอบทุกเวลาฝ
           const timeSlotsDiv = document.createElement('div');
           timeSlotsDiv.className = 'time-slots';
@@ -422,9 +432,27 @@
 
           };
 
-          dayContainer.appendChild(addButton);
+          // dayContainer.appendChild(addButton);
+          //
+          // daysContainer.appendChild(dayContainer);
 
+          const headerContainer = document.createElement('div');
+          headerContainer.className = 'header-container';
+
+          const removeDayButton = document.createElement('button');
+          removeDayButton.className = 'remove-day-btn';
+          removeDayButton.textContent = 'Remove Day';
+
+          removeDayButton.onclick = function() {
+            removeDay(isoDateString);
+          };
+
+          headerContainer.appendChild(addButton);
+          headerContainer.appendChild(removeDayButton);
+
+          dayContainer.appendChild(headerContainer);
           daysContainer.appendChild(dayContainer);
+
         }
 
         currentDate.setDate(currentDate.getDate() + 1);
@@ -465,9 +493,11 @@
     startInput.onchange = function () {
       selectedTimeSlots[dateString][index].start = this.value;
 
+      updateEndTimeBasedOnDuration(dateString, index);
+
       const endInput = document.getElementById(`end-${dateString}-${index}`);
 
-      if (endInput.value && this.value && endInput.value < this.value) {
+      if (endInput.value && this.value && endInput.value <= this.value) {
         Swal.fire({
           icon: "error",
           title: "Incorrect time",
@@ -494,7 +524,7 @@
     endInput.onchange = function() {
       // const startInput = document.getElementById(`start-${dateString}-${index}`);
 
-      if (startInput.value && this.value && this.value < startInput.value) {
+      if (startInput.value && this.value && this.value <= startInput.value) {
         Swal.fire({
           icon: "error",
           title: "Incorrect time",
@@ -556,6 +586,7 @@
 
       startInput.onchange = function () {
         selectedTimeSlots[dateString][newIndex].start = this.value;
+        updateEndTimeBasedOnDuration(dateString, newIndex);
       }
 
       endInput.onchange = function () {
@@ -566,9 +597,92 @@
 
   }
 
+  function removeDay(dateString){
+
+    console.log("📌 Before delete day: " + Object.keys(selectedTimeSlots));
+
+    delete selectedTimeSlots[dateString];
+
+    console.log("⭐️ After delete day: " + Object.keys(selectedTimeSlots));
+
+    const dayElement = document.getElementById(`day-${dateString}`);
+
+    if(dayElement) {
+
+      dayElement.remove();
+
+    }
+
+    const remainingDays = Object.keys(selectedTimeSlots).length;
+
+    if(remainingDays === 0) {
+
+      const noDateMessage = document.createElement('div');
+      noDateMessage.className = 'no-date-message';
+      noDateMessage.textContent = '⚠️ No working days selected. Please adjust your date range. ⚠️';
+      noDateMessage.style.display = 'flex';
+      noDateMessage.style.justifyContent = 'center';
+      noDateMessage.style.alignItems = 'center';
+      noDateMessage.style.fontSize = '1rem';
+      noDateMessage.style.marginBottom = '2rem';
+      daysContainer.appendChild(noDateMessage);
+
+    }
 
 
+  }
 
+  const durationInput = document.getElementById('session-duration');
+
+  durationInput.addEventListener('change', function () {
+
+    Object.keys(selectedTimeSlots).forEach(dateString => {
+
+      selectedTimeSlots[dateString].forEach((slot, index) => {
+
+        if(slot.start) {
+          updateEndTimeBasedOnDuration(dateString, index);
+        }
+      });
+    });
+  });
+
+  function updateEndTimeBasedOnDuration(dateString, index) {
+
+    const startTimeInput = document.getElementById(`start-${dateString}-${index}`);
+    const endTimeInput = document.getElementById(`end-${dateString}-${index}`);
+    const durationInput = document.getElementById('session-duration');
+
+    if(startTimeInput.value && durationInput.value) {
+
+      const [startHours, startMinutes] = startTimeInput.value.split(':').map(Number);
+
+      const startDate = new Date();
+      startDate.setHours(startHours, startMinutes, 0);
+
+      // 1 นาที = 60000 ms
+      const endDate = new Date(startDate.getTime() + parseInt(durationInput.value) * 60000);
+
+      // if(endDate.getDay() !== startDate.getDay() +1) {
+      //
+      //   const endHours = endDate.getHours().toString().padStart(2, '0');
+      //   const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
+      //   const endTimeString = `${endHours}:${endMinutes}`;
+      //
+      //   endTimeInput.value = endTimeString;
+      //   selectedTimeSlots[dateString][index].end = endTimeString;
+      // }
+
+      // https://www.w3schools.com/jsref/tryit.asp?filename=tryjsref_string_padding1
+      const endHours = endDate.getHours().toString().padStart(2, '0');
+      const endMinutes = endDate.getMinutes().toString().padStart(2, '0');
+      const endTimeString = `${endHours}:${endMinutes}`;
+
+      endTimeInput.value = endTimeString;
+      selectedTimeSlots[dateString][index].end = endTimeString;
+
+    }
+  }
 
   <!-- ===================================================================  Generate =================================================================== -->
 
