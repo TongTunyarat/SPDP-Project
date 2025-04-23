@@ -628,6 +628,7 @@
                     },
                     documentScores: {
                         qualityScores: [],
+                        timelinessScores: []
                     },
                     totalPresentationScore: 0,
                     totalDocumentScore: 0,
@@ -643,9 +644,11 @@
                 studentScoresMap[studentId].presentationScores[score.criteriaName] += scoreValue;
             }
 
-            // คำนวณคะแนนสำหรับ Document (Quality และ Timeliness)
+            // คำนวณคะแนนสำหรับ Document (Quality)
             if (score.criteriaName === "Quality") {
                 studentScoresMap[studentId].documentScores.qualityScores.push(scoreValue);
+            } else if (score.criteriaName === "Timeliness") {
+                studentScoresMap[studentId].documentScores.timelinessScores.push(scoreValue);
             }
         });
 
@@ -693,13 +696,16 @@
                 totalDocumentScore += qualityDocumentScore;
             }
 
-            // // คำนวณสำหรับ Timeliness (Document) โดยหาค่าเฉลี่ย
-            // if (documentScores.timelinessScores.length > 0) {
-            //     const timelinessAverage = documentScores.timelinessScores.reduce((sum, score) => sum + score, 0) / documentScores.timelinessScores.length;
-            //
-            //     totalDocumentScore += timelinessAverage;
-            // }
+            // คำนวณคะแนนสำหรับ Timeliness (Document)
+            if (documentScores.timelinessScores.length > 0) {
+                const timelinessAvg = documentScores.timelinessScores.reduce((sum, score) => sum + score, 0);
+                const timelinessEntries = documentScores.timelinessScores.length;
+                const timelinessMaxScore = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Timeliness")?.maxScore || 5.0;
+                const timelinessWeight = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Timeliness")?.criteriaWeight || 0.05;
 
+                const timelinessScore = ((timelinessAvg / timelinessEntries) / timelinessMaxScore) * (timelinessWeight * 100);
+                totalDocumentScore += timelinessScore;
+            }
             studentData.totalDocumentScore = totalDocumentScore;
 
             // คำนวณคะแนนรวม (Result Score)

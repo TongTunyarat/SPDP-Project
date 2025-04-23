@@ -230,8 +230,9 @@
                 </svg>
                 Grades (60%)
             </h4>
-            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade" >Senior Project 1</a></li>
-            <li><a href="/show-defense-grade-projects" data-period="defenseGrade" class="active">Senior Project 2</a></li>
+            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Senior Project 1</a></li>
+            <li><a href="/show-defense-grade-projects" data-period="defenseGrade" class="active">Senior Project 2</a>
+            </li>
         </ul>
     </div>
 
@@ -547,19 +548,20 @@
     async function displayScoreData(scoreData, posterData, tableBody, projectId) {
         const studentScoresMap = {};
 
-        // จัดกลุ่มข้อมูลตาม studentId
+        // คำนวณคะแนนก่อน แล้วค่อยจัดกลุ่มข้อมูลตาม studentId
         scoreData.forEach(score => {
             const studentId = score.studentId;
-            const studentName = score.studentName || `Unknown (${studentId})`;
+            const studentName = score.studentName;
 
+            // หากยังไม่มีข้อมูลนักเรียนใน studentScoresMap ให้สร้างขึ้นใหม่
             if (!studentScoresMap[studentId]) {
                 studentScoresMap[studentId] = {
                     studentName: studentName,
                     presentationScores: {
-                        "Quality of Work": [],
-                        "Level of Progress": [],
-                        "Presentation Language": [],
-                        "Question & Answer": []
+                        qualityOfWorkScores: [],
+                        levelOfProgressScores: [],
+                        presentationLanguagesScores: [],
+                        questionAndAnswerScores: []
                     },
                     documentScores: {
                         completenessScores: [],
@@ -579,9 +581,19 @@
 
             const scoreValue = score.score;
 
-            // Group and store scores for each CriteriaName under Presentation
-            if (["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"].includes(score.criteriaName)) {
-                studentScoresMap[studentId].presentationScores[score.criteriaName].push(scoreValue);
+            // // Group and store scores for each CriteriaName under Presentation
+            // if (["Quality of Work", "Level of Progress", "Presentation Language", "Question & Answer"].includes(score.criteriaName)) {
+            //     studentScoresMap[studentId].presentationScores[score.criteriaName].push(scoreValue);
+            // }
+
+            if (score.criteriaName === "Quality of Work") {
+                studentScoresMap[studentId].presentationScores.qualityOfWorkScores.push(scoreValue);
+            } else if (score.criteriaName === "Level of Progress") {
+                studentScoresMap[studentId].presentationScores.levelOfProgressScores.push(scoreValue);
+            } else if (score.criteriaName === "Presentation Language") {
+                studentScoresMap[studentId].presentationScores.presentationLanguagesScores.push(scoreValue);
+            } else if (score.criteriaName === "Question & Answer") {
+                studentScoresMap[studentId].presentationScores.questionAndAnswerScores.push(scoreValue);
             }
 
             // Group and store scores for Document (Completeness, Timeliness)
@@ -592,41 +604,84 @@
             }
         });
 
-        // คำนวณคะแนนและแสดงผล
+        // หลังจากคำนวณเสร็จแล้ว คำนวณคะแนนรวม
         for (const studentId in studentScoresMap) {
             const studentData = studentScoresMap[studentId];
-            const { studentName, presentationScores, documentScores} = studentData;
+            const {studentName, presentationScores, documentScores} = studentData;
 
-            // **คำนวณคะแนน Presentation**
-            let totalPresentationScore = 0;
+            // // คำนวณคะแนนสำหรับ Presentation
+            // let totalPresentationScore = 0;
 
-            for (const criteriaName in presentationScores) {
-                const scores = presentationScores[criteriaName];    // นี่คือ array ของคะแนนแต่ละ criteria
-                // รวมคะแนนทั้งหมดของ criteria นี้
-                const sumScore = scores.length
-                    ? scores.reduce((acc, v) => acc + v, 0)
-                    : 0;
+            // for (const criteriaName in presentationScores) {
+            //     const sumScore = presentationScores[criteriaName];
+            //
+            //     // คำนวณจำนวน professorId ที่ไม่ซ้ำกันสำหรับ criteria นี้
+            //     const professorIds = [...new Set(scoreData
+            //         .filter(s => s.criteriaName === criteriaName && s.studentId === studentId)
+            //         .map(s => s.professorId))];  // ใช้ Set เพื่อดึงค่า professorId ที่ไม่ซ้ำกัน
+            //
+            //     const numProfessors = professorIds.length > 0 ? professorIds.length : 1;  // ถ้าไม่มีข้อมูล professor ก็ใช้ 1 แทน
+            //
+            //     // ดึง maxScore และ weight
+            //     const score = scoreData.find(s => s.studentId === studentId && s.criteriaName === criteriaName); // ค้นหาข้อมูลของแต่ละ criteria
+            //     const maxScore = score ? parseFloat(score.maxScore) : 10.0;  // ตรวจสอบค่า maxScore ว่ามีหรือไม่
+            //     const weight = score ? parseFloat(score.criteriaWeight) : 0.0;  // คูณด้วย 100 เพื่อให้เป็นเปอร์เซ็นต์ หากไม่มีให้ใช้ค่า default 100
+            //
+            //     // คำนวณ weightedScore ตามสูตรที่ระบุ
+            //     const weightedScore = ((sumScore / numProfessors) / maxScore) * (weight * 100);
+            //     totalPresentationScore += weightedScore;
+            // }
+            //
+            // studentData.totalPresentationScore = totalPresentationScore;
 
-                // คำนวณจำนวน professorId ที่ไม่ซ้ำกันสำหรับ criteria นี้
-                const professorIds = [...new Set(
-                    scoreData
-                        .filter(s => s.criteriaName === criteriaName && s.studentId === studentId)
-                        .map(s => s.professorId)
-                )];
-                const numProfessors = professorIds.length || 1;
+            let rawPresentationScore = 0;
 
-                // ดึง maxScore และ weight
-                const rec = scoreData.find(s => s.studentId === studentId && s.criteriaName === criteriaName);
-                const maxScore = rec ? parseFloat(rec.maxScore) : 10.0;
-                const weight   = rec ? parseFloat(rec.criteriaWeight) : 0.0;
+            if (presentationScores.qualityOfWorkScores.length > 0) {
+                const sumQualityOfWorkScore = presentationScores.qualityOfWorkScores.reduce((sum, score) => sum + score, 0);
+                const numQualityofWorkEntries= presentationScores.qualityOfWorkScores.length;
+                const maxScoreQOW = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Quality of Work")?.maxScore || 10.0;
+                const weightScoreQOW = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Quality of Work")?.criteriaWeight || 0.05;
 
-                // คำนวณ weightedScore
-                const weightedScore = (sumScore / numProfessors / maxScore) * (weight * 100);
-                totalPresentationScore += weightedScore;
+                const qualityOfWorkScore =  ((sumQualityOfWorkScore / numQualityofWorkEntries) / maxScoreQOW) * (weightScoreQOW * 100);
+                rawPresentationScore += qualityOfWorkScore;
             }
 
-            studentData.totalPresentationScore = totalPresentationScore;
+            if (presentationScores.levelOfProgressScores.length > 0) {
+                const sumlevelProgressScore = presentationScores.levelOfProgressScores.reduce((sum, score) => sum + score, 0);
+                const numlevelProgressEntries= presentationScores.levelOfProgressScores.length;
+                const maxScoreLOP = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Level of Progress")?.maxScore || 10.0;
+                const weightScoreLOP = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Level of Progress")?.criteriaWeight || 0.05;
 
+                const levelOfProgressScore =  ((sumlevelProgressScore / numlevelProgressEntries) / maxScoreLOP) * (weightScoreLOP * 100);
+                rawPresentationScore += levelOfProgressScore;
+            }
+
+            if (presentationScores.presentationLanguagesScores.length > 0) {
+                const sumpresentLanguageScore = presentationScores.presentationLanguagesScores.reduce((sum, score) => sum + score, 0);
+                const numpresentLanguageEntries= presentationScores.presentationLanguagesScores.length;
+                const maxScorePL= scoreData.find(s => s.studentId === studentId && s.criteriaName === "Presentation Language")?.maxScore || 10.0;
+                const weightScorePL= scoreData.find(s => s.studentId === studentId && s.criteriaName === "Presentation Language")?.criteriaWeight || 0.05;
+
+                const presentationLanguageScore =  ((sumpresentLanguageScore / numpresentLanguageEntries) / maxScorePL) * (weightScorePL * 100);
+                rawPresentationScore += presentationLanguageScore;
+            }
+
+
+            if (presentationScores.questionAndAnswerScores.length > 0) {
+                const sumQuestionAnswerScore = presentationScores.questionAndAnswerScores.reduce((sum, score) => sum + score, 0);
+                const numQuestionAnswerEntries= presentationScores.questionAndAnswerScores.length;
+                const maxScoreQAW = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Question & Answer")?.maxScore || 10.0;
+                const weightScoreQAW = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Question & Answer")?.criteriaWeight || 0.05;
+
+                const questionAndAnswerScore =  ((sumQuestionAnswerScore / numQuestionAnswerEntries) / maxScoreQAW) * (weightScoreQAW * 100);
+                rawPresentationScore += questionAndAnswerScore;
+            }
+
+            studentData.totalPresentationScore = rawPresentationScore;
+
+            // คะแนน Presentation จะไม่เกิน 20%
+            rawPresentationScore = Math.min(rawPresentationScore, 20.0);
+            const totalPresentationScores = rawPresentationScore > 0 ? rawPresentationScore.toFixed(2) : "0";  // เปลี่ยน "-" เป็น "0"
 
 
             // **คำนวณคะแนน Document**
@@ -634,7 +689,7 @@
 
             // คำนวณคะแนนสำหรับ Completeness (Document)
             if (documentScores.completenessScores.length > 0) {
-                const completenessAvg = documentScores.completenessScores.reduce((sum, score) => sum + score, 0) / documentScores.completenessScores.length;
+                const completenessAvg = documentScores.completenessScores.reduce((sum, score) => sum + score, 0);
                 const completenessEntries = documentScores.completenessScores.length;
                 const completenessMaxScore = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Completeness")?.maxScore || 10.0;
                 const qualityWeight = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Completeness")?.criteriaWeight || 0.07;
@@ -645,8 +700,8 @@
 
             // คำนวณคะแนนสำหรับ Timeliness (Document)
             if (documentScores.timelinessScores.length > 0) {
-                const timelinessAvg = documentScores.timelinessScores.reduce((sum, score) => sum + score, 0) / documentScores.timelinessScores.length;
-                const timelinessEntries= documentScores.completenessScores.length;
+                const timelinessAvg = documentScores.timelinessScores.reduce((sum, score) => sum + score, 0);
+                const timelinessEntries = documentScores.timelinessScores.length;
                 const timelinessMaxScore = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Timeliness")?.maxScore || 10.0;
                 const timelinessWeight = scoreData.find(s => s.studentId === studentId && s.criteriaName === "Timeliness")?.criteriaWeight || 0.03;
 
@@ -664,7 +719,7 @@
             let totalPosterScore = 0;
 
             // คำนวณคะแนน Poster โดยการหาค่าเฉลี่ยจากหมวดหมู่ต่าง ๆ
-            const posterCategories = { appearance: [], contents: [], verbal: [] };
+            const posterCategories = {appearance: [], contents: [], verbal: []};
 
             posterData.forEach(score => {
                 if (score.criteriaName === "Poster is well organized, readable, easy to follow and has a logical, clear progression of ideas, methods, and") {
@@ -687,11 +742,10 @@
             const posterScore = totalPosterScore > 0 ? totalPosterScore.toFixed(2) : "0";  // เปลี่ยน "-" เป็น "0"
 
 
-
             // **คำนวณคะแนนรวม (Total Score)**
-            const PresentationNumber = Number(totalPresentationScore) || 0;
-            const DocumentNumber  = Number(totalDocumentScore)      || 0;
-            const PosterNumber = Number(totalPosterScore)       || 0;
+            const PresentationNumber = parseFloat(totalPresentationScores) || 0;
+            const DocumentNumber = parseFloat(totalDocumentScore) || 0;
+            const PosterNumber = parseFloat(totalPosterScore) || 0;
 
             const rawTotalScore = PresentationNumber + DocumentNumber + PosterNumber;
 
@@ -701,9 +755,9 @@
             const row = document.createElement('tr');
             row.innerHTML = `
             <td>${studentName}</td>
-            <td>${PresentationNumber.toFixed(2)}</td>
-            <td>${DocumentNumber}</td>
-            <td>${PosterNumber.toFixed(2)}</td>
+            <td>${totalPresentationScores}</td>
+            <td>${totalDocumentScore}</td>
+            <td>${totalPosterScore.toFixed(2)}</td>
             <td>${totalScore}</td>
         `;
             tableBody.appendChild(row);
@@ -723,10 +777,6 @@
         const sum = scores.reduce((acc, score) => acc + score, 0);
         return (sum / scores.length).toFixed(2);
     }
-
-
-
-
 
 
 </script>
