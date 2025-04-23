@@ -382,6 +382,21 @@
 
 <script>
 
+    document.addEventListener('DOMContentLoaded', () => {
+        const sidebar = document.querySelector('.sidebar');
+
+        // พอ scroll เก็บตำแหน่งไว้ใน sessionStorage
+        sidebar.addEventListener('scroll', () => {
+            sessionStorage.setItem('sidebarScrollPos', sidebar.scrollTop);
+        });
+
+        // พอโหลดเสร็จ ให้ restore ตำแหน่งเดิมกลับเข้าไป
+        const saved = sessionStorage.getItem('sidebarScrollPos');
+        if (saved !== null) {
+            sidebar.scrollTop = parseInt(saved, 10);
+        }
+    });
+
     const semesterSelect = document.getElementById("semester-selector");
     semesterSelect.addEventListener("change", function () {
         console.log("Selected Semester:", semesterSelect.value);
