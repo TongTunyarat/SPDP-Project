@@ -788,14 +788,21 @@
 
             // showFloors();
 
-            if(selectedFloor === null) {
+            if(selectedRoom) {
 
+                const roomObj = rooms.find(room => room.name === selectedRoom);
+
+                if(roomObj) {
+                    console.log("Have roomObj: " + roomObj);
+                    selectedFloor = roomObj.floor;
+                    showRoomsByFloor(selectedFloor);
+
+                }
+
+            } else {
                 selectedFloor = "3";
                 showRoomsByFloor("3");
 
-            } else {
-
-                showFloors();
             }
 
         }
