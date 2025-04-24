@@ -797,11 +797,11 @@
                         today.setHours(0, 0, 0, 0);
 
                         let statusClass = "status-btn-pending";
-                        let statusText = "Waiting for evaluation";
+                        let statusText = "Waiting for Schedule";
 
                         if(projectDate < today) {
                             statusClass = "status-btn-finished";
-                            statusText = "Evaluation completed";
+                            statusText = "Event Completed";
                         }
 
                         const dateSet = project.date ? true : false;
