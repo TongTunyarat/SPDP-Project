@@ -7,6 +7,7 @@ import com.example.project.DTO.projectManagement.StudentProjectDTO;
 import com.example.project.entity.Project;
 import com.example.project.entity.ProposalSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -96,9 +97,12 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 
     void deleteBySemester(String semester);
 
+    @Modifying
+    @Query("DELETE FROM Project p WHERE p.semester = :semester"
+            + " AND (:program IS NULL OR LOWER(p.program) = LOWER(:program))")
+    int deleteBySemesterAndProgram(@Param("semester") String semester,
+                                   @Param("program") String program);
 
-    // เพิ่มฟังก์ชันที่ดึงข้อมูลโปรเจกต์ทั้งหมดได้
-//    List<Project> findAll();
 
 
 

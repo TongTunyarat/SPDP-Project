@@ -831,3 +831,25 @@ td:nth-child(4) {
 .tabs input {
     margin-left: auto;
 }
+
+.program-options {
+    display: flex;
+    gap: 1em;
+    padding: 16px;
+}
+
+.select-item {
+    padding: 0.5em 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s, border-color 0.2s;
+    font-size: 12px;
+}
+
+.select-item.selected {
+    background-color: #4472C4;
+    color: white;
+    border-color: #2a56a0;
+}

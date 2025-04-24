@@ -210,10 +210,23 @@ public class projectAdminController {
     }
 
 
+//    @DeleteMapping("/deleteProjectsBySemester")
+//    public ResponseEntity<String> deleteBySemester(@RequestParam String semester) {
+//        uploadFilesService.deleteProjectsBySemester(semester);
+//        return ResponseEntity.ok("Deleted projects for semester " + semester);
+//    }
+
     @DeleteMapping("/deleteProjectsBySemester")
-    public ResponseEntity<String> deleteBySemester(@RequestParam String semester) {
-        uploadFilesService.deleteProjectsBySemester(semester);
-        return ResponseEntity.ok("Deleted projects for semester " + semester);
+    public ResponseEntity<String> deleteBySemester(
+            @RequestParam String semester,
+            @RequestParam(defaultValue = "all") String program) {
+
+        uploadFilesService.deleteProjectsBySemesterAndProgram(semester, program);
+
+        String msg = "Deleted " +
+                ("all".equalsIgnoreCase(program) ? "all projects" : program.toUpperCase() + " projects") +
+                " for semester " + semester;
+        return ResponseEntity.ok(msg);
     }
 
 
@@ -329,6 +342,58 @@ public class projectAdminController {
                 .existsByProjectIdRole_SemesterAndRole(semester, "Poster-Committee");
         return ResponseEntity.ok(has);
     }
+
+    @GetMapping("/hasAdvisorProgram")
+    public ResponseEntity<Boolean> hasAdvisorProgram(
+            @RequestParam String semester,
+            @RequestParam String program) {
+
+        boolean exists;
+        if ("all".equalsIgnoreCase(program)) {
+            exists = projectInstructorRoleRepository
+                    .existsByProjectIdRoleSemesterAndRole(semester, "Advisor");
+        } else {
+            exists = projectInstructorRoleRepository
+                    .existsByProjectIdRoleSemesterAndRoleAndProjectIdRoleProgram(
+                            semester, "Advisor", program);
+        }
+        return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/hasCommitteeProgram")
+    public ResponseEntity<Boolean> hasCommitteeProgram(
+            @RequestParam String semester,
+            @RequestParam String program) {
+
+        boolean exists;
+        if ("all".equalsIgnoreCase(program)) {
+            exists = projectInstructorRoleRepository
+                    .existsByProjectIdRoleSemesterAndRole(semester, "Committee");
+        } else {
+            exists = projectInstructorRoleRepository
+                    .existsByProjectIdRoleSemesterAndRoleAndProjectIdRoleProgram(
+                            semester, "Committee", program);
+        }
+        return ResponseEntity.ok(exists);
+    }
+
+    @GetMapping("/hasPosterCommitteeProgram")
+    public ResponseEntity<Boolean> hasPosterCommitteeProgram(
+            @RequestParam String semester,
+            @RequestParam String program) {
+
+        boolean exists;
+        if ("all".equalsIgnoreCase(program)) {
+            exists = projectInstructorRoleRepository
+                    .existsByProjectIdRoleSemesterAndRole(semester, "Poster-Committee");
+        } else {
+            exists = projectInstructorRoleRepository
+                    .existsByProjectIdRoleSemesterAndRoleAndProjectIdRoleProgram(
+                            semester, "Poster-Committee", program);
+        }
+        return ResponseEntity.ok(exists);
+    }
+
 
 //    @GetMapping("/hasAdvisor")
 //    public ResponseEntity<Boolean> hasAdvisor(@RequestParam String semester) {

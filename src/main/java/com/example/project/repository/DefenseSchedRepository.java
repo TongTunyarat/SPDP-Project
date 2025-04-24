@@ -44,4 +44,13 @@ public interface DefenseSchedRepository extends JpaRepository<DefenseSchedule, S
     @Query("SELECT p FROM DefenseSchedule p WHERE p.projectId IN :projectId ")
     List<DefenseSchedule> findByProjectAllId(String projectId);
 
+    @Modifying
+    @Query("""
+    DELETE FROM DefenseSchedule ds
+    WHERE ds.project.semester = :semester
+      AND (:program IS NULL OR LOWER(ds.project.program) = LOWER(:program))
+  """)
+    int deleteBySemesterAndProgram(
+            @Param("semester") String semester,
+            @Param("program")  String program);
 }

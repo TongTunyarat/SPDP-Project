@@ -52,4 +52,14 @@ public interface ProposalSchedRepository extends JpaRepository<ProposalSchedule,
 
     @Query("SELECT p FROM ProposalSchedule p WHERE p.projectId IN :projectId ")
     List<ProposalSchedule> findByProjectAllId(String projectId);
+
+    @Modifying
+    @Query("""
+    DELETE FROM ProposalSchedule ps
+    WHERE ps.project.semester = :semester
+      AND (:program IS NULL OR LOWER(ps.project.program) = LOWER(:program))
+  """)
+    int deleteBySemesterAndProgram(
+            @Param("semester") String semester,
+            @Param("program")  String program);
 }

@@ -112,6 +112,7 @@
             </div>
 
             <div class="btn-header">
+<!--                <button id="deleteAllCommitteeBtn">🗑️ Delete All Committees</button>-->
                 <button class="export-btn" id="export-project-excel-new">Download Project Template</button>
 
                 <!--                <div class="dropdown-export">-->
@@ -255,7 +256,8 @@
             </div>
         </div>
 
-        <!-- Popup สำหรับแจ้งเตือนเมื่อกด Delete ของแต่ละ Project -->
+
+        <!-- Popup สำหรับยืนยันการลบ -->
         <div id="confirmDeletePopup" style="display: none;">
             <div class="popup-overlay">
                 <div class="popup-content">
@@ -266,21 +268,20 @@
             </div>
         </div>
 
+<!--                <div class="btn-footer">-->
+<!--                    <button class="deleteAll-btn">Delete ALL</button>-->
+<!--                </div>-->
 
-        <!--        <div class="btn-footer">-->
-        <!--            <button class="deleteAll-btn">Delete ALL</button>-->
+        <!--        <div class="pagination">-->
+        <!--            <button class="page-btn" onclick="changePage('prev')">&lt;</button>-->
+        <!--            &lt;!&ndash; ปุ่มหน้าอื่นๆ จะถูกเพิ่มใน JavaScript &ndash;&gt;-->
+        <!--            <button class="page-btn" onclick="changePage('next')">&gt;</button>-->
         <!--        </div>-->
-
-        <div class="pagination">
-            <button class="page-btn" onclick="changePage('prev')">&lt;</button>
-            <!-- ปุ่มหน้าอื่นๆ จะถูกเพิ่มใน JavaScript -->
-            <button class="page-btn" onclick="changePage('next')">&gt;</button>
-        </div>
 
 
     </div>
 </div>
-</div>
+
 </body>
 </html>
 <script>
@@ -324,8 +325,11 @@
         });
     });
 
+    let currentCategory = 'all';
+
     // ฟังก์ชันกรองโปรเจกต์ตามหมวดหมู่
     function filterProjects(category) {
+        currentCategory = category;
         const rows = document.querySelectorAll("#projectTable tr");
         rows.forEach(row => {
             if (category === "all") {
@@ -338,12 +342,15 @@
         // อัพเดตปุ่มที่ถูกเลือก
         document.querySelectorAll(".filter").forEach(btn => btn.classList.remove("active"));
         document.querySelector(`.filter[onclick="filterProjects('${category}')"]`).classList.add("active");
+
+        // เรียกเช็คปุ่ม upload ทุกครั้งที่เปลี่ยนหมวดหมู่
+        checkUploadAvailability();
     }
 
     // -------------------- Fetch Project -------------------- //
-    let currentPage = 1;  // หน้าเริ่มต้น
-    const itemsPerPage = 15; // จำนวนข้อมูลที่จะแสดงในแต่ละหน้า
+
     let projectsData = [];  // ข้อมูลทั้งหมดที่ดึงมาจาก API
+    let filteredData = [];
 
     function debounce(fn, ms) {
         let t;
@@ -424,10 +431,8 @@
         // วาดหัวตารางใหม่
         renderCommitteeHeader(maxCommittee);
 
-        // รีเซ็ต pagination แล้ว render body
-        currentPage = 1;
-        updatePagination();
-        displayResults(currentPage);
+        displayResults();
+        checkUploadAvailability();
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -451,7 +456,9 @@
             .then(data => {
                 projectsData = data;
                 filteredData = data;
+
                 populateSemesterOptions();
+
                 applyFilters();
 
                 // หลังเรา render table เสร็จ ให้เช็คปุ่ม upload
@@ -461,14 +468,25 @@
     }
 
     function checkUploadAvailability() {
+
         const uploadBtn = document.getElementById('upload-btn');
         const sem = document.getElementById('semester-selector').value;
         if (!sem) return;
 
-        fetch(`/admin/hasCommittee?semester=${encodeURIComponent(sem)}`)
-            .then(r => r.json())
-            .then(hasCommittee => {
-                if (hasCommittee) {
+        let url;
+        if (currentCategory === 'all') {
+            url = `/admin/hasCommittee?semester=${encodeURIComponent(sem)}`;
+        } else {
+            url = `/admin/hasCommitteeProgram?semester=${encodeURIComponent(sem)}&program=${encodeURIComponent(currentCategory)}`;
+        }
+
+        fetch(url)
+            .then(r => {
+                if (!r.ok) throw new Error(r.statusText);
+                return r.json();
+            })
+            .then(hasAdvisor => {
+                if (hasAdvisor) {
                     uploadBtn.disabled = true;
                     uploadBtn.classList.add('disabled');
                     uploadBtn.textContent = 'Upload Disabled';
@@ -537,14 +555,11 @@
         const tableBody = document.querySelector("#projectsTable tbody");
         tableBody.innerHTML = "";
 
-        const startIndex = (page - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const pageData = filteredData.slice(startIndex, endIndex);
 
         // คำนวณจำนวนคอลัมน์สูงสุดที่ต้องใช้สำหรับแต่ละ Role
         const maxCommittee = Math.max(...projectsData.map(p => p.professorList.filter(x => x.role === 'Committee').length));
 
-        pageData.forEach(project => {
+        filteredData.forEach(project => {
             const row = document.createElement("tr");
             const projectProgram = project.program ? project.program.toLowerCase() : "unknown";
             row.setAttribute("data-category", projectProgram);
@@ -599,52 +614,6 @@
             .addEventListener('input', debounce(applyFilters, 200));
         fetchProjects();
     });
-
-
-    // -------------------- Pagination -------------------- //
-    // ฟังก์ชันสำหรับการเปลี่ยนหน้า
-    function changePage(page) {
-        const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-        if (page === 'prev' && currentPage > 1) {
-            currentPage--;
-        } else if (page === 'next' && currentPage < totalPages) {
-            currentPage++;
-        } else if (typeof page === 'number') {
-            currentPage = page;
-        }
-        displayResults(currentPage);
-        updatePagination();
-    }
-
-    function updatePagination() {
-        const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-        const container = document.querySelector('.pagination');
-        container.innerHTML = '';
-
-        // Prev
-        const prev = document.createElement('button');
-        prev.classList.add('page-btn');
-        prev.textContent = '<';
-        prev.onclick = () => changePage('prev');
-        container.appendChild(prev);
-
-        // Pages
-        for (let i = 1; i <= totalPages; i++) {
-            const btn = document.createElement('button');
-            btn.classList.add('page-btn');
-            btn.textContent = i;
-            if (i === currentPage) btn.classList.add('active');
-            btn.onclick = () => changePage(i);
-            container.appendChild(btn);
-        }
-
-        // Next
-        const next = document.createElement('button');
-        next.classList.add('page-btn');
-        next.textContent = '>';
-        next.onclick = () => changePage('next');
-        container.appendChild(next);
-    }
 
 
     // -------------------- Upload Files -------------------- //
@@ -1045,6 +1014,57 @@
         }
         return csv;
     }
+
+
+    // -------------------- Delete Committee -------------------- //
+
+    // 1) เมื่อกดปุ่ม Delete All Committees
+    document.getElementById('deleteAllCommitteeBtn').addEventListener('click', () => {
+        const sem = document.getElementById('semester-selector').value;
+        const msgElem = document.getElementById('delete-confirm-msg');
+        msgElem.textContent =
+            `Remove all "Committee" in semester "${sem}"` +
+            (currentCategory === 'all'
+                ? ` Program: All?`
+                : ` Program: ${currentCategory.toUpperCase()} ?`);
+
+        document.getElementById('confirmDeletePopup').style.display = 'block';
+    });
+
+    // 2) เมื่อกด “Delete” ใน popup
+    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+        const sem     = document.getElementById('semester-selector').value;
+        const program = currentCategory; // 'all','ict','dst'
+        let url = `/admin/deleteCommitteeByProgramAndSemester?semester=${encodeURIComponent(sem)}`;
+        if (program !== 'all') {
+            url += `&program=${encodeURIComponent(program)}`;
+        }
+
+        fetch(url, { method: 'DELETE' })
+            .then(res => {
+                if (!res.ok) throw new Error(res.statusText);
+                return res.text();
+            })
+            .then(msg => Swal.fire({
+                icon: 'success',
+                title: 'Deleted',
+                text: msg,
+                showConfirmButton: false,
+                timer: 1500
+            }).then(() => {
+                document.getElementById('confirmDeletePopup').style.display = 'none';
+                location.reload();
+            }))
+            .catch(err => {
+                document.getElementById('confirmDeletePopup').style.display = 'none';
+                Swal.fire('Error', err.message, 'error');
+            });
+    });
+
+    // 3) เมื่อกด Cancel ใน popup
+    document.getElementById('cancelDeleteBtn').addEventListener('click', () => {
+        document.getElementById('confirmDeletePopup').style.display = 'none';
+    });
 
 
 </script>
