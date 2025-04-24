@@ -1017,7 +1017,7 @@
     function getRequiredText() {
         return currentCategory === 'all'
             ? 'DELETE ALL PROJECT'
-            : `DELETE ALL ${currentCategory.toUpperCase()} PROJECT`;
+            : `DELETE ${currentCategory.toUpperCase()} PROJECT`;
     }
 
     // เมื่อกดปุ่ม "Delete All" เพื่อเปิด popup
@@ -1091,7 +1091,7 @@
                 showConfirmButton: false,
                 timer: 2000
             }).then(() => location.reload()))
-            .catch(err => Swal.fire('Error', err.message, 'error'));
+            // .catch(err => Swal.fire('Error', err.message, 'error'));
     }
 
     // ผูกปุ่ม confirm
@@ -1575,12 +1575,12 @@
         ws.mergeCells('A4:I4');
 
         // แถว 1
-        ws.getCell('A1').value = "Senior Project Overview";
+        ws.getCell('A1').value = "Senior Project SignUp Template";
         ws.getCell('A1').font = {bold: true, size: 14, color: {argb: 'FF000000'}};
         ws.getCell('A1').alignment = {horizontal: 'center', vertical: 'middle'};
 
         // แถว 2
-        ws.getCell('A2').value = "Exported Project Data";
+        ws.getCell('A2').value = "Sign up template";
         ws.getCell('A2').font = {size: 12, color: {argb: 'FF4D93D9'}};
         ws.getCell('A2').alignment = {horizontal: 'center', vertical: 'middle'};
 
@@ -1653,19 +1653,19 @@
         // แถว 6
         const row6Extra = {
             E: "648XXXX",
-            F: "648XXXX",
+            F: "XXXXXXX",
             I: "Aj.XXXX"
         };
         // แถว 7
         const row7Extra = {
             E: "648XXXX",
-            F: "648XXXX",
+            F: "XXXXXXX",
             I: "Aj.XXXX"
         };
         // แถว 8
         const row8Extra = {
             E: "648XXXX",
-            F: "648XXXX",
+            F: "XXXXXXX",
             I: "Aj.XXXX"
         };
 
