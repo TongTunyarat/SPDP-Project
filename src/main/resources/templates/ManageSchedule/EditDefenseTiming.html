@@ -454,45 +454,79 @@
                         const dateObj = new Date(project.date);
                         const weekday = dateObj.toLocaleDateString('en-US', {weekday: 'long'}).toLowerCase();
 
+                        fetchData();
+
+                        const isEmptyDate = !FormattedDate;
+                        const isEmptyTime = !timeSlot;
+                        const isEmptyRoom = !project.room;
+
                         row.innerHTML = `
-                    <td class="${!FormattedDate? 'empty-date' : ''}" style="position: relative;">
-                        ${FormattedDate
-                            ?  `<div class="day-indicator ${weekday}-indicator"></div>${FormattedDate}`: ''}
-                    </td>
-                    <td class="${!timeSlot ? 'empty-time' : ''}">${timeSlot ? timeSlot: ''}</td>
-                    <td class="${!project.room ? 'empty-room' : ''}">${project.room ? project.room: ''}</td>
+                            <td class="${!FormattedDate? 'empty-date' : ''}" style="position: relative;">
+                                ${FormattedDate
+                                    ?  `<div class="day-indicator ${weekday}-indicator"></div>${FormattedDate}`: ''}
+                            </td>
+                            <td class="${!timeSlot ? 'empty-time' : ''}">${timeSlot ? timeSlot: ''}</td>
+                            <input type="hidden" id="hiddenInfo" name="projectId" value="${projectId}">
+                            <td class="${!project.room ? 'empty-room' : ''}">
+                                    ${
+                                         !isEmptyDate && !isEmptyTime && isEmptyRoom ?
+                                            `
+                                            <div class="dropdown">
 
-                    <td class="left-align">${cleanId} <br><span class="tag ${project.program.toLowerCase()}">${project.program}</span></td>
-                    <td class="left-align">${project.projectTitle}</td>
-                    <td>
-                      <div class="instructor-container">
-                      ${advisor
-                            ?`
-                            <div class="instructor-group">
-                              <div>
-                                <span class="advisor-label">Advisor</span>
-                                <span class="instructor-name">${advisor.name}</span>
-                              </div>
-                            </div>
+                                                <button style="background-color: #c34e4e; color: white" id="selected-label-${projectId}" onclick="toggleDropdown('${projectId}')">
+                                                    <span class="selected-text" id="selected-text-${projectId}">${selectedRooms[projectId] || "Select Room"}&nbsp;<i class="fas fa-chevron-down dropdown-arrow"></i></span>
+                                                </button>
 
-                            `
-                            : ''}
+                                                <div class="dropdown-content upward" id="dropdown-content-${projectId}" style="width: 150%;">
 
-                        ${committee.length > 0
-                            ?`
-                            <div class="instructor-group">
-                                <div class="instructor-name">${committee.join(", ")}</div>
-                                <div class="instructor-type">Committee</div>
-                              </div>
-                            </div>
-                       `
-                            : ''}
-                    </td>
+                                                    <div class="dropdown-header">
+                                                      <div id="back-button-${projectId}" onclick="backToFloors('${projectId}')">
+                                                        <span style="font-size: 20px">&larr;</span>
+                                                      </div>
+                                                      <h4 id="floor-title-${projectId}">Select Floor</h4>
+                                                    </div>
 
-                    <td>
-                      <button class="edit-btn" data-id="${projectId}">Edit</button>
-                    </td>
-                  `;
+                                                     <div id="search-container-${projectId}">
+                                                           <input type="text" id="search-${projectId}" placeholder="Search room" onkeyup="filterRooms('${projectId}')">
+                                                     </div>
+
+                                                      <div id="room-list-${projectId}"></div>
+                                                </div>
+                                            </div>
+                                            `:project.room || '' }
+
+                            </td>
+                            <td class="left-align">${cleanId} <br><span class="tagData ${project.program.toLowerCase()}">${project.program}</span></td>
+                            <td class="left-align">${project.projectTitle}</td>
+                            <td>
+                              <div class="instructor-container">
+                              ${advisor
+                                    ?`
+                                    <div class="instructor-group">
+                                      <div>
+                                        <span class="advisor-label">Advisor</span>
+                                        <span class="instructor-name">${advisor.name}</span>
+                                      </div>
+                                    </div>
+
+                                    `
+                                    : ''}
+
+                                ${committee.length > 0
+                                    ?`
+                                    <div class="instructor-group">
+                                        <div class="instructor-name">${committee.join(", ")}</div>
+                                        <div class="instructor-type">Committee</div>
+                                      </div>
+                                    </div>
+                               `
+                                    : ''}
+                            </td>
+
+                            <td>
+                              <button class="edit-btn" data-id="${projectId}">Edit</button>
+                            </td>
+                          `;
                         tbody.appendChild(row);
                         document.getElementById("modalLoaderOverlay").style.display = "none";
                     });
@@ -608,12 +642,23 @@
                 //   console.log("Room: " + room.name + ", Floor: " + room.floor);
                 // })
 
-                const dropdown = document.getElementById("dropdown-content");
-                if (dropdown.style.display === "block") {
+                // const dropdowns = document.getElementById("dropdown-content");
+                // if (dropdown.style.display === "block") {
+                //
+                //     showFloors();
+                //
+                // }
 
-                    showFloors();
+                const dropdowns = document.querySelectorAll(".dropdown-content");
+                dropdowns.forEach(dropdown => {
 
-                }
+                    if(dropdown.style.display === "block"){
+
+                        const idSuffix = dropdown.id.replace('dropdown-content-', '');
+
+                        showFloors(idSuffix);
+                    }
+                });
 
             })
             .catch(error => {
@@ -624,8 +669,8 @@
 
     // room
     const rooms = [];
-    let selectedRoom = ""
-    let selectedFloor = null;
+    let selectedRooms = {};
+    let selectedFloors = {};
 
     function getFloors() {
 
@@ -635,15 +680,20 @@
         return Array.from(flors).sort();
     }
 
-    function showFloors() {
+    function showFloors(idSuffix = "") {
 
-        let roomList = document.getElementById("room-list");
+        let roomList = document.getElementById(`room-list-${idSuffix}`);
+        if (!roomList) {
+            console.error(`Element room-list-${idSuffix} not found`);
+            return; // Exit if element doesn't exist
+        }
+
         roomList.innerHTML = "";
 
         // set
-        document.getElementById("search-container").style.display = "none";
-        document.getElementById("back-button").style.display = "none";
-        document.getElementById("floor-title").textContent = "Select Floor";
+        document.getElementById(`search-container-${idSuffix}`).style.display = "none";
+        document.getElementById(`back-button-${idSuffix}`).style.display = "none";
+        document.getElementById(`floor-title-${idSuffix}`).textContent = "Select Floor";
 
         const floors = getFloors();
 
@@ -654,6 +704,8 @@
             let floorItem = document.createElement("div");
             floorItem.classList.add("floor-item");
             floorItem.textContent = `Floor ${floor}`;
+
+            const selectedRoom = selectedRooms[idSuffix] || "";
 
             // เก็บค่า room ในเเต่ละชั้น
             const selectedInFloor = rooms.filter(r => r.name === selectedRoom && r.floor === floor);
@@ -671,8 +723,8 @@
 
             floorItem.onclick = function () {
 
-                selectedFloor = floor;
-                showRoomsByFloor(floor);
+                selectedFloors[idSuffix] = floor;
+                showRoomsByFloor(floor, idSuffix);
 
             };
 
@@ -683,47 +735,66 @@
     }
 
     // กรอง room เเต่ละชั้นเพื่อไป create
-    function showRoomsByFloor(floor) {
+    function showRoomsByFloor(floor, idSuffix) {
 
-        let roomList = document.getElementById("room-list");
+        let roomList = document.getElementById(`room-list-${idSuffix}`);
+
+        if (!roomList) {
+            console.error(`Element room-list-${idSuffix} not found`);
+            return;
+        }
         roomList.innerHTML = "";
 
-        document.getElementById("search-container").style.display = "block";
-        document.getElementById("back-button").style.display = "flex";
-        document.getElementById("floor-title").textContent = `Floor ${floor}`;
-        document.getElementById("dropdown-content").style.display = "block";
+        document.getElementById(`search-container-${idSuffix}`).style.display = "block";
+        document.getElementById(`back-button-${idSuffix}`).style.display = "flex";
+        document.getElementById(`floor-title-${idSuffix}`).textContent = `Floor ${floor}`;
+        document.getElementById(`dropdown-content-${idSuffix}`).style.display = "block";
 
         console.log(`🏢 แสดงห้องในชั้น ${floor}`);
 
         const roomsInFloor = rooms.filter(room => room.floor === floor)
             .map(room => room.name);
 
-        createRooms(roomsInFloor);
+        createRooms(roomsInFloor, idSuffix);
 
     }
 
-    function filterRooms() {
+    function filterRooms(idSuffix) {
 
+        const selectedFloor = selectedFloors[idSuffix];
         console.log("Floor:", selectedFloor)
 
         if(!selectedFloor) return;
 
+        const searchInput = document.getElementById(`search-${idSuffix}`);
+        if (!searchInput) {
+            console.error(`Search input search-${idSuffix} not found`);
+            return;
+        }
+
+
         // change
-        let searchValue = document.getElementById("search").value.toLowerCase();
+        let searchValue = searchInput.value.toLowerCase();
         console.log(`🔎 Find: ${searchValue}`);
 
         let filteredRooms = rooms.filter(room => room.name.toLowerCase().includes(searchValue) && room.floor === selectedFloor)
             .map(room => room.name);
         console.log("📋 Result:", filteredRooms);
 
-        createRooms(filteredRooms); // หลังค้นหา
+        createRooms(filteredRooms, idSuffix); // หลังค้นหา
     }
 
 
-    function createRooms(roomNames = []) {
+    function createRooms(roomNames = [], idSuffix) {
 
-        let roomList = document.getElementById("room-list");
-        let selectedText = document.getElementById("selected-text");
+        let roomList = document.getElementById(`room-list-${idSuffix}`);
+        let selectedText = document.getElementById(`selected-text-${idSuffix}`);
+
+        if (!roomList) {
+            console.error(`Element room-list-${idSuffix} not found`);
+            return; // Exit if element doesn't exist
+        }
+
         roomList.innerHTML = ""; // clear
 
         console.log("🔄 Load new room");
@@ -740,6 +811,8 @@
             return;
         }
 
+        const selectedRoom = selectedRooms[idSuffix] || "";
+
         roomNames.forEach(room => {
             let label = document.createElement("label");
             label.classList.add("room-label");
@@ -747,14 +820,21 @@
 
             radio.type = "radio";
             radio.value = room;
-            radio.name = "room";
+            radio.name = `room-${idSuffix}`;
             radio.checked = room === selectedRoom;
 
             radio.onchange = function () {
                 if (radio.checked) {
-                    selectedRoom = room;
+                    selectedRooms[idSuffix] = room;
                     selectedText.textContent = room;
                     console.log(`✅ Select room: ${room}`);
+
+                    // const pureProjectId = idSuffix.replace("modal-", "");
+                    // handleRoomSelect(idSuffix, room);
+
+                    if (!idSuffix.startsWith("modal-")) {
+                        handleRoomSelect(idSuffix, room);
+                    }
                 }
             };
 
@@ -766,27 +846,34 @@
 
     }
 
-    function backToFloors() {
+    function backToFloors(idSuffix) {
 
-        selectedFloor = null;
-        showFloors();
+        selectedFloors[idSuffix] = null;
+        showFloors(idSuffix);
 
     }
 
 
     // ============================================================= Modal Dropdorn=====================================================================
 
-    function toggleDropdown() {
-        let dropdown = document.getElementById("dropdown-content");
+    function toggleDropdown(idSuffix) {
+        let dropdown = document.getElementById(`dropdown-content-${idSuffix}`);
+        let selectedText = document.getElementById(`selected-text-${idSuffix}`);
         let isVisible = dropdown.style.display === "block";
         console.log(`${isVisible}`);
 
         dropdown.style.display = isVisible ? "none" : "block";
         console.log(`📂 Dropdown ${isVisible ? "close" : "open"}`);
 
+        if (selectedText) {
+            selectedText.classList.toggle("active", !isVisible);
+        }
+
+
         if (!isVisible) {
 
             // showFloors();
+            const selectedRoom = selectedRooms[idSuffix];
 
             if(selectedRoom) {
 
@@ -794,14 +881,14 @@
 
                 if(roomObj) {
                     console.log("Have roomObj: " + roomObj);
-                    selectedFloor = roomObj.floor;
-                    showRoomsByFloor(selectedFloor);
+                    selectedFloors[idSuffix] = roomObj.floor;
+                    showRoomsByFloor(roomObj.floor, idSuffix);
 
                 }
 
             } else {
-                selectedFloor = "3";
-                showRoomsByFloor("3");
+                selectedFloors[idSuffix] = "3";
+                showRoomsByFloor("3", idSuffix);
 
             }
 
@@ -813,13 +900,26 @@
     // close dropdown room
     document.addEventListener("click", function(event) {
 
-        const dropdown =  document.getElementById("dropdown-content");
+        // const dropdown =  document.getElementById("dropdown-content");
+        const dropdowns = document.querySelectorAll(".dropdown-content");
 
-        if (dropdown && !event.target.closest(".dropdown") && !event.target.closest(".floor-item")) {
-            dropdown.style.display = "none";
-            // console.log("📌 คลิกข้างนอก -> ปิด Dropdown");
-        }
+        // if (dropdown && !event.target.closest(".dropdown") && !event.target.closest(".floor-item")) {
+        //     dropdown.style.display = "none";
+        //     // console.log("📌 คลิกข้างนอก -> ปิด Dropdown");
+        // }
 
+
+        dropdowns.forEach(dropdown => {
+            if (!event.target.closest(".dropdown") && !event.target.closest(".floor-item")) {
+                dropdown.style.display = "none";
+
+                const idSuffix = dropdown.id.replace("dropdown-content-", "");
+                const selectedText = document.getElementById(`selected-text-${idSuffix}`);
+                if (selectedText) {
+                    selectedText.classList.remove("active");
+                }
+            }
+        });
     });
 
     // ============================================================= Get modal data =====================================================================
@@ -892,11 +992,12 @@
 
                         }
 
-                        selectedRoom = project.room || "";
+                        // selectedRoom = project.room || "";
+                        selectedRooms['modal-'+projectId] = project.room || "";
 
                         cardPop.innerHTML = `
                           <div class="card-header">
-                              <input type="hidden" id="hiddenInfo" name="projectId" value="${projectId}">
+                              <input type="hidden" id="hiddenInfo-modal-${projectId}" name="modal-projectId" value="${projectId}">
                               <h1 class="card-title">${cleanId}</h1>
                               <div class="tag ${project.program.toLowerCase()}">${project.program}</div>
                           </div>
@@ -932,24 +1033,24 @@
                             <label>Room: </label>
                             <div class="dropdown">
 
-                                <button id="selected-label" onclick="toggleDropdown()">
-                                    <span id="selected-text">${selectedRoom || "Select Room"}</span>
+                                <button id="selected-label-modal-${projectId}" onclick="toggleDropdown('modal-${projectId}')">
+                                    <span id="selected-text-modal-${projectId}">${selectedRooms['modal-'+projectId] || "Select Room"}</span>
                                 </button>
 
-                                <div class="dropdown-content upward" id="dropdown-content">
+                                <div class="dropdown-content upward" id="dropdown-content-modal-${projectId}">
 
                                     <div class="dropdown-header">
-                                      <div id="back-button" onclick="backToFloors()">
+                                      <div id="back-button-modal-${projectId}" onclick="backToFloors('modal-${projectId}')">
                                         <span style="font-size: 20px">&larr;</span>
                                       </div>
-                                      <h4 id="floor-title">Select Floor</h4>
+                                      <h4 id="floor-title-modal-${projectId}">Select Floor</h4>
                                     </div>
 
-                                     <div id="search-container">
-                                           <input type="text" id="search" placeholder="Search room" onkeyup="filterRooms()">
+                                     <div id="search-container-modal-${projectId}">
+                                           <input type="text" id="search-modal-${projectId}" placeholder="Search room" onkeyup="filterRooms('modal-${projectId}')">
                                      </div>
 
-                                      <div id="room-list"></div>
+                                      <div id="room-list-modal-${projectId}"></div>
                                 </div>
                             </div>
                         </div>
@@ -975,6 +1076,137 @@
             });
     }
 
+    function formatDateFromTr(dateText) {
+
+        const date = new Date(dateText);
+        console.log("🙊 Change Day: " + date);
+
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+
+        const formattedDate = `${year}-${month}-${day}`;
+        console.log("🙊 formattedDate: " + formattedDate);
+
+        return formattedDate;
+    }
+
+
+    // change room dropdown
+    function handleRoomSelect(projectId, selectedRoom) {
+
+        const row = document.getElementById(`selected-label-${projectId}`).closest('tr');
+
+
+        const programData = row.querySelector(".tagData").textContent.trim();
+        const cells = row.querySelectorAll("td");
+        const dateText = cells[0]?.textContent.trim();  // td แรก
+        const timeText = cells[1]?.textContent.trim();  // td ที่สอง
+        const [startTime, endTime] = timeText.split(" - ");
+
+        const date = formatDateFromTr(dateText);
+        console.log("date: " + date);
+
+        console.log("startTime: " + startTime);
+        console.log("endTime: " + endTime);
+
+        // formatDateFromTr(dateText);
+        const startDateTime = new Date(`${dateText}T${startTime}`);
+        const endDateTime = new Date(`${dateText}T${endTime}`);
+
+        console.log("🕰️ Check StartTime & EndTime: " + startDateTime + " - " + endDateTime);
+
+
+                if (!date || !startTime || !endTime || !selectedRoom) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Oops...",
+                        text: "Please fill in all information.",
+                        draggable: true,
+                        confirmButtonColor: "#dc7633"
+                    });
+                    return;
+                }
+
+                if(startDateTime >= endDateTime) {
+                    Swal.fire({
+                        icon: "warning",
+                        title: "Oops...",
+                        text: "Start time must be before end time.",
+                        draggable: true,
+                        confirmButtonColor: "#dc7633"
+                    });
+                    return;
+                }
+
+                let settingData = {
+                    projectId: projectId,
+                    program: programData,
+                    startDate: date,
+                    startTime: startTime,
+                    endTime: endTime,
+                    room: selectedRoom,
+                };
+
+
+                console.log("📤 settingData: ", settingData);
+                document.getElementById("modalLoaderOverlay").style.display = "flex";
+
+                let csrfToken = document.getElementById("csrfToken").value;
+
+                fetch('http://localhost:8080/admin/EditDefenseByProjectId', {
+
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken
+                    },
+                    body: JSON.stringify(settingData)
+
+                })
+                    .then(response =>
+                        response.json()
+                    )
+                    .then(data => {
+                        console.log("🐍data: ", data);
+
+                        if(data.hasErrorSaveData) {
+                            document.getElementById("modalLoaderOverlay").style.display = "none";
+                            Swal.fire({
+                                icon: "error",
+                                title: "Oops...",
+                                text: "Sorry, we couldn't save the data",
+                            });
+                        }
+
+                        if(!data.hasRoomConflict && !data.hasInstructorConflict) {
+                            document.getElementById("modalLoaderOverlay").style.display = "none";
+                            Swal.fire({
+                                icon: "success",
+                                title: "Save data successfully.",
+                                showConfirmButton: false,
+                                timer: 2000
+                            }).then(() => {
+                                window.location.reload();
+                            });
+                            return;
+                        }
+
+                        showConflictPopup(data);
+
+                    })
+                    .catch(error => {
+                        document.getElementById("modalLoaderOverlay").style.display = "none";
+                        console.error('Error fetching data:', error);
+                        Swal.fire({
+                            icon: "error",
+                            title: "Oops...",
+                            text: "Something went wrong!",
+                        });
+                    });
+
+    };
+
 
     // setting
     document.addEventListener('DOMContentLoaded', function () {
@@ -984,7 +1216,8 @@
             if(e.target.id.includes("saveBtn") ){
 
                 // send value to controlller
-                let projectId = document.querySelector("#hiddenInfo").value;
+                // let projectId = document.querySelector("#hiddenInfo").value;
+                let projectId = document.querySelector('input[name="modal-projectId"]').value;
                 console.log("❗️Do you want to edit project id " + projectId);
                 // let projectId = document.querySelector(".card-title").textContent;
                 let cardTitle = document.querySelector(".card-header");
@@ -992,7 +1225,10 @@
                 let startDateInput = document.querySelector("input[type='date']");
                 let startTimeInput = document.querySelector("input[type='time']");
                 let endTimeInput = document.querySelectorAll("input[type='time']")[1];
-                let selectedRoomFinal = selectedRoom && selectedRoom !== "Select Room" ? selectedRoom : null;
+
+                let selectedTextElement = document.getElementById(`selected-text-modal-${projectId}`);
+                let selectedRoomValue = selectedTextElement && selectedTextElement.textContent !== "Select Room" ? selectedTextElement.textContent : "Select Room";
+                console.log("selectedRoomValue: " + selectedRoomValue);
 
                 let startDate = startDateInput.value;
                 let startTime = startTimeInput.value;
@@ -1004,7 +1240,7 @@
                 console.log("🕰️ Check StartTime & EndTime: " + startDateTime + " - " + endDateTime);
 
 
-                if (!startDate || !startTime || !endTime || !selectedRoomFinal) {
+                if (!startDate || !startTime || !endTime || !selectedRoomValue) {
                     Swal.fire({
                         icon: "warning",
                         title: "Oops...",
@@ -1032,7 +1268,7 @@
                     startDate: startDate,
                     startTime: startTime,
                     endTime: endTime,
-                    room: selectedRoomFinal,
+                    room: selectedRoomValue,
                 };
 
                 console.log("📤 settingData: ", settingData);
@@ -1055,9 +1291,9 @@
                     )
                     .then(data => {
                         console.log("🐍data: ", data);
-                        document.getElementById("modalLoaderOverlay").style.display = "none";
 
                         if(data.hasErrorSaveData) {
+                            document.getElementById("modalLoaderOverlay").style.display = "none";
                             Swal.fire({
                                 icon: "error",
                                 title: "Oops...",
@@ -1066,6 +1302,7 @@
                         }
 
                         if(!data.hasRoomConflict && !data.hasInstructorConflict) {
+                            document.getElementById("modalLoaderOverlay").style.display = "none";
                             Swal.fire({
                                 icon: "success",
                                 title: "Save data successfully.",
@@ -1077,158 +1314,7 @@
                             return;
                         }
 
-                        let conflictHtml = '<div class="conflict-container">';
-
-                        if(data.hasRoomConflict && data.roomConflicts.length > 0) {
-
-                            conflictHtml += `
-                          <div class="conflict-section">
-                                  <h4 class="conflict-title">Room Conflict</h4>
-                                  <div class="conflict-list">
-                      `;
-
-                            const dateGroups = {};
-                            data.roomConflicts.forEach(conflict => {
-                                const startTimeParts = conflict.conflictStartTime.split(':');
-                                const endTimeParts = conflict.conflictEndTime.split(':');
-                                const timeSlot = `${startTimeParts[0]}:${startTimeParts[1]} - ${endTimeParts[0]}:${endTimeParts[1]}`;
-
-                                const getDate = new Date(conflict.date);
-                                let nameDay = getDate.toLocaleDateString('en-us', {weekday: 'short'})
-                                let month = getDate.toLocaleDateString('en-us', {month: 'short'})
-                                let date = getDate.toLocaleDateString('en-us', {day: 'numeric'})
-                                let year = getDate.toLocaleDateString('en-us', {year: 'numeric'})
-
-                                // FormattedDate = `${nameDay} ${month} ${date}, ${year}`
-                                FormattedDate = `${nameDay}, ${date} ${month}. ${year}`
-                                console.log("🗓️ getDate: ", getDate);
-                                console.log("FormattedDate: ", FormattedDate);
-
-                                if(!dateGroups[FormattedDate]) {
-                                    dateGroups[FormattedDate] = [];
-                                }
-
-                                dateGroups[FormattedDate].push({
-                                    room: conflict.room,
-                                    project: conflict.projectId,
-                                    time: timeSlot
-                                });
-                            });
-
-                            Object.keys(dateGroups).forEach((date, dateIndex) => {
-
-                                conflictHtml += `
-                            <div class="conflict-group">
-                              <div class="conflict-date">Date: ${date}</div>
-                          `;
-
-                                dateGroups[date].forEach(item => {
-                                    conflictHtml += `
-                              <div class="conflict-item">
-                                   <span class="conflict-bullet"></span>
-                                   <span class="conflict-content">Room: ${item.room}</span>
-                              </div>
-
-                               <div class="conflict-item">
-                                  <span class="conflict-bullet"></span>
-                                  <span class="conflict-content">Project: ${item.project}</span>
-                                </div>
-
-                                <div class="conflict-time">
-                                  <span class="conflict-time-icon">⏰</span>
-                                  <span>Time: ${item.time}</span>
-                                </div><br>
-                          `;
-                                });
-                                conflictHtml += `</div>`;
-                            })
-
-                            conflictHtml += `
-                            </div>
-                        </div>
-                      `;
-                        }
-
-                        if(data.instructorConflicts && data.instructorConflicts.length > 0) {
-
-                            conflictHtml += `
-                          <div class="conflict-section">
-                                  <h4 class="conflict-title">Instructor Conflict</h4>
-                                  <div class="conflict-list">
-                      `;
-
-                            const instructorGroups = {};
-                            data.instructorConflicts.forEach(conflict => {
-
-                                if(!instructorGroups[conflict.instructorName]) {
-                                    instructorGroups[conflict.instructorName] = [];
-                                }
-
-                                const startTimeParts = conflict.conflictStartTime.split(':');
-                                const endTimeParts = conflict.conflictEndTime.split(':');
-                                const timeSlot = `${startTimeParts[0]}:${startTimeParts[1]} - ${endTimeParts[0]}:${endTimeParts[1]}`;
-
-                                instructorGroups[conflict.instructorName].push({
-                                    project: conflict.conflictingProjectId,
-                                    date: conflict.conflictingDate,
-                                    time: timeSlot
-                                });
-                            });
-
-                            Object.keys(instructorGroups).forEach(instructor => {
-
-                                // instructorGroups[instructor].sort((a, b) => {
-                                //
-                                //     const timeA = a.time.split(' - ')[0];
-                                //     const timeB = b.time.split(' - ')[0];
-                                //
-                                //     return timeA.localeCompare(timeB);
-                                // });
-
-                                conflictHtml += `
-                            <div class="conflict-group">
-                              <div class="conflict-instructor">${instructor}</div>
-                          `;
-
-                                instructorGroups[instructor].forEach(item => {
-                                    conflictHtml += `
-                              <div class="conflict-item">
-                                <span class="conflict-bullet"></span>
-                                <span class="conflict-content">Project: ${item.project}</span>
-                              </div>
-
-                              <div class="conflict-item">
-                                <span class="conflict-bullet"></span>
-                                <span class="conflict-content">Date: ${item.date}</span>
-                              </div>
-
-                              <div class="conflict-time">
-                                  <span class="conflict-time-icon">⏰</span>
-                                  <span>Time: ${item.time}</span>
-                                </div><br>
-                                `;
-                                });
-
-                                conflictHtml += '</div>';
-                            });
-
-                            conflictHtml += `
-                            </div>
-                          </div>
-                        `;
-                        }
-
-                        conflictHtml += '</div>';
-
-                        Swal.fire({
-                            icon: "warning",
-                            title: "Schedule overlap found",
-                            html: conflictHtml,
-                            showCancelButton: true,
-                            showConfirmButton: false,
-                            cancelButtonColor: "#d33",
-                            cancelButtonText: "Close"
-                        })
+                        showConflictPopup(data);
 
                     })
                     .catch(error => {
@@ -1245,6 +1331,164 @@
         });
 
     });
+
+    function showConflictPopup(data) {
+
+        let conflictHtml = '<div class="conflict-container">';
+
+        if(data.hasRoomConflict && data.roomConflicts.length > 0) {
+
+            conflictHtml += `
+                          <div class="conflict-section">
+                                  <h4 class="conflict-title">Room Conflict</h4>
+                                  <div class="conflict-list">
+                      `;
+
+            const dateGroups = {};
+            data.roomConflicts.forEach(conflict => {
+                const startTimeParts = conflict.conflictStartTime.split(':');
+                const endTimeParts = conflict.conflictEndTime.split(':');
+                const timeSlot = `${startTimeParts[0]}:${startTimeParts[1]} - ${endTimeParts[0]}:${endTimeParts[1]}`;
+
+                const getDate = new Date(conflict.date);
+                let nameDay = getDate.toLocaleDateString('en-us', {weekday: 'short'})
+                let month = getDate.toLocaleDateString('en-us', {month: 'short'})
+                let date = getDate.toLocaleDateString('en-us', {day: 'numeric'})
+                let year = getDate.toLocaleDateString('en-us', {year: 'numeric'})
+
+                // FormattedDate = `${nameDay} ${month} ${date}, ${year}`
+                FormattedDate = `${nameDay}, ${date} ${month}. ${year}`
+                console.log("🗓️ getDate: ", getDate);
+                console.log("FormattedDate: ", FormattedDate);
+
+                if(!dateGroups[FormattedDate]) {
+                    dateGroups[FormattedDate] = [];
+                }
+
+                dateGroups[FormattedDate].push({
+                    room: conflict.room,
+                    project: conflict.projectId,
+                    time: timeSlot
+                });
+            });
+
+            Object.keys(dateGroups).forEach((date, dateIndex) => {
+
+                conflictHtml += `
+                            <div class="conflict-group">
+                              <div class="conflict-date">Date: ${date}</div>
+                          `;
+
+                dateGroups[date].forEach(item => {
+                    conflictHtml += `
+                              <div class="conflict-item">
+                                   <span class="conflict-bullet"></span>
+                                   <span class="conflict-content">Room: ${item.room}</span>
+                              </div>
+
+                               <div class="conflict-item">
+                                  <span class="conflict-bullet"></span>
+                                  <span class="conflict-content">Project: ${item.project}</span>
+                                </div>
+
+                                <div class="conflict-time">
+                                  <span class="conflict-time-icon">⏰</span>
+                                  <span>Time: ${item.time}</span>
+                                </div><br>
+                          `;
+                });
+                conflictHtml += `</div>`;
+            })
+
+            conflictHtml += `
+                            </div>
+                        </div>
+                      `;
+        }
+
+        if(data.instructorConflicts && data.instructorConflicts.length > 0) {
+
+            conflictHtml += `
+                          <div class="conflict-section">
+                                  <h4 class="conflict-title">Instructor Conflict</h4>
+                                  <div class="conflict-list">
+                      `;
+
+            const instructorGroups = {};
+            data.instructorConflicts.forEach(conflict => {
+
+                if(!instructorGroups[conflict.instructorName]) {
+                    instructorGroups[conflict.instructorName] = [];
+                }
+
+                const startTimeParts = conflict.conflictStartTime.split(':');
+                const endTimeParts = conflict.conflictEndTime.split(':');
+                const timeSlot = `${startTimeParts[0]}:${startTimeParts[1]} - ${endTimeParts[0]}:${endTimeParts[1]}`;
+
+                instructorGroups[conflict.instructorName].push({
+                    project: conflict.conflictingProjectId,
+                    date: conflict.conflictingDate,
+                    time: timeSlot
+                });
+            });
+
+            Object.keys(instructorGroups).forEach(instructor => {
+
+                // instructorGroups[instructor].sort((a, b) => {
+                //
+                //     const timeA = a.time.split(' - ')[0];
+                //     const timeB = b.time.split(' - ')[0];
+                //
+                //     return timeA.localeCompare(timeB);
+                // });
+
+                conflictHtml += `
+                            <div class="conflict-group">
+                              <div class="conflict-instructor">${instructor}</div>
+                          `;
+
+                instructorGroups[instructor].forEach(item => {
+                    conflictHtml += `
+                              <div class="conflict-item">
+                                <span class="conflict-bullet"></span>
+                                <span class="conflict-content">Project: ${item.project}</span>
+                              </div>
+
+                              <div class="conflict-item">
+                                <span class="conflict-bullet"></span>
+                                <span class="conflict-content">Date: ${item.date}</span>
+                              </div>
+
+                              <div class="conflict-time">
+                                  <span class="conflict-time-icon">⏰</span>
+                                  <span>Time: ${item.time}</span>
+                                </div><br>
+                                `;
+                });
+
+                conflictHtml += '</div>';
+            });
+
+            conflictHtml += `
+                            </div>
+                          </div>
+                        `;
+        }
+
+        conflictHtml += '</div>';
+
+        document.getElementById("modalLoaderOverlay").style.display = "none";
+
+        Swal.fire({
+            icon: "warning",
+            title: "Schedule overlap found",
+            html: conflictHtml,
+            showCancelButton: true,
+            showConfirmButton: false,
+            cancelButtonColor: "#d33",
+            cancelButtonText: "Close"
+        })
+    }
 
 </script>
 
