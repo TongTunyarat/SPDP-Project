@@ -1095,3 +1095,92 @@ button.disabled {
 /*    background-color: #FCB6CE;*/
 /*    color: black;*/
 /*}*/
+
+/* Modal styling */
+#exportModal {
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 24px;
+    max-width: 400px;
+    width: 100%;
+}
+
+#exportModal::backdrop {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
+/* Form styling */
+#exportModal form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+#exportModal p {
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0 0 8px 0;
+    color: #333;
+}
+
+/* Radio options styling */
+.program-options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin: 8px 0;
+}
+
+.program-options label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 15px;
+    cursor: pointer;
+}
+
+.program-options input[type="radio"] {
+    margin: 0;
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+}
+
+/* Button menu styling */
+menu {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 0;
+    margin: 0;
+}
+
+#cancelExport, #confirmExport {
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#cancelExport {
+    background-color: #f1f1f1;
+    border: 1px solid #ddd;
+    color: #333;
+}
+
+#cancelExport:hover {
+    background-color: #e5e5e5;
+}
+
+#confirmExport {
+    background-color: #4285f4;
+    border: 1px solid #3367d6;
+    color: white;
+}
+
+#confirmExport:hover {
+    background-color: #3367d6;
+}

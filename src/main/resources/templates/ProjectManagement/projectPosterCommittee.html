@@ -115,8 +115,8 @@
             </div>
 
             <div class="btn-header">
-                <button class="export-btn" id="export-project-excel-new">Download Project Template</button>
-
+<!--                <button class="export-btn" id="export-project-excel-new">Download Project Template</button>-->
+                <button class="export-block" id="openModal">Download Project Template</button>
                 <!--                <div class="dropdown-export">-->
                 <!--                    <button class="dropbtn">Export</button>-->
                 <!--                    <div class="dropdown-content">-->
@@ -221,6 +221,21 @@
                 </div>
             </div>
         </div>
+
+        <!--Modal Export Template -->
+        <dialog id="exportModal">
+            <form method="dialog">
+                <p>Please select the program you want to export.</p>
+                <div class="program-options">
+                    <label><input type="radio" name="program" value="DST"> DST</label><br>
+                    <label><input type="radio" name="program" value="ICT"> ICT</label>
+                </div>
+                <menu>
+                    <button id="cancelExport" value="cancel">Cancel</button>
+                    <button id="confirmExport" value="default">Export</button>
+                </menu>
+            </form>
+        </dialog>
 
 
 <!--        <div class="pagination">-->
@@ -1044,13 +1059,50 @@
 
     // -------------------- Export Template -------------------- //
 
-    function exportTemplateNew() {
+    // หา element
+    const openBtn    = document.getElementById('openModal');
+    const exportModal = document.getElementById('exportModal');
+    const cancelBtn  = document.getElementById('cancelExport');
+    const confirmBtn = document.getElementById('confirmExport');
+
+    // เปิด dialog
+    openBtn.addEventListener('click', () => {
+        exportModal.showModal();
+    });
+
+    // ยกเลิกปิด dialog
+    cancelBtn.addEventListener('click', () => {
+        exportModal.close();
+    });
+
+    // ยืนยันเลือกแล้วเรียก export
+    confirmBtn.addEventListener('click', () => {
+        const sel = exportModal.querySelector('input[name="program"]:checked');
+        if (!sel) {
+            return Swal.fire('Warning', 'กรุณาเลือกโปรแกรมที่จะ Export', 'warning');
+        }
+        const programFilter = sel.value;
+        exportModal.close();
+        // เรียกฟังก์ชัน export พร้อมค่า programFilter
+        exportTemplateNew(programFilter);
+    });
+
+
+    function exportTemplateNew(programFilter) {
 
         const semester = document.getElementById('semester-selector').value;
-        // 1) กรองข้อมูลโปรเจกต์ตาม semester
-        const filteredProjects = projectsData.filter(p => String(p.semester) === semester);
+
+        // filter by semester AND selected program
+        const filteredProjects = projectsData.filter(p =>
+            String(p.semester) === semester &&
+            p.program === programFilter
+        );
         if (filteredProjects.length === 0) {
-            return Swal.fire('ไม่มีข้อมูล', `ไม่มีโปรเจกต์ในภาคการศึกษา ${semester}`, 'info');
+            return Swal.fire(
+                'ไม่มีข้อมูล',
+                `ไม่มีโปรเจกต์ในภาคการศึกษา ${semester} / โปรแกรม ${programFilter}`,
+                'info'
+            );
         }
 
 

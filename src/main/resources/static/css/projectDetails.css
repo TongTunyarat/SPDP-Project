@@ -164,13 +164,6 @@ td:nth-child(6) ul, td:nth-child(7) ul {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* เพิ่มเงาเล็กน้อยเมื่อ hover */
 }
 
-thead tr {
-    position: sticky;
-    top: 0;
-    background-color: #f9fafb;
-    z-index: 10;
-}
-
 
 .filter-controls {
     display: flex;

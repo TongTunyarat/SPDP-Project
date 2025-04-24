@@ -112,8 +112,9 @@
             </div>
 
             <div class="btn-header">
-<!--                <button id="deleteAllCommitteeBtn">🗑️ Delete All Committees</button>-->
-                <button class="export-btn" id="export-project-excel-new">Download Project Template</button>
+                <!--                <button id="deleteAllCommitteeBtn">🗑️ Delete All Committees</button>-->
+<!--                <button class="export-btn" id="export-project-excel-new">Download Project Template</button>-->
+                <button class="export-block" id="openModal">Download Project Template</button>
 
                 <!--                <div class="dropdown-export">-->
                 <!--                    <button class="dropbtn">Export</button>-->
@@ -256,6 +257,20 @@
             </div>
         </div>
 
+        <!--Modal Export Template -->
+        <dialog id="exportModal">
+            <form method="dialog">
+                <p>Please select the program you want to export.</p>
+                <div class="program-options">
+                    <label><input type="radio" name="program" value="DST"> DST</label><br>
+                    <label><input type="radio" name="program" value="ICT"> ICT</label>
+                </div>
+                <menu>
+                    <button id="cancelExport" value="cancel">Cancel</button>
+                    <button id="confirmExport" value="default">Export</button>
+                </menu>
+            </form>
+        </dialog>
 
         <!-- Popup สำหรับยืนยันการลบ -->
         <div id="confirmDeletePopup" style="display: none;">
@@ -268,9 +283,9 @@
             </div>
         </div>
 
-<!--                <div class="btn-footer">-->
-<!--                    <button class="deleteAll-btn">Delete ALL</button>-->
-<!--                </div>-->
+        <!--                <div class="btn-footer">-->
+        <!--                    <button class="deleteAll-btn">Delete ALL</button>-->
+        <!--                </div>-->
 
         <!--        <div class="pagination">-->
         <!--            <button class="page-btn" onclick="changePage('prev')">&lt;</button>-->
@@ -1033,14 +1048,14 @@
 
     // 2) เมื่อกด “Delete” ใน popup
     document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
-        const sem     = document.getElementById('semester-selector').value;
+        const sem = document.getElementById('semester-selector').value;
         const program = currentCategory; // 'all','ict','dst'
         let url = `/admin/deleteCommitteeByProgramAndSemester?semester=${encodeURIComponent(sem)}`;
         if (program !== 'all') {
             url += `&program=${encodeURIComponent(program)}`;
         }
 
-        fetch(url, { method: 'DELETE' })
+        fetch(url, {method: 'DELETE'})
             .then(res => {
                 if (!res.ok) throw new Error(res.statusText);
                 return res.text();
@@ -1248,14 +1263,50 @@
     // เพิ่ม event listener ให้ปุ่ม Export
     // document.getElementById("export-project-raw-excel").addEventListener("click", exportTemplate);
 
+    // หา element
+    const openBtn    = document.getElementById('openModal');
+    const exportModal = document.getElementById('exportModal');
+    const cancelBtn  = document.getElementById('cancelExport');
+    const confirmBtn = document.getElementById('confirmExport');
 
-    function exportTemplateNew() {
+    // เปิด dialog
+    openBtn.addEventListener('click', () => {
+        exportModal.showModal();
+    });
+
+    // ยกเลิกปิด dialog
+    cancelBtn.addEventListener('click', () => {
+        exportModal.close();
+    });
+
+    // ยืนยันเลือกแล้วเรียก export
+    confirmBtn.addEventListener('click', () => {
+        const sel = exportModal.querySelector('input[name="program"]:checked');
+        if (!sel) {
+            return Swal.fire('Warning', 'กรุณาเลือกโปรแกรมที่จะ Export', 'warning');
+        }
+        const programFilter = sel.value;
+        exportModal.close();
+        // เรียกฟังก์ชัน export พร้อมค่า programFilter
+        exportTemplateNew(programFilter);
+    });
+
+
+    function exportTemplateNew(programFilter) {
 
         const semester = document.getElementById('semester-selector').value;
-        // 1) กรองข้อมูลโปรเจกต์ตาม semester
-        const filteredProjects = projectsData.filter(p => String(p.semester) === semester);
+
+        // filter by semester AND selected program
+        const filteredProjects = projectsData.filter(p =>
+            String(p.semester) === semester &&
+            p.program === programFilter
+        );
         if (filteredProjects.length === 0) {
-            return Swal.fire('ไม่มีข้อมูล', `ไม่มีโปรเจกต์ในภาคการศึกษา ${semester}`, 'info');
+            return Swal.fire(
+                'ไม่มีข้อมูล',
+                `ไม่มีโปรเจกต์ในภาคการศึกษา ${semester} / โปรแกรม ${programFilter}`,
+                'info'
+            );
         }
 
         // เพิ่มคอลัมน์ Poster Committee เข้าไปใน headers
