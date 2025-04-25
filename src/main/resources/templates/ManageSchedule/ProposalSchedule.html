@@ -1114,7 +1114,7 @@
                       const startTime = new Date(project.startTime);
                       const endTime = new Date(project.endTime);
 
-                      const timeSlot = `${startTime.getHours()}:${String(startTime.getMinutes()).padStart(2, '0')} - ${endTime.getHours()}:${String(endTime.getMinutes()).padStart(2, '0')}`;
+                      const timeSlot = `${String(startTime.getHours()).padStart(2, '0')}:${String(startTime.getMinutes()).padStart(2, '0')} - ${String(endTime.getHours()).padStart(2, '0')}:${String(endTime.getMinutes()).padStart(2, '0')}`;
                       console.log("🕰️timeSlot: "+timeSlot);
 
                       if (!timeSlots[timeSlot]) {
