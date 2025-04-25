@@ -492,7 +492,6 @@ public class UploadFilesService {
     public List<String> processProjectCommittee(MultipartFile file) throws Exception {
         List<String> warnings = new ArrayList<>();
 
-
         String[] HEADERS = {
                 "Project ID",
                 "Project Title",
@@ -506,15 +505,17 @@ public class UploadFilesService {
                 "Committee"
         };
 
-        // format ที่รองรับ RFC4180 (comma/newline ใน quotes, "" escaping)
+        // รองรับ RFC4180
         CSVFormat format = CSVFormat.DEFAULT
                 .withQuote('"')
                 .withEscape('\\')
                 .withTrim()
                 .withIgnoreEmptyLines();
 
+        // เก็บชื่อ committee ที่ประมวลผลแล้ว แยกตาม projectId
+        Map<String, Set<String>> seenCommitteesMap = new HashMap<>();
+
         try (
-                // ใช้ LineNumberReader เพื่อ skip บรรทัดก่อนหน้า
                 LineNumberReader lnr = new LineNumberReader(
                         new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))
         ) {
@@ -523,24 +524,21 @@ public class UploadFilesService {
                 if (lnr.readLine() == null) break;
             }
 
-            // บรรทัดถัดไป (row5) จะถูกมองเป็น header
             CSVParser parser = new CSVParser(
                     lnr,
                     format
-                            .withHeader(HEADERS)         // map header names
-                            .withSkipHeaderRecord()      // ไม่เอา header row เป็น data
+                            .withHeader(HEADERS)
+                            .withSkipHeaderRecord()
             );
 
             String currentProjectId = null;
             for (CSVRecord rec : parser) {
-                // อ่านค่าจากแต่ละคอลัมน์ตามชื่อ
-                String fileProjId = rec.get("Project ID");
-                String committee = rec.get("Committee").replaceAll("^'+|'+$", "");  // trim single‑quotes รอบๆ
+                String fileProjId = rec.get("Project ID").trim();
+                String committee = rec.get("Committee").trim().replaceAll("^'+|'+$", "");
 
-                // ถ้า record นี้มี Project ID ใหม่ ให้อัพเดตตัวชี้
+                // อัปเดต project pointer
                 if (!fileProjId.isBlank()) {
-                    Optional<Project> projOpt = projectRepository.findById(fileProjId);
-                    if (projOpt.isEmpty()) {
+                    if (!projectRepository.existsById(fileProjId)) {
                         warnings.add("Row " + rec.getRecordNumber()
                                 + ": ไม่พบ Project ID '" + fileProjId + "'");
                         continue;
@@ -553,10 +551,23 @@ public class UploadFilesService {
                     continue;
                 }
 
-                // ข้ามถ้าไม่มีชื่อ committee
-                if (committee.isBlank()) continue;
+                // ข้ามถ้าไม่มี committee
+                if (committee.isBlank()) {
+                    continue;
+                }
 
-                // lookup อาจารย์ใน DB
+                // 1) เช็ค duplicate ในไฟล์ CSV
+                Set<String> seen = seenCommitteesMap
+                        .computeIfAbsent(currentProjectId, k -> new HashSet<>());
+                if (seen.contains(committee)) {
+                    warnings.add("Row " + rec.getRecordNumber()
+                            + ": คณะกรรมการ '" + committee
+                            + "' ซ้ำในโปรเจกต์ " + currentProjectId);
+                    return warnings;  // หยุดทั้งกระบวนการ
+                }
+                seen.add(committee);
+
+                // lookup instructor
                 Optional<Instructor> instOpt = instructorRepository
                         .findByProfessorName(committee);
                 if (instOpt.isEmpty()) {
@@ -572,16 +583,32 @@ public class UploadFilesService {
                     instructorRepository.save(instr);
                 }
 
-                // ตรวจซ้ำก่อน insert
+                // 2) เช็คว่าเป็น Advisor อยู่แล้วหรือไม่
+                boolean isAdvisor = projectInstructorRoleRepository
+                        .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(
+                                currentProjectId,
+                                instr.getProfessorId(),
+                                "Advisor"
+                        );
+                if (isAdvisor) {
+                    warnings.add("Row " + rec.getRecordNumber()
+                            + ": ไม่สามารถเพิ่ม '" + committee
+                            + "' เป็น Committee เพราะเป็น Advisor อยู่แล้ว");
+                    return warnings;  // หยุดทั้งกระบวนการ
+                }
+
+                // 3) เช็คซ้ำใน DB ว่า committee เดิมมีอยู่แล้วหรือไม่
                 boolean exists = projectInstructorRoleRepository
                         .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(
                                 currentProjectId,
                                 instr.getProfessorId(),
                                 "Committee"
                         );
-                if (exists) continue;
+                if (exists) {
+                    continue;  // ข้าม เพราะมีอยู่แล้ว
+                }
 
-                // สร้าง ProjectInstructorRole ใหม่
+                // 4) สร้าง ProjectInstructorRole ใหม่
                 Project project = projectRepository.findById(currentProjectId).get();
                 ProjectInstructorRole pir = new ProjectInstructorRole();
                 pir.setInstructorId(generateNextInstructorId());
@@ -597,7 +624,6 @@ public class UploadFilesService {
 
         return warnings;
     }
-
 
     @Transactional
     public List<String> processProjectPosterCommittee(MultipartFile file) throws Exception {
@@ -615,7 +641,6 @@ public class UploadFilesService {
                 "Advisor",
                 "Co-Advisor",
                 "Committee",
-                "Poster-Committee"
         };
 
         // ตั้งค่า CSVFormat ให้รองรับ RFC4180
