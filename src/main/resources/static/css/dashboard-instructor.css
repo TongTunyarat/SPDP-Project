@@ -441,11 +441,11 @@ label {
 }
 
 .tag-proposal {
-    background: #999;
+    background: #8d75de;
 }
 
 .tag-defense {
-    background: #999;
+    background: #e8884a;
 }
 
 .tag-ict {
@@ -515,6 +515,13 @@ label {
     color: #155724;
     border: 1px solid #c3e6cb;
 }
+
+.schedule-item:has(.status-btn-finished) {
+    background-color: #f5f5f5;
+    border-color: #757171;
+    opacity: 0.9;
+}
+
 
 /* Grade */
 .main-content {
