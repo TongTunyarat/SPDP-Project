@@ -189,7 +189,7 @@ public class UploadFilesController {
             @RequestParam("program") String program
     ) {
         String year = String.valueOf(LocalDate.now().getYear());
-        String projectId = uploadFilesService.generateNextProjectId(program, year);
+        String projectId = uploadFilesService.generateNextProjectId(program, year, "Advisor");
         return ResponseEntity.ok(Map.of("projectId", projectId));
     }
 

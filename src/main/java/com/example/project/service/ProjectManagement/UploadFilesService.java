@@ -162,6 +162,7 @@ public class UploadFilesService {
      */
     @Transactional
     public List<String> processProjectAndStudent(MultipartFile file) throws Exception {
+        // อ่านไฟล์และแปลงเป็น DTO
         Map<String, FileProjectData> fileData = parseFile(file);
         List<String> warnings = new ArrayList<>();
 
@@ -180,15 +181,12 @@ public class UploadFilesService {
             if (fp.program == null || fp.program.isBlank()) {
                 warnings.add("Project No " + no + ": program ห้ามเป็นค่าว่าง");
             }
-            // advisor ต้องมีอย่างน้อย 1
             if (fp.advisors == null || fp.advisors.isEmpty()) {
                 warnings.add("Project No " + no + ": ต้องระบุ advisor อย่างน้อย 1 คน");
             }
-            // นักศึกษาต้องมีอย่างน้อย 1 record
             if (fp.students == null || fp.students.isEmpty()) {
                 warnings.add("Project No " + no + ": ต้องมีนักศึกษาอย่างน้อย 1 คน");
             } else {
-                // เช็คแต่ละนักศึกษา
                 for (FileStudent fs : fp.students) {
                     if (fs.id == null || fs.id.isBlank()) {
                         warnings.add("Project No " + no + ": studentId ห้ามเป็นค่าว่าง");
@@ -199,12 +197,11 @@ public class UploadFilesService {
                 }
             }
         }
-        // ถ้าเจอ warning ใด ๆ ให้หยุด และคืนไปเลย
         if (!warnings.isEmpty()) {
             return warnings;
         }
 
-        // 1) สแกนหา Student ID ที่ซ้ำกับฐานข้อมูล
+        // 1) ตรวจหา Student ID ซ้ำกับ DB
         for (FileProjectData fp : fileData.values()) {
             for (FileStudent fs : fp.students) {
                 if (studentProjectRepository.existsByStudent_StudentId(fs.id)) {
@@ -216,55 +213,91 @@ public class UploadFilesService {
             return warnings;
         }
 
-        // 2) ถ้าไม่มีค่าว่างและไม่ซ้ำแล้ว ก็เริ่มอัพลง DB ตามเดิม
+        // 2) เริ่มอัพโหลดลง DB
         int year = LocalDate.now().getYear();
-        Map<String, Integer> counters = new HashMap<>();
         int studentCounter = Integer.parseInt(generateNextStudentPjId());
 
-        for (FileProjectData fp : fileData.values()) {
-            String key = fp.program + "_" + year;
-            int seq = counters.getOrDefault(key, 0) + 1;
-            counters.put(key, seq);
-            String projId = fp.program + " SP" + year + "-" + String.format("%02d", seq);
+        // 2.1) จัดกลุ่มตาม program
+        Map<String, List<FileProjectData>> groupedByProgram =
+                fileData.values()
+                        .stream()
+                        .collect(Collectors.groupingBy(fp -> fp.program));
 
-            if (projectRepository.existsById(projId)) {
-                studentProjectRepository.deleteByProject_ProjectId(projId);
-                projectInstructorRoleRepository.deleteByProjectIdRole_ProjectId(projId);
-            }
+        // 2.2) วนแต่ละโปรแกรม
+        for (Map.Entry<String, List<FileProjectData>> entry : groupedByProgram.entrySet()) {
+            String program = entry.getKey();
+            List<FileProjectData> projects = entry.getValue();
 
-            Project project = projectRepository.findById(projId)
-                    .orElseGet(() -> {
-                        Project p = new Project();
-                        p.setProjectId(projId);
-                        p.setRecordedOn(LocalDateTime.now());
-                        return p;
-                    });
-            project.setProgram(fp.program);
-            project.setSemester(String.valueOf(year));
-            project.setProjectTitle(fp.title);
-            project.setProjectCategory(fp.category);
-            project.setProjectDescription(fp.description);
-            project.setEditedOn(LocalDateTime.now());
-            projectRepository.save(project);
-
-            for (FileStudent fs : fp.students) {
-                Student stu = studentRepository.findById(fs.id)
-                        .orElseThrow(() -> new IllegalStateException("Student not found: " + fs.id));
-                if (!stu.getStudentName().equals(fs.name)) {
-                    throw new IllegalStateException(
-                            "Name mismatch for " + fs.id +
-                                    ": DB=" + stu.getStudentName() + ", File=" + fs.name);
+            // หาหมายเลขเริ่มต้นจาก DB (ตัวเลขหลังขีด)
+            String lastId = projectRepository
+                    .findLatestProjectIdByProgramAndYear(program, String.valueOf(year));
+            int nextSeq = 1;
+            if (lastId != null && !lastId.isEmpty()) {
+                try {
+                    nextSeq = Integer.parseInt(lastId.split("-")[1]) + 1;
+                } catch (NumberFormatException ex) {
+                    // default = 1
                 }
-                StudentProject sp = new StudentProject();
-                sp.setStudent(stu);
-                sp.setProject(project);
-                sp.setStatus("Active");
-                sp.setStudentPjId("SP" + String.format("%03d", studentCounter++));
-                studentProjectRepository.save(sp);
             }
 
-            createRoles(fp.advisors, "Advisor", project);
-            createRoles(fp.coAdvisors, "Co-Advisor", project);
+            // เรียงตามชื่อ Advisor คนแรก (primaryAdvisor)
+            projects.sort(Comparator.comparing(fp -> fp.advisors.get(0)));
+
+            // 2.3) วนสร้างแต่ละโปรเจกต์
+            for (FileProjectData fp : projects) {
+                if (fp.advisors.isEmpty()) {
+                    throw new IllegalStateException("ต้องมี Advisor อย่างน้อยหนึ่งคน");
+                }
+                String projId = String.format("%s SP%d-%02d",
+                        program, year, nextSeq++);
+
+                // ลบข้อมูลเก่าถ้ามี
+                if (projectRepository.existsById(projId)) {
+                    studentProjectRepository.deleteByProject_ProjectId(projId);
+                    projectInstructorRoleRepository
+                            .deleteByProjectIdRole_ProjectId(projId);
+                }
+
+                // บันทึกหรือปรับปรุง Project
+                Project project = projectRepository.findById(projId)
+                        .orElseGet(() -> {
+                            Project p = new Project();
+                            p.setProjectId(projId);
+                            p.setRecordedOn(LocalDateTime.now());
+                            return p;
+                        });
+                project.setProgram(fp.program);
+                project.setSemester(String.valueOf(year));
+                project.setProjectTitle(fp.title);
+                project.setProjectCategory(fp.category);
+                project.setProjectDescription(fp.description);
+                project.setEditedOn(LocalDateTime.now());
+                projectRepository.save(project);
+
+                // บันทึก StudentProject แต่ละคน
+                for (FileStudent fs : fp.students) {
+                    Student stu = studentRepository.findById(fs.id)
+                            .orElseThrow(() ->
+                                    new IllegalStateException("Student not found: " + fs.id));
+                    if (!stu.getStudentName().equals(fs.name)) {
+                        throw new IllegalStateException(
+                                "Name mismatch for " + fs.id +
+                                        ": DB=" + stu.getStudentName() +
+                                        ", File=" + fs.name);
+                    }
+                    StudentProject sp = new StudentProject();
+                    sp.setStudent(stu);
+                    sp.setProject(project);
+                    sp.setStatus("Active");
+                    sp.setStudentPjId(
+                            "SP" + String.format("%03d", studentCounter++));
+                    studentProjectRepository.save(sp);
+                }
+
+                // บันทึก Roles (Advisor / Co-Advisor)
+                createRoles(fp.advisors,  "Advisor",    project);
+                createRoles(fp.coAdvisors, "Co-Advisor", project);
+            }
         }
 
         return warnings;
@@ -400,18 +433,20 @@ public class UploadFilesService {
     }
 
 
-    public String generateNextProjectId(String program, String year) {
-        int nextNum = generateNextProjectNumber(program, year);
+    public String generateNextProjectId(String program, String year, String role) {
+        int nextNum = generateNextProjectNumber(program, year, role);
         return String.format("%s SP%s-%02d", program, year, nextNum);
     }
 
 
     // ฟังก์ชันในการดึงรหัส Project ล่าสุด และเพิ่มขึ้นเป็นตัวเลขต่อไป (คืนค่าเป็น int)
-    private int generateNextProjectNumber(String program, String year) {
-        String latestProjectId = projectRepository.findLatestProjectIdByProgramAndYear(program, year);
+    private int generateNextProjectNumber(String program, String year, String role) {
+        String latestProjectId =
+                projectRepository.findLatestProjectIdByProgramAndYearAndAdvisor(program, year, role);
         if (latestProjectId == null || latestProjectId.isEmpty()) {
             return 1;
         }
+        // สมมติรูปแบบ projectId เป็น "...-NN"
         String[] parts = latestProjectId.split("-");
         if (parts.length < 2) {
             return 1;

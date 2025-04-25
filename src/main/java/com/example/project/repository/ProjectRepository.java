@@ -93,6 +93,18 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
     String findLatestProjectIdByProgramAndYear(@Param("program") String program,
                                                @Param("year") String year);
 
+    @Query("SELECT p.projectId " +
+            "FROM Project p " +
+            " JOIN p.projectInstructorRoles pir " +
+            " JOIN pir.instructor i " +
+            "WHERE p.program = :program " +
+            "  AND p.semester = :year " +
+            "  AND i.professorName = :advisor " +
+            "ORDER BY p.projectId DESC")
+    String findLatestProjectIdByProgramAndYearAndAdvisor(@Param("program") String program,
+                                                         @Param("year") String year,
+                                                         @Param("advisor") String role);
+
     Optional<Project> findByProjectTitleAndProjectDescription(String title, String description);
 
     void deleteBySemester(String semester);

@@ -227,6 +227,7 @@
             <form method="dialog">
                 <p>Please select the program you want to export.</p>
                 <div class="program-options">
+                    <label><input type="radio" name="program" value="ALL"> ALL</label><br>
                     <label><input type="radio" name="program" value="DST"> DST</label><br>
                     <label><input type="radio" name="program" value="ICT"> ICT</label>
                 </div>
@@ -498,6 +499,7 @@
     <th>Project ID</th>
     <th>Project Name</th>
     <th>Student ID</th>
+    <th>Advisor</th>
     <th colspan="${roleCount}">Committee</th>
   `;
         thead.appendChild(headerRow);
@@ -506,10 +508,8 @@
         const subRow = document.createElement("tr");
         subRow.classList.add("sub-header-row");
         // ช่องว่างสามคอลัมน์แรก
-        subRow.innerHTML = `<th></th><th></th><th></th>`;
+        subRow.innerHTML = `<th></th><th></th><th></th><th></th>`;
 
-        // Advisor
-        subRow.innerHTML += `<th style="background:#FCB6B7">Advisor</th>`;
 
         // สร้าง palette ของสี
         const committeeColors = [
@@ -1095,7 +1095,7 @@
         // filter by semester AND selected program
         const filteredProjects = projectsData.filter(p =>
             String(p.semester) === semester &&
-            p.program === programFilter
+            (programFilter === 'ALL' || p.program === programFilter)
         );
         if (filteredProjects.length === 0) {
             return Swal.fire(

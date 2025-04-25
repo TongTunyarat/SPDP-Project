@@ -262,6 +262,7 @@
             <form method="dialog">
                 <p>Please select the program you want to export.</p>
                 <div class="program-options">
+                    <label><input type="radio" name="program" value="ALL"> ALL</label><br>
                     <label><input type="radio" name="program" value="DST"> DST</label><br>
                     <label><input type="radio" name="program" value="ICT"> ICT</label>
                 </div>
@@ -1299,7 +1300,7 @@
         // filter by semester AND selected program
         const filteredProjects = projectsData.filter(p =>
             String(p.semester) === semester &&
-            p.program === programFilter
+            (programFilter === 'ALL' || p.program === programFilter)
         );
         if (filteredProjects.length === 0) {
             return Swal.fire(
