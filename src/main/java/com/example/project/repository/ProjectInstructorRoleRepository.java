@@ -4,6 +4,7 @@ import com.example.project.entity.Instructor;
 import com.example.project.entity.Project;
 import com.example.project.entity.ProjectInstructorRole;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -65,6 +66,16 @@ public interface ProjectInstructorRoleRepository extends JpaRepository<ProjectIn
     boolean existsByProjectIdRole_ProjectIdAndRole(String projectId, String role);
 
     boolean existsByProjectIdRole_SemesterAndRole(String semester, String role);
+
+    boolean existsByProjectIdRoleSemesterAndRole(String semester, String role);
+
+    boolean existsByProjectIdRoleSemesterAndRoleAndProjectIdRoleProgram(String semester, String role, String program);
+
+    @Modifying
+    @Query("DELETE FROM ProjectInstructorRole pir WHERE pir.projectIdRole.semester = :semester"
+            + " AND (:program IS NULL OR LOWER(pir.projectIdRole.program) = LOWER(:program))")
+    int deleteBySemesterAndProgram(@Param("semester") String semester,
+                                   @Param("program") String program);
 
 }
 

@@ -117,6 +117,7 @@
             </div>
 
             <div class="btn-header">
+                <button class="deleteAll-btn" id="deleteAll-btn"> 🗑️ Delete </button>
                 <button class="export-btn" id="export-project-template">Download Project Template</button>
                 <!--                <div class="dropdown-export">-->
                 <!--                    <button class="dropbtn">Export Project Template</button>-->
@@ -148,7 +149,6 @@
                     <button class="filter" onclick="filterProjects('ict')">ICT</button>
                     <button class="filter" onclick="filterProjects('dst')">DST</button>
                     <input type="text" placeholder="Search" id="search-keyword"/>
-
                 </div>
                 <table>
                     <thead>
@@ -164,75 +164,15 @@
                     </tr>
                     </thead>
                     <tbody id="projectTable">
-                    <!--                    <tr data-category="ict">-->
-                    <!--                        <td><span class="tag ict">ICT</span> SP2024-01</td>-->
-                    <!--                        <td>Aj.Akara</td>-->
-                    <!--                        <td></td>-->
-                    <!--                        <td>A Noise-Resilient Model</td>-->
-                    <!--                        <td>การวิจัยและพัฒนาโมเดล Deep Learning...</td>-->
-                    <!--                        <td> 6487023</td>-->
-                    <!--                        <td> CHAN</td>-->
-                    <!--                        <td>-->
-                    <!--                            <button class="edit-btn" onclick="showProjectDetails('project1')">Edit</button>-->
-                    <!--                            <button class="delete-btn" onclick="showProjectDetails('project1')">Delete</button>-->
-                    <!--                        </td>-->
-                    <!--                    </tr>-->
-                    <!--                    <tr data-category="dst">-->
-                    <!--                        <td><span class="tag dst">DST</span> SP2024-02</td>-->
-                    <!--                        <td>Aj.Dolvara</td>-->
-                    <!--                        <td></td>-->
-                    <!--                        <td>IoT Dashboard</td>-->
-                    <!--                        <td>การนำเทคโนโลยี IoT มาใช้...</td>-->
-                    <!--                        <td> 6487023</td>-->
-                    <!--                        <td> CHAN</td>-->
-                    <!--                        <td>-->
-                    <!--                            <button class="edit-btn" onclick="showProjectDetails('project1')">Edit</button>-->
-                    <!--                            <button class="delete-btn" onclick="showProjectDetails('project1')">Delete</button>-->
-                    <!--                        </td>-->
-                    <!--                    </tr>-->
-                    <!--                    <tr data-category="ict">-->
-                    <!--                        <td><span class="tag ict">ICT</span> SP2024-03</td>-->
-                    <!--                        <td>Aj.Jidapa</td>-->
-                    <!--                        <td></td>-->
-                    <!--                        <td>ICT InternNet</td>-->
-                    <!--                        <td>ระบบจัดการฝึกงานสำหรับคณะ ICT</td>-->
-                    <!--                        <td> 6487023</td>-->
-                    <!--                        <td> CHAN</td>-->
-                    <!--                        <td>-->
-                    <!--                            <button class="edit-btn" onclick="showProjectDetails('project1')">Edit</button>-->
-                    <!--                            <button class="delete-btn" onclick="showProjectDetails('project1')">Delete</button>-->
-                    <!--                        </td>-->
-                    <!--                    </tr>-->
-                    <!--                    <tr data-category="ict">-->
-                    <!--                        <td><span class="tag ict">ICT</span> SP2024-04</td>-->
-                    <!--                        <td>Aj.Jidapa</td>-->
-                    <!--                        <td></td>-->
-                    <!--                        <td>Project Management Tools</td>-->
-                    <!--                        <td>เป็น Website ที่ใช้ช่วยจัดการงานและโครงการ</td>-->
-                    <!--                        <td> 6487023</td>-->
-                    <!--                        <td> CHAN</td>-->
-                    <!--                        <td>-->
-                    <!--                            <button class="edit-btn" onclick="showProjectDetails('project1')">Edit</button>-->
-                    <!--                            <button class="delete-btn" onclick="showProjectDetails('project1')">Delete</button>-->
-                    <!--                        </td>-->
-                    <!--                    </tr>-->
-                    <!--                    <tr data-category="dst">-->
-                    <!--                        <td><span class="tag dst">DST</span> SP2024-05</td>-->
-                    <!--                        <td>Aj.Morakot</td>-->
-                    <!--                        <td></td>-->
-                    <!--                        <td>Testcase Management</td>-->
-                    <!--                        <td>เว็บไซต์ที่ใช้จัดการ Test case management</td>-->
-                    <!--                        <td> 6487023</td>-->
-                    <!--                        <td> CHAN</td>-->
-                    <!--                        <td>-->
-                    <!--                            <button class="edit-btn" onclick="showProjectDetails('project1')">Edit</button>-->
-                    <!--                            <button class="delete-btn" onclick="showProjectDetails('project1')">Delete</button>-->
-                    <!--                        </td>-->
-                    <!--                    </tr>-->
+
                     </tbody>
                 </table>
             </div>
         </div>
+
+<!--        <div class="btn-footer">-->
+<!--            <button class="deleteAll-btn">Delete ALL</button>-->
+<!--        </div>-->
 
         <!-- Modal สำหรับการอัปโหลดไฟล์ -->
         <div id="uploadModal" class="modal-details" style="display: none;">
@@ -256,17 +196,6 @@
                 <!-- Upload Button -->
                 <button type="button" id="confirm-upload-btn" style="display:none;">Upload</button>
             </div>
-        </div>
-
-
-        <div class="btn-footer">
-            <button class="deleteAll-btn">Delete ALL</button>
-        </div>
-
-        <div class="pagination">
-            <button class="page-btn" onclick="changePage('prev')">&lt;</button>
-            <!-- ปุ่มหน้าอื่นๆ จะถูกเพิ่มใน JavaScript -->
-            <button class="page-btn" onclick="changePage('next')">&gt;</button>
         </div>
 
         <!-- Popup สำหรับแจ้งเตือนเมื่อกด Delete ของแต่ละ Project -->
@@ -420,8 +349,13 @@
         });
     });
 
+    let currentCategory = 'all';
+
     // ฟังก์ชันกรองโปรเจกต์ตามหมวดหมู่
     function filterProjects(category) {
+
+        currentCategory = category;
+
         const rows = document.querySelectorAll("#projectTable tr");
         rows.forEach(row => {
             if (category === "all") {
@@ -433,12 +367,16 @@
 
         // อัพเดตปุ่มที่ถูกเลือก
         document.querySelectorAll(".filter").forEach(btn => btn.classList.remove("active"));
-        document.querySelector(`.filter[onclick="filterProjects('${category}')"]`).classList.add("active");
+        document.querySelector(`.filter[onclick="filterProjects('${category}')"]`)
+            .classList.add("active");
+
+        // เรียกเช็คปุ่ม upload ทุกครั้งที่เปลี่ยนหมวดหมู่
+        checkUploadAvailability();
+
     }
 
     // -------------------- Fetch Project -------------------- //
-    let currentPage = 1;  // หน้าเริ่มต้น
-    const itemsPerPage = 15; // จำนวนข้อมูลที่จะแสดงในแต่ละหน้า
+
     let projectsData = [];  // ข้อมูลทั้งหมดที่ดึงมาจาก API
     let filteredData = [];  // หลังกรองแล้ว
 
@@ -514,10 +452,9 @@
             return true;
         });
 
-        // reset page และ re-render
-        currentPage = 1;
-        updatePagination();
-        displayResults(currentPage);
+        displayResults();
+        checkUploadAvailability();
+
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -541,22 +478,32 @@
             .then(data => {
                 projectsData = data;
                 filteredData = data;
+
                 populateSemesterOptions();
                 applyFilters();
-
-                // หลังเรา render table เสร็จ ให้เช็คปุ่ม upload
                 checkUploadAvailability();
             })
             .catch(err => console.error("Error fetching projects:", err));
     }
 
     function checkUploadAvailability() {
+
         const uploadBtn = document.getElementById('upload-btn');
         const sem = document.getElementById('semester-selector').value;
         if (!sem) return;
 
-        fetch(`/admin/hasAdvisor?semester=${encodeURIComponent(sem)}`)
-            .then(r => r.json())
+        let url;
+        if (currentCategory === 'all') {
+            url = `/admin/hasAdvisor?semester=${encodeURIComponent(sem)}`;
+        } else {
+            url = `/admin/hasAdvisorProgram?semester=${encodeURIComponent(sem)}&program=${encodeURIComponent(currentCategory)}`;
+        }
+
+        fetch(url)
+            .then(r => {
+                if (!r.ok) throw new Error(r.statusText);
+                return r.json();
+            })
             .then(hasAdvisor => {
                 if (hasAdvisor) {
                     uploadBtn.disabled = true;
@@ -579,17 +526,12 @@
         });
 
 
-    // ฟังก์ชันแสดงข้อมูลในตาราง
-    function displayResults(page) {
+    function displayResults() {
         const tbody = document.querySelector("tbody");
         tbody.innerHTML = ""; // เคลียร์ข้อมูลเก่า
 
-        // ใช้ filteredData แทน projectsData
-        const startIndex = (page - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const pageData = filteredData.slice(startIndex, endIndex);
-
-        pageData.forEach(project => {
+        // แสดงทุก record ใน filteredData
+        filteredData.forEach(project => {
             const row = document.createElement('tr');
             const projectProgram = project.program ? project.program.toLowerCase() : "unknown";
             row.setAttribute("data-category", projectProgram);
@@ -603,73 +545,27 @@
             const projId = parts.slice(1).join(" ");
 
             row.innerHTML = `
-            <td><span class="tag ${projectProgram}">${project.program || "N/A"}</span> ${projId}</td>
-            <td>${profName}</td>
-            <td>${coProfName}</td>
-            <td>${project.projectTitle || "N/A"}</td>
-            <td>${project.projectDescription || "N/A"}</td>
-            <td><ul>${project.studentList.map(s => `<li>${s.studentId}</li>`).join('')}</ul></td>
-            <td><ul>${project.studentList.map(s => `<li>${s.studentName}</li>`).join('')}</ul></td>
-            <td>
-              <form action="/admin/editProjectDetails" method="get">
-                <input type="hidden" name="projectId" value="${project.projectId}">
-                <button type="submit" class="edit-btn"><span class="material-icons">edit</span></button>
-              </form>
-              <form onsubmit="return confirmDelete(event, '${project.projectId}')">
-                <input type="hidden" name="projectId" value="${project.projectId}">
-                <button type="submit" class="delete-btn"><span class="material-icons">delete</span></button>
-              </form>
-            </td>
+        <td><span class="tag ${projectProgram}">${project.program || "N/A"}</span> ${projId}</td>
+        <td>${profName}</td>
+        <td>${coProfName}</td>
+        <td>${project.projectTitle || "N/A"}</td>
+        <td>${project.projectDescription || "N/A"}</td>
+        <td><ul>${project.studentList.map(s => `<li>${s.studentId}</li>`).join('')}</ul></td>
+        <td><ul>${project.studentList.map(s => `<li>${s.studentName}</li>`).join('')}</ul></td>
+        <td>
+          <form action="/admin/editProjectDetails" method="get">
+            <input type="hidden" name="projectId" value="${project.projectId}">
+            <button type="submit" class="edit-btn"><span class="material-icons">edit</span></button>
+          </form>
+          <form onsubmit="return confirmDelete(event, '${project.projectId}')">
+            <input type="hidden" name="projectId" value="${project.projectId}">
+            <button type="submit" class="delete-btn"><span class="material-icons">delete</span></button>
+          </form>
+        </td>
         `;
             tbody.appendChild(row);
         });
     }
-
-    // -------------------- Pagination -------------------- //
-    // ฟังก์ชันสำหรับการเปลี่ยนหน้า
-    function changePage(page) {
-        const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-        if (page === 'prev' && currentPage > 1) {
-            currentPage--;
-        } else if (page === 'next' && currentPage < totalPages) {
-            currentPage++;
-        } else if (typeof page === 'number') {
-            currentPage = page;
-        }
-        displayResults(currentPage);
-        updatePagination();
-    }
-
-    function updatePagination() {
-        const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-        const container = document.querySelector('.pagination');
-        container.innerHTML = '';
-
-        // Prev
-        const prev = document.createElement('button');
-        prev.classList.add('page-btn');
-        prev.textContent = '<';
-        prev.onclick = () => changePage('prev');
-        container.appendChild(prev);
-
-        // Pages
-        for (let i = 1; i <= totalPages; i++) {
-            const btn = document.createElement('button');
-            btn.classList.add('page-btn');
-            btn.textContent = i;
-            if (i === currentPage) btn.classList.add('active');
-            btn.onclick = () => changePage(i);
-            container.appendChild(btn);
-        }
-
-        // Next
-        const next = document.createElement('button');
-        next.classList.add('page-btn');
-        next.textContent = '>';
-        next.onclick = () => changePage('next');
-        container.appendChild(next);
-    }
-
 
     // -------------------- Upload Files -------------------- //
 
@@ -808,16 +704,16 @@
             } else {
                 // ต่อเติม property ของโปรเจกต์ถ้ามีข้อมูลใหม่
                 if (projectTitle) currentProject.projectTitle = projectTitle;
-                if (projectDesc)   currentProject.projectDescription = projectDesc;
+                if (projectDesc) currentProject.projectDescription = projectDesc;
                 if (projectCategory) currentProject.projectCategory = projectCategory;
-                if (program)       currentProject.program = program;
-                if (advisor)       currentProject.advisor = advisor;
-                if (coAdvisor)     currentProject.coAdvisor = coAdvisor;
+                if (program) currentProject.program = program;
+                if (advisor) currentProject.advisor = advisor;
+                if (coAdvisor) currentProject.coAdvisor = coAdvisor;
             }
 
             // เพิ่ม student ถ้ามี
             if (studentId || studentName) {
-                currentProject.studentList.push({ studentId, studentName });
+                currentProject.studentList.push({studentId, studentName});
             }
         }
 
@@ -1116,51 +1012,78 @@
 
 
     // -------------------- Delete ALL Project -------------------- //
-    // เมื่อกดปุ่ม "Delete All"
-    document.querySelector('.deleteAll-btn').addEventListener('click', function () {
-        // แสดง pop-up ยืนยันการลบ
+
+
+    function getRequiredText() {
+        return currentCategory === 'all'
+            ? 'DELETE ALL PROJECT'
+            : `DELETE ${currentCategory.toUpperCase()} PROJECT`;
+    }
+
+    // เมื่อกดปุ่ม "Delete All" เพื่อเปิด popup
+    document.querySelector('.deleteAll-btn').addEventListener('click', () => {
         const popup = document.getElementById('deleteAllPopup');
+        const sem   = document.getElementById('semester-selector').value;
+        const txt   = getRequiredText();
+
+        // อัปเดตข้อความใน <p>
+        popup.querySelector('.popup-content p').textContent =
+            `Type "${txt}" to delete ${
+                currentCategory === 'all'
+                    ? 'all projects'
+                    : currentCategory.toUpperCase() + ' projects'
+            } in semester ${sem}.`;
+
+        // อัปเดต placeholder ของ input
+        const input = document.getElementById('deleteAllInput');
+        input.value = '';
+        input.setAttribute('placeholder', txt);
+
         popup.style.display = 'block';
     });
 
-    // เมื่อกดยืนยันการลบทั้งหมด
-    document.getElementById('confirmDeleteAllBtn').addEventListener('click', function () {
-        const userInput = document.getElementById('deleteAllInput').value;
+    // ผูก listener เดียวสำหรับปุ่มยืนยัน ให้เช็คกับ getRequiredText()
+    document.getElementById('confirmDeleteAllBtn').addEventListener('click', () => {
+        const txt       = getRequiredText();
+        const userInput = document.getElementById('deleteAllInput').value.trim();
 
-        // ตรวจสอบว่าผู้ใช้พิมพ์ "DELETE ALL PROJECT"
-        if (userInput === "DELETE ALL PROJECT") {
-            // เรียกฟังก์ชันลบโปรเจกต์ทั้งหมด
-            deleteAllProjects();
-            document.getElementById('deleteAllPopup').style.display = 'none'; // ซ่อน pop-up
-        } else {
-            alert('Please type "DELETE ALL PROJECT" to confirm');
+        if (userInput !== txt) {
+            return Swal.fire({
+                icon: 'warning',
+                title: 'กรุณาพิมพ์ข้อความให้ถูกต้อง',
+                text: `พิมพ์ "${txt}" ให้ตรงก่อนยืนยัน`,
+                confirmButtonText: 'ตกลง'
+            });
         }
+
+        // ถ้าพิมพ์ถูกต้อง ให้ลบโปรเจกต์
+        deleteAllProjects();
+        document.getElementById('deleteAllPopup').style.display = 'none';
     });
 
-    // เมื่อกดปุ่ม Cancel
-    document.getElementById('cancelDeleteAllBtn').addEventListener('click', function () {
-        document.getElementById('deleteAllPopup').style.display = 'none'; // ซ่อน pop-up
-    });
 
-    // ฟังก์ชันลบโปรเจกต์ทั้งหมด
+    // ฟังก์ชันลบโปรเจกต์ทั้งหมด (หรือแค่โปรแกรมที่เลือก)
     function deleteAllProjects() {
         const semester = document.getElementById('semester-selector').value;
-        const token  = document.querySelector('meta[name="_csrf"]').getAttribute('content');
+        const program = currentCategory;  // 'all', 'ict', 'dst'
+        const token = document.querySelector('meta[name="_csrf"]').getAttribute('content');
 
-        // สร้าง Headers โดยใช้ชื่อคงที่ X-CSRF-TOKEN
-        const headers = new Headers({
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': token
-        });
+        let url = `/admin/deleteProjectsBySemester?semester=${encodeURIComponent(semester)}`;
+        if (program !== 'all') {
+            url += `&program=${encodeURIComponent(program)}`;
+        }
 
-        fetch(`/admin/deleteProjectsBySemester?semester=${encodeURIComponent(semester)}`, {
+        fetch(url, {
             method: 'DELETE',
-            headers
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': token
+            }
         })
-            // .then(res => {
-            //     if (!res.ok) return res.text().then(t => { throw new Error(t) });
-            //     return res.text();
-            // })
+            .then(res => {
+                if (!res.ok) return res.text().then(t => { throw new Error(t) });
+                return res.text();
+            })
             .then(msg => Swal.fire({
                 icon: 'success',
                 title: 'Deleted',
@@ -1174,17 +1097,24 @@
     // ผูกปุ่ม confirm
     document.getElementById('confirmDeleteAllBtn').addEventListener('click', function () {
         const userInput = document.getElementById('deleteAllInput').value.trim();
-        if (userInput === 'DELETE ALL PROJECT') {
-            deleteAllProjects();
-            document.getElementById('deleteAllPopup').style.display = 'none';
-        } else {
-            Swal.fire({
+        if (userInput !== 'DELETE ALL PROJECT') {
+            return Swal.fire({
                 icon: 'warning',
                 title: 'กรุณาพิมพ์ข้อความให้ถูกต้อง',
                 text: 'พิมพ์ "DELETE ALL PROJECT" ให้ตรงก่อนยืนยัน',
                 confirmButtonText: 'ตกลง'
             });
         }
+
+        // เรียกฟังก์ชันลบ โดยเอา program มาพิจารณาด้วย
+        deleteAllProjects();
+        document.getElementById('deleteAllPopup').style.display = 'none';
+    });
+
+
+    // เมื่อกดปุ่ม Cancel
+    document.getElementById('cancelDeleteAllBtn').addEventListener('click', function () {
+        document.getElementById('deleteAllPopup').style.display = 'none';
     });
 
 
@@ -1645,12 +1575,12 @@
         ws.mergeCells('A4:I4');
 
         // แถว 1
-        ws.getCell('A1').value = "Senior Project Overview";
+        ws.getCell('A1').value = "Senior Project SignUp Template";
         ws.getCell('A1').font = {bold: true, size: 14, color: {argb: 'FF000000'}};
         ws.getCell('A1').alignment = {horizontal: 'center', vertical: 'middle'};
 
         // แถว 2
-        ws.getCell('A2').value = "Exported Project Data";
+        ws.getCell('A2').value = "Sign up template";
         ws.getCell('A2').font = {size: 12, color: {argb: 'FF4D93D9'}};
         ws.getCell('A2').alignment = {horizontal: 'center', vertical: 'middle'};
 
@@ -1723,19 +1653,19 @@
         // แถว 6
         const row6Extra = {
             E: "648XXXX",
-            F: "648XXXX",
+            F: "XXXXXXX",
             I: "Aj.XXXX"
         };
         // แถว 7
         const row7Extra = {
             E: "648XXXX",
-            F: "648XXXX",
+            F: "XXXXXXX",
             I: "Aj.XXXX"
         };
         // แถว 8
         const row8Extra = {
             E: "648XXXX",
-            F: "648XXXX",
+            F: "XXXXXXX",
             I: "Aj.XXXX"
         };
 

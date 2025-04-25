@@ -40,6 +40,26 @@ public class UploadFilesService {
 
     @Autowired
     private InstructorRepository instructorRepository;
+    @Autowired
+    private ProposalEvaluationRepository proposalEvaluationRepository;
+    @Autowired
+    private DefenseEvaluationRepository defenseEvaluationRepository;
+    @Autowired
+    private PosterEvaRepository posterEvaRepository;
+    @Autowired
+    private ProposalEvalScoreRepository proposalEvalScoreRepository;
+    @Autowired
+    private PosterEvaScoreRepository posterEvaScoreRepository;
+    @Autowired
+    private DefenseEvalScoreRepository defenseEvalScoreRepository;
+    @Autowired
+    private ProposalSchedRepository proposalSchedRepository;
+    @Autowired
+    private DefenseSchedRepository defenseSchedRepository;
+    @Autowired
+    private GradingDefenseEvaluationRepository gradingDefenseEvaluationRepository;
+    @Autowired
+    private GradingProposalEvaluationRepository gradingProposalEvaluationRepository;
 
 
     // ฟังก์ชันในการตรวจสอบว่าเป็นชื่ออาจารย์ที่ถูกต้องหรือไม่
@@ -673,50 +693,6 @@ public class UploadFilesService {
     }
 
 
-    private final DefenseEvaluationRepository defenseRepo;
-    private final ProjectInstructorRoleRepository roleRepo;
-    private final StudentProjectRepository stuRepo;
-    private final ProjectRepository projRepo;
-    private final PosterEvaRepository posterRepo;
-    private final ProposalEvaluationRepository proposalRepo;
-    private final GradingDefenseEvaluationRepository gradeDefenseRepo;
-    private final GradingProposalEvaluationRepository gradePropRepo;
-    private final ProposalEvalScoreRepository proposalEvalScore;
-    private final DefenseEvalScoreRepository defenseEvalScore;
-    private final PosterEvaScoreRepository posterEvalScore;
-    private final DefenseSchedRepository defenseSched;
-    private final ProposalSchedRepository proposalSched;
-
-    public UploadFilesService(
-            DefenseEvaluationRepository defenseRepo,
-            ProjectInstructorRoleRepository roleRepo,
-            StudentProjectRepository stuRepo,
-            ProjectRepository projRepo,
-            PosterEvaRepository posterRepo,
-            ProposalEvaluationRepository proposalRepo,
-            GradingProposalEvaluationRepository gradePropRepo,
-            GradingDefenseEvaluationRepository gradeDefenseRepo,
-            ProposalEvalScoreRepository proposalEvalScore,
-            DefenseEvalScoreRepository defenseEvalScore,
-            PosterEvaScoreRepository posterEvalScore,
-            DefenseSchedRepository defenseSched,
-            ProposalSchedRepository proposalSched
-    ) {
-        this.defenseRepo = defenseRepo;
-        this.roleRepo = roleRepo;
-        this.stuRepo = stuRepo;
-        this.projRepo = projRepo;
-        this.posterRepo = posterRepo;
-        this.proposalRepo = proposalRepo;
-        this.gradeDefenseRepo = gradeDefenseRepo;
-        this.gradePropRepo = gradePropRepo;
-        this.proposalEvalScore = proposalEvalScore;
-        this.defenseEvalScore = defenseEvalScore;
-        this.posterEvalScore = posterEvalScore;
-        this.defenseSched = defenseSched;
-        this.proposalSched = proposalSched;
-    }
-
 //    @Transactional
 //    public void deleteAllProjects() {
 //        // 1) bulk‑delete ข้อมูลใน child ก่อน
@@ -745,12 +721,43 @@ public class UploadFilesService {
 //    }
 
 
+//    @Transactional
+//    public void deleteProjectsBySemester(String semester) {
+//        List<Project> list = projectRepository.findBySemester(semester);
+//        for (Project p : list) {
+//            projectRepository.delete(p); //  => this remove() will trigger cascade REMOVE
+//        }
+//    }
+
     @Transactional
-    public void deleteProjectsBySemester(String semester) {
-        List<Project> list = projectRepository.findBySemester(semester);
-        for (Project p : list) {
-            projectRepository.delete(p); //  => this remove() will trigger cascade REMOVE
-        }
+    public void deleteProjectsBySemesterAndProgram(String semester, String program) {
+        String prog = "all".equalsIgnoreCase(program) ? null : program;
+
+
+        proposalEvalScoreRepository.deleteBySemesterAndProgram(semester, prog);
+        posterEvaScoreRepository.deleteBySemesterAndProgram(semester, prog);
+        defenseEvalScoreRepository.deleteBySemesterAndProgram(semester, prog);
+
+        gradingProposalEvaluationRepository.deleteBySemesterAndProgram(semester, prog);
+        gradingDefenseEvaluationRepository.deleteBySemesterAndProgram(semester, prog);
+
+
+        proposalEvaluationRepository.deleteBySemesterAndProgram(semester, prog);
+        defenseEvaluationRepository.deleteBySemesterAndProgram(semester, prog);
+        posterEvaRepository.deleteBySemesterAndProgram(semester, prog);
+
+        proposalSchedRepository.deleteBySemesterAndProgram(semester, prog);
+        defenseSchedRepository.deleteBySemesterAndProgram(semester, prog);
+
+
+        projectInstructorRoleRepository.deleteBySemesterAndProgram(semester, prog);
+
+
+        studentProjectRepository.deleteBySemesterAndProgram(semester, prog);
+
+
+        projectRepository.deleteBySemesterAndProgram(semester, prog);
     }
 
 }
+

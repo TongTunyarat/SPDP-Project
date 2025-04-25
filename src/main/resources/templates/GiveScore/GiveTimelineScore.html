@@ -626,6 +626,196 @@
         });
     }
 
+    // same score -------------------
+    // Add this function to your JavaScript
+    function applySameScore() {
+        // Show a dialog to get the score and criteria for applying it
+        Swal.fire({
+            title: 'Apply Same Score to Multiple Projects',
+            html: `
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label for="score-value" style="display: block; margin-bottom: 5px; font-weight: bold;">Score:</label>
+                <input id="score-value" type="number" min="0" class="swal2-input" placeholder="Enter score">
+            </div>
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Apply to:</label>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button id="btn-all" class="swal2-confirm swal2-styled" style="margin: 0; background-color: #6c757d;">All Projects</button>
+                    <button id="btn-ict" class="swal2-confirm swal2-styled" style="margin: 0; background-color: #007bff;">ICT Only</button>
+                    <button id="btn-dst" class="swal2-confirm swal2-styled" style="margin: 0; background-color: #28a745;">DST Only</button>
+                </div>
+                <div style="display: flex; gap: 10px;">
+<!--                    <button id="btn-empty" class="swal2-confirm swal2-styled" style="margin: 0; background-color: #dc3545;">Empty Only</button>-->
+                    <button id="btn-selected" class="swal2-confirm swal2-styled" style="margin: 0; background-color: #fd7e14;">Selected Only</button>
+                </div>
+            </div>
+        `,
+            showConfirmButton: false,
+            showCancelButton: true,
+            cancelButtonText: 'Close',
+            didOpen: () => {
+                // Add event listeners to the buttons
+                document.getElementById('btn-all').addEventListener('click', () => applyScoreToProjects('all'));
+                document.getElementById('btn-ict').addEventListener('click', () => applyScoreToProjects('ict'));
+                document.getElementById('btn-dst').addEventListener('click', () => applyScoreToProjects('dst'));
+                document.getElementById('btn-empty').addEventListener('click', () => applyScoreToProjects('empty'));
+                document.getElementById('btn-selected').addEventListener('click', () => applyScoreToProjects('selected'));
+            }
+        });
+    }
+
+    function applyScoreToProjects(criteria) {
+        const scoreValue = document.getElementById('score-value').value;
+
+        if (!scoreValue) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Score',
+                text: 'Please enter a score value first',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            return;
+        }
+
+        const inputs = document.querySelectorAll('.timeline-input');
+        let updatedCount = 0;
+
+        inputs.forEach(input => {
+            const maxScore = parseFloat(input.getAttribute('data-max-score'));
+            const projectId = input.getAttribute('data-project-id');
+
+            // Skip if score would be invalid
+            if (parseFloat(scoreValue) > maxScore || parseFloat(scoreValue) < 0) {
+                return;
+            }
+
+            let shouldUpdate = false;
+
+            switch(criteria) {
+                case 'all':
+                    shouldUpdate = true;
+                    break;
+                case 'ict':
+                    shouldUpdate = projectId.includes('ICT');
+                    break;
+                case 'dst':
+                    shouldUpdate = projectId.includes('DST');
+                    break;
+                case 'empty':
+                    shouldUpdate = input.value === '';
+                    break;
+                case 'selected':
+                    // For selected, we'll need to check if the row is selected
+                    // We'll implement this later with checkboxes
+                    const row = input.closest('tr');
+                    shouldUpdate = row && row.classList.contains('selected-row');
+                    break;
+            }
+
+            if (shouldUpdate) {
+                input.value = scoreValue;
+                updatedCount++;
+
+                // Trigger input event for validation
+                const event = new Event('input', { bubbles: true });
+                input.dispatchEvent(event);
+            }
+        });
+
+        // Close the dialog and show success message
+        Swal.fire({
+            icon: 'success',
+            title: 'Scores Updated',
+            text: `Applied score ${scoreValue} to ${updatedCount} projects`,
+            timer: 2000,
+            showConfirmButton: false
+        });
+    }
+
+    // Add this to enable row selection for the "Selected Only" option
+    function setupRowSelection() {
+        const tableRows = document.querySelectorAll('#projectTable tr');
+
+        tableRows.forEach(row => {
+            row.addEventListener('click', function(e) {
+                // Don't toggle selection if clicking on an input
+                if (e.target.tagName === 'INPUT') return;
+
+                // Toggle selected class
+                this.classList.toggle('selected-row');
+            });
+        });
+    }
+
+    // Call this after rendering the table
+    function enhanceTable() {
+        setupRowSelection();
+
+        // Add CSS for selected rows
+        if (!document.getElementById('row-selection-styles')) {
+            const style = document.createElement('style');
+            style.id = 'row-selection-styles';
+            style.textContent = `
+            .selected-row {
+                background-color: rgba(0, 123, 255, 0.15) !important;
+                border-left: 3px solid #007bff;
+            }
+            #projectTable tr {
+                cursor: pointer;
+            }
+            #projectTable tr td input {
+                cursor: text;
+            }
+        `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // Modify the renderGroupedTable function to call enhanceTable at the end
+    const originalRenderGroupedTable = renderGroupedTable;
+    renderGroupedTable = function(projects) {
+        originalRenderGroupedTable(projects);
+        enhanceTable();
+    };
+
+    // Add button to the UI
+    function addSameScoreButton() {
+        // First remove any existing same-score buttons to prevent duplicates
+        const existingButtons = document.querySelectorAll('.same-score-button');
+        existingButtons.forEach(button => button.remove());
+
+        const saveButton = document.querySelector('.save-button');
+        if (saveButton) {
+            const sameScoreButton = document.createElement('button');
+            sameScoreButton.className = 'same-score-button';
+            sameScoreButton.innerHTML = 'Apply Same Score';
+            sameScoreButton.onclick = applySameScore;
+            sameScoreButton.style.marginRight = '10px';
+            sameScoreButton.style.backgroundColor = '#17a2b8';
+            sameScoreButton.style.color = 'white';
+            sameScoreButton.style.border = 'none';
+            sameScoreButton.style.padding = '8px 16px';
+            sameScoreButton.style.borderRadius = '4px';
+            sameScoreButton.style.cursor = 'pointer';
+
+            saveButton.parentNode.insertBefore(sameScoreButton, saveButton);
+        }
+    }
+
+    // Call this when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Wait a bit for the original UI to render
+        setTimeout(addSameScoreButton, 500);
+    });
+
+    // Also call when the table is reloaded
+    const originalFetchProposalGrades = fetchProposalGrades;
+    fetchProposalGrades = function() {
+        return originalFetchProposalGrades().then(() => {
+            setTimeout(addSameScoreButton, 200);
+        });
+    };
 </script>
 
 

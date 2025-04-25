@@ -67,18 +67,21 @@ body {
 
 /* Table */
 .table-container {
-    max-width: 1500px;
     background: white;
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
     padding: 20px;
+    margin-left: 20px;
+    margin-right: 20px;
+    margin-bottom: 50px;
     margin-top: -60px;
-    margin-left: 32px;
 }
 
 table {
     width: 100%;
     border-collapse: collapse;
+
 }
 
 th,
@@ -90,6 +93,10 @@ td {
 
 th {
     background-color: #f4f4f4;
+}
+
+td {
+    vertical-align: top;
 }
 
 thead th {
@@ -137,6 +144,26 @@ td:nth-child(6) ul, td:nth-child(7) ul {
     list-style-type: none;
     padding: 0;
 }
+
+/*#projectTable tr:nth-of-type(odd) {*/
+/*    background-color: #f3f3f3; !* สีเทาอ่อน *!*/
+/*}*/
+
+/*!* โครงการที่มีลำดับคู่ (2, 4, 6, ...) *!*/
+/*#projectTable tr:nth-of-type(even) {*/
+/*    background-color: #ffffff; !* สีขาว *!*/
+/*}*/
+
+#projectTable tr {
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s ease; /* เพิ่ม transition เพื่อให้การเปลี่ยนสีดูนุ่มนวล */
+}
+
+#projectTable tr:hover {
+    background-color: #f9fafb; /* สีเขียวอ่อนมากๆ ที่เข้ากับธีมเขียวของคุณ */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05); /* เพิ่มเงาเล็กน้อยเมื่อ hover */
+}
+
 
 .filter-controls {
     display: flex;
@@ -339,7 +366,7 @@ td form {
 }
 
 .committee-card p {
-    margin-right: 20px;  /* เพิ่มระยะห่างระหว่าง Committee และ Poster Committee */
+    margin-right: 20px; /* เพิ่มระยะห่างระหว่าง Committee และ Poster Committee */
 }
 
 /* Style for modal */
@@ -470,8 +497,8 @@ td form {
     height: 100%;
     background-color: rgba(0, 0, 0, 0.5); /* พื้นหลังโปร่งใส */
     display: flex;
-    justify-content: center;  /* จัดให้ popup อยู่กลางในแนวนอน */
-    align-items: center;      /* จัดให้ popup อยู่กลางในแนวตั้ง */
+    justify-content: center; /* จัดให้ popup อยู่กลางในแนวนอน */
+    align-items: center; /* จัดให้ popup อยู่กลางในแนวตั้ง */
     z-index: 9999; /* ทำให้ overlay อยู่ด้านหน้าของเนื้อหาทั้งหมด */
 }
 
@@ -506,42 +533,13 @@ td form {
     outline: none;
 }
 
-/* ปรับรูปแบบของปุ่ม Delete All */
-.deleteAll-btn {
-    background-color: white;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    height: 30px;
-    cursor: pointer;
-    color: #624BFF;
-    font-weight: 500;
-    box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08),
-    0px 1px 2px 0px rgba(21, 30, 40, 0.08);
-    transition: background-color 0.3s ease, transform 0.2s ease;
-}
-
-/* การเปลี่ยนสีเมื่อเมาส์ hover */
-.deleteAll-btn:hover {
-    background-color: #624BFF; /* เปลี่ยนสีพื้นหลังเมื่อ hover */
-    color: white; /* เปลี่ยนสีตัวอักษรเมื่อ hover */
-    transform: scale(1.05); /* ขยายขนาดปุ่มเล็กน้อย */
-    box-shadow: 0px 4px 6px rgba(13, 23, 33, 0.1), 0px 2px 4px rgba(21, 30, 40, 0.12); /* เพิ่มความเข้มของเงา */
-}
-
-/* การตั้งค่าเมื่อปุ่มถูกคลิก */
-.deleteAll-btn:active {
-    background-color: #003f7f;  /* สีเมื่อคลิก */
-    transform: scale(1);  /* ทำให้ปุ่มกลับมาเป็นขนาดเดิมเมื่อคลิก */
-}
-
 .addProject-btn a {
     text-decoration: none;
 }
 
 .addProject-btn a:active {
-    background-color: #624BFF;  /* สีเมื่อคลิก */
-    transform: scale(1);  /* ทำให้ปุ่มกลับมาเป็นขนาดเดิมเมื่อคลิก */
+    background-color: #624BFF; /* สีเมื่อคลิก */
+    transform: scale(1); /* ทำให้ปุ่มกลับมาเป็นขนาดเดิมเมื่อคลิก */
 }
 
 .span-fileType {
@@ -631,7 +629,7 @@ select {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    width: 20%;  /* ทำให้ปุ่มกว้างเต็ม */
+    width: 20%; /* ทำให้ปุ่มกว้างเต็ม */
     font-size: 16px;
     display: none;
 }
@@ -654,7 +652,7 @@ select {
     padding: 12px; /* เพิ่มการเว้นช่องว่าง */
     text-align: left;
     border-bottom: 1px solid #ddd;
-    word-wrap: break-word;  /* เพื่อไม่ให้คำยาวเกินไปออกจากตาราง */
+    word-wrap: break-word; /* เพื่อไม่ให้คำยาวเกินไปออกจากตาราง */
 }
 
 .preview-table th {
@@ -668,8 +666,8 @@ select {
 
 #preview-content {
     margin-top: 20px;
-    max-height: 60vh;  /* ให้พื้นที่การแสดงผลสูงสุด 60% ของความสูงหน้าจอ */
-    overflow-y: auto;  /* ให้ scrollbar หากข้อมูลมากเกินไป */
+    max-height: 60vh; /* ให้พื้นที่การแสดงผลสูงสุด 60% ของความสูงหน้าจอ */
+    overflow-y: auto; /* ให้ scrollbar หากข้อมูลมากเกินไป */
 }
 
 /* ปุ่ม Upload */
@@ -852,7 +850,7 @@ select {
     position: absolute;
     background-color: #f9f9f9;
     min-width: 250px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 1;
 }
 
@@ -986,7 +984,7 @@ select {
 
 .header-left {
     display: flex;
-    gap: 1rem;       /* ระยะห่างระหว่าง title กับ dropdown */
+    gap: 1rem; /* ระยะห่างระหว่าง title กับ dropdown */
 }
 
 /* กำหนดให้ dropdown อยู่ในแนวนอน */
@@ -1055,3 +1053,31 @@ select {
     background-color: #f8f8f8;
 }
 
+/* ปรับรูปแบบของปุ่ม Delete All */
+#deleteAll-btn {
+    background-color: #B05959; /* สีแดงอมน้ำตาล อบอุ่นกว่าแดงสด */
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    height: 30px;
+    cursor: pointer;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1),
+    0px 1px 2px rgba(0, 0, 0, 0.08);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* hover เป็นแดงเข้มขึ้น */
+#deleteAll-btn:hover {
+    background-color: #964B4B;      /* สีเข้มขึ้นเล็กน้อย */
+    transform: scale(1.05);
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.12),
+    0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* active กดค้างให้ดูลึกขึ้น */
+#deleteAll-btn:active {
+    background-color: #7A3E3E;      /* สีเข้มที่สุด */
+    transform: scale(1);
+}

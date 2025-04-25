@@ -1872,6 +1872,19 @@
                     grade: gradeResult
                 });
 
+                // Add the student card with the correct grade from the database
+                updateScoreCard(studentId, totalScore, gradeResult);
+
+                // If the grade is 'I', we need to make sure the checkbox is checked
+                if (gradeResult === 'I') {
+                    setTimeout(() => {
+                        const checkbox = document.querySelector(`.card-score-result[data-student-id="${studentId}"] .i-grade-checkbox`);
+                        if (checkbox) {
+                            checkbox.checked = true;
+                        }
+                    }, 100); // Small delay to ensure the DOM has updated
+                }
+
             } catch (error) {
                 console.error(`❌ Error processing student ${studentId}:`, error);
 
@@ -2049,9 +2062,17 @@
     async function calculateGradeWithCheck(score, studentId) {
         console.log(`📝 Calculating grade for student: ${studentId} with total score: ${score}`);
 
+        // Check if the checkbox is checked for manual 'I' grade
+        const cardElement = document.querySelector(`.card-score-result[data-student-id="${studentId}"]`);
+        const manualICheckbox = cardElement?.querySelector('.i-grade-checkbox');
+
+        if (manualICheckbox && manualICheckbox.checked) {
+            console.log(`🔍 Manual 'I' grade selected for student: ${studentId}`);
+            return 'I';
+        }
+
         // ดึงรายชื่ออาจารย์ของโปรเจคก่อน
         const instructors = await projectInstructor(getProjectIdFromURL());
-
         console.log('📚 Instructors:', instructors);
 
         // Check if any score from any instructor is 0 or null
@@ -2064,15 +2085,18 @@
             return 'I';  // Return 'I' if any score is 0 or null
         }
 
+        // Calculate the grade based on the total score
+        return calculateRegularGrade(score);
+
         // Otherwise, calculate the grade based on the total score
-        if (score >= 80) return 'A';
-        if (score >= 75) return 'B+';
-        if (score >= 70) return 'B';
-        if (score >= 65) return 'C+';
-        if (score >= 60) return 'C';
-        if (score >= 55) return 'D+';
-        if (score >= 50) return 'D';
-        return 'F';
+        // if (score >= 80) return 'A';
+        // if (score >= 75) return 'B+';
+        // if (score >= 70) return 'B';
+        // if (score >= 65) return 'C+';
+        // if (score >= 60) return 'C';
+        // if (score >= 55) return 'D+';
+        // if (score >= 50) return 'D';
+        // return 'F';
     }
 
     async function updateStudentScore(studentId, studentName) {
@@ -2172,9 +2196,61 @@
         });
     }
 
+    // function updateScoreCard(studentId, totalScore, grade) {
+    //     const cardContainer = document.querySelector('#card-container');
+    //     if (!cardContainer) return;
+    //
+    //     let card = cardContainer.querySelector(`[data-student-id="${studentId}"]`);
+    //     if (!card) {
+    //         card = document.createElement('div');
+    //         card.className = 'card-score-result';
+    //         card.setAttribute('data-student-id', studentId);
+    //         cardContainer.appendChild(card);
+    //     }
+    //
+    //     const studentName = getStudentName(studentId);
+    //     console.log(`🎯 Updating UI: Student ${studentId} | Total Score: ${totalScore} | Grade: ${grade}`);
+    //
+    //     // Calculate the actual grade based on score
+    //     const calculatedGrade = calculateRegularGrade(totalScore);
+    //
+    //     // Store original calculated grade as a data attribute
+    //     card.setAttribute('data-calculated-grade', calculatedGrade);
+    //     card.setAttribute('data-total-score', totalScore.toFixed(2));
+    //
+    //     const warningMessage = grade === 'I'
+    //         ? '<div class="warning-message" style="color: #f44336; font-size: 0.8em; margin-top: 5px;">Incomplete evaluation detected</div>'
+    //         : '';
+    //
+    //     card.innerHTML = `
+    //     <span class="icon">
+    //         <i class="fa fa-user"></i>
+    //         ${studentName}
+    //     </span>
+    //     <span class="grade" ${grade === 'I' ? 'style="color: #f44336;"' : ''}>${grade}</span>
+    //     <span class="score">${totalScore.toFixed(2)} / 100</span>
+    //     <div class="manual-i-grade" style="margin-top: 5px;">
+    //         <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;">
+    //             <input type="checkbox" class="i-grade-checkbox" data-student-id="${studentId}" ${isChecked} style="margin-right: 5px;">
+    //             Assign 'I' grade
+    //         </label>
+    //     </div>
+    //     ${warningMessage}
+    // `;
+    //
+    //     // Add event listener to the checkbox
+    //     const checkbox = card.querySelector('.i-grade-checkbox');
+    //     checkbox.addEventListener('change', function() {
+    //         const newGrade = this.checked ? 'I' : card.getAttribute('data-calculated-grade');
+    //         updateGradeDisplay(card, newGrade);
+    //     });
+    // }
     function updateScoreCard(studentId, totalScore, grade) {
         const cardContainer = document.querySelector('#card-container');
-        if (!cardContainer) return;
+        if (!cardContainer) {
+            console.error("Card container not found! Please add a div with id 'card-container' to your HTML.");
+            return;
+        }
 
         let card = cardContainer.querySelector(`[data-student-id="${studentId}"]`);
         if (!card) {
@@ -2187,6 +2263,16 @@
         const studentName = getStudentName(studentId);
         console.log(`🎯 Updating UI: Student ${studentId} | Total Score: ${totalScore} | Grade: ${grade}`);
 
+        // Calculate the actual grade based on score
+        const calculatedGrade = calculateRegularGrade(totalScore);
+
+        // Store original calculated grade as a data attribute
+        card.setAttribute('data-calculated-grade', calculatedGrade);
+        card.setAttribute('data-total-score', totalScore.toFixed(2));
+
+        // Check if grade should be 'I'
+        const isChecked = grade === 'I' ? 'checked' : '';
+
         const warningMessage = grade === 'I'
             ? '<div class="warning-message" style="color: #f44336; font-size: 0.8em; margin-top: 5px;">Incomplete evaluation detected</div>'
             : '';
@@ -2198,8 +2284,64 @@
         </span>
         <span class="grade" ${grade === 'I' ? 'style="color: #f44336;"' : ''}>${grade}</span>
         <span class="score">${totalScore.toFixed(2)} / 100</span>
+        <div class="manual-i-grade" style="margin-top: 5px;">
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;">
+                <input type="checkbox" class="i-grade-checkbox" data-student-id="${studentId}" ${isChecked} style="margin-right: 5px;">
+                Assign 'I' grade
+            </label>
+        </div>
         ${warningMessage}
     `;
+
+        // Add event listener to the checkbox
+        const checkbox = card.querySelector('.i-grade-checkbox');
+        checkbox.addEventListener('change', function() {
+            const newGrade = this.checked ? 'I' : card.getAttribute('data-calculated-grade');
+            updateGradeDisplay(card, newGrade);
+        });
+    }
+
+    // Function to update the grade display without recalculating everything
+    function updateGradeDisplay(card, newGrade) {
+        const gradeSpan = card.querySelector('.grade');
+        const studentId = card.getAttribute('data-student-id');
+
+        // Update the style and text of the grade display
+        if (newGrade === 'I') {
+            gradeSpan.style.color = '#f44336';
+
+            // Add warning message if not already present
+            if (!card.querySelector('.warning-message')) {
+                const warningDiv = document.createElement('div');
+                warningDiv.className = 'warning-message';
+                warningDiv.style.cssText = 'color: #f44336; font-size: 0.8em; margin-top: 5px;';
+                warningDiv.textContent = 'Incomplete evaluation detected';
+                card.appendChild(warningDiv);
+            }
+        } else {
+            gradeSpan.style.color = '';
+
+            // Remove warning message if present
+            const warningMessage = card.querySelector('.warning-message');
+            if (warningMessage) {
+                warningMessage.remove();
+            }
+        }
+
+        gradeSpan.textContent = newGrade;
+        console.log(`🔄 Grade manually updated to ${newGrade} for student ${studentId}`);
+    }
+
+    // Simple function to calculate grade from score without any 'I' logic
+    function calculateRegularGrade(score) {
+        if (score >= 80) return 'A';
+        if (score >= 75) return 'B+';
+        if (score >= 70) return 'B';
+        if (score >= 65) return 'C+';
+        if (score >= 60) return 'C';
+        if (score >= 55) return 'D+';
+        if (score >= 50) return 'D';
+        return 'F';
     }
 
     async function checkForZeroScoresForAllInstructors(studentId, instructors) {
@@ -2249,9 +2391,30 @@
         return false; // ถ้าไม่มีคะแนน 0 และทุก instructor ให้คะแนนครบ → return false
     }
 
+    // function getStudentName(studentId) {
+    //     const evaluationInput = document.querySelector(`input[data-student-id="${studentId}"]`);
+    //     return evaluationInput?.dataset?.studentName || studentId;
+    // }
+
     function getStudentName(studentId) {
         const evaluationInput = document.querySelector(`input[data-student-id="${studentId}"]`);
-        return evaluationInput?.dataset?.studentName || studentId;
+        const fullName = evaluationInput?.dataset?.studentName || studentId;
+
+        // Split the full name into first and last name
+        const nameParts = fullName.split(' ');
+
+        if (nameParts.length >= 2) {
+            const firstName = nameParts[0];
+            const lastName = nameParts[1];
+
+            // Get first 3 characters of last name and add a period
+            const shortenedLastName = lastName.substring(0, 3) + '.';
+
+            return `${firstName} ${shortenedLastName}`;
+        }
+
+        // If there's no space in the name or other issues, return the original
+        return fullName;
     }
 
 </script>

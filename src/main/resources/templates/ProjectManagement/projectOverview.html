@@ -144,11 +144,11 @@
             </div>
         </div>
 
-        <div class="pagination">
-            <button class="page-btn" onclick="changePage('prev')">&lt;</button>
-            <!-- ปุ่มหน้าอื่นๆ จะถูกเพิ่มใน JavaScript -->
-            <button class="page-btn" onclick="changePage('next')">&gt;</button>
-        </div>
+        <!--        <div class="pagination">-->
+        <!--            <button class="page-btn" onclick="changePage('prev')">&lt;</button>-->
+        <!--            &lt;!&ndash; ปุ่มหน้าอื่นๆ จะถูกเพิ่มใน JavaScript &ndash;&gt;-->
+        <!--            <button class="page-btn" onclick="changePage('next')">&gt;</button>-->
+        <!--        </div>-->
 
 
         <!-- Modal Structure -->
@@ -185,6 +185,14 @@
         <div id="export-dialog" class="export-dialog">
             <h3>Select Columns to Export</h3>
 
+            <!-- Program Filter -->
+            <label>Export Program:</label>
+            <div class="program-options">
+                <div class="select-item selected" data-value="ALL">All</div>
+                <div class="select-item" data-value="ICT">ICT</div>
+                <div class="select-item" data-value="DST">DST</div>
+            </div>
+
             <!-- Column Options -->
             <div class="column-options">
                 <div class="select-all-option">
@@ -204,12 +212,16 @@
                     <label for="projectDescription">Project Description</label>
                 </div>
                 <div class="column-option">
+                    <input type="checkbox" id="projectCategory" checked>
+                    <label for="projectCategory"> Category</label>
+                </div>
+                <div class="column-option">
                     <input type="checkbox" id="advisor" checked>
                     <label for="advisor">Advisor</label>
                 </div>
                 <div class="column-option">
                     <input type="checkbox" id="coAdvisor" checked>
-                    <label for="advisor">Advisor</label>
+                    <label for="advisor">Co-Advisor</label>
                 </div>
                 <div class="column-option">
                     <input type="checkbox" id="studentId" checked>
@@ -313,8 +325,7 @@
     }
 
     // -------------------- Fetch Project -------------------- //
-    let currentPage = 1;  // หน้าเริ่มต้น
-    const itemsPerPage = 15; // จำนวนข้อมูลที่จะแสดงในแต่ละหน้า
+
     let projectsData = [];  // ข้อมูลทั้งหมดที่ดึงมาจาก API
     let filteredData = [];  // หลังกรองแล้ว
 
@@ -388,10 +399,8 @@
             return true;
         });
 
-        // reset page และ re-render
-        currentPage = 1;
-        updatePagination();
-        displayResults(currentPage);
+        displayResults();
+        checkUploadAvailability();
     }
 
     document.addEventListener('DOMContentLoaded', () => {
@@ -430,12 +439,7 @@
         let tableBody = document.querySelector("tbody");
         tableBody.innerHTML = ""; // เคลียร์ข้อมูลเก่า
 
-        // คำนวณขอบเขตข้อมูลที่จะแสดง
-        const startIndex = (page - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        const pageData = filteredData.slice(startIndex, endIndex);
-
-        pageData.forEach(project => {
+        filteredData.forEach(project => {
             console.log(project);
             const row = document.createElement('tr');
             const projectProgram = project.program ? project.program.toLowerCase() : "unknown";
@@ -849,139 +853,160 @@
         return cols;
     }
 
+    // 1) setup click handlers to toggle selection
+    document.querySelectorAll('.program-options .select-item')
+        .forEach(item => {
+            item.addEventListener('click', () => {
+                // unselect all, then select this one
+                document
+                    .querySelectorAll('.program-options .select-item')
+                    .forEach(i => i.classList.remove('selected'));
+                item.classList.add('selected');
+            });
+        });
+
     function exportToExcel() {
         console.log("Export button clicked");
-
-        // อ่าน semester ปัจจุบันจาก dropdown
-        const sem = document.getElementById('semester-selector').value;
 
         // ดึงข้อมูลจาก API
         fetch("http://localhost:8080/admin/projectOverview")
             .then(resp => resp.json())
             .then(data => {
-                if (!data || data.length === 0) {
-                    console.warn("No data available to export.");
-                    return;
-                }
+                    if (!data || data.length === 0) {
+                        console.warn("No data available to export.");
+                        return;
+                    }
 
-                // กรองเอาเฉพาะโปรเจกต์ของ semester ที่เลือก
-                const filtered = data.filter(p => String(p.semester) === sem);
-                if (filtered.length === 0) {
-                    return Swal.fire('Warning', `ไม่มีข้อมูลสำหรับ Semester ${sem}`, 'warning');
-                }
+                    // อ่าน semester ปัจจุบันจาก dropdown
+                    const sem = document.getElementById('semester-selector').value;
 
-                // อ่านคอลัมน์ที่เลือก
-                const selectedColumns = getSelectedColumns();
+                    const programFilter = document.querySelector('.program-options .select-item.selected').dataset.value;
 
-                // สร้าง header ตามที่เลือก
-                const headers = [];
-                if (selectedColumns.includes("Project ID")) headers.push("Project ID");
-                if (selectedColumns.includes("Project Title")) headers.push("Project Title");
-                if (selectedColumns.includes("Project Description")) headers.push("Project Description");
-                if (selectedColumns.includes("Advisor")) headers.push("Advisor");
-                if (selectedColumns.includes("Co-Advisor")) headers.push("Co-Advisor");
-                if (selectedColumns.includes("Student ID")) headers.push("Student ID");
-                if (selectedColumns.includes("Student Name")) headers.push("Student Name");
-                if (selectedColumns.includes("Program")) headers.push("Program");
-                if (selectedColumns.includes("Section")) headers.push("Section");
-                if (selectedColumns.includes("Track")) headers.push("Track");
-                if (selectedColumns.includes("Committee")) headers.push("Committee");
-                if (selectedColumns.includes("Poster-Committee")) headers.push("Poster-Committee");
+                    const filtered = data.filter(p =>
+                        String(p.semester) === sem &&
+                        (programFilter === 'ALL' || p.program === programFilter)
+                    );
+                    if (!filtered.length) {
+                        return Swal.fire(
+                            'Warning',
+                            `ไม่มีข้อมูลสำหรับ Semester ${sem} / Program ${programFilter}`,
+                            'warning'
+                        );
+                    }
 
-                // เตรียมข้อมูลแต่ละแถว
-                const rows = [];
-                filtered.forEach(project => {
-                    // หา Advisor
-                    const advisorName = project.professorList.find(p => p.role === "Advisor")?.professorName || "";
+                    // อ่านคอลัมน์ที่เลือก
+                    const selectedColumns = getSelectedColumns();
 
-                    // หา Co-Advisor
-                    const coAdvisorName = project.professorList.find(p => p.role === "Co-Advisor")?.professorName || "";
+                    // สร้าง header ตามที่เลือก
+                    const headers = [];
+                    if (selectedColumns.includes("Project ID")) headers.push("Project ID");
+                    if (selectedColumns.includes("Project Title")) headers.push("Project Title");
+                    if (selectedColumns.includes("Project Description")) headers.push("Project Description");
+                    if (selectedColumns.includes("Advisor")) headers.push("Advisor");
+                    if (selectedColumns.includes("Co-Advisor")) headers.push("Co-Advisor");
+                    if (selectedColumns.includes("Student ID")) headers.push("Student ID");
+                    if (selectedColumns.includes("Student Name")) headers.push("Student Name");
+                    if (selectedColumns.includes("Program")) headers.push("Program");
+                    if (selectedColumns.includes("Section")) headers.push("Section");
+                    if (selectedColumns.includes("Track")) headers.push("Track");
+                    if (selectedColumns.includes("Committee")) headers.push("Committee");
+                    if (selectedColumns.includes("Poster-Committee")) headers.push("Poster-Committee");
 
-                    // หา Committee ทั้งหมด
-                    const committeeList = project.professorList
-                        .filter(p => p.role === "Committee")
-                        .map(p => p.professorName);
+                    // เตรียมข้อมูลแต่ละแถว
+                    const rows = [];
+                    filtered.forEach(project => {
+                        // หา Advisor
+                        const advisorName = project.professorList.find(p => p.role === "Advisor")?.professorName || "";
 
-                    // หา Poster Committee
-                    const posterList = project.professorList
-                        .filter(p => p.role === "Poster-Committee")
-                        .map(p => p.professorName);
+                        // หา Co-Advisor
+                        const coAdvisorName = project.professorList.find(p => p.role === "Co-Advisor")?.professorName || "";
 
-                    project.studentList.forEach(student => {
-                        // ดึงชื่อ committee ทีละคน
-                        const committeeName = committeeList.length > 0 ? committeeList.shift() : "";
-                        const posterCommitteeName = posterList.length > 0 ? posterList.shift() : "";
+                        // หา Committee ทั้งหมด
+                        const committeeList = project.professorList
+                            .filter(p => p.role === "Committee")
+                            .map(p => p.professorName);
 
-                        const row = [];
-                        if (selectedColumns.includes("Project ID")) row.push(project.projectId);
-                        if (selectedColumns.includes("Project Title")) row.push(project.projectTitle);
-                        if (selectedColumns.includes("Project Description")) row.push(project.projectDescription);
-                        if (selectedColumns.includes("Advisor")) row.push(advisorName);
-                        if (selectedColumns.includes("Co-Advisor")) row.push(coAdvisorName);
-                        if (selectedColumns.includes("Student ID")) row.push(student.studentId);
-                        if (selectedColumns.includes("Student Name")) row.push(student.studentName);
-                        if (selectedColumns.includes("Program")) row.push(project.program);
-                        if (selectedColumns.includes("Section")) row.push(student.section);
-                        if (selectedColumns.includes("Track")) row.push(student.track);
-                        if (selectedColumns.includes("Committee")) row.push(committeeName);
-                        if (selectedColumns.includes("Poster-Committee")) row.push(posterCommitteeName);
+                        // หา Poster Committee
+                        const posterList = project.professorList
+                            .filter(p => p.role === "Poster-Committee")
+                            .map(p => p.professorName);
 
-                        rows.push(row);
+                        project.studentList.forEach(student => {
+                            // ดึงชื่อ committee ทีละคน
+                            const committeeName = committeeList.length > 0 ? committeeList.shift() : "";
+                            const posterCommitteeName = posterList.length > 0 ? posterList.shift() : "";
+
+                            const row = [];
+                            if (selectedColumns.includes("Project ID")) row.push(project.projectId);
+                            if (selectedColumns.includes("Project Title")) row.push(project.projectTitle);
+                            if (selectedColumns.includes("Project Description")) row.push(project.projectDescription);
+                            if (selectedColumns.includes("Advisor")) row.push(advisorName);
+                            if (selectedColumns.includes("Co-Advisor")) row.push(coAdvisorName);
+                            if (selectedColumns.includes("Student ID")) row.push(student.studentId);
+                            if (selectedColumns.includes("Student Name")) row.push(student.studentName);
+                            if (selectedColumns.includes("Program")) row.push(project.program);
+                            if (selectedColumns.includes("Section")) row.push(student.section);
+                            if (selectedColumns.includes("Track")) row.push(student.track);
+                            if (selectedColumns.includes("Committee")) row.push(committeeName);
+                            if (selectedColumns.includes("Poster-Committee")) row.push(posterCommitteeName);
+
+                            rows.push(row);
+                        });
                     });
-                });
 
-                // สร้าง Excel Workbook + Worksheet
-                const wb = new ExcelJS.Workbook();
-                const ws = wb.addWorksheet('Project Overview');
+                    // สร้าง Excel Workbook + Worksheet
+                    const wb = new ExcelJS.Workbook();
+                    const ws = wb.addWorksheet('Project Overview');
 
-                // เขียน Header Row (แถวที่ 1)
-                const headerRow = ws.getRow(1);
-                headerRow.values = headers;
-                headerRow.font = {bold: true, color: {argb: 'FFFFFFFF'}};
-                headerRow.alignment = {horizontal: 'center', vertical: 'middle'};
-                headers.forEach((_, i) => {
-                    const cell = headerRow.getCell(i + 1);
-                    cell.fill = {type: 'pattern', pattern: 'solid', fgColor: {argb: '4472C4'}};
-                    cell.border = {
-                        top: {style: 'thin'}, left: {style: 'thin'},
-                        bottom: {style: 'thin'}, right: {style: 'thin'}
-                    };
-                });
-
-                // เขียน Data Rows
-                rows.forEach((dataRow, idx) => {
-                    const row = ws.addRow(dataRow);
-                    row.alignment = {vertical: 'middle'};
-                    row.eachCell(cell => {
-                        cell.fill = {
-                            type: 'pattern',
-                            pattern: 'solid',
-                            fgColor: {argb: idx % 2 === 0 ? 'FFE9EFF7' : 'FFFFFFFF'}
-                        };
+                    // เขียน Header Row (แถวที่ 1)
+                    const headerRow = ws.getRow(1);
+                    headerRow.values = headers;
+                    headerRow.font = {bold: true, color: {argb: 'FFFFFFFF'}};
+                    headerRow.alignment = {horizontal: 'center', vertical: 'middle'};
+                    headers.forEach((_, i) => {
+                        const cell = headerRow.getCell(i + 1);
+                        cell.fill = {type: 'pattern', pattern: 'solid', fgColor: {argb: '4472C4'}};
                         cell.border = {
                             top: {style: 'thin'}, left: {style: 'thin'},
                             bottom: {style: 'thin'}, right: {style: 'thin'}
                         };
                     });
-                });
 
-                // ปรับความกว้างคอลัมน์
-                ws.columns = headers.map(() => ({width: 20}));
-
-                // ดาวน์โหลดไฟล์ Excel
-                wb.xlsx.writeBuffer().then(buffer => {
-                    const blob = new Blob([buffer], {
-                        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                    // เขียน Data Rows
+                    rows.forEach((dataRow, idx) => {
+                        const row = ws.addRow(dataRow);
+                        row.alignment = {vertical: 'middle'};
+                        row.eachCell(cell => {
+                            cell.fill = {
+                                type: 'pattern',
+                                pattern: 'solid',
+                                fgColor: {argb: idx % 2 === 0 ? 'FFE9EFF7' : 'FFFFFFFF'}
+                            };
+                            cell.border = {
+                                top: {style: 'thin'}, left: {style: 'thin'},
+                                bottom: {style: 'thin'}, right: {style: 'thin'}
+                            };
+                        });
                     });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = 'Project_Overview_Raw.xlsx';
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                });
-            })
+
+                    // ปรับความกว้างคอลัมน์
+                    ws.columns = headers.map(() => ({width: 20}));
+
+                    // ดาวน์โหลดไฟล์ Excel
+                    wb.xlsx.writeBuffer().then(buffer => {
+                        const blob = new Blob([buffer], {
+                            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+                        });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = 'Project_Overview_Raw.xlsx';
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                    });
+                }
+            )
             .catch(err => console.error("Error exporting Excel:", err));
     }
 
@@ -1016,8 +1041,8 @@
             {id: "program", name: "Program"},
             {id: "advisor", name: "Advisor"},
             {id: "coAdvisor", name: "Co-Advisor"},
-            {id: "committee1", name: "Committee"},
-            {id: "posterCommittee1", name: "Poster-Committee"}
+            {id: "committee", name: "Committee"},
+            {id: "posterCommittee", name: "Poster-Committee"}
         ];
         return map
             .filter(col => {
@@ -1029,17 +1054,25 @@
 
 
     // 2) ฟังก์ชัน export ฉบับเต็ม
-    async function exportTemplateNew() {
+    async function exportMergeExcel() {
 
         if (!projectsData || projectsData.length === 0) {
             return Swal.fire('Warning', 'ไม่มีข้อมูลโปรเจกต์ให้ส่งออก', 'warning');
         }
 
         const sem = document.getElementById('semester-selector').value;
+        const programFilter = document.querySelector('.program-options .select-item.selected').dataset.value;
 
-        const exportData = projectsData.filter(p => String(p.semester) === sem);
+        const exportData = projectsData.filter(p =>
+            String(p.semester) === sem &&
+            (programFilter === 'ALL' || p.program === programFilter)
+        );
         if (exportData.length === 0) {
-            return Swal.fire('Warning', `ไม่มีข้อมูลสำหรับ Semester ${sem}`, 'warning');
+            return Swal.fire(
+                'Warning',
+                `ไม่มีข้อมูลสำหรับ Semester ${sem} / Program ${programFilter}`,
+                'warning'
+            );
         }
 
         let headers = getSelectedColumnsPC();
@@ -1047,26 +1080,20 @@
             return Swal.fire('Warning', 'กรุณาเลือกอย่างน้อยหนึ่งคอลัมน์', 'warning');
         }
 
-        // 3) บังคับให้มีหัวข้อหลักบางตัว (ตำแหน่งอาจเปลี่ยนตาม headers)
-        if (!headers.includes("Project Category")) headers.splice(
-            headers.indexOf("Project Description") + 1, 0, "Project Category"
-        );
-        ["Co-Advisor", "Committee", "Poster-Committee"].forEach(col => {
-            if (!headers.includes(col)) headers.push(col);
-        });
 
         // 4) เตรียม row objects
         const rowObjs = [];
-        const projectMap = new Map(); // สำหรับ merge
-        let globalRow = 6; // data เริ่มเขียนที่ row 6
+        const projectMap = new Map();
+        let globalRow = 6; // เริ่มเขียนแถวที่ 6
 
         exportData.forEach(proj => {
-            // แยกอาจารย์ตาม role
+            // แยกชื่ออาจารย์ตาม role
             const advs = proj.professorList.filter(p => p.role === "Advisor").map(p => p.professorName);
             const coAd = proj.professorList.filter(p => p.role === "Co-Advisor").map(p => p.professorName);
             const coms = proj.professorList.filter(p => p.role === "Committee").map(p => p.professorName);
             const pos = proj.professorList.filter(p => p.role === "Poster-Committee").map(p => p.professorName);
-            // เตรียม students
+
+            // เตรียม studentList
             const studs = Array.isArray(proj.studentList)
                 ? proj.studentList.map(s => ({
                     "Student ID": s.studentId || "",
@@ -1076,8 +1103,8 @@
                 }))
                 : [];
 
+            // หา numRows สูงสุดแล้ว pad แต่ละ array
             const numRows = Math.max(studs.length, advs.length, coAd.length, coms.length, pos.length);
-            // pad แต่ละ array
             while (advs.length < numRows) advs.push("");
             while (coAd.length < numRows) coAd.push("");
             while (coms.length < numRows) coms.push("");
@@ -1086,7 +1113,6 @@
 
             const startRow = globalRow;
             for (let i = 0; i < numRows; i++, globalRow++) {
-                // สร้าง object แถวนี้
                 const obj = {};
                 headers.forEach(h => {
                     switch (h) {
@@ -1125,6 +1151,7 @@
                             break;
                         default:
                             obj[h] = "";
+                            break;
                     }
                 });
                 rowObjs.push(obj);
@@ -1145,7 +1172,7 @@
         });
         ws.getCell("A1").value = "Senior Project Overview";
         ws.getCell("A2").value = "Exported Project Committee Data";
-        ws.getCell("A3").value = "Generated by System";
+        ws.getCell("A3").value = `Program: ${programFilter}`;
         ws.getCell("A4").value = new Date().toLocaleString();
 
         // 7) เขียน header row ที่แถว 5
@@ -1153,14 +1180,9 @@
         hr.values = headers;
         hr.font = {bold: true};
         hr.alignment = {horizontal: "center", vertical: "middle"};
-        hr.eachCell(cell => {
-            cell.fill = {type: "pattern", pattern: "solid", fgColor: {argb: "FFB5E6A2"}};
-            cell.border = {
-                top: {style: "thin"},
-                left: {style: "thin"},
-                bottom: {style: "thin"},
-                right: {style: "thin"}
-            };
+        hr.eachCell(c => {
+            c.fill = {type: "pattern", pattern: "solid", fgColor: {argb: "FFB5E6A2"}};
+            c.border = {top: {style: "thin"}, left: {style: "thin"}, bottom: {style: "thin"}, right: {style: "thin"}};
         });
 
         // 8) เขียน dataRows
@@ -1168,8 +1190,8 @@
             const row = ws.getRow(6 + idx);
             row.values = headers.map(h => obj[h]);
             row.alignment = {vertical: "middle", horizontal: "left"};
-            row.eachCell(cell => {
-                cell.border = {
+            row.eachCell(c => {
+                c.border = {
                     top: {style: "thin"},
                     left: {style: "thin"},
                     bottom: {style: "thin"},
@@ -1178,24 +1200,19 @@
             });
         });
 
-        // 9) Merge คอลัมน์หลัก ตาม projectMap
+        // 8) Merge คอลัมน์หลัก per projectMap
         ["Project ID", "Project Title", "Project Description", "Project Category", "Program", "Advisor", "Co-Advisor"]
             .forEach(colName => {
                 const colIdx = headers.indexOf(colName) + 1;
                 if (colIdx < 1) return;
                 projectMap.forEach(({startRow, endRow}) => {
-                    if (endRow > startRow) {
-                        ws.mergeCells(startRow, colIdx, endRow, colIdx);
-                    }
+                    if (endRow > startRow) ws.mergeCells(startRow, colIdx, endRow, colIdx);
                 });
             });
 
-        // 10) ดาวน์โหลดไฟล์
+        // 9) ดาวน์โหลดไฟล์
         const buf = await wb.xlsx.writeBuffer();
-        const blob = new Blob([buf], {
-            type:
-                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-        });
+        const blob = new Blob([buf], {type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -1206,7 +1223,7 @@
     }
 
     // ผูกปุ่ม Export
-    document.getElementById("export-project-excel-new").addEventListener("click", exportTemplateNew);
+    document.getElementById("export-project-excel-new").addEventListener("click", exportMergeExcel);
 
 
 </script>

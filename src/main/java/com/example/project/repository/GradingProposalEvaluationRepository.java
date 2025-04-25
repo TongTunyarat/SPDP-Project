@@ -4,6 +4,7 @@ import com.example.project.entity.GradingProposalEvaluation;
 import com.example.project.entity.Project;
 import com.example.project.entity.Student;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -24,4 +25,16 @@ public interface GradingProposalEvaluationRepository extends JpaRepository<Gradi
     GradingProposalEvaluation findGradeResultByProjectAndStudent_StudentId(Project project, String student);
 
     List<GradingProposalEvaluation> findByProject_Semester(String year);
+
+    @Modifying
+    @Query("""
+      DELETE FROM GradingProposalEvaluation g
+      WHERE g.project.semester = :semester
+        AND (:program IS NULL OR LOWER(g.project.program) = LOWER(:program))
+    """)
+    int deleteBySemesterAndProgram(
+            @Param("semester") String semester,
+            @Param("program")  String program
+    );
+
 }
