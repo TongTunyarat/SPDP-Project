@@ -696,6 +696,7 @@
 
                 const completenessScore = ((completenessAvg / completenessEntries) / completenessMaxScore) * (qualityWeight * 100);
                 rawDocumentScore += completenessScore;
+                console.log("CompletenessScore " + completenessScore);
             }
 
             // คำนวณคะแนนสำหรับ Timeliness (Document)
@@ -707,6 +708,7 @@
 
                 const timelinessScore = ((timelinessAvg / timelinessEntries) / timelinessMaxScore) * (timelinessWeight * 100);
                 rawDocumentScore += timelinessScore;
+                console.log("TimelinessScore " + timelinessScore);
             }
 
             studentData.totalDocumentScore = rawDocumentScore;

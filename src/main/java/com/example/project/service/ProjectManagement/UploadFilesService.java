@@ -512,7 +512,14 @@ public class UploadFilesService {
                 .withTrim()
                 .withIgnoreEmptyLines();
 
-        // เก็บชื่อ committee ที่ประมวลผลแล้ว แยกตาม projectId
+        // เก็บข้อมูลที่จะ insert ทีหลัง (หลัง validate ผ่านทั้งไฟล์)
+        class Entry {
+            String projectId;
+            Instructor instr;
+        }
+        List<Entry> toInsert = new ArrayList<>();
+
+        // เก็บชื่อ committee ที่เจอแล้ว แยกตาม projectId (ตรวจ duplicate in-file)
         Map<String, Set<String>> seenCommitteesMap = new HashMap<>();
 
         try (
@@ -524,105 +531,119 @@ public class UploadFilesService {
                 if (lnr.readLine() == null) break;
             }
 
-            CSVParser parser = new CSVParser(
+            try (CSVParser parser = new CSVParser(
                     lnr,
                     format
                             .withHeader(HEADERS)
                             .withSkipHeaderRecord()
-            );
+            )) {
+                String currentProjectId = null;
 
-            String currentProjectId = null;
-            for (CSVRecord rec : parser) {
-                String fileProjId = rec.get("Project ID").trim();
-                String committee = rec.get("Committee").trim().replaceAll("^'+|'+$", "");
+                for (CSVRecord rec : parser) {
+                    long rowNum = rec.getRecordNumber() + 4;
+                    String fileProjId = rec.get("Project ID").trim();
+                    String committee   = rec.get("Committee").trim().replaceAll("^'+|'+$", "");
 
-                // อัปเดต project pointer
-                if (!fileProjId.isBlank()) {
-                    if (!projectRepository.existsById(fileProjId)) {
-                        warnings.add("Row " + rec.getRecordNumber()
-                                + ": ไม่พบ Project ID '" + fileProjId + "'");
+                    // 1) อัปเดต project pointer
+                    if (!fileProjId.isBlank()) {
+                        if (!projectRepository.existsById(fileProjId)) {
+                            warnings.add("Row " + rowNum + ": ไม่พบ Project ID '" + fileProjId + "'");
+                            break;
+                        }
+                        currentProjectId = fileProjId;
+                    }
+                    if (currentProjectId == null) {
+                        warnings.add("Row " + rowNum + ": ยังไม่พบ Project ID ก่อนหน้านี้");
+                        break;
+                    }
+
+                    // 2) ข้ามถ้าไม่มีชื่อ committee
+                    if (committee.isBlank()) {
                         continue;
                     }
-                    currentProjectId = fileProjId;
-                }
-                if (currentProjectId == null) {
-                    warnings.add("Row " + rec.getRecordNumber()
-                            + ": ยังไม่พบ Project ID ก่อนหน้านี้");
-                    continue;
-                }
 
-                // ข้ามถ้าไม่มี committee
-                if (committee.isBlank()) {
-                    continue;
-                }
+                    // 3) ตรวจ duplicate ในไฟล์
+                    Set<String> seen = seenCommitteesMap
+                            .computeIfAbsent(currentProjectId, k -> new HashSet<>());
+                    if (seen.contains(committee)) {
+                        warnings.add("Row " + rowNum
+                                + ": คณะกรรมการ '" + committee
+                                + "' ซ้ำในโปรเจกต์ " + currentProjectId);
+                        break;
+                    }
+                    seen.add(committee);
 
-                // 1) เช็ค duplicate ในไฟล์ CSV
-                Set<String> seen = seenCommitteesMap
-                        .computeIfAbsent(currentProjectId, k -> new HashSet<>());
-                if (seen.contains(committee)) {
-                    warnings.add("Row " + rec.getRecordNumber()
-                            + ": คณะกรรมการ '" + committee
-                            + "' ซ้ำในโปรเจกต์ " + currentProjectId);
-                    return warnings;  // หยุดทั้งกระบวนการ
-                }
-                seen.add(committee);
+                    // 4) lookup instructor
+                    Optional<Instructor> instOpt = instructorRepository
+                            .findByProfessorName(committee);
+                    if (instOpt.isEmpty()) {
+                        warnings.add("Row " + rowNum
+                                + ": ไม่พบอาจารย์ '" + committee + "'");
+                        break;
+                    }
+                    Instructor instr = instOpt.get();
 
-                // lookup instructor
-                Optional<Instructor> instOpt = instructorRepository
-                        .findByProfessorName(committee);
-                if (instOpt.isEmpty()) {
-                    warnings.add("Row " + rec.getRecordNumber()
-                            + ": ไม่พบอาจารย์ '" + committee + "'");
-                    continue;
-                }
-                Instructor instr = instOpt.get();
+                    // 5) สร้าง professorId ถ้ายังไม่มี
+                    if (instr.getProfessorId() == null) {
+                        instr.setProfessorId(generateNextInstructorId());
+                        instructorRepository.save(instr);
+                    }
 
-                // สร้าง professorId ถ้ายังไม่มี
-                if (instr.getProfessorId() == null) {
-                    instr.setProfessorId(generateNextInstructorId());
-                    instructorRepository.save(instr);
-                }
+                    // 6) เช็คว่าเป็น Advisor อยู่แล้วหรือไม่
+                    boolean isAdvisor = projectInstructorRoleRepository
+                            .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(
+                                    currentProjectId,
+                                    instr.getProfessorId(),
+                                    "Advisor"
+                            );
+                    if (isAdvisor) {
+                        warnings.add("Row " + rowNum
+                                + ": ไม่สามารถเพิ่ม '" + committee
+                                + "' เป็น Committee เพราะเป็น Advisor อยู่แล้ว");
+                        break;
+                    }
 
-                // 2) เช็คว่าเป็น Advisor อยู่แล้วหรือไม่
-                boolean isAdvisor = projectInstructorRoleRepository
-                        .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(
-                                currentProjectId,
-                                instr.getProfessorId(),
-                                "Advisor"
-                        );
-                if (isAdvisor) {
-                    warnings.add("Row " + rec.getRecordNumber()
-                            + ": ไม่สามารถเพิ่ม '" + committee
-                            + "' เป็น Committee เพราะเป็น Advisor อยู่แล้ว");
-                    return warnings;  // หยุดทั้งกระบวนการ
-                }
+                    // 7) เช็คซ้ำใน DB ว่า committee เดิมมีอยู่แล้วหรือไม่
+                    boolean exists = projectInstructorRoleRepository
+                            .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(
+                                    currentProjectId,
+                                    instr.getProfessorId(),
+                                    "Committee"
+                            );
+                    if (exists) {
+                        // ถ้ามีแล้ว ก็ข้าม quietly
+                        continue;
+                    }
 
-                // 3) เช็คซ้ำใน DB ว่า committee เดิมมีอยู่แล้วหรือไม่
-                boolean exists = projectInstructorRoleRepository
-                        .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(
-                                currentProjectId,
-                                instr.getProfessorId(),
-                                "Committee"
-                        );
-                if (exists) {
-                    continue;  // ข้าม เพราะมีอยู่แล้ว
+                    // 8) เก็บ entry ไว้สร้างจริงทีหลัง
+                    Entry e = new Entry();
+                    e.projectId = currentProjectId;
+                    e.instr     = instr;
+                    toInsert.add(e);
                 }
-
-                // 4) สร้าง ProjectInstructorRole ใหม่
-                Project project = projectRepository.findById(currentProjectId).get();
-                ProjectInstructorRole pir = new ProjectInstructorRole();
-                pir.setInstructorId(generateNextInstructorId());
-                pir.setAssignDate(LocalDateTime.now());
-                pir.setRole("Committee");
-                pir.setProjectIdRole(project);
-                pir.setInstructor(instr);
-                projectInstructorRoleRepository.save(pir);
             }
         } catch (IOException e) {
             throw new Exception("Error อ่าน CSV: " + e.getMessage(), e);
         }
 
-        return warnings;
+        // ถ้าพบปัญหาในไฟล์ ให้หยุดทั้งกระบวนการ และ rollback เพราะ @Transactional
+        if (!warnings.isEmpty()) {
+            return warnings;
+        }
+
+        // 9) ถ้า validation ผ่านทั้งหมด ให้ insert ทุก entry
+        for (Entry e : toInsert) {
+            Project project = projectRepository.findById(e.projectId).get();
+            ProjectInstructorRole pir = new ProjectInstructorRole();
+            pir.setInstructorId(generateNextInstructorId());
+            pir.setAssignDate(LocalDateTime.now());
+            pir.setRole("Committee");
+            pir.setProjectIdRole(project);
+            pir.setInstructor(e.instr);
+            projectInstructorRoleRepository.save(pir);
+        }
+
+        return warnings;  // ว่าง = สำเร็จทั้งหมด
     }
 
     @Transactional
@@ -641,6 +662,7 @@ public class UploadFilesService {
                 "Advisor",
                 "Co-Advisor",
                 "Committee",
+                "Poster-Committee"
         };
 
         // ตั้งค่า CSVFormat ให้รองรับ RFC4180
@@ -650,52 +672,62 @@ public class UploadFilesService {
                 .withTrim()
                 .withIgnoreEmptyLines();
 
+        // DTO เก็บรายการที่จะ insert ทีหลัง (หลัง validate ผ่านทั้งไฟล์)
+        class Entry {
+            String projectId;
+            Instructor instr;
+        }
+        List<Entry> toInsert = new ArrayList<>();
+
         try (
-                // อ่านข้าม 4 บรรทัดแรกแบบง่าย ๆ
+                // อ่านข้าม 4 บรรทัดแรก
                 LineNumberReader lnr = new LineNumberReader(
                         new InputStreamReader(file.getInputStream(), StandardCharsets.UTF_8))
         ) {
+            // skip 4 header lines
             for (int i = 0; i < 4; i++) {
                 if (lnr.readLine() == null) break;
             }
 
-            // บรรทัดถัดไป (row5) ให้ Commons CSV อ่านเป็น header
+            // row5 เป็น header ให้ Commons CSV อ่านเป็น header record
             try (CSVParser parser = new CSVParser(
                     lnr,
                     format
-                            .withHeader(HEADERS)     // map header
-                            .withSkipHeaderRecord()  // ไม่เอา header row ไปเป็น data
+                            .withHeader(HEADERS)
+                            .withSkipHeaderRecord()
             )) {
                 String currentProjectId = null;
-                for (CSVRecord rec : parser) {
-                    // อ่านค่าตามชื่อคอลัมน์
-                    String fileProjId = rec.get("Project ID").trim();
-                    String posterCommittee = rec.get("Poster-Committee").trim();
-                    long rowNum = rec.getRecordNumber() + 4; // +4 เพราะข้ามไปแล้ว
 
-                    // 1) ถ้ามี Project ID ใหม่ ให้อัปเดตตัวชี้
+                for (CSVRecord rec : parser) {
+                    long rowNum = rec.getRecordNumber() + 4;  // ปรับเลขบรรทัดจริง
+                    String fileProjId      = rec.get("Project ID").trim();
+                    String posterCommittee = rec.get("Poster-Committee").trim();
+
+                    // 1) ถ้ามี Project ID ใหม่ ให้เช็คและอัปเดต pointer
                     if (!fileProjId.isBlank()) {
-                        Optional<Project> projOpt = projectRepository.findById(fileProjId);
-                        if (projOpt.isEmpty()) {
+                        if (!projectRepository.existsById(fileProjId)) {
                             warnings.add("Row " + rowNum + ": ไม่พบ Project ID '" + fileProjId + "'");
-                            continue;
+                            break;
                         }
                         currentProjectId = fileProjId;
                     }
                     if (currentProjectId == null) {
                         warnings.add("Row " + rowNum + ": ยังไม่มี Project ID ก่อนหน้าให้ใช้");
-                        continue;
+                        break;
                     }
 
-                    // 2) ข้ามถ้า posterCommittee ว่าง
-                    if (posterCommittee.isBlank()) continue;
+                    // 2) ถ้าไม่มีชื่อ Poster-Committee ให้ข้าม
+                    if (posterCommittee.isBlank()) {
+                        continue;
+                    }
 
                     // 3) lookup Instructor
                     Optional<Instructor> instOpt = instructorRepository
                             .findByProfessorName(posterCommittee);
                     if (instOpt.isEmpty()) {
-                        warnings.add("Row " + rowNum + ": ไม่พบอาจารย์ Poster-Committee '" + posterCommittee + "'");
-                        continue;
+                        warnings.add("Row " + rowNum
+                                + ": ไม่พบอาจารย์ Poster-Committee '" + posterCommittee + "'");
+                        break;
                     }
                     Instructor instr = instOpt.get();
 
@@ -705,28 +737,74 @@ public class UploadFilesService {
                         instructorRepository.save(instr);
                     }
 
-                    // 5) ป้องกันซ้ำ
+                    // 5) ป้องกันซ้ำ: เป็น Advisor อยู่แล้ว?
+                    boolean isAdvisor = projectInstructorRoleRepository
+                            .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(
+                                    currentProjectId,
+                                    instr.getProfessorId(),
+                                    "Advisor"
+                            );
+                    if (isAdvisor) {
+                        warnings.add("Row " + rowNum
+                                + ": ไม่สามารถเพิ่ม '" + posterCommittee
+                                + "' เป็น Poster-Committee เพราะเป็น Advisor อยู่แล้ว");
+                        break;
+                    }
+
+                    // 6) ป้องกันซ้ำ: เป็น Committee อยู่แล้ว?
+                    boolean isCommittee = projectInstructorRoleRepository
+                            .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(
+                                    currentProjectId,
+                                    instr.getProfessorId(),
+                                    "Committee"
+                            );
+                    if (isCommittee) {
+                        warnings.add("Row " + rowNum
+                                + ": ไม่สามารถเพิ่ม '" + posterCommittee
+                                + "' เป็น Poster-Committee เพราะเป็น Committee อยู่แล้ว");
+                        break;
+                    }
+
+                    // 7) ป้องกันซ้ำ: เป็น Poster-Committee เดิม?
                     boolean exists = projectInstructorRoleRepository
                             .existsByProjectIdRole_ProjectIdAndInstructor_ProfessorIdAndRole(
                                     currentProjectId,
                                     instr.getProfessorId(),
                                     "Poster-Committee"
                             );
-                    if (exists) continue;
+                    if (exists) {
+                        warnings.add("Row " + rowNum
+                                + ": Poster-Committee '" + posterCommittee
+                                + "' ซ้ำในโปรเจกต์ " + currentProjectId);
+                        break;
+                    }
 
-                    // 6) สร้าง record ใหม่
-                    Project project = projectRepository.findById(currentProjectId).get();
-                    ProjectInstructorRole pir = new ProjectInstructorRole();
-                    pir.setInstructorId(generateNextInstructorId());
-                    pir.setAssignDate(LocalDateTime.now());
-                    pir.setRole("Poster-Committee");
-                    pir.setProjectIdRole(project);
-                    pir.setInstructor(instr);
-                    projectInstructorRoleRepository.save(pir);
+                    // 8) เก็บ entry ไว้ insert ทีหลัง
+                    Entry e = new Entry();
+                    e.projectId = currentProjectId;
+                    e.instr     = instr;
+                    toInsert.add(e);
                 }
             }
         } catch (IOException e) {
             throw new Exception("Error อ่าน CSV: " + e.getMessage(), e);
+        }
+
+        // ถ้าพบปัญหาในไฟล์ ให้หยุดทั้งกระบวนการ (rollback) และคืน warnings
+        if (!warnings.isEmpty()) {
+            return warnings;
+        }
+
+        // ถ้า validation ผ่านทั้งหมด ให้ insert ทุก entry
+        for (Entry e : toInsert) {
+            Project project = projectRepository.findById(e.projectId).get();
+            ProjectInstructorRole pir = new ProjectInstructorRole();
+            pir.setInstructorId(generateNextInstructorId());
+            pir.setAssignDate(LocalDateTime.now());
+            pir.setRole("Poster-Committee");
+            pir.setProjectIdRole(project);
+            pir.setInstructor(e.instr);
+            projectInstructorRoleRepository.save(pir);
         }
 
         return warnings;
