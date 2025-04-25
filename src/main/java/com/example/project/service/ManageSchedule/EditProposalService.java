@@ -265,7 +265,7 @@ public class EditProposalService {
         proposalScheduleList.stream()
                 .filter(p -> p.getDate() != null)
                 .filter(p -> p.getStartTime() != null && p.getEndTime() != null)
-                .filter(p -> p.getRoom() != null)
+//                .filter(p -> p.getRoom() != null)
                 .filter(schedule -> schedule.getDate().equals(startDate))
                 .forEach(p -> {
 
