@@ -49,7 +49,7 @@ public class SecurityConfig {
                         .successHandler((request, response, authentication) -> {
                             //[SimpleGrantedAuthority("ROLE_ADMIN"), SimpleGrantedAuthority("ROLE_INSTRUCTOR")]
                             Set<String> roles = authentication.getAuthorities().stream()
-                                    // string
+                                    // string role
                                     .map(GrantedAuthority::getAuthority)
                                     .collect(Collectors.toSet());
                             if(roles.contains("ROLE_ADMIN")){
@@ -77,6 +77,12 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return  new BCryptPasswordEncoder();
     }
+
+    // $2a$10$qYbZSUa3B/rJX4M1bX5keuQ5GcvFAeqnUJ2Y3iZT9Vc9EVJ9h1F9G
+    // $2a$ คือ version ของ BCrypt
+    // 10$ คือ work factor
+    // qYbZSUa3B/rJX4M1bX5keu คือ salt
+    // hashed password
 
     // https://stackoverflow.com/questions/77504542/rewriting-a-spring-security-deprecated-authenticationmanager-httpsecurity
     // จัดการ authentication

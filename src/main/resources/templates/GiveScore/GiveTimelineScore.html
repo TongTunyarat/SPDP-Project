@@ -658,7 +658,7 @@
                 document.getElementById('btn-all').addEventListener('click', () => applyScoreToProjects('all'));
                 document.getElementById('btn-ict').addEventListener('click', () => applyScoreToProjects('ict'));
                 document.getElementById('btn-dst').addEventListener('click', () => applyScoreToProjects('dst'));
-                document.getElementById('btn-empty').addEventListener('click', () => applyScoreToProjects('empty'));
+                // document.getElementById('btn-empty').addEventListener('click', () => applyScoreToProjects('empty'));
                 document.getElementById('btn-selected').addEventListener('click', () => applyScoreToProjects('selected'));
             }
         });
@@ -702,9 +702,9 @@
                 case 'dst':
                     shouldUpdate = projectId.includes('DST');
                     break;
-                case 'empty':
-                    shouldUpdate = input.value === '';
-                    break;
+                // case 'empty':
+                //     shouldUpdate = input.value === '';
+                //     break;
                 case 'selected':
                     // For selected, we'll need to check if the row is selected
                     // We'll implement this later with checkboxes
