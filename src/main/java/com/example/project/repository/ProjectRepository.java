@@ -7,6 +7,7 @@ import com.example.project.DTO.projectManagement.StudentProjectDTO;
 import com.example.project.entity.Project;
 import com.example.project.entity.ProposalSchedule;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -24,7 +25,6 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
             "LOWER(p.projectCategory) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(p.projectTitle) LIKE LOWER(CONCAT('%', :keyword, '%')) OR " +
             "LOWER(p.projectDescription) LIKE LOWER(CONCAT('%', :keyword, '%'))")
-
     List<Project> searchProjects(@Param("keyword") String keyword);
 
     Object[] findProfessorNameByProjectId(@Param("projectId") String projectId);
@@ -85,10 +85,37 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
     @Query("SELECT MAX(p.projectId) FROM Project p WHERE p.program = :program AND p.projectId LIKE CONCAT(:program, ' SP%')")
     String findLatestProjectIdByProgram(@Param("program") String program);
 
-    // เพิ่มฟังก์ชันที่ดึงข้อมูลโปรเจกต์ทั้งหมดได้
-//    List<Project> findAll();
 
-}
+    @Query(value = "SELECT project_id FROM project " +
+            "WHERE project_id LIKE CONCAT(:program, ' SP', :year, '-%') " +
+            "ORDER BY CAST(SUBSTRING(project_id, LOCATE('-', project_id) + 1) AS UNSIGNED) DESC " +
+            "LIMIT 1", nativeQuery = true)
+    String findLatestProjectIdByProgramAndYear(@Param("program") String program,
+                                               @Param("year") String year);
+
+    @Query("SELECT p.projectId " +
+            "FROM Project p " +
+            " JOIN p.projectInstructorRoles pir " +
+            " JOIN pir.instructor i " +
+            "WHERE p.program = :program " +
+            "  AND p.semester = :year " +
+            "  AND i.professorName = :advisor " +
+            "ORDER BY p.projectId DESC")
+    String findLatestProjectIdByProgramAndYearAndAdvisor(@Param("program") String program,
+                                                         @Param("year") String year,
+                                                         @Param("advisor") String role);
+
+    Optional<Project> findByProjectTitleAndProjectDescription(String title, String description);
+
+    void deleteBySemester(String semester);
+
+    @Modifying
+    @Query("DELETE FROM Project p WHERE p.semester = :semester"
+            + " AND (:program IS NULL OR LOWER(p.program) = LOWER(:program))")
+    int deleteBySemesterAndProgram(@Param("semester") String semester,
+                                   @Param("program") String program);
+
+
 
 
 // Default กัน พลาด เสียหาย
@@ -105,4 +132,4 @@ public interface ProjectRepository extends JpaRepository<Project, String> {
 //
 //    Project findByProjectId(String projectId);
 //
-//}
+}

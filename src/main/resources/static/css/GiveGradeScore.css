@@ -245,19 +245,35 @@ input[type="number"], input[type="text"] {
 /* ปรับ modal ให้สามารถ scroll ได้ */
 #popup-modal {
     display: none;
+    justify-content: center;
+    align-items: center;
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.6);
-    overflow: auto; /* ทำให้สามารถ scroll ได้ */
-    z-index: 9999; /* ให้ modal อยู่บนสุด */
+    overflow: hidden; /* ซ่อน scroll ของ overlay */
+    z-index: 9999;
+}
+
+/* 2. กล่อง modal จริงๆ */
+#popup-modal > div {
+    position: absolute;
+    top: 5%;
+    width: 90vw !important;
+    max-width: 1100px;
+    max-height: 90vh;
+    margin: auto !important;
+    padding: 20px;
+    box-sizing: border-box;
+    background: #fff;
+    border-radius: 8px;
+    overflow-y: auto !important;  /* สกรอลล์ภายในกล่องได้ */
 }
 
 #popup-modal .table-container {
     border-collapse: collapse;
-    margin-top: 32px;
 }
 
 #confirmationModal {
@@ -435,4 +451,4 @@ button {
 
 .invalid-score:focus {
     outline-color: red;
-
+}

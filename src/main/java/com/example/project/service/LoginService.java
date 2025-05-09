@@ -26,17 +26,20 @@ public class LoginService implements UserDetailsService {
 
 
     // authentication wit spring security
+    // UsernamePasswordAuthenticationToken(username, password)
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Account account = accountRepository.findAccountByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User account not found"));
         // GrantedAuthority - interface กำหนด role
         List<GrantedAuthority> authorities = new ArrayList<>();
+
         if(account.getAdmins() != null) {
             authorities.add(new SimpleGrantedAuthority("ROLE_ADMIN"));
         } else if (account.getInstructors() != null) {
             authorities.add(new SimpleGrantedAuthority("ROLE_INSTRUCTOR"));
         }
+
         // ส่งให้ security
         return new User(account.getUsername(), account.getPassword(), authorities);
     }

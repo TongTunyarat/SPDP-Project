@@ -4,6 +4,7 @@ import com.example.project.entity.Project;
 import com.example.project.entity.Project;
 import com.example.project.entity.StudentProject;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -32,4 +33,17 @@ public interface StudentProjectRepository extends JpaRepository<StudentProject, 
 
     int countByProject(Project project);
 
+    boolean existsByProject_ProjectIdAndStudent_StudentId(String projectId, String studentId);
+
+    void deleteByProject_ProjectId(String projectId);
+
+    boolean existsByStudent_StudentId(String id);
+
+    void deleteByProject_ProjectIdAndStudent_StudentId(String projectId, String studentId);
+
+    @Modifying
+    @Query("DELETE FROM StudentProject sp WHERE sp.project.semester = :semester"
+            + " AND (:program IS NULL OR LOWER(sp.project.program) = LOWER(:program))")
+    int deleteBySemesterAndProgram(@Param("semester") String semester,
+                                   @Param("program") String program);
 }

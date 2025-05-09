@@ -13,6 +13,7 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.io.IOException;
 import java.text.DateFormat;
@@ -60,11 +61,12 @@ public class ExportScheduleService {
 
         // mime type มาตรฐานการสื่อสารของไฟล์เอกสาร เพื่อให้เบราว์เซอร์รู้ว่าไฟล์ที่กำลังติดต่อกับ server นั้นคือไฟล์รูปแบบใด (https://kb.hostatom.com/content/20612/)
         response.setContentType("application/octet-stream");
-        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss");
+        DateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd");
         String currentDateTime = dateFormatter.format(new Date());
 
         // ทำให้ browser download ไฟล์แทนที่จะเปิดใน browser
         String headerKey = "Content-Disposition";
+//        String headerValue = "attachment; filename=" + fileName + "_" + currentDateTime + ".xlsx";
         String headerValue = "attachment; filename=" + fileName + "_" + currentDateTime + ".xlsx";
 
         response.setHeader(headerKey, headerValue);
@@ -259,12 +261,12 @@ public class ExportScheduleService {
     }
 
 
-    public void exportToExcel(HttpServletResponse response, List<PreviewProposalDTO> data) throws IOException {
+    public void exportToExcel(HttpServletResponse response, List<PreviewProposalDTO> data, String program, String semesterYear) throws IOException {
 
         newReportExcel();
 
         // response  writer to excel
-        response = initResponseForExportExcel(response, "Proposal_Schedule");
+        response = initResponseForExportExcel(response, "Proposal_Schedule_" + program + "_" + semesterYear);
         ServletOutputStream outputStream = response.getOutputStream();
 
         // write sheet, title & header
@@ -279,12 +281,12 @@ public class ExportScheduleService {
 
     }
 
-    public void exportDefenseToExcel(HttpServletResponse response, List<PreviewProposalDTO> data) throws IOException {
+    public void exportDefenseToExcel(HttpServletResponse response, List<PreviewProposalDTO> data, String semesterYear) throws IOException {
 
         newReportExcel();
 
         // response  writer to excel
-        response = initResponseForExportExcel(response, "Defense_Schedule");
+        response = initResponseForExportExcel(response, "Defense_Schedule"+ "_" + semesterYear);
         ServletOutputStream outputStream = response.getOutputStream();
 
         // write sheet, title & header

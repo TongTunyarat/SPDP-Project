@@ -34,12 +34,128 @@ body {
     font-weight: 500;
     box-shadow: 0px 2px 4px 0px rgba(13, 23, 33, 0.08),
     0px 1px 2px 0px rgba(21, 30, 40, 0.08);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Button Styles */
+.export-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.export-button {
+    background-color: #4472C4;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 24px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.export-button:hover {
+    background-color: #3b62b0;
+}
+
+/* Container for dropdown */
+.dropdown-export {
+    position: relative;
+    display: inline-block;
+    margin-top: -3px;
+
+}
+
+/* Dropdown content (ซ่อนโดยค่า default) */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 250px;
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+/* รูปแบบของลิงค์ใน dropdown */
+.dropdown-content a {
+    color: black;
+    text-decoration: none;
+    display: block;
+}
+
+/* เปลี่ยนสีเมื่อ hover */
+.dropdown-content a:hover {
+    background-color: #f1f1f1;
+}
+
+/* เมื่อ hover ที่ container แสดง dropdown */
+.dropdown-export:hover .dropdown-content {
+    display: block;
+}
+
+/* เปลี่ยนสีปุ่มเมื่อ hover */
+.dropdown-export:hover .dropbtn {
+    background-color: #4472C4;
+    color: white;
+}
+
+
+/* Hide the dropdown content by default */
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f9f9f9;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+    z-index: 1;
+}
+
+/* Style for the dropdown button */
+.dropdown-btn {
+    background-color: #4CAF50;
+    color: white;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+/* When you hover over the dropdown button */
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+/* Style for each link inside the dropdown */
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    font-size: 14px;
+    text-decoration: none;
+    display: block;
+}
+
+/* Change color when hovering over the links */
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+.show {
+    display: block;
 }
 
 .btn-footer {
     display: flex;
     justify-content: flex-end;
 }
+
+.btn-header button:hover {
+    background-color: #624BFF; /* เปลี่ยนสีพื้นหลังเมื่อ hover */
+    color: white; /* เปลี่ยนสีตัวอักษรเมื่อ hover */
+    transform: scale(1.05); /* ขยายขนาดปุ่มเล็กน้อย */
+    box-shadow: 0px 4px 6px rgba(13, 23, 33, 0.1), 0px 2px 4px rgba(21, 30, 40, 0.12); /* เพิ่มความเข้มของเงา */
+}
+
 
 .btn-footer button {
     background-color: white;
@@ -365,6 +481,7 @@ td:nth-child(4) {
     overflow-y: auto;
 }
 
+
 .close-btn {
     background-color: #f44336; /* สีแดง */
     color: white;
@@ -397,7 +514,7 @@ td:nth-child(4) {
     border-radius: 12px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     z-index: 10000;
-    width: 450px;
+    width: 80vh;
     font-family: 'Prompt', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -410,6 +527,78 @@ td:nth-child(4) {
     padding-bottom: 15px;
     border-bottom: 1px solid #e9ecef;
 }
+
+.header-left {
+    display: flex;
+    gap: 1rem; /* ระยะห่างระหว่าง title กับ dropdown */
+}
+
+/* กำหนดให้ dropdown อยู่ในแนวนอน */
+.semester-container {
+    display: flex;
+    align-items: center;
+    border-radius: 8px;
+    cursor: pointer;
+    width: auto;
+    margin: 0 1rem;
+}
+
+/* ปรับให้ dropdown ดูเรียบง่ายและสมูธ */
+.semester-container select {
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #ffffff;
+    appearance: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+/* เมื่อ hover บน dropdown */
+.semester-container select:hover {
+    background-color: #f1f1f1;
+    border-color: #00796b;
+}
+
+/* ปรับ dropdown ให้มีขนาดและความยาวเหมาะสม */
+#semester-selector {
+    font-size: 14px;
+    width: 120px; /* ความกว้างของ dropdown */
+    margin-top: -6vh;
+}
+
+/* ปรับไอคอนให้ดูดี */
+.calendar-icon {
+    font-size: 16px;
+    color: #555;
+}
+
+/* ปรับให้ฟิลเตอร์อื่น ๆ ดูเหมาะสม */
+.filter-container {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+/* เพิ่มการจัดระเบียบ dropdown ให้ดูสะอาดตา */
+#program-select-box, #role-select-box {
+    padding: 8px 12px;
+    font-size: 14px;
+    font-weight: bold;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    cursor: pointer;
+    background-color: white;
+}
+
+/* เพิ่ม hover effect ให้ dropdown */
+#program-select-box:hover, #role-select-box:hover {
+    background-color: #f8f8f8;
+}
+
 
 /* Program Filter Styles */
 .program-filter {
@@ -587,4 +776,80 @@ td:nth-child(4) {
 /* ซ่อน Dialog และ Overlay เมื่อโหลดหน้าเว็บ */
 .export-dialog, .export-overlay {
     display: none;
+}
+
+
+/* TAB: ICT,DST */
+.tabs {
+    display: flex;
+    background-color: #ffffff;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: -25px 20px 20px;
+}
+
+.tab {
+    /*flex: 1;*/
+    display: flex;
+    padding: 10px 20px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    color: #555;
+    transition: background-color 0.3s, color 0.3s;
+    align-items: center;
+    justify-content: center;
+}
+
+.tab:not(:last-child) {
+    border-right: 1px solid #ddd;
+}
+
+.tab.active {
+    font-weight: bold;
+    background-color: #fff;
+    color: #026e6e;
+    border-bottom: 3px solid #026e6e;
+}
+
+.tab:hover:not(.active) {
+    background-color: #f1f1f1;
+}
+
+
+/* Search */
+.tabs input {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 10px 20px 10px auto;
+}
+
+.tabs input {
+    margin-left: auto;
+}
+
+.program-options {
+    display: flex;
+    gap: 1em;
+    padding: 16px;
+}
+
+.select-item {
+    padding: 0.5em 1em;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.2s, border-color 0.2s;
+    font-size: 12px;
+}
+
+.select-item.selected {
+    background-color: #4472C4;
+    color: white;
+    border-color: #2a56a0;
 }

@@ -4,14 +4,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> Dashboard </title>
+    <title> Add Project </title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="/CSS/sidebar-admin.css">
     <link rel="stylesheet" href="/CSS/addNewProject.css">
 
     <!-- Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.17.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css"/>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
 </head>
 
 <body>
@@ -19,52 +25,69 @@
     <div class="sidebar">
         <h2>ICT MAHIDOL</h2>
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">
-                <path
-                        d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
-                </path>
-            </svg> Homepage </h4>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                     style="fill:#FFFFFF;">
+                    <path
+                            d="M39.5,43h-9c-1.381,0-2.5-1.119-2.5-2.5v-9c0-1.105-0.895-2-2-2h-4c-1.105,0-2,0.895-2,2v9c0,1.381-1.119,2.5-2.5,2.5h-9	C7.119,43,6,41.881,6,40.5V21.413c0-2.299,1.054-4.471,2.859-5.893L23.071,4.321c0.545-0.428,1.313-0.428,1.857,0L39.142,15.52	C40.947,16.942,42,19.113,42,21.411V40.5C42,41.881,40.881,43,39.5,43z">
+                    </path>
+                </svg>
+                Homepage
+            </h4>
             <li><a href="/admin-dashboard">Dashboard</a></li>
             <li><a href="/admin-proposal-report">Proposal Grade Report</a></li>
             <li><a href="/admin-defense-report">Defense Grade Report</a></li>
             <li><a href="/admin-eva-traking">Evaluation Tracking</a></li>
+            <li><a href="/admin-timeliness-scoring">Timeliness Scoring</a></li>
         </ul>
 
         <h2> Pages </h2>
 
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
-                <g fill="#ffffff" fill-rule="nonzero">
-                    <g transform="scale(5.33333,5.33333)">
-                        <path
-                                d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
-                        </path>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0,0,256,256">
+                    <g fill="#ffffff" fill-rule="nonzero">
+                        <g transform="scale(5.33333,5.33333)">
+                            <path
+                                    d="M12.5,4c-2.481,0 -4.5,2.019 -4.5,4.5v31c0,2.481 2.019,4.5 4.5,4.5h23c2.481,0 4.5,-2.019 4.5,-4.5v-19.5h-11.5c-2.481,0 -4.5,-2.019 -4.5,-4.5v-11.5zM27,4.87891v10.62109c0,0.827 0.673,1.5 1.5,1.5h10.62109zM17.5,25h13c0.828,0 1.5,0.672 1.5,1.5c0,0.828 -0.672,1.5 -1.5,1.5h-13c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.828 0.672,-1.5 1.5,-1.5zM17.49023,32h8.99609c0.828,0 1.5,0.671 1.5,1.5c0.001,0.759 -0.56292,1.38733 -1.29492,1.48633l-0.20312,0.01367h-8.99609c-0.828,0 -1.5,-0.672 -1.5,-1.5c0,-0.759 0.56292,-1.38733 1.29492,-1.48633z">
+                            </path>
+                        </g>
                     </g>
-                </g>
-            </svg>Score Evaluation </h4>
+                </svg>
+                Score Evaluation
+            </h4>
             <li><a href="/scoring-periods">Scoring Period Settings</a></li>
         </ul>
 
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">
-                <path
-                        d="M42 15v-2.5C42 8.916 39.084 6 35.5 6h-23C8.916 6 6 8.916 6 12.5V15H42zM25.5 27H32V33H25.5zM35 27H42V33H35zM6 27H13V33H6zM16 27H22.5V33H16zM35 18H42V24H35zM25.5 18H32V24H25.5zM25.5 36H32V42H25.5zM16 36H22.5V42H16zM35 36v6h.5c3.415 0 6.218-2.649 6.475-6H35zM6.025 36c.257 3.351 3.059 6 6.475 6H13v-6H6.025zM16 18H22.5V24H16zM6 18H13V24H6z">
-                </path>
-            </svg> Manage Schedule </h4>
-            <li><a href="/admin/proposalSchedule">Proposal Schedule</a></li>
-            <li><a href="/admin/editProposalSchedulePage">Edit Proposal Timing</a></li>
-            <li><a href="/admin/defenseSchedule">Defense Schedule</a></li>
-            <li><a href="#">Edit Defense Timing</a></li>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                     style="fill:#FFFFFF;">
+                    <path
+                            d="M42 15v-2.5C42 8.916 39.084 6 35.5 6h-23C8.916 6 6 8.916 6 12.5V15H42zM25.5 27H32V33H25.5zM35 27H42V33H35zM6 27H13V33H6zM16 27H22.5V33H16zM35 18H42V24H35zM25.5 18H32V24H25.5zM25.5 36H32V42H25.5zM16 36H22.5V42H16zM35 36v6h.5c3.415 0 6.218-2.649 6.475-6H35zM6.025 36c.257 3.351 3.059 6 6.475 6H13v-6H6.025zM16 18H22.5V24H16zM6 18H13V24H6z">
+                    </path>
+                </svg>
+                Manage Schedule
+            </h4>
+            <li><a href="/admin-dashboard">Dashboard</a></li>
+            <li><a href="/admin-proposal-report">Proposal Grade Report</a></li>
+            <li><a href="/admin-defense-report">Defense Grade Report</a></li>
+            <li><a href="/admin-eva-traking">Evaluation Tracking</a></li>
+            <li><a href="/admin-timeliness-scoring">Timeliness Scoring</a></li>
         </ul>
 
         <ul>
-            <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">
-                <path
-                        d="M35.5,8h-3.551C31.697,5.756,29.81,4,27.5,4h-7c-2.31,0-4.197,1.756-4.449,4H12.5C10.019,8,8,10.019,8,12.5v27	c0,2.481,2.019,4.5,4.5,4.5h23c2.481,0,4.5-2.019,4.5-4.5v-27C40,10.019,37.981,8,35.5,8z M20.5,7h7C28.327,7,29,7.673,29,8.5	S28.327,10,27.5,10h-7C19.673,10,19,9.327,19,8.5S19.673,7,20.5,7z M22.5,34h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,34,22.5,34z M22.5,24h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,24,22.5,24z M34.561,34.439c0.586,0.585,0.586,1.536,0,2.121C34.268,36.854,33.884,37,33.5,37	s-0.768-0.146-1.061-0.439L31,35.121l-1.439,1.439C29.268,36.854,28.884,37,28.5,37s-0.768-0.146-1.061-0.439	c-0.586-0.585-0.586-1.536,0-2.121L28.879,33l-1.439-1.439c-0.586-0.585-0.586-1.536,0-2.121c0.586-0.586,1.535-0.586,2.121,0	L31,30.879l1.439-1.439c0.586-0.586,1.535-0.586,2.121,0c0.586,0.585,0.586,1.536,0,2.121L33.121,33L34.561,34.439z M34.561,21.561	l-4,4C30.268,25.854,29.884,26,29.5,26s-0.768-0.146-1.061-0.439l-2-2c-0.586-0.585-0.586-1.536,0-2.121	c0.586-0.586,1.535-0.586,2.121,0l0.939,0.939l2.939-2.939c0.586-0.586,1.535-0.586,2.121,0	C35.146,20.025,35.146,20.975,34.561,21.561z">
-                </path>
-            </svg> Manage Project </h4>
-            <li><a href="/project-overview" class="active">Project Overview</a></li>
-            <li><a href="/project-details">Project Details</a></li>
+            <h4>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48"
+                     style="fill:#FFFFFF;">
+                    <path
+                            d="M35.5,8h-3.551C31.697,5.756,29.81,4,27.5,4h-7c-2.31,0-4.197,1.756-4.449,4H12.5C10.019,8,8,10.019,8,12.5v27	c0,2.481,2.019,4.5,4.5,4.5h23c2.481,0,4.5-2.019,4.5-4.5v-27C40,10.019,37.981,8,35.5,8z M20.5,7h7C28.327,7,29,7.673,29,8.5	S28.327,10,27.5,10h-7C19.673,10,19,9.327,19,8.5S19.673,7,20.5,7z M22.5,34h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,34,22.5,34z M22.5,24h-8c-0.828,0-1.5-0.671-1.5-1.5s0.672-1.5,1.5-1.5h8	c0.828,0,1.5,0.671,1.5,1.5S23.328,24,22.5,24z M34.561,34.439c0.586,0.585,0.586,1.536,0,2.121C34.268,36.854,33.884,37,33.5,37	s-0.768-0.146-1.061-0.439L31,35.121l-1.439,1.439C29.268,36.854,28.884,37,28.5,37s-0.768-0.146-1.061-0.439	c-0.586-0.585-0.586-1.536,0-2.121L28.879,33l-1.439-1.439c-0.586-0.585-0.586-1.536,0-2.121c0.586-0.586,1.535-0.586,2.121,0	L31,30.879l1.439-1.439c0.586-0.586,1.535-0.586,2.121,0c0.586,0.585,0.586,1.536,0,2.121L33.121,33L34.561,34.439z M34.561,21.561	l-4,4C30.268,25.854,29.884,26,29.5,26s-0.768-0.146-1.061-0.439l-2-2c-0.586-0.585-0.586-1.536,0-2.121	c0.586-0.586,1.535-0.586,2.121,0l0.939,0.939l2.939-2.939c0.586-0.586,1.535-0.586,2.121,0	C35.146,20.025,35.146,20.975,34.561,21.561z">
+                    </path>
+                </svg>
+                Manage Project
+            </h4>
+            <li><a href="/project-overview">Project Overview</a></li>
+            <li><a href="/project-details" class="active">Project Details</a></li>
             <li><a href="/project-committee">Committee</a></li>
             <li><a href="/project-poster-committee">Poster Committee</a></li>
         </ul>
@@ -182,6 +205,23 @@
             </div>
         </div>
 
+        <!-- Popup ยืนยันการบันทึก (Save) -->
+        <div id="confirmSavePopup" class="save-popup">
+            <div class="popup-content">
+                <div id="save-confirm-msg">Are you sure you want to save the changes?</div>
+                <button id="confirmSaveBtn">Yes, Save</button>
+                <button id="cancelSaveBtn">Cancel</button>
+            </div>
+        </div>
+
+        <!-- Popup ยืนยันการลบ -->
+        <div id="confirmDeletePopup" class="delete-popup">
+            <div class="popup-content">
+                <div id="delete-confirm-msg"></div>
+                <button id="confirmDeleteBtn">Yes, Delete</button>
+                <button id="cancelDeleteBtn">Cancel</button>
+            </div>
+        </div>
 
     </div>
 </div>
@@ -190,361 +230,513 @@
 </html>
 
 <script>
+    document.addEventListener("DOMContentLoaded", () => {
 
-    document.addEventListener("DOMContentLoaded", function () {
-        // ฟังก์ชันสำหรับแสดงผลข้อมูลใน modal
+        // ดึง URL ปัจจุบัน
+        const currentPage = window.location.pathname.split("/").pop();
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('projectId');
+
         displayResults();
 
-        // ฟังก์ชันแสดงฟอร์มที่ใช้กรอกข้อมูลโปรเจกต์ใหม่
-        function displayResults() {
-            // ดึงข้อมูลล่าสุดของ Project ID จาก API
-            fetchLastProjectId()
-                .then(lastProjectId => {
-                    const modalHTML = `
-                    <h3>Project Details</h3>
-                    <div class="form-group">
-                        <label>Project ID :</label>
-                        <div class="input-icon">
-                            <input type="text" id="projectId" disabled value="${generateNewProjectId(lastProjectId, 'ICT', 2024)}">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Project Name :</label>
-                        <div class="input-icon">
-                            <input type="text" id="projectTitle">
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label>Project Description :</label>
-                        <div class="input-icon">
-                            <textarea id="projectDescription"></textarea>
-                        </div>
-                    </div>
-
-                    <h3>Member Details</h3>
-                    <div class="form-group-row">
-                        <div class="form-group">
-                            <label>Program :</label>
-                            <select id="program">
-                                <option value="ICT">ICT</option>
-                                <option value="DST">DST</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Semester :</label>
-                            <input type="text" value="2024" disabled>
-                        </div>
-                    </div>
-
-                    <!-- ดึงข้อมูลนักศึกษาที่ยังไม่มีโปรเจกต์และแสดงใน dropdown -->
-                    <div class="form-group">
-                        <label>Select Student 1:</label>
-                        <select id="studentSelect1">
-                            <option value="">Select Student</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Select Student 2:</label>
-                        <select id="studentSelect2">
-                            <option value="">Select Student</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Select Student 3:</label>
-                        <select id="studentSelect3">
-                            <option value="">Select Student</option>
-                        </select>
-                    </div>
-
-                  <h3>Instructor Details</h3>
-                    <div class="form-group">
-                        <label>Advisor:</label>
-                        <select id="advisorSelect">
-                            <option value="">Select Advisor</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Co-Advisor:</label>
-                        <select id="coAdvisorSelect">
-                            <option value="">Select Co-Advisor</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Committee:</label>
-                        <select id="committeeSelect">
-                            <option value="">Select Committee</option>
-                        </select>
-                    </div>
-
-
-                    <div class="button-group">
-                        <button class="cancel-btn">Cancel</button>
-                        <button class="save-btn">Save</button>
-                    </div>
-                `;
-
-                    // แสดงผล Modal ที่ div ที่ต้องการ
-                    document.getElementById('modal-container').innerHTML = modalHTML;
-
-                    // ดึงข้อมูลนักศึกษาที่ไม่มีโปรเจกต์และแสดงใน dropdown
-                    fetchStudentsWithoutProject();
-
-                    // คลิกปุ่ม Cancel
-                    document.querySelector('.cancel-btn').addEventListener('click', function () {
-                        window.location.href = "http://localhost:8080/project-details";  // เปลี่ยนเส้นทางไปหน้าอื่นเมื่อกดยกเลิก
-                    });
-
-                    // คลิกปุ่ม Save
-                    document.querySelector('.save-btn').addEventListener('click', function () {
-                        saveProjectData();  // เรียกฟังก์ชันบันทึกข้อมูล
-                    });
-                })
-                .catch(error => {
-                    console.error("Error fetching last project ID:", error);
-                });
-        }
-
-        // -------------------- Project -------------------- //
-        // ฟังก์ชันสำหรับการสร้าง Project ID ใหม่โดยอัตโนมัติ
-        function generateNewProjectId(lastProjectId, program, year) {
-            const prefix = program;  // ค่า program (DST, ICT)
-            const yearPart = year.toString();  // ใช้ปีแบบเต็ม เช่น 2024
-            let sequencePart = "01";  // ค่าเริ่มต้นลำดับ
-
-            if (lastProjectId && lastProjectId.startsWith(prefix) && lastProjectId.includes("SP")) {
-                const lastSequence = lastProjectId.substring(lastProjectId.length - 2);  // รับลำดับสุดท้ายจากรหัสโปรเจกต์
-                const newSequence = parseInt(lastSequence) + 1;
-                sequencePart = newSequence.toString().padStart(2, "0");  // เพิ่มลำดับใหม่และจัดรูปแบบให้เป็น 2 หลัก
-            }
-
-            return `SP${yearPart}-${sequencePart}`;
-        }
-
-        // ฟังก์ชันดึงข้อมูล Project ID ล่าสุดจาก API
-        function fetchLastProjectId() {
-            return fetch('http://localhost:8080/admin/getLastProjectId')
-                .then(response => response.json())  // รับข้อมูล JSON
-                .then(data => {
-                    return data.lastProjectId;  // คืนค่ารหัสโปรเจกต์ล่าสุด
-                })
-                .catch(error => {
-                    console.error("Error fetching last project ID:", error);
-                    return null;  // ถ้าไม่สามารถดึงข้อมูลได้ ให้ส่งคืน null
-                });
-        }
-
-        // -------------------- Student -------------------- //
-        let studentsWithoutProject = []; // สมมติว่ามีข้อมูลนักศึกษาที่ไม่ได้มีโปรเจกต์แล้วจาก API
-
-        // ฟังก์ชันดึงข้อมูลนักศึกษาที่ยังไม่มีโปรเจกต์
-        function fetchStudentsWithoutProject() {
-            fetch("http://localhost:8080/admin/getStudentsWithoutProject") // ดึงข้อมูลจาก API
-                .then(response => response.json())
-                .then(data => {
-                    studentsWithoutProject = data; // เก็บข้อมูลนักศึกษาที่ไม่มีโปรเจกต์
-                    populateDropdowns(); // เพิ่มข้อมูลนักศึกษาเข้า dropdown
-                })
-                .catch(error => console.error("Error fetching students:", error));
-        }
-
-        // ฟังก์ชันสำหรับเพิ่มข้อมูลนักศึกษาเข้า dropdown
-        function populateDropdowns() {
-            const studentSelect1 = document.getElementById("studentSelect1");
-            const studentSelect2 = document.getElementById("studentSelect2");
-            const studentSelect3 = document.getElementById("studentSelect3");
-
-            const allDropdowns = [studentSelect1, studentSelect2, studentSelect3];
-
-            // ฟังก์ชันที่ใช้กรองนักศึกษาในแต่ละ dropdown
-            function filterStudents(selectedStudents) {
-                return studentsWithoutProject.filter(student => !selectedStudents.includes(student.studentId));
-            }
-
-            // ฟังก์ชันสำหรับกรอก dropdown
-            function populateDropdown(dropdown, selectedStudents) {
-                dropdown.innerHTML = "<option value=''>Select Student</option>"; // reset options
-                const availableStudents = filterStudents(selectedStudents);
-
-                availableStudents.forEach(student => {
-                    const option = document.createElement("option");
-                    option.value = student.studentId;
-                    option.textContent = `${student.studentId} - ${student.studentName}`;
-                    dropdown.appendChild(option);
-                });
-            }
-
-            // สร้างตัวแปรเก็บข้อมูลนักศึกษาที่ถูกเลือกใน dropdowns
-            let selectedStudents = [];
-
-            // เริ่มต้นการกรอก dropdown ทั้ง 3 ด้วยข้อมูลนักศึกษาที่ไม่มีโปรเจกต์
-            allDropdowns.forEach(d => populateDropdown(d, selectedStudents));
-        }
-
-        // เรียกฟังก์ชันเพื่อดึงข้อมูลนักศึกษาที่ไม่มีโปรเจกต์
-        fetchStudentsWithoutProject();
-
-        // -------------------- Instructor -------------------- //
-        let instructors = [];
-
-        // ฟังก์ชันดึงข้อมูลอาจารย์จาก API
-        function fetchInstructors() {
-            fetch('http://localhost:8080/admin/getInstructors')  // URL ที่ดึงข้อมูลจาก API
-                .then(response => response.json())
-                .then(data => {
-                    instructors = data;  // เก็บข้อมูลอาจารย์
-                    populateInstructorDropdown();  // แสดงใน dropdown
-                })
-                .catch(error => console.error("Error fetching instructors:", error));
-        }
-
-        // ฟังก์ชันแปลง `professorId` เป็น `professorName` และแสดงใน dropdown
-        function populateInstructorDropdown() {
-            const advisorSelect = document.getElementById('advisorSelect');
-            const coAdvisorSelect = document.getElementById('coAdvisorSelect');
-            const committeeSelect = document.getElementById('committeeSelect');
-
-            // ฟังก์ชันเพื่อเพิ่มข้อมูลใน dropdown
-            function populateDropdown(dropdown, selectedInstructors = []) {
-                dropdown.innerHTML = "<option value=''>Select</option>";  // reset options
-
-                instructors.forEach(instructor => {
-                    if (!selectedInstructors.includes(instructor.professorId)) {
-                        const option = document.createElement('option');
-                        option.value = instructor.professorId;  // ใช้ professorId สำหรับ value
-                        option.textContent = instructor.professorName;  // แสดง professorName ใน dropdown
-                        dropdown.appendChild(option);
+        // แล้วค่อยผูก listener แบบ delegation
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('#instructorList tbody')
+                .addEventListener('click', e => {
+                    if (e.target.classList.contains('delete-btn')) {
+                        confirmDeleteInstructor(e.target.closest('tr'));
                     }
                 });
-            }
 
-            // เริ่มต้นกรอก dropdown ด้วยข้อมูลอาจารย์
-            populateDropdown(advisorSelect);
-            populateDropdown(coAdvisorSelect);
-            populateDropdown(committeeSelect);
+        });
+
+
+    });
+
+    let studentsWithoutProject = [];
+
+    async function fetchStudentsWithoutProject() {
+        try {
+            const res = await fetch('/admin/getStudentsWithoutProject');
+            studentsWithoutProject = await res.json();
+        } catch (e) {
+            console.error('Error fetching students:', e);
+            studentsWithoutProject = [];
+        }
+    }
+
+    function populateStudentDropdowns() {
+        ['studentSelect1', 'studentSelect2', 'studentSelect3'].forEach(id => {
+            const sel = document.getElementById(id);
+            if (!sel) return;
+            sel.innerHTML = '<option value="">Select Student</option>' +
+                studentsWithoutProject.map(s =>
+                    `<option value="${s.studentId}">
+           ${s.studentId} - ${s.studentName}
+         </option>`
+                ).join('');
+        });
+    }
+
+    // 5) Fetch instructors & populate
+    async function fetchInstructors() {
+        try {
+            const res = await fetch('/admin/getInstructors');
+            return await res.json();
+        } catch (e) {
+            console.error('Error fetching instructors:', e);
+            return [];
+        }
+    }
+
+    function populateInstructorDropdowns(instructors) {
+        document.querySelectorAll('.instructor-select').forEach(sel => {
+            sel.innerHTML = '<option value="">-- Select --</option>' +
+                instructors.map(i =>
+                    `<option value="${i.professorName}">
+           ${i.professorName}
+         </option>`
+                ).join('');
+        });
+    }
+
+    async function displayResults() {
+        try {
+            // ดึงข้อมูลจาก API
+            const year = new Date().getFullYear();
+            const projectIdInputValue = `SP -`;
+            const instructors = await fetchInstructors();
+            await fetchStudentsWithoutProject();
+
+            // เริ่มต้น empty list สำหรับ projek ที่กำลังสร้างใหม่
+            const professorList = [];
+
+            // สร้าง HTML ของ Modal
+            const modalHTML = `
+      <div class="modal-backdrop">
+      <div class="modal-content">
+        <h3>Project Details</h3>
+        <div class="form-group">
+          <label>Project ID :</label>
+          <input type="text" id="projectId" disabled
+                 value="${projectIdInputValue}">
+        </div>
+        <div class="form-group">
+          <label>Project Name :</label>
+          <input type="text" id="projectTitle">
+        </div>
+        <div class="form-group">
+          <label>Project Description :</label>
+          <textarea id="projectDescription"></textarea>
+        </div>
+        <div class="form-group">
+          <label>Project Category :</label>
+          <input type="text" id="projectCategory">
+        </div>
+
+        <h3>Member Details</h3>
+        <div class="form-group-row">
+          <div class="form-group">
+            <label>Program :</label>
+            <select id="program">
+              <option value="ICT">ICT</option>
+              <option value="DST">DST</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Semester :</label>
+            <input type="text" id="semester" value="${year}">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Select Student 1:</label>
+          <select id="studentSelect1"><option value="">Select Student</option></select>
+        </div>
+        <div class="form-group">
+          <label>Select Student 2:</label>
+          <select id="studentSelect2"><option value="">Select Student</option></select>
+        </div>
+        <div class="form-group">
+          <label>Select Student 3:</label>
+          <select id="studentSelect3"><option value="">Select Student</option></select>
+        </div>
+
+         <!-- แสดง Instructor -->
+        <h3>Instructor Details</h3>
+        <div id="instructorList">
+          <table class="instructor-table">
+            <thead>
+              <tr><th>Role</th><th>Professor</th><th>Action</th></tr>
+            </thead>
+            <tbody>
+              ${professorList.map(pr => `
+                <tr data-role="${pr.role}">
+                  <td>
+                    <select class="role-select">
+                      <option value="Advisor"        ${pr.role === 'Advisor' ? 'selected' : ''}>Advisor</option>
+                      <option value="Co-Advisor"     ${pr.role === 'Co-Advisor' ? 'selected' : ''}>Co-Advisor</option>
+                      <option value="Committee"      ${pr.role === 'Committee' ? 'selected' : ''}>Committee</option>
+                      <option value="Poster-Committee"${pr.role === 'Poster-Committee' ? 'selected' : ''}>
+                        Poster-Committee
+                      </option>
+                    </select>
+                  </td>
+                  <td>
+                    <select class="instructor-select"
+                            data-id="${pr.professorId}"
+                            data-name="${pr.professorName}">
+                      <option value="">-- Select --</option>
+                      ${instructors.map(inst => `
+                        <option value="${inst.professorId}"
+                                ${inst.professorId === pr.professorId ? 'selected' : ''}>
+                          ${inst.professorName}
+                        </option>`).join('')}
+                    </select>
+                  </td>
+                  <td><button class="delete-btn">🗑️</button></td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+          <button id="addInstructorBtn">+ Add Instructor</button>
+        </div>
+
+        <!-- Actions Button -->
+        <div class="button-group">
+          <button class="cancel-btn">Cancel</button>
+          <button class="save-btn">Save</button>
+        </div>
+
+
+    `;
+            document.getElementById('modal-container').innerHTML = modalHTML;
+
+            // เติม dropdown data
+            populateStudentDropdowns();
+            populateInstructorDropdowns(instructors);
+            enableSearchableSelects();
+
+            // คลิกปุ่ม Cancel
+            document.querySelector('.cancel-btn').addEventListener('click', function () {
+                window.location.href = "http://localhost:8080/project-details";
+            });
+
+            // Delete instructor
+            document.querySelectorAll('.instructor-table .delete-btn').forEach(btn => {
+                btn.addEventListener('click', e => {
+                    const row = e.currentTarget.closest('tr');  // หาแถวที่ถูกคลิก
+                    confirmDeleteInstructor(row);  // เรียก confirmDeleteInstructor ก่อนการลบ
+                });
+            });
+
+
+            // ผูก listener — เพิ่ม instructor row
+            document.getElementById('addInstructorBtn')
+                .addEventListener('click', () => {
+                    const tbody = document.querySelector('#instructorList tbody');
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>
+                        <select class="role-select">
+                            <option value="Advisor">Advisor</option>
+                            <option value="Co-Advisor">Co-Advisor</option>
+                            <option value="Committee">Committee</option>
+                            <option value="Poster-Committee">Poster-Committee</option>
+                        </select>
+                        </td>
+                        <td>
+                        <select class="instructor-select" data-id="">
+                            <!-- placeholder แถวแรก -->
+                            <option value="" disabled selected>-- Select Instructor --</option>
+                            ${instructors.map(i => `
+                              <option value="${i.professorId}">
+                                ${i.professorName}
+                              </option>
+                            `).join('')}
+                        </select>
+                        </td>
+                        <td>
+                        <button class="delete-btn">🗑️</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+
+                    // Populate & init search on new select only
+                    const newSel = tr.querySelector('.instructor-select');
+                    instructors.forEach(i => {
+                        const opt = document.createElement('option');
+                        opt.value = i.professorId;
+                        opt.textContent = i.professorName;
+                        newSel.appendChild(opt);
+                    });
+                    newSel.choicesInstance = new Choices(newSel, {
+                        searchEnabled: true,
+                        shouldSort: false,
+                        placeholderValue: 'ค้นหาอาจารย์...',
+                        classNames: {
+                            containerInner: 'my-choices-inner',
+                            listDropdown: 'my-choices-dropdown',
+                            itemChoice: 'my-choices-item',
+                            itemSelectable: 'my-choices-selectable'
+                        }
+                    });
+                });
+
+
+            document.querySelector('#instructorList tbody').addEventListener('click', e => {
+                if (e.target.classList.contains('delete-btn')) {
+                    // remove the entire <tr> ที่อยู่รอบ ๆ ปุ่มนั้น
+                    e.target.closest('tr').remove();
+                }
+            });
+
+
+            await fetchInstructors();
+
+
+            document.querySelector('.cancel-btn').addEventListener('click', function () {
+                window.location.href = "http://localhost:8080/project-details";
+            });
+
+        } catch (err) {
+            console.error(err);
+            Swal.fire({icon: 'error', title: 'Error', text: err.message});
         }
 
-        // เรียกใช้ฟังก์ชันเพื่อดึงข้อมูลอาจารย์จาก API
-        fetchInstructors();
-
-
-        // -------------------- Save Project and Send to DB -------------------- //
-        // ฟังก์ชันบันทึกข้อมูลโปรเจกต์ใหม่
-        function saveProjectData() {
-            // เก็บข้อมูลที่กรอก
-            const projectTitle = document.getElementById('projectTitle').value;
-            const projectDescription = document.getElementById('projectDescription').value;
-            const program = document.getElementById('program').value;
-
-            // ดึงค่าจาก dropdown ของนักศึกษา
-            const student1Value = document.getElementById('studentSelect1') ? document.getElementById('studentSelect1').value : null;
-            const student2Value = document.getElementById('studentSelect2') ? document.getElementById('studentSelect2').value : null;
-            const student3Value = document.getElementById('studentSelect3') ? document.getElementById('studentSelect3').value : null;
-
-            // ดึงค่าจาก dropdown Instructor
-            const advisor = document.getElementById('advisorSelect').value;
-            const coAdvisor = document.getElementById('coAdvisorSelect').value;
-            const committee = document.getElementById('committeeSelect').value;
-
-            // ตรวจสอบว่าเลือก student หรือไม่
-            if (!student1Value && !student2Value && !student3Value) {
-                alert('Please select at least one student!');
-                return;  // หยุดการดำเนินการ
-            }
-
-            // หากไม่มีค่า Advisor ให้แจ้งเตือน
-            if (!advisor) {
-                alert('Please select an advisor!');
-                return;  // หยุดการดำเนินการ
-            }
-
-            // สร้าง list ของ studentId ที่ถูกเลือก
-            const selectedStudentIds = [student1Value, student2Value, student3Value].filter(studentId => studentId);
-
-            // ฟังก์ชันสำหรับดึงข้อมูลนักศึกษาจาก studentId
-            function getStudentDetails(studentId) {
-                // ใช้ฟังก์ชันหรือติดต่อ API เพื่อดึงข้อมูลของนักศึกษาจาก studentId
-                // ตัวอย่างนี้คือดึงจาก studentsWithoutProject ที่เก็บข้อมูลนักศึกษาทั้งหมด
-                const student = studentsWithoutProject.find(s => s.studentId === studentId);
-                return student ? {studentId: student.studentId, studentName: student.studentName} : null;
-            }
-
-            // เก็บข้อมูลนักศึกษาที่จะส่งไปใน request
-            const studentList = selectedStudentIds.map(studentId => getStudentDetails(studentId));
-
-            let professorList = [];
-
-            if (advisor) {
-                const advisorName = instructors.find(instructor => instructor.professorId === advisor).professorName;
-                professorList.push({ professorName: advisorName, role: 'Advisor' });
-            }
-
-            if (coAdvisor) {
-                const coAdvisorName = instructors.find(instructor => instructor.professorId === coAdvisor).professorName;
-                professorList.push({ professorName: coAdvisorName, role: 'Co-Advisor' });
-            }
-
-            if (committee) {
-                const committeeName = instructors.find(instructor => instructor.professorId === committee).professorName;
-                professorList.push({ professorName: committeeName, role: 'Committee' });
-            }
-
-            // เก็บข้อมูลที่ต้องส่งไปยัง Controller
-            const newProjectDetails = {
-                projectTitle,  // ค่า projectTitle
-                projectDescription,  // ค่า projectDescription
-                program,  // ค่า program
-                studentList,  // รายชื่อสมาชิกที่เก็บทั้ง studentId และ studentName
-                professorList
-            };
-
-
-
-            // ตรวจสอบข้อมูลที่ต้องส่งไปยังเซิร์ฟเวอร์
-            console.log("Sending data to the server: ", newProjectDetails);
-
-            // ส่งข้อมูลไปที่ Controller
-            fetch("http://localhost:8080/admin/addNewProject", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify(newProjectDetails)
-            })
-                .then(response => response.json())
-                .then(data => {
-                    console.log("Success:", data);
-                    showNotification("New project added successfully!");
-                })
-                .catch(error => {
-                    console.error("Error:", error);
-                    showNotification("Error adding new project: " + error.message);
+        function enableSearchableSelects() {
+            document
+                .querySelectorAll(
+                    '#studentSelect1, #studentSelect2, #studentSelect3, ' +
+                    '.instructor-select, #advisorSelect, #coAdvisorSelect, #committeeSelect'
+                )
+                .forEach(el => {
+                    new Choices(el, {
+                        searchEnabled: true,
+                        shouldSort: false,
+                        classNames: {
+                            containerInner: 'my-choices-inner',
+                            listDropdown: 'my-choices-dropdown',
+                            itemChoice: 'my-choices-item',
+                            itemSelectable: 'my-choices-selectable',
+                        }
+                    });
                 });
         }
 
-        // ฟังก์ชัน showNotification สำหรับการแสดงแจ้งเตือน
-        function showNotification(message, callback) {
-            const notification = document.createElement("div");
-            notification.textContent = message;
-            notification.style.position = "fixed";
-            notification.style.top = "20px";
-            notification.style.right = "20px";
-            notification.style.padding = "10px 20px";
-            notification.style.background = "green";
-            notification.style.color = "white";
-            notification.style.borderRadius = "5px";
-            notification.style.boxShadow = "0 0 10px rgba(0,0,0,0.3)";
-            document.body.appendChild(notification);
+        function collectProfessorList() {
+            const professorList = Array.from(document.querySelectorAll('#instructorList tbody tr'))
+                .map(tr => {
+                    const role = tr.querySelector('.role-select').value;
+                    const name = tr.querySelector('.instructor-select').value;
+                    return (role && name) ? {professorName: name, role} : null;
+                })
+                .filter(x => x);  // Filter out invalid rows with empty roles or names
 
-            // ให้ข้อความหายไปอัตโนมัติหลังจาก 1 วินาที
-            setTimeout(() => {
-                notification.remove();
-                if (callback) callback(); // เรียก callback หลังจากแจ้งเตือนเสร็จ
-            }, 1000);
+            // Check for missing Advisor
+            if (!professorList.find(p => p.role === 'Advisor')) {
+                Swal.fire({icon: 'warning', title: 'Please select an Advisor!'});
+            }
+
+            return professorList;
         }
 
-        document.addEventListener("DOMContentLoaded", function () {
-            const projectId = generateNewProjectId();
-            fetchInstructorsWithoutProject(projectId);
+        // 7) Save Project Data
+        document.querySelector('.save-btn').addEventListener('click', async function () {
+
+            // แสดง popup ยืนยันการบันทึก
+            const savePopup = document.getElementById('confirmSavePopup');
+            savePopup.style.display = 'block';
+
+            // คลิกปุ่มยืนยันการบันทึก
+            document.getElementById('confirmSaveBtn').addEventListener('click', async function () {
+                const instructorRows = document.querySelectorAll('#instructorList .instructor-table tbody tr');
+                for (let tr of instructorRows) {
+                    const sel = tr.querySelector('select.instructor-select');
+                    if (!sel.value) {
+                        // ยังไม่เลือกอาจารย์ในแถวนี้
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'กรุณาเลือกชื่ออาจารย์ทุกแถว',
+                            text: 'มีแถวที่ไม่ได้เลือกชื่ออาจารย์ กรุณาตรวจสอบก่อนบันทึก',
+                            confirmButtonText: 'ตกลง'
+                        });
+                        return; // หยุดการบันทึก
+                    }
+                }
+
+
+                // เก็บค่าจากฟอร์ม
+                const projectTitle = document.getElementById('projectTitle').value;
+                const projectDescription = document.getElementById('projectDescription').value;
+                const projectCategory = document.getElementById('projectCategory').value;
+
+                // เก็บค่า program จาก dropdown
+                const program = document.getElementById('program').value;
+
+                // เก็บค่า semester จาก dropdown
+                const semester = document.getElementById('semester').value;
+
+                // เก็บข้อมูล Student
+                const studentIds = ['studentSelect1', 'studentSelect2', 'studentSelect3']
+                    .map(id => document.getElementById(id).value)
+                    .filter(x => x);
+                const studentList = studentIds.map(id => {
+                    const s = studentsWithoutProject.find(x => x.studentId === id);
+                    return {studentId: s.studentId, studentName: s.studentName};
+                });
+
+
+                // เก็บข้อมูล Instructor
+                const professorList = Array.from(
+                    document.querySelectorAll('#instructorList .instructor-table tbody tr')
+                ).map(tr => {
+                    const sel = tr.querySelector('select.instructor-select');
+                    const role = tr.querySelector('select.role-select').value;
+                    return {
+                        professorId: sel?.value || "",
+                        professorName: sel?.selectedOptions[0]?.text || "",
+                        role
+                    };
+                })
+                    // drop anything with no professorId
+                    .filter(p => p.professorId);
+
+
+                // เงื่อนไขเช็ค
+                if (!studentList.length) {
+                    return Swal.fire({icon: 'warning', title: 'Please select at least one student!'});
+                }
+                if (!professorList.find(p => p.role === 'Advisor')) {
+                    return Swal.fire({icon: 'warning', title: 'Please select an Advisor!'});
+                }
+
+                const payload = {
+                    projectTitle,
+                    projectDescription,
+                    program,
+                    semester,
+                    projectCategory,
+                    studentList,
+                    professorList
+                };
+
+                console.log("Sending data to the server: ", payload);
+
+                try {
+                    const res = await fetch('/admin/addProject', {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify(payload)
+                    });
+
+                    const data = await res.json();
+
+                    if (res.ok) {
+                        // สำเร็จ
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Created',
+                            text: `Project ID: ${data.projectId}`,
+                            timer: 1500,
+                            showConfirmButton: false,
+                            timerProgressBar: true
+                        }).then(() => {
+                            window.location.href = 'http://localhost:8080/project-details';
+                        });
+                    } else {
+                        // ถ้ามี warnings ส่งมาเป็น array
+                        const warnings = data.warnings || [data.message || 'Unknown error'];
+                        showErrorsPopup(warnings);
+                    }
+                } catch (err) {
+                    console.error(err);
+                    // ถ้า network error หรือ parse ผิดพลาด
+                    showErrorsPopup([err.message || 'Unknown error']);
+                }
+            });
+
+            // คลิกปุ่มยกเลิกการบันทึก
+            document.getElementById('cancelSaveBtn').addEventListener('click', function () {
+                const savePopup = document.getElementById('confirmSavePopup');
+                savePopup.style.display = 'none';  // ซ่อน popup
+            });
+        });
+
+    }
+
+    function showErrorsPopup(errors, redirectUrl = null) {
+        const savePopup = document.getElementById('confirmSavePopup');
+        if (savePopup) {
+            savePopup.style.display = 'none';
+        }
+
+        Swal.fire({
+            icon: 'error',
+            title: 'Errors',
+            html: errors.map(e => `<p style="text-align:left; margin:0.25em 0;">${e}</p>`).join(''),
+            width: '600px',
+            confirmButtonText: 'ปิด'
+        }).then(() => {
+            // ถ้าต้องการ redirect ต่อทันที
+            if (redirectUrl) {
+                window.location.href = redirectUrl;
+            }
+        });
+    }
+
+    // -------------------- Delete Instructor -------------------- //
+
+    const PROJECT_ID = urlParams.get('projectId');
+
+    function confirmDeleteInstructor(row) {
+        // อ่าน projectId จาก URL หรือ attribute ของ element
+        const urlParams = new URLSearchParams(window.location.search);
+        const projectId = urlParams.get('projectId');
+        const sel = row.querySelector('.instructor-select');
+        const professorId = sel.value;   // หรือ sel.dataset.id ตามที่ตั้งไว้
+        const instructorName = sel.options[sel.selectedIndex]?.text;
+
+        if (!projectId || !professorId) {
+            return Swal.fire({icon: 'error', title: 'ข้อมูลไม่ครบ', text: 'ไม่พบ Project ID หรือ Professor ID'});
+        }
+
+        Swal.fire({
+            icon: 'warning',
+            title: `Are you sure you want to remove ${instructorName}?`,
+            showCancelButton: true,
+            confirmButtonText: 'Delete',
+            cancelButtonText: 'Cancel'
+        }).then(({isConfirmed}) => {
+            if (isConfirmed) {
+                // ลบแถวออกก่อน
+                row.remove();
+                // เรียก API ส่งทั้งสอง param
+                deleteInstructorFromProject(projectId, professorId);
+            }
+        });
+    }
+
+    // ฟังก์ชันลบ Instructor จาก Project
+    function deleteInstructorFromProject(projectId, professorId) {
+        fetch(`/admin/deleteInstructorFromProject?projectId=${encodeURIComponent(projectId)}&professorId=${encodeURIComponent(professorId)}`, {
+            method: 'DELETE'
+        })
+            .then(res => res.ok
+                ? Swal.fire({icon: 'success', title: 'Delete Success!'})
+                : res.text().then(txt => {
+                    throw new Error(txt)
+                })
+            )
+            .catch(err => Swal.fire({icon: 'error', title: 'Error', text: err.message}));
+    }
+
+
+    // Event listener สำหรับปุ่มลบ
+    document.querySelectorAll('.instructor-table .delete-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const row = e.currentTarget.closest('tr');  // หาแถวที่ถูกคลิก
+            confirmDeleteInstructor(row);  // เรียกฟังก์ชันยืนยันการลบ
         });
     });
 

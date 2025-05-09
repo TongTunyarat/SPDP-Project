@@ -75,18 +75,18 @@ public class ProposalScheduleService {
                 .filter(i -> program.equalsIgnoreCase(i.getProgram()))
                 // อย่าลืมกลับมา filter อาจารย์ เเล้วก็ปีการศึกษา
                 //❗️❗️❗️❗️❗️ ห้ามลบ
-//                .filter(i -> {
-//                    List<StudentProject> studentProjects = i.getStudentProjects();
-//                    if (studentProjects == null || studentProjects.isEmpty()) return false;
-//
-//                    boolean hasActive = studentProjects.stream()
-//                            .anyMatch(studentProject -> "Active".equalsIgnoreCase(studentProject.getStatus()));
-//
-//                    boolean allExited = studentProjects.stream()
-//                            .allMatch(studentProject -> "Exited".equalsIgnoreCase(studentProject.getStatus()));
-//
-//                    return hasActive && !allExited;
-//                })
+                .filter(i -> {
+                    List<StudentProject> studentProjects = i.getStudentProjects();
+                    if (studentProjects == null || studentProjects.isEmpty()) return false;
+
+                    boolean hasActive = studentProjects.stream()
+                            .anyMatch(studentProject -> "Active".equalsIgnoreCase(studentProject.getStatus()));
+
+                    boolean allExited = studentProjects.stream()
+                            .allMatch(studentProject -> "Exited".equalsIgnoreCase(studentProject.getStatus()));
+
+                    return hasActive && !allExited;
+                })
                 .filter(i -> Integer.parseInt(i.getSemester()) == semesterYearInt)
                 .map(i -> {
 
@@ -537,6 +537,7 @@ public class ProposalScheduleService {
     // 🤯🤯🤯🤯
     private void scheduleProjects(List<ProjectWithInstructorsDTO> projects, Map<LocalDateTime, List<ScheduleSlotDTO>> timeGroupedSlots, List<ScheduleAssignmentDTO> scheduledAssignments,  List<ProjectWithInstructorsDTO> unscheduledProjects, List<String> roomNumbers, List<Pair<LocalDateTime, LocalDateTime>> allTimeSlots) {
 
+        // [ProjectWithInstructorsDTO{project=DST SP2024-19, instructorUsernames=[Aj.Tipajin, Aj.Petch, Aj.Suradej]}, ProjectWithInstructorsDTO{project=DST SP2024-21, instructorUsernames=[Aj.Petch, Aj.Tipajin, Aj.Pisit]}
         List<ProjectWithInstructorsDTO> remainderProject = new ArrayList<>(projects);
 
         System.out.println("📋Remainder: " + remainderProject);
@@ -547,7 +548,8 @@ public class ProposalScheduleService {
             availableTimeSlots.put(entry.getKey(), new ArrayList<>(entry.getValue()));
 
         }
-//        System.out.println("📋availableTimeSlots: " + availableTimeSlots);
+        //📋availableTimeSlots: {2025-04-11T13:00=[ScheduleSlotDTO{room='Room TBA 1', startTime=2025-04-11T13:00, endTime=2025-04-11T14:15}, ScheduleSlotDTO{room='Room TBA 2', startTime=2025-04-11T13:00, endTime=2025-04-11T14:15}
+        System.out.println("📋availableTimeSlots: " + availableTimeSlots);
 
         List<LocalDateTime> sortTime = new ArrayList<>(availableTimeSlots.keySet());
         // https://www.geeksforgeeks.org/collections-sort-java-examples/

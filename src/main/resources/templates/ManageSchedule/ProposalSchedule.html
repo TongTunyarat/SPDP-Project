@@ -5,7 +5,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title> Dashboard </title>
+  <title> Proposal Schedule </title>
 
   <!-- CSS -->
   <link rel="stylesheet" href="/css/sidebar-admin.css">
@@ -40,6 +40,7 @@
     <li><a href="/admin-proposal-report">Proposal Grade Report</a></li>
     <li><a href="/admin-defense-report">Defense Grade Report</a></li>
     <li><a href="/admin-eva-traking">Evaluation Tracking</a></li>
+    <li><a href="/admin-timeliness-scoring">Timeliness Scoring</a></li>
   </ul>
 
   <h2> Pages </h2>
@@ -66,7 +67,7 @@
     <li><a href="/admin/proposalSchedule" class="active">Proposal Schedule</a></li>
     <li><a href="/admin/editProposalSchedulePage">Edit Proposal Timing</a></li>
     <li><a href="/admin/defenseSchedule">Defense Schedule</a></li>
-    <li><a href="#">Edit Defense Timing</a></li>
+    <li><a href="/admin/editDefenseSchedulePage">Edit Defense Timing</a></li>
   </ul>
 
   <ul>
@@ -128,7 +129,7 @@
         <label>Time Start :</label>
         <input type="time" class="custom-input"><br>
 
-        <label>End Start :</label>
+        <label>Time End :</label>
         <input type="time" class="custom-input"><br>
 
         <label>Room: </label>
@@ -571,7 +572,13 @@
 
     if (!isVisible) {
 
-      showFloors();
+      // showFloors();
+      if(selectedFloor === null) {
+
+        selectedFloor = "3";
+        showRoomsByFloor("3");
+
+      }
 
     }
 
@@ -1107,7 +1114,7 @@
                       const startTime = new Date(project.startTime);
                       const endTime = new Date(project.endTime);
 
-                      const timeSlot = `${startTime.getHours()}:${String(startTime.getMinutes()).padStart(2, '0')} - ${endTime.getHours()}:${String(endTime.getMinutes()).padStart(2, '0')}`;
+                      const timeSlot = `${String(startTime.getHours()).padStart(2, '0')}:${String(startTime.getMinutes()).padStart(2, '0')} - ${String(endTime.getHours()).padStart(2, '0')}:${String(endTime.getMinutes()).padStart(2, '0')}`;
                       console.log("🕰️timeSlot: "+timeSlot);
 
                       if (!timeSlots[timeSlot]) {
@@ -1133,7 +1140,7 @@
                         const startTime = new Date(timeSlotDTO.startTime);
                         const endTime = new Date(timeSlotDTO.endTime);
 
-                        const timeSlot = `${startTime.getHours()}:${String(startTime.getMinutes()).padStart(2, '0')} - ${endTime.getHours()}:${String(endTime.getMinutes()).padStart(2, '0')}`;
+                        const timeSlot = `${String(startTime.getHours()).padStart(2, '0')}:${String(startTime.getMinutes()).padStart(2, '0')} - ${String(endTime.getHours()).padStart(2, '0')}:${String(endTime.getMinutes()).padStart(2, '0')}`;
 
                         if (!timeSlots[timeSlot]) {
                           timeSlots[timeSlot] = {
@@ -2157,6 +2164,14 @@
   const semesterSelect = document.getElementById("semester-selector");
   semesterSelect.addEventListener("change", function () {
     console.log("Selected Semester:", semesterSelect.value);
+
+    localStorage.setItem("selectedSemester", semesterSelect.value);
+    // fetchGradeDistribution();
+    // fetchEvaluationStatus();
+    // fetchTeacherScoringData();
+
+    getScheduleData();
+    getUnScheduleData();
   });
 
   // ตั้งค่า event listeners
@@ -2171,6 +2186,8 @@
 
 <!-- --------- Semester Change ------------- -->
 <script>
+
+
   async function fetchAcademicYears() {
     try {
       const response = await fetch('/api/academic-years'); // เรียก API
@@ -2184,7 +2201,7 @@
       data.forEach(year => {
         const option = document.createElement("option");
         option.value = year;
-        option.textContent = "🗓︎ "+year;
+        option.textContent = "📆 "+year;
         // option.innerHTML = `<!--<i class='far fa-calendar'></i> ${year} <i class='fas fa-chevron-down dropdown-arrow'></i>-->`;
         semesterSelector.appendChild(option);
       });
@@ -2198,12 +2215,23 @@
       const defaultYear = currentMonth <= 8 ? currentYear - 1 : currentYear;
 
       // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
-      if (data.includes(defaultYear.toString())) {
+      // if (data.includes(defaultYear.toString())) {
+      //   semesterSelector.value = defaultYear.toString();
+      //   console.log("yearrrrrrrrrrrrrr : ",document.getElementById('semester-selector').value)
+      // } else {
+      //   semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+      // }
+
+      const savedSemester = localStorage.getItem("selectedSemester");
+
+      if (savedSemester && data.includes(savedSemester)) {
+        semesterSelector.value = savedSemester;
+      } else if (data.includes(defaultYear.toString())) {
         semesterSelector.value = defaultYear.toString();
-        console.log("yearrrrrrrrrrrrrr : ",document.getElementById('semester-selector').value)
       } else {
-        semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+        semesterSelector.selectedIndex = 0;
       }
+
 
       await getScheduleData();
       await getUnScheduleData();

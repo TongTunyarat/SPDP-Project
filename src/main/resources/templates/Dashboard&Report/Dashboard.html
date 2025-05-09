@@ -24,12 +24,18 @@
 <div class="container">
     <div class="sidebar">
         <h2>ICT MAHIDOL</h2>
-
-        <form th:action="@{/logout}" method="post" class="logout-container">
-            <!--        ค่าที่ใช้สำหรับป้องกัน Cross-Site Request Forgery (CSRF)-->
-            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"/>
+        <form th:action="@{/logout}" method="post" class="logout-container" onsubmit="clearLocalStorageBeforeLogout()">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <button type="submit" class="logout-button"><i class="fas fa-sign-out-alt"></i></button>
         </form>
+
+        <script>
+            function clearLocalStorageBeforeLogout() {
+                localStorage.removeItem("selectedSemester");
+            }
+        </script>
+
+
 
         <ul>
             <h4><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 48 48" style="fill:#FFFFFF;">
@@ -68,7 +74,7 @@
             <li><a href="/admin/proposalSchedule">Proposal Schedule</a></li>
             <li><a href="/admin/editProposalSchedulePage">Edit Proposal Timing</a></li>
             <li><a href="/admin/defenseSchedule">Defense Schedule</a></li>
-            <li><a href="#">Edit Defense Timing</a></li>
+            <li><a href="/admin/editDefenseSchedulePage">Edit Defense Timing</a></li>
         </ul>
 
         <ul>
@@ -119,9 +125,9 @@
             </div>
 
             <div class="header-container">
-                <label class="text-header"> Senior Project 1 Grades </label>
+                <label class="text-header"> Senior Project 1 </label>
                 <label class="text-center">
-                    <h1> 0/0 <span style="color: #919EAB;"></span></h1>
+                    <h1> 0/0 <span style="color: #919EAB;"> Students </span></h1>
                 </label>
             </div>
 
@@ -140,9 +146,9 @@
             </div>
 
             <div class="header-container">
-                <label class="text-header"> Senior Project 2 Grades </label>
+                <label class="text-header"> Senior Project 2 </label>
                 <label class="text-center">
-                    <h1> 0/0 <span style="color: #919EAB;"></span></h1>
+                    <h1> 0/0 <span style="color: #919EAB;"> Students </span></h1>
                 </label>
             </div>
 
@@ -206,6 +212,20 @@
     const semesterSelect = document.getElementById("semester-selector");
     semesterSelect.addEventListener("change", function () {
         console.log("Selected Semester:", semesterSelect.value);
+
+        localStorage.setItem("selectedSemester", semesterSelect.value);
+        // fetchGradeDistribution();
+        // fetchEvaluationStatus();
+        // fetchTeacherScoringData();
+
+        fetchGradingStatistics();
+        fetchImportantDates();
+        fetchProposalData();
+        fetchDefenseData();
+        fetchPosterData();
+        fetchGradeDistribution();
+        fetchEvaluationStatus();
+        fetchTeacherScoringData();
     });
 
     // ตั้งค่า event listeners
@@ -256,6 +276,7 @@
 
 <!-- --------- Semester Change ------------- -->
 <script>
+
     async function fetchAcademicYears() {
         try {
             const response = await fetch('/api/academic-years'); // เรียก API
@@ -269,7 +290,7 @@
             data.forEach(year => {
                 const option = document.createElement("option");
                 option.value = year;
-                option.textContent = "🗓︎ "+year;
+                option.textContent = "📆 "+year;
                 // option.innerHTML = `<!--<i class='far fa-calendar'></i> ${year} <i class='fas fa-chevron-down dropdown-arrow'></i>-->`;
                 semesterSelector.appendChild(option);
             });
@@ -289,11 +310,23 @@
             const defaultYear = currentMonth <= 8 ? currentYear - 1 : currentYear;
 
             // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
-            if (data.includes(defaultYear.toString())) {
+            // if (data.includes(defaultYear.toString())) {
+            //     semesterSelector.value = defaultYear.toString();
+            // } else {
+            //     semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+            // }
+
+            // ตรวจสอบว่าผู้ใช้เคยเลือกปีไว้หรือไม่
+            const savedSemester = localStorage.getItem("selectedSemester");
+
+            if (savedSemester && data.includes(savedSemester)) {
+                semesterSelector.value = savedSemester;
+            } else if (data.includes(defaultYear.toString())) {
                 semesterSelector.value = defaultYear.toString();
             } else {
-                semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+                semesterSelector.selectedIndex = 0;
             }
+
 
             // เรียก fetchGradingStatistics เพื่อส่งค่า initial ปีไป
             await fetchGradingStatistics();
@@ -392,7 +425,6 @@
         }
     }
 
-
     function updateGradingByProgram(program) {
         console.log("📌 Data before filter:", gradingData);
 
@@ -407,54 +439,51 @@
             filteredData = gradingData.filter(item => item.program === program);
         }
 
-        // Use proposalEvaluation and defenseEvaluation from gradingSummary
+        // Use evaluations from gradingSummary
         const proposalEvaluation = gradingSummary.proposalEvaluation || [];
         const defenseEvaluation = gradingSummary.defenseEvaluation || [];
 
-        // Calculate number of students with valid grades from both evaluations
-        const successfulStudents = filteredData.filter(item => {
-            const hasValidProposalGrade = proposalEvaluation.some(proposal => proposal.student.studentId === item.studentId && proposal.gradeResult !== "I");
-            const hasValidDefenseGrade = defenseEvaluation.some(defense => defense.studentId.studentId === item.studentId && defense.gradeResult !== "I");
+        // Proposal: นักศึกษาที่มี gradeResult ไม่ใช่ "I"
+        const successfulProposal = filteredData.filter(item =>
+            proposalEvaluation.some(proposal =>
+                proposal.student.studentId === item.studentId && proposal.gradeResult !== "I"
+            )
+        );
 
-            return hasValidProposalGrade || hasValidDefenseGrade;  // If either evaluation has a valid grade
-        });
+        // Defense: นักศึกษาที่มี gradeResult ไม่ใช่ "I"
+        const successfulDefense = filteredData.filter(item =>
+            defenseEvaluation.some(defense =>
+                defense.studentId.studentId === item.studentId && defense.gradeResult !== "I"
+            )
+        );
 
-        const successfulCount = successfulStudents.length;
-        const totalCount = filteredData.length;  // Total count after filtering by program
+        const totalCount = filteredData.length;
 
-        console.log(`📊 ${program} - จำนวนที่สำเร็จ: ${successfulCount}/${totalCount}`);
-        updateGradingCards(successfulCount, totalCount, program); // Update the card with successful count
+        console.log(`📊 ${program} - Proposal: ${successfulProposal.length}/${totalCount}`);
+        console.log(`📊 ${program} - Defense: ${successfulDefense.length}/${totalCount}`);
+
+        updateGradingCards(successfulProposal.length, successfulDefense.length, totalCount, program);
     }
 
+    function updateGradingCards(proposalCount, defenseCount, totalCount, program) {
+        console.log("🎞️ Proposal:", proposalCount, "Defense:", defenseCount);
 
-    function updateGradingCards(successfulCount, totalCount, program) {
-        console.log("🎞️ จำนวนที่สำเร็จ: " + successfulCount);
-
-        // คำนวณและอัปเดตข้อมูลที่แสดงในการ์ด
-        const proposalCard = document.querySelector('.card-wrapper .header-container:nth-child(1)');
+        // Update Proposal Grades (ใบที่ 2)
+        const proposalCard = document.querySelector('.card-wrapper .header-container:nth-child(2)');
         if (proposalCard) {
             const headingEl = proposalCard.querySelector('.text-center h1');
-            // const footerEl = proposalCard.querySelector('.text-footer');
-
             if (headingEl) {
-                headingEl.innerHTML = `${successfulCount}/${totalCount} <span style="color: #919EAB;"> Students </span>`;
+                headingEl.innerHTML = `${proposalCount}/${totalCount} <span style="color: #919EAB;"> Students </span>`;
             }
-            // if (footerEl) {
-            //     footerEl.innerHTML = `${successfulCount} <span style="color: #919EAB;"> completed </span>`;
-            // }
         }
 
-        const defenseCard = document.querySelector('.card-wrapper .header-container:nth-child(2)');
+        // Update Defense Grades (ใบที่ 5)
+        const defenseCard = document.querySelector('.card-wrapper .header-container:nth-child(5)');
         if (defenseCard) {
             const headingEl = defenseCard.querySelector('.text-center h1');
-            // const footerEl = defenseCard.querySelector('.text-footer');
-
             if (headingEl) {
-                headingEl.innerHTML = `${successfulCount}/${totalCount} <span style="color: #919EAB;"> Students </span>`;
+                headingEl.innerHTML = `${defenseCount}/${totalCount} <span style="color: #919EAB;"> Students </span>`;
             }
-            // if (footerEl) {
-            //     footerEl.innerHTML = `${successfulCount} <span style="color: #919EAB;"> completed </span>`;
-            // }
         }
     }
 </script>
@@ -782,7 +811,7 @@
 
             if (daysRemaining === 0) {
                 statusClass = "timeline-expired";
-                statusText = "⏳ กำหนดการสิ้นสุดแล้ว!";
+                statusText = "✅ กำหนดการสิ้นสุดแล้ว!";
             } else if (daysRemaining <= 7) {
                 statusClass = "timeline-urgent";
             } else if (daysRemaining >= 30) {
@@ -929,6 +958,8 @@
 
 <!-- ------- Instructor scoring --------- -->
 <script>
+    const unitLabel = evaType === "Poster" ? "กลุ่ม" : "คน";
+
     async function fetchTeacherScoringData() {
         try {
             const activeFilter = document.querySelector('.filter.active').textContent.trim();
@@ -1007,41 +1038,76 @@
                         legend: {
                             position: 'top',
                         },
+                        // tooltip: {
+                        //     callbacks: {
+                        //         // แสดงชื่ออาจารย์
+                        //         title: function(tooltipItems) {
+                        //             return tooltipItems[0].label;
+                        //         },
+                        //         // แสดงข้อมูลรวม
+                        //         afterTitle: function(context) {
+                        //             const index = context[0].dataIndex;
+                        //             return `สรุปข้อมูลการประเมิน:`;
+                        //         },
+                        //         // แสดงข้อมูลของแต่ละส่วน
+                        //         label: function(context) {
+                        //             const index = context.dataIndex;
+                        //             const datasetIndex = context.datasetIndex;
+                        //
+                        //             // เลือกแสดงข้อมูลตาม dataset ที่ผู้ใช้ชี้
+                        //             if (datasetIndex === 0) {
+                        //                 return `ประเมินแล้ว: ${completedCounts[index]} คน`;
+                        //             } else {
+                        //                 return `ยังไม่ได้ประเมิน: ${remainingCounts[index]} คน`;
+                        //             }
+                        //         },
+                        //         // เพิ่มข้อมูลสรุปหลังจาก label
+                        //         afterLabel: function(context) {
+                        //             const index = context.dataIndex;
+                        //             const totalAssigned = totalAssignedCounts[index];
+                        //             const completed = completedCounts[index];
+                        //             const remaining = remainingCounts[index];
+                        //             const percentComplete = totalAssigned > 0
+                        //                 ? Math.round((completed / totalAssigned) * 100)
+                        //                 : 0;
+                        //
+                        //             return [
+                        //                 `จำนวนทั้งหมด: ${totalAssigned} คน`,
+                        //                 `ความคืบหน้า: ${percentComplete}%`
+                        //             ];
+                        //         }
+                        //     }
+                        // }
                         tooltip: {
                             callbacks: {
-                                // แสดงชื่ออาจารย์
                                 title: function(tooltipItems) {
                                     return tooltipItems[0].label;
                                 },
-                                // แสดงข้อมูลรวม
                                 afterTitle: function(context) {
-                                    const index = context[0].dataIndex;
                                     return `สรุปข้อมูลการประเมิน:`;
                                 },
-                                // แสดงข้อมูลของแต่ละส่วน
                                 label: function(context) {
                                     const index = context.dataIndex;
                                     const datasetIndex = context.datasetIndex;
+                                    const unitLabel = evaType === "Poster" ? "กลุ่ม" : "คน";
 
-                                    // เลือกแสดงข้อมูลตาม dataset ที่ผู้ใช้ชี้
                                     if (datasetIndex === 0) {
-                                        return `ประเมินแล้ว: ${completedCounts[index]} คน`;
+                                        return `ประเมินแล้ว: ${completedCounts[index]} ${unitLabel}`;
                                     } else {
-                                        return `ยังไม่ได้ประเมิน: ${remainingCounts[index]} คน`;
+                                        return `ยังไม่ได้ประเมิน: ${remainingCounts[index]} ${unitLabel}`;
                                     }
                                 },
-                                // เพิ่มข้อมูลสรุปหลังจาก label
                                 afterLabel: function(context) {
                                     const index = context.dataIndex;
                                     const totalAssigned = totalAssignedCounts[index];
                                     const completed = completedCounts[index];
-                                    const remaining = remainingCounts[index];
                                     const percentComplete = totalAssigned > 0
                                         ? Math.round((completed / totalAssigned) * 100)
                                         : 0;
+                                    const unitLabel = evaType === "Poster" ? "กลุ่ม" : "คน";
 
                                     return [
-                                        `จำนวนทั้งหมด: ${totalAssigned} คน`,
+                                        `จำนวนทั้งหมด: ${totalAssigned} ${unitLabel}`,
                                         `ความคืบหน้า: ${percentComplete}%`
                                     ];
                                 }

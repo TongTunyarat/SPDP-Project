@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Give Score Proposal Evaluation</title>
+    <title>Score Poster Evaluation</title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="/css/sidebar-instructor.css">
@@ -222,8 +222,8 @@
                     </g>
                 </g>
             </svg> Grades (60%) </h4>
-            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Proposal Grade</a></li>
-            <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Defense Grade</a></li>
+            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Senior Project 1</a></li>
+            <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Senior Project 2</a></li>
         </ul>
     </div>
 
@@ -663,7 +663,22 @@
             return; // Stop execution and don't show the confirmation modal
         }
 
+        // Show the modal
         document.getElementById("confirmationModal").style.display = "block";
+
+        // Get references to buttons
+        const confirmBtn = document.getElementById("confirmSave");
+        const cancelBtn = document.getElementById("cancelSave");
+        const closeBtn = document.getElementById("closeModal");
+
+        // Remove existing event listeners by cloning and replacing the buttons
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        const newCancelBtn = cancelBtn.cloneNode(true);
+        const newCloseBtn = closeBtn.cloneNode(true);
+
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+        closeBtn.parentNode.replaceChild(newCloseBtn, closeBtn);
 
         document.getElementById("confirmSave").addEventListener('click', function() {
             document.getElementById("confirmationModal").style.display = "none";
@@ -783,6 +798,7 @@
         document.getElementById("closeModal").addEventListener('click', function() {
             document.getElementById("confirmationModal").style.display = "none";
         });
+
     });
 
 </script>

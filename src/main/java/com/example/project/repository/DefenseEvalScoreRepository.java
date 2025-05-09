@@ -4,6 +4,7 @@ import com.example.project.DTO.DefenseEvaResponseDTO;
 import com.example.project.entity.DefenseEvalScore;
 import com.example.project.entity.ProposalEvalScore;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -37,4 +38,13 @@ public interface DefenseEvalScoreRepository extends JpaRepository<DefenseEvalSco
 
     // สำหรับการค้นหาข้อมูลที่ return เป็น Entity
     List<DefenseEvalScore> findByDefenseEvaluation_ProjectId_ProjectId(String projectId);
+
+    @Modifying
+    @Query("""
+    DELETE FROM DefenseEvalScore des
+    WHERE des.defenseEvaluation.projectId.semester = :semester
+      AND (:program IS NULL OR LOWER(des.defenseEvaluation.projectId.program) = LOWER(:program))
+  """)
+    int deleteBySemesterAndProgram(@Param("semester") String semester,
+                                   @Param("program")  String program);
 }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Give Score Proposal Evaluation</title>
+    <title>Score Proposal Evaluation</title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="/css/sidebar-instructor.css">
@@ -224,8 +224,8 @@
                     </g>
                 </g>
             </svg> Grades (60%) </h4>
-            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Proposal Grade</a></li>
-            <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Defense Grade</a></li>
+            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Senior Project 1</a></li>
+            <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Senior Project 2</a></li>
         </ul>
     </div>
 
@@ -1147,14 +1147,33 @@
         // Show the modal
         modal.style.display = "block";
 
-        // ถ้าผู้ใช้กดปิด modal
-        closeButton.addEventListener('click', function () {
-            modal.style.display = "none"; // ซ่อน modal
+        const newCloseButton = closeButton.cloneNode(true);
+        const newConfirmSaveButton = confirmSaveButton.cloneNode(true);
+        const newCancelSaveButton = cancelSaveButton.cloneNode(true);
+
+        closeButton.parentNode.replaceChild(newCloseButton, closeButton);
+        confirmSaveButton.parentNode.replaceChild(newConfirmSaveButton, confirmSaveButton);
+        cancelSaveButton.parentNode.replaceChild(newCancelSaveButton, cancelSaveButton);
+
+        // Update references
+        const closeBtn = document.getElementById('closeModal');
+        const confirmBtn = document.getElementById('confirmSave');
+        const cancelBtn = document.getElementById('cancelSave');
+
+        // Add new event listeners
+        closeBtn.addEventListener('click', function() {
+            modal.style.display = "none";
         });
 
+
+        cancelBtn.addEventListener('click', function() {
+            modal.style.display = "none";
+        });
+
+
         // ถ้าผู้ใช้กดยืนยันการบันทึกคะแนน
-        confirmSaveButton.addEventListener('click', function () {
-            modal.style.display = "none"; // ซ่อน modal
+        confirmBtn.addEventListener('click', function() {
+            modal.style.display = "none";
 
             // ===== projectId ===== //
             var projectId = getProjectIdFromURL();
@@ -1266,19 +1285,13 @@
                 showNotification("Evaluation saved successfully!", function() {
                     window.location.href = "/show-proposal-eva-projects";
                 });
-
-                // แสดงข้อความ alert ว่าการบันทึกสำเร็จ
-                // alert('Evaluation saved successfully!');
-
-                // เปลี่ยน path ไปที่ /show-proposal-eva-projects
-                // window.location.href = '/show-proposal-eva-projects';
             }
         });
 
         // ถ้าผู้ใช้กดยกเลิกการบันทึก
-        cancelSaveButton.addEventListener('click', function () {
-            modal.style.display = "none"; // ซ่อน modal
-        });
+        // cancelSaveButton.addEventListener('click', function () {
+        //     modal.style.display = "none"; // ซ่อน modal
+        // });
     });
 </script>
 

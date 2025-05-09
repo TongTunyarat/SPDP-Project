@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proposal Grade Report</title>
+    <title>Timeliness Score</title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="/css/sidebar-admin.css">
@@ -132,6 +132,17 @@
 
 <!-- Semester Change -->
 <script>
+    const semesterSelect = document.getElementById("semester-selector");
+    semesterSelect.addEventListener("change", function () {
+        console.log("Selected Semester:", semesterSelect.value);
+
+        localStorage.setItem("selectedSemester", semesterSelect.value);
+
+        fetchProposalGrades();
+        fetchTimelineScores();
+
+    });
+
     async function fetchAcademicYears() {
         try {
             const response = await fetch('/api/academic-years');
@@ -147,16 +158,39 @@
                 semesterSelector.appendChild(option);
             });
 
-            const currentDate = new Date();
-            const currentYear = currentDate.getFullYear();
-            const currentMonth = currentDate.getMonth() + 1;
-            const defaultYear = currentMonth <= 8 ? currentYear - 1 : currentYear;
+            // ดึงค่าปีจาก localStorage (จากหน้า Dashboard)
+            const savedSemester = localStorage.getItem("selectedSemester");
 
-            if (data.includes(defaultYear.toString())) {
-                semesterSelector.value = defaultYear.toString();
+            // ถ้ามีค่า savedSemester ใน localStorage ให้ตั้งค่าเป็นค่าที่เก็บไว้
+            if (savedSemester && data.includes(savedSemester)) {
+                semesterSelector.value = savedSemester;
             } else {
-                semesterSelector.selectedIndex = 0;
+                // ถ้าไม่มีค่าจาก localStorage ใช้ปี default
+                const currentDate = new Date();
+                const currentYear = currentDate.getFullYear();
+                const currentMonth = currentDate.getMonth() + 1; // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
+
+                // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
+                const defaultYear = currentMonth <= 8 ? currentYear - 1 : currentYear;
+
+                // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
+                if (data.includes(defaultYear.toString())) {
+                    semesterSelector.value = defaultYear.toString();
+                } else {
+                    semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+                }
             }
+
+            // const currentDate = new Date();
+            // const currentYear = currentDate.getFullYear();
+            // const currentMonth = currentDate.getMonth() + 1;
+            // const defaultYear = currentMonth <= 8 ? currentYear - 1 : currentYear;
+            //
+            // if (data.includes(defaultYear.toString())) {
+            //     semesterSelector.value = defaultYear.toString();
+            // } else {
+            //     semesterSelector.selectedIndex = 0;
+            // }
 
             await fetchProposalGrades();
 
@@ -293,24 +327,33 @@
                 if (isFirstStudent) {
                     const prefix = project.projectId.match(/^(ICT|DST)/)?.[0] || '';
                     const remainingId = project.projectId.substring(prefix.length);
+                    const maxScore = maxScoreMap[project.projectId];
 
                     row.innerHTML = `
-                        <td rowspan="${project.students.length}">${remainingId}<br>
-                            <div class="${prefix.toLowerCase()}-badge">${prefix}</div>
-                        </td>
-                        <td rowspan="${project.students.length}">${project.projectTitle}</td>
-                        <td rowspan="${project.students.length}">${project.advisor}</td>
-                        <td><input type="number" min="0" max="10" class="timeline-input"
-                            value="${timelineScoresMap[project.projectId] ?? ''}"
-                            data-project-id="${project.projectId}"></td>
-                    `;
+                    <td rowspan="${project.students.length}">${remainingId}<br>
+                        <div class="${prefix.toLowerCase()}-badge">${prefix}</div>
+                    </td>
+                    <td rowspan="${project.students.length}">${project.projectTitle}</td>
+                    <td rowspan="${project.students.length}">${project.advisor}</td>
+                    <td>
+                        <input type="number" min="0" max="${maxScore}" class="timeline-input"
+                        value="${timelineScoresMap[project.projectId] ?? ''}"
+                        data-project-id="${project.projectId}"
+                        data-max-score="${maxScore}">
+                        <small class="max-score-label">(Max: ${maxScore})</small>
+                    </td>
+                `;
                 }
 
                 tableBody.appendChild(row);
                 isFirstStudent = false;
             });
         });
+
+        addInputValidation();
     }
+
+    let maxScoreMap = {};
 
     function fetchTimelineScores() {
         const selectedYear = document.getElementById("semester-selector").value;
@@ -327,9 +370,15 @@
             .then(response => response.json())
             .then(data => {
                 timelineScoresMap = {};
+                maxScoreMap = {}; // Reset max scores
+
                 data.forEach(score => {
                     timelineScoresMap[score.projectId] = score.timelineScore;
+                    maxScoreMap[score.projectId] = score.maxScore; // Store maxScore for each project
                 });
+                // data.forEach(score => {
+                //     timelineScoresMap[score.projectId] = score.timelineScore;
+                // });
 
                 // หลังจากได้ timeline scores มาแล้ว ให้กรองข้อมูลตาม program อีกครั้ง
                 const activeProgram = document.querySelector('.tab.active').textContent;
@@ -378,10 +427,151 @@
 
 </script>
 
-
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <!-- Save Score -->
 <script>
+
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add CSS styling for invalid scores
+        const styleElement = document.createElement('style');
+        styleElement.textContent = `
+        .invalid-score {
+            border: 2px solid #ff0000 !important;
+            background-color: rgba(255, 0, 0, 0.1) !important;
+            color: #ff0000;
+        }
+
+        .invalid-score:focus {
+            outline-color: #ff0000;
+        }
+
+        .invalid-score-alert {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.2);
+            z-index: 1000;
+            max-width: 80%;
+        }
+    `;
+        document.head.appendChild(styleElement);
+
+        // The rest of this function will be called by your existing DOMContentLoaded handler
+    });
+
+    // Add this to your renderGroupedTable function after creating the input elements
+    function addInputValidation() {
+        const inputs = document.querySelectorAll(".timeline-input");
+
+        inputs.forEach(input => {
+            // Remove any existing event listeners by cloning and replacing
+            const newInput = input.cloneNode(true);
+            input.parentNode.replaceChild(newInput, input);
+
+            // Add new event listener for validation
+            newInput.addEventListener("input", function() {
+                const maxScore = parseFloat(this.getAttribute("data-max-score"));
+                let value = parseFloat(this.value);
+
+                if (isNaN(value)) {
+                    this.classList.remove("invalid-score");
+                    this.title = "";
+                } else if (value > maxScore) {
+                    this.classList.add("invalid-score");
+                    this.title = `Maximum score is ${maxScore}`;
+                } else if (value < 0) {
+                    this.classList.add("invalid-score");
+                    this.title = "Score cannot be negative";
+                } else {
+                    this.classList.remove("invalid-score");
+                    this.title = "";
+                }
+            });
+        });
+    }
+
+    function checkForInvalidScores() {
+        const inputs = document.querySelectorAll('.timeline-input');
+        const invalidScores = [];
+
+        inputs.forEach(input => {
+            const value = parseFloat(input.value);
+            const maxScore = parseFloat(input.getAttribute('data-max-score'));
+            const projectId = input.getAttribute('data-project-id');
+
+            // Only check fields that have values entered
+            if (!isNaN(value) && input.value !== '') {
+                if (value > maxScore || value < 0) {
+                    invalidScores.push({
+                        projectId: projectId,
+                        value: input.value,
+                        maxScore: maxScore
+                    });
+                }
+            }
+        });
+
+        return invalidScores;
+    }
+
     function saveScores() {
+        const invalidScores = checkForInvalidScores();
+
+        if (invalidScores.length > 0) {
+            // Create and show invalid score alert
+            const invalidScoreAlert = document.createElement('div');
+            invalidScoreAlert.className = 'invalid-score-alert';
+
+            let alertContent = '<h3 style="margin-top:0">⚠️ Invalid Scores Detected</h3>';
+            alertContent += '<p>Cannot save scores. Please correct the following:</p><ul>';
+
+            invalidScores.forEach(item => {
+                // Determine the problem with the score
+                let problem = "";
+                if (parseFloat(item.value) > parseFloat(item.maxScore)) {
+                    problem = `Maximum score is ${item.maxScore}`;
+                } else if (parseFloat(item.value) < 0) {
+                    problem = "Score cannot be negative";
+                } else {
+                    problem = "Invalid score";
+                }
+
+                alertContent += `
+                <li style="margin-bottom: 10px;">
+                    <div><strong>${item.projectId}</strong></div>
+                    <div style="color: #dc3545;">Score: ${item.value} - <strong>${problem}</strong></div>
+                </li>
+            `;
+            });
+
+            alertContent += '</ul>';
+            alertContent += '<button id="closeInvalidAlert" style="background-color:#dc3545;color:white;border:none;padding:8px 15px;border-radius:4px;cursor:pointer;float:right">Close</button>';
+            alertContent += '<div style="clear:both"></div>';
+
+            invalidScoreAlert.innerHTML = alertContent;
+            document.body.appendChild(invalidScoreAlert);
+
+            // Add event listener to close button
+            document.getElementById('closeInvalidAlert').addEventListener('click', function() {
+                invalidScoreAlert.remove();
+            });
+
+            // Automatically remove after 10 seconds
+            setTimeout(() => {
+                if (document.body.contains(invalidScoreAlert)) {
+                    invalidScoreAlert.remove();
+                }
+            }, 10000);
+
+            return; // Stop execution and don't save
+        }
+
+        // Continue with the original save function if no invalid scores
         const scores = [];
         const inputs = document.querySelectorAll('.timeline-input');
 
@@ -393,7 +583,7 @@
                 scores.push({
                     projectId: projectId,
                     score: score,
-                    evaType: document.getElementById("evaTypeSelect").value  // ประเภทการประเมิน
+                    evaType: document.getElementById("evaTypeSelect").value
                 });
             }
         });
@@ -411,19 +601,221 @@
             body: JSON.stringify(scores)
         })
             .then(async response => {
-                const data = await response.text(); // อ่านเป็น text ก่อน
+                const data = await response.text();
                 if (!response.ok) {
-                    throw new Error(data); // ขว้าง error เพื่อให้ไปเข้า catch
+                    throw new Error(data);
                 }
                 console.log('Scores saved:', data);
-                alert("Scores saved successfully!");
+                // alert("Scores saved successfully!");
+                showAutoAlert("Timeliness score saved successfully!");
             })
             .catch(error => {
                 console.error('Error saving scores:', error);
                 alert("Failed to save scores: " + error.message);
             });
-
     }
+
+    function showAutoAlert(message, type = "success", duration = 3000) {
+        Swal.fire({
+            title: message,
+            icon: type, // "success", "error", "warning", "info", "question"
+            timer: 1000, // ปิดเองหลังจาก 3 วินาที (แก้ไขได้)
+            showConfirmButton: false, // ไม่ต้องกด OK
+            allowOutsideClick: false, // ป้องกันการคลิกเพื่อปิด
+            backdrop: true // มีพื้นหลังโปร่งแสงเหมือน alert()
+        });
+    }
+
+    // same score -------------------
+    // Add this function to your JavaScript
+    function applySameScore() {
+        // Show a dialog to get the score and criteria for applying it
+        Swal.fire({
+            title: 'Apply Same Score to Multiple Projects',
+            html: `
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label for="score-value" style="display: block; margin-bottom: 5px; font-weight: bold;">Score:</label>
+                <input id="score-value" type="number" min="0" class="swal2-input" placeholder="Enter score">
+            </div>
+            <div style="text-align: left; margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Apply to:</label>
+                <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+                    <button id="btn-all" class="swal2-confirm swal2-styled" style="margin: 0; background-color: #6c757d;">All Projects</button>
+                    <button id="btn-ict" class="swal2-confirm swal2-styled" style="margin: 0; background-color: #007bff;">ICT Only</button>
+                    <button id="btn-dst" class="swal2-confirm swal2-styled" style="margin: 0; background-color: #28a745;">DST Only</button>
+                </div>
+                <div style="display: flex; gap: 10px;">
+<!--                    <button id="btn-empty" class="swal2-confirm swal2-styled" style="margin: 0; background-color: #dc3545;">Empty Only</button>-->
+                    <button id="btn-selected" class="swal2-confirm swal2-styled" style="margin: 0; background-color: #fd7e14;">Selected Only</button>
+                </div>
+            </div>
+        `,
+            showConfirmButton: false,
+            showCancelButton: true,
+            cancelButtonText: 'Close',
+            didOpen: () => {
+                // Add event listeners to the buttons
+                document.getElementById('btn-all').addEventListener('click', () => applyScoreToProjects('all'));
+                document.getElementById('btn-ict').addEventListener('click', () => applyScoreToProjects('ict'));
+                document.getElementById('btn-dst').addEventListener('click', () => applyScoreToProjects('dst'));
+                // document.getElementById('btn-empty').addEventListener('click', () => applyScoreToProjects('empty'));
+                document.getElementById('btn-selected').addEventListener('click', () => applyScoreToProjects('selected'));
+            }
+        });
+    }
+
+    function applyScoreToProjects(criteria) {
+        const scoreValue = document.getElementById('score-value').value;
+
+        if (!scoreValue) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Missing Score',
+                text: 'Please enter a score value first',
+                timer: 2000,
+                showConfirmButton: false
+            });
+            return;
+        }
+
+        const inputs = document.querySelectorAll('.timeline-input');
+        let updatedCount = 0;
+
+        inputs.forEach(input => {
+            const maxScore = parseFloat(input.getAttribute('data-max-score'));
+            const projectId = input.getAttribute('data-project-id');
+
+            // Skip if score would be invalid
+            if (parseFloat(scoreValue) > maxScore || parseFloat(scoreValue) < 0) {
+                return;
+            }
+
+            let shouldUpdate = false;
+
+            switch(criteria) {
+                case 'all':
+                    shouldUpdate = true;
+                    break;
+                case 'ict':
+                    shouldUpdate = projectId.includes('ICT');
+                    break;
+                case 'dst':
+                    shouldUpdate = projectId.includes('DST');
+                    break;
+                // case 'empty':
+                //     shouldUpdate = input.value === '';
+                //     break;
+                case 'selected':
+                    // For selected, we'll need to check if the row is selected
+                    // We'll implement this later with checkboxes
+                    const row = input.closest('tr');
+                    shouldUpdate = row && row.classList.contains('selected-row');
+                    break;
+            }
+
+            if (shouldUpdate) {
+                input.value = scoreValue;
+                updatedCount++;
+
+                // Trigger input event for validation
+                const event = new Event('input', { bubbles: true });
+                input.dispatchEvent(event);
+            }
+        });
+
+        // Close the dialog and show success message
+        Swal.fire({
+            icon: 'success',
+            title: 'Scores Updated',
+            text: `Applied score ${scoreValue} to ${updatedCount} projects`,
+            timer: 2000,
+            showConfirmButton: false
+        });
+    }
+
+    // Add this to enable row selection for the "Selected Only" option
+    function setupRowSelection() {
+        const tableRows = document.querySelectorAll('#projectTable tr');
+
+        tableRows.forEach(row => {
+            row.addEventListener('click', function(e) {
+                // Don't toggle selection if clicking on an input
+                if (e.target.tagName === 'INPUT') return;
+
+                // Toggle selected class
+                this.classList.toggle('selected-row');
+            });
+        });
+    }
+
+    // Call this after rendering the table
+    function enhanceTable() {
+        setupRowSelection();
+
+        // Add CSS for selected rows
+        if (!document.getElementById('row-selection-styles')) {
+            const style = document.createElement('style');
+            style.id = 'row-selection-styles';
+            style.textContent = `
+            .selected-row {
+                background-color: rgba(0, 123, 255, 0.15) !important;
+                border-left: 3px solid #007bff;
+            }
+            #projectTable tr {
+                cursor: pointer;
+            }
+            #projectTable tr td input {
+                cursor: text;
+            }
+        `;
+            document.head.appendChild(style);
+        }
+    }
+
+    // Modify the renderGroupedTable function to call enhanceTable at the end
+    const originalRenderGroupedTable = renderGroupedTable;
+    renderGroupedTable = function(projects) {
+        originalRenderGroupedTable(projects);
+        enhanceTable();
+    };
+
+    // Add button to the UI
+    function addSameScoreButton() {
+        // First remove any existing same-score buttons to prevent duplicates
+        const existingButtons = document.querySelectorAll('.same-score-button');
+        existingButtons.forEach(button => button.remove());
+
+        const saveButton = document.querySelector('.save-button');
+        if (saveButton) {
+            const sameScoreButton = document.createElement('button');
+            sameScoreButton.className = 'same-score-button';
+            sameScoreButton.innerHTML = 'Apply Same Score';
+            sameScoreButton.onclick = applySameScore;
+            sameScoreButton.style.marginRight = '10px';
+            sameScoreButton.style.backgroundColor = '#17a2b8';
+            sameScoreButton.style.color = 'white';
+            sameScoreButton.style.border = 'none';
+            sameScoreButton.style.padding = '8px 16px';
+            sameScoreButton.style.borderRadius = '4px';
+            sameScoreButton.style.cursor = 'pointer';
+
+            saveButton.parentNode.insertBefore(sameScoreButton, saveButton);
+        }
+    }
+
+    // Call this when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        // Wait a bit for the original UI to render
+        setTimeout(addSameScoreButton, 500);
+    });
+
+    // Also call when the table is reloaded
+    const originalFetchProposalGrades = fetchProposalGrades;
+    fetchProposalGrades = function() {
+        return originalFetchProposalGrades().then(() => {
+            setTimeout(addSameScoreButton, 200);
+        });
+    };
 </script>
 
 

@@ -190,7 +190,6 @@ public class TimelinessScoring {
         return ResponseEntity.ok(responseList);
     }
 
-
 //    @PostMapping("/api/save/timeliness")
 //    public ResponseEntity<String> saveTimelinessScore(@RequestBody List<TimelinessRequest> requests) {
 //        try {
@@ -208,19 +207,21 @@ public class TimelinessScoring {
 //                        continue;
 //                    }
 //
-//                    ProposalEvaluation proposalEvaluation = existingEvas.get(0);
-//                    // หา EvalScore เดิมที่ตรงกับ criteria CRIT006
-//                    Optional<ProposalEvalScore> existingScoreOpt = proposalEvaluation.getProposalEvalScores()
-//                            .stream()
-//                            .filter(score -> score.getCriteria() != null && "CRIT006".equals(score.getCriteria().getCriteriaId()))
-//                            .findFirst();
+//                    // Loop through all ProposalEvaluation objects
+//                    for (ProposalEvaluation proposalEvaluation : existingEvas) {
+//                        Optional<ProposalEvalScore> existingScoreOpt = proposalEvaluation.getProposalEvalScores()
+//                                .stream()
+//                                .filter(score -> score.getCriteria() != null && "CRIT006".equals(score.getCriteria().getCriteriaId()))
+//                                .findFirst();
 //
-//                    if (existingScoreOpt.isPresent()) {
-//                        ProposalEvalScore existingScore = existingScoreOpt.get();
-//                        existingScore.setScore(new BigDecimal(scoreStr));
-//                        proposalEvalScoreRepository.save(existingScore);
-//                    } else {
-//                        continue; // ไม่สร้างใหม่
+//                        if (existingScoreOpt.isPresent()) {
+//                            ProposalEvalScore existingScore = existingScoreOpt.get();
+//                            existingScore.setScore(new BigDecimal(scoreStr));
+//                            proposalEvalScoreRepository.save(existingScore);
+//                        } else {
+//                            // ไม่สร้างใหม่
+//                            continue;
+//                        }
 //                    }
 //
 //                } else if (evaType.equals("Defense")) {
@@ -230,18 +231,21 @@ public class TimelinessScoring {
 //                        continue;
 //                    }
 //
-//                    DefenseEvaluation defenseEvaluation = existingEvas.get(0);
-//                    Optional<DefenseEvalScore> existingScoreOpt = defenseEvaluation.getDefenseEvalScore()
-//                            .stream()
-//                            .filter(score -> score.getCriteria() != null && "CRIT012".equals(score.getCriteria().getCriteriaId()))
-//                            .findFirst();
+//                    // Loop through all DefenseEvaluation objects
+//                    for (DefenseEvaluation defenseEvaluation : existingEvas) {
+//                        Optional<DefenseEvalScore> existingScoreOpt = defenseEvaluation.getDefenseEvalScore()
+//                                .stream()
+//                                .filter(score -> score.getCriteria() != null && "CRIT012".equals(score.getCriteria().getCriteriaId()))
+//                                .findFirst();
 //
-//                    if (existingScoreOpt.isPresent()) {
-//                        DefenseEvalScore existingScore = existingScoreOpt.get();
-//                        existingScore.setScore(Float.parseFloat(scoreStr));
-//                        defenseEvalScoreRepository.save(existingScore);
-//                    } else {
-//                        continue; // ไม่สร้างใหม่
+//                        if (existingScoreOpt.isPresent()) {
+//                            DefenseEvalScore existingScore = existingScoreOpt.get();
+//                            existingScore.setScore(Float.parseFloat(scoreStr));
+//                            defenseEvalScoreRepository.save(existingScore);
+//                        } else {
+//                            // ไม่สร้างใหม่
+//                            continue;
+//                        }
 //                    }
 //                }
 //            }
@@ -261,14 +265,11 @@ public class TimelinessScoring {
 
                 if (evaType.equals("Proposal")) {
                     List<ProposalEvaluation> existingEvas = proposalEvaluationRepository.findByProject_ProjectId(projectId);
-                    System.out.println("💩💩 existingEvas");
-                    System.out.println(existingEvas);
 
                     if (existingEvas == null || existingEvas.isEmpty()) {
                         continue;
                     }
 
-                    // Loop through all ProposalEvaluation objects
                     for (ProposalEvaluation proposalEvaluation : existingEvas) {
                         Optional<ProposalEvalScore> existingScoreOpt = proposalEvaluation.getProposalEvalScores()
                                 .stream()
@@ -280,8 +281,19 @@ public class TimelinessScoring {
                             existingScore.setScore(new BigDecimal(scoreStr));
                             proposalEvalScoreRepository.save(existingScore);
                         } else {
-                            // ไม่สร้างใหม่
-                            continue;
+                            // ✅ สร้างใหม่ ถ้าไม่มี
+                            ProposalEvalScore newScore = new ProposalEvalScore();
+                            String evaId = proposalEvaluation.getProposalId() + "_CRIT006"; // หรือใช้ projectId ก็ได้
+                            newScore.setEvaId(evaId);
+                            newScore.setScore(new BigDecimal(scoreStr));
+
+                            Criteria criteria = criteriaRepository.findById("CRIT006").orElse(null);
+                            if (criteria == null) continue;
+
+                            newScore.setCriteria(criteria);
+                            newScore.setProposalEvaluation(proposalEvaluation);
+
+                            proposalEvalScoreRepository.save(newScore);
                         }
                     }
 
@@ -292,7 +304,6 @@ public class TimelinessScoring {
                         continue;
                     }
 
-                    // Loop through all DefenseEvaluation objects
                     for (DefenseEvaluation defenseEvaluation : existingEvas) {
                         Optional<DefenseEvalScore> existingScoreOpt = defenseEvaluation.getDefenseEvalScore()
                                 .stream()
@@ -304,18 +315,30 @@ public class TimelinessScoring {
                             existingScore.setScore(Float.parseFloat(scoreStr));
                             defenseEvalScoreRepository.save(existingScore);
                         } else {
-                            // ไม่สร้างใหม่
-                            continue;
+                            // ✅ สร้างใหม่ ถ้าไม่มี
+                            DefenseEvalScore newScore = new DefenseEvalScore();
+                            String evaId = defenseEvaluation.getDefenseEvaId() + "_CRIT012";
+                            newScore.setEvalId(evaId);
+                            newScore.setScore(Float.parseFloat(scoreStr));
+
+                            Criteria criteria = criteriaRepository.findById("CRIT012").orElse(null);
+                            if (criteria == null) continue;
+
+                            newScore.setCriteria(criteria);
+                            newScore.setDefenseEvaluation(defenseEvaluation);
+
+                            defenseEvalScoreRepository.save(newScore);
                         }
                     }
                 }
             }
 
-            return ResponseEntity.ok("Scores updated where applicable.");
+            return ResponseEntity.ok("Scores updated or created where applicable.");
         } catch (Exception e) {
             return ResponseEntity.badRequest().body("Error: " + e.getMessage());
         }
     }
+
 
 
 

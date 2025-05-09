@@ -228,8 +228,8 @@
                     </g>
                 </g>
             </svg> Grades (60%) </h4>
-            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Proposal Grade</a></li>
-            <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Defense Grade</a></li>
+            <li><a href="/show-proposal-grade-projects" data-period="proposalGrade">Senior Project 1</a></li>
+            <li><a href="/show-defense-grade-projects" data-period="defenseGrade">Senior Project 2</a></li>
         </ul>
     </div>
     <!--    <div class="sidebar">-->
@@ -336,6 +336,18 @@
 </html>
 
 <script>
+
+
+    const semesterSelect = document.getElementById("semester-selector");
+    semesterSelect.addEventListener("change", function () {
+        console.log("Selected Semester:", semesterSelect.value);
+
+        localStorage.setItem("selectedSemester", semesterSelect.value);
+
+        fetchData();
+
+    });
+
 
     // ------ Script for search function ------- //
     document.getElementById('search-keyword').addEventListener('input', function () {
@@ -499,24 +511,32 @@
         semesters.forEach(semester => {
             const option = document.createElement("option");
             option.value = semester;
-            option.textContent = `🗓︎ ${semester}`;
+            option.textContent = `📆 ${semester}`;
             semesterSelector.appendChild(option);
         });
 
-        // ตรวจสอบเดือนปัจจุบัน
-        const currentDate = new Date();
-        const currentYear = currentDate.getFullYear();
-        const currentMonth = currentDate.getMonth() + 1; // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
+        const savedSemester = localStorage.getItem("selectedSemester");
 
-        // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
-        const defaultYear = currentMonth <= 6 ? currentYear - 1 : currentYear;
-
-        // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
-        if (semesters.includes(defaultYear.toString())) {
-            semesterSelector.value = defaultYear.toString();
+        if (savedSemester && semesters.includes(savedSemester)) {
+            semesterSelector.value = savedSemester;
         } else {
-            semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+            // ตรวจสอบเดือนปัจจุบัน
+            const currentDate = new Date();
+            const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth() + 1; // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
+
+            // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
+            const defaultYear = currentMonth <= 6 ? currentYear - 1 : currentYear;
+
+            // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
+            if (semesters.includes(defaultYear.toString())) {
+                semesterSelector.value = defaultYear.toString();
+            } else {
+                semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+            }
         }
+
+
     }
 
     // ฟังก์ชันกรองข้อมูลตาม semester ที่เลือก

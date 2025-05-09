@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Proposal Grade Report</title>
+    <title>Defense Grade Report</title>
 
     <!-- CSS -->
     <link rel="stylesheet" href="/css/sidebar-admin.css">
@@ -31,8 +31,9 @@
             </svg> Homepage </h4>
             <li><a href="/admin-dashboard">Dashboard</a></li>
             <li><a href="/admin-proposal-report">Proposal Grade Report</a></li>
-            <li><a href="/admin-defense-report" class="active">Defense Grade Report</a></li>
+            <li><a href="/admin-defense-report" class="active" >Defense Grade Report</a></li>
             <li><a href="/admin-eva-traking">Evaluation Tracking</a></li>
+            <li><a href="/admin-timeliness-scoring">Timeliness Scoring</a></li>
         </ul>
 
         <h2> Pages </h2>
@@ -59,7 +60,7 @@
             <li><a href="/admin/proposalSchedule">Proposal Schedule</a></li>
             <li><a href="/admin/editProposalSchedulePage">Edit Proposal Timing</a></li>
             <li><a href="/admin/defenseSchedule">Defense Schedule</a></li>
-            <li><a href="#">Edit Defense Timing</a></li>
+            <li><a href="/admin/editDefenseSchedulePage">Edit Defense Timing</a></li>
         </ul>
 
         <ul>
@@ -130,6 +131,17 @@
 
 <!-- --------- Semester Change ------------- -->
 <script>
+    // ดึงค่าที่เลือกจาก Dropdown (สามารถใช้ค่าที่เลือกไปทำอย่างอื่นได้)
+    const semesterSelect = document.getElementById("semester-selector");
+    semesterSelect.addEventListener("change", function () {
+        console.log("Selected Semester:", semesterSelect.value);
+
+        localStorage.setItem("selectedSemester", semesterSelect.value);
+
+        fetchProposalGrades();
+
+    });
+
     async function fetchAcademicYears() {
         try {
             const response = await fetch('/api/academic-years'); // เรียก API
@@ -155,21 +167,42 @@
             //
             // // เรียก fetchGradingStatistics เพื่อส่งค่า initial ปีไป
             // await fetchProposalGrades();
+            const savedSemester = localStorage.getItem("selectedSemester");
 
-            // ตรวจสอบเดือนปัจจุบัน
-            const currentDate = new Date();
-            const currentYear = currentDate.getFullYear();
-            const currentMonth = currentDate.getMonth() + 1; // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
-
-            // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
-            const defaultYear = currentMonth <= 8 ? currentYear - 1 : currentYear;
-
-            // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
-            if (data.includes(defaultYear.toString())) {
-                semesterSelector.value = defaultYear.toString();
+            // ถ้ามีค่า savedSemester ใน localStorage ให้ตั้งค่าเป็นค่าที่เก็บไว้
+            if (savedSemester && data.includes(savedSemester)) {
+                semesterSelector.value = savedSemester;
             } else {
-                semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+                // ถ้าไม่มีค่าจาก localStorage ใช้ปี default
+                const currentDate = new Date();
+                const currentYear = currentDate.getFullYear();
+                const currentMonth = currentDate.getMonth() + 1; // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
+
+                // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
+                const defaultYear = currentMonth <= 8 ? currentYear - 1 : currentYear;
+
+                // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
+                if (data.includes(defaultYear.toString())) {
+                    semesterSelector.value = defaultYear.toString();
+                } else {
+                    semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+                }
             }
+
+            // // ตรวจสอบเดือนปัจจุบัน
+            // const currentDate = new Date();
+            // const currentYear = currentDate.getFullYear();
+            // const currentMonth = currentDate.getMonth() + 1; // getMonth() คืนค่าเป็น 0-11 (มกราคม = 0, ธันวาคม = 11)
+            //
+            // // ถ้าเดือนปัจจุบัน <= 6 (ม.ค. - มิ.ย.) ให้ใช้ปีปัจจุบัน -1, ถ้าเป็น ก.ค. เป็นต้นไปให้ใช้ปีปัจจุบัน
+            // const defaultYear = currentMonth <= 8 ? currentYear - 1 : currentYear;
+            //
+            // // ตรวจสอบว่าปีที่ต้องการมีอยู่ในตัวเลือกหรือไม่
+            // if (data.includes(defaultYear.toString())) {
+            //     semesterSelector.value = defaultYear.toString();
+            // } else {
+            //     semesterSelector.selectedIndex = 0; // ถ้าไม่มีปีนั้น ให้เลือกตัวแรกแทน
+            // }
 
             // เรียก fetchGradingStatistics เพื่อส่งค่า initial ปีไป
             await fetchProposalGrades();
@@ -312,9 +345,9 @@
         groupedProjects = Object.values(projectGroups);
 
         // ถ้าข้อมูลมีน้อย ให้เพิ่มข้อมูลตัวอย่างเพื่อทดสอบ
-        if (groupedProjects.length < 3) {
-            addSampleProjects();
-        }
+        // if (groupedProjects.length < 3) {
+        //     addSampleProjects();
+        // }
     }
 
     // ฟังก์ชันแสดงข้อมูลในตารางแบบจัดกลุ่ม
@@ -542,7 +575,7 @@
         }
 
         // สร้างชื่อไฟล์ที่แสดงว่ากรองด้วย program ไหน
-        let filename = 'proposal_grades';
+        let filename = 'defense_grades';
         if (programFilter !== 'all') {
             filename += `_${programFilter}`;
         }
