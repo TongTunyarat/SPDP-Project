@@ -91,7 +91,6 @@ mysql -u springuser -p springbootdb < database/Final_Database_SeniorProject.sql
 
 ```bash
 git clone https://github.com/TongTunyarat/SPDP-Project.git
-cd SPDP-Project
 ```
 
 ---
