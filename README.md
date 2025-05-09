@@ -11,7 +11,12 @@
 * Git
 * MySQL 8.x
 * IDE เช่น IntelliJ IDEA, VS Code หรืออื่น ๆ
+  
+---
 
+### 📥 ดาวน์โหลดไฟล์ฐานข้อมูล
+
+สามารถดาวน์โหลดไฟล์ `Final_Database_SeniorProject.sql` ได้จาก [ที่นี่](https://github.com/TongTunyarat/SPDP-Project/blob/main/database/Final_Database_SeniorProject.sql)
 ---
 
 ## 🗄 การติดตั้ง MySQL
@@ -41,11 +46,7 @@ GRANT ALL PRIVILEGES ON springbootdb.* TO 'springuser'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 ```
----
 
-### 📥 ดาวน์โหลดไฟล์ฐานข้อมูล
-
-สามารถดาวน์โหลดไฟล์ `Final_Database_SeniorProject.sql` ได้จาก [ที่นี่](https://github.com/TongTunyarat/SPDP-Project/blob/main/database/Final_Database_SeniorProject.sql)
 
 ---
 
