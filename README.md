@@ -20,7 +20,7 @@
 
 ---
 
-## 🗄 การติดตั้ง MySQL - แบบ ใช้ Command
+## 🗄 การติดตั้ง MySQL
 
 ### 1. ติดตั้ง MySQL
 
@@ -47,7 +47,6 @@ GRANT ALL PRIVILEGES ON springbootdb.* TO 'springuser'@'localhost';
 FLUSH PRIVILEGES;
 EXIT;
 ```
-
 
 ---
 
