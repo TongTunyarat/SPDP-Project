@@ -76,9 +76,10 @@ mysql -u springuser -p springbootdb < database/Final_Database_SeniorProject.sql
 #### ▪️ กรณีใช้ **MySQL Workbench** (GUI):
 
 1. เปิด MySQL Workbench
-2. เชื่อมต่อฐานข้อมูลโดยใช้ user: `springuser` และ database: `springbootdb`
-3. ไปที่ **File > Open SQL Script** แล้วเลือกไฟล์ `Final_Database_SeniorProject.sql` จากโฟลเดอร์ `database`
-4. กดปุ่ม "Execute" (ไอคอนรูปสายฟ้า) เพื่อ import
+2. เชื่อมต่อฐานข้อมูลโดยใช้ โดยสร้าง MySQL Connection ใหม่ ดังนี้ user: `springuser` password: `springpass` และ database: `springbootdb`
+3. ไปที่ **Server > Data Import** แล้วเลือกไฟล์ `Final_Database_SeniorProject.sql` ที่ดาวน์โหลดมา
+4. เลือก Default Target Schema เป็น springbootdb
+5. กด Start Import
 
 > 💡 **คำแนะนำ**: ให้แน่ใจว่าไฟล์ `.sql` อยู่ในโฟลเดอร์ `database/` ของโปรเจกต์
 
